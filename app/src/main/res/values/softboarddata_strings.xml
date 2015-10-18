@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="data_name">"Name:"</string>
+    <string name="data_version">"Version:"</string>
+    <string name="data_author">"Author:"</string>
+    <string name="data_tags">"Tag added:"</string>
+    <string name="data_description">"Description:"</string>
+    <string name="data_docfile">"Doc-file:"</string>
+    <string name="data_docuri">"Doc-URI:"</string>
+    <string name="data_locale">"Locale: (Error check was not preformed!)"</string>
+    <string name="data_default_boardcolor">"Default color for board: "</string>
+    <string name="data_default_buttoncolor">"Default color for button: "</string>
+    <string name="data_default_titleslot">"Default title-slot: "</string>
+    <string name="data_titleslot_invalid">"Title-slot is not yet definied!"</string>
+    <string name="data_metacolor">"Color of active meta-keys:"</string>
+    <string name="data_lockcolor">"Color of locked meta-keys:"</string>
+    <string name="data_autocolor">"Color of activated autocaps:"</string>
+    <string name="data_touchcolor">"Color of touched buttons:"</string>
+    <string name="data_strokecolor">"Color of stroke: "</string>
+    <string name="data_typeface">"Typeface: "</string>
+    <string name="data_typeface_missing">"Cannot setup custom font:"</string>
+
+    <string name="data_entertitle">"Enter title: "</string>
+    <string name="data_gotitle">"Go title: "</string>
+    <string name="data_searchtitle">"Search title: "</string>
+    <string name="data_sendtitle">"Send title: "</string>
+    <string name="data_nexttitle">"Next title: "</string>
+    <string name="data_donetitle">"Done title: "</string>
+    <string name="data_prevtitle">"Prev title: "</string>
+    <string name="data_nonetitle">"None title: "</string>
+    <string name="data_unknowntitle">"Unknown title: "</string>
+
+    <string name="data_slot_no_id">"New slot has no ID!"</string>
+    <string name="data_slot_added">"New slot added:"</string>
+    <string name="data_board_no_id">"New board has no ID!"</string>
+    <string name="data_columns_missing">"Columns parameter is missing for board!"</string>
+    <string name="data_rows_missing">"Rows parameter is missing for board!"</string>
+    <string name="data_board_added">"New board added:"</string>
+    <string name="data_align_bad_parameter">"Align parameter cannot be identified!"</string>
+    <string name="data_board_error">"New board cannot be created with these parameters!"</string>
+    <string name="data_board_missing">"Board parameter is missing!"</string>
+    <string name="data_no_board">"Board does not exist!"</string>
+    <string name="data_boards_excluded">"All boards are excluded."</string>
+    <string name="data_none_parameters_not_allowed">"No other parameters are allowed with NONE! Parameters are skipped."</string>
+    <string name="data_cursor_set">"Cursor set"</string>
+    <string name="data_send_packet_text_override">"Packet default text was overwritten!"</string>
+    <string name="data_send_packet_key_override">"Packet default key was overwritten!"</string>
+    <string name="data_send_function_invalid">"Function token is invalid!"</string>
+    <string name="data_send_missing">"Button's function is missing!"</string>
+    <string name="data_send_one_allowed">"Only one button function is allowed!"</string>
+    <string name="data_autocaps_bad_parameter">"Auto-caps parameter cannot be identified!"</string>
+    <string name="data_autospace_bad_parameter">"Auto-space parameter cannot be identified!"</string>
+    <string name="data_erasespaces_bad_parameter">"Erase-spaces parameter cannot be identified!"</string>
+    <string name="data_meta_unknown_meta_state">"Unknown meta-state!"</string>
+    <string name="data_button_function_missing">"No function is definied for button, an empty button is set!"</string>
+    <string name="data_button_overwritten">"Previous button definition is overwritten!"</string>
+    <string name="data_button_added">"Button added:"</string>
+    <string name="data_button_error">"Cannot create button!"</string>
+    <string name="data_addlink_no_index">"Link index is missing!"</string>
+    <string name="data_addlink_invalid_index">"Link index is invalid:"</string>
+    <string name="data_addlink_board_set">"Link index is set to a board:"</string>
+    <string name="data_addlink">"Link parameter LANDSCAPE is missing!"</string>
+    <string name="data_addlink_portrait_missing">"Link parameter PORTRAIT is missing!"</string>
+    <string name="data_modify_no_id">"New modify has no ID!"</string>
+    <string name="data_modify_one_allowed">"Text and character rolls cannot be mixed! Character modify is used."</string>
+    <string name="data_modify_no_rolls">"Modify has no valid rolls!"</string>
+    <string name="data_modify_overwritten">"Previous modification data is overwritten!"</string>
+    <string name="data_modify_added">"Modification data is added."</string>
+    <string name="data_primary_board_missing">"Primary board is not defined, first board is used."</string>
+
+</resources>

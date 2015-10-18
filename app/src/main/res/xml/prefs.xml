@@ -1,0 +1,134 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+	<PreferenceCategory
+		android:title="@string/prefs_drawing">
+
+		<CheckBoxPreference
+			android:key="@string/drawing_hide_upper_key"
+			android:title="@string/drawing_hide_upper_title"
+			android:summary="@string/drawing_hide_upper_summary"
+			android:defaultValue="false" />
+
+		<CheckBoxPreference
+			android:key="@string/drawing_hide_lower_key"
+			android:title="@string/drawing_hide_lower_title"
+			android:summary="@string/drawing_hide_lower_summary"
+			android:defaultValue="false" />
+
+	</PreferenceCategory>
+
+
+
+
+
+
+/* BoardView
+
+    private int longBow = 80;
+    private int pressBow = 1;
+    private int startRepeat = 500 * 1000000;
+    private int repeatRepeat = 100 * 1000000;
+    // private boolean prefsVibrationAllowed;
+    private float prefsPressureThreshold = 1.0f;
+
+*/
+
+/* Board
+
+    public int outerRimPercent = 30;
+    public int hideTop = 0;
+    public int hideBottom = 0;
+    public int landscapeOffsetPercent = 30;
+
+    - ez miért nem boardview-ban van? -
+    public boolean displayTouch = true;
+    public boolean displayStroke = true;
+
+    screenHeightInPixels *= 3;
+    screenHeightInPixels /= 4;
+
+*/
+
+/*
+    Primary debug
+*/
+
+/* SoftBoardService
+
+    public static String coatFileName = "coat.txt"; // .descriptor
+    public static final String WORKING_DIRECTORY = "_bestboard";
+
+*/
+
+
+
+
+
+
+
+    <PreferenceCategory
+		android:title="@string/prefs_pressure">
+
+		<EditTextPreference
+			android:key="@string/pressure_key"
+			android:inputType="numberDecimal"
+			android:title="@string/pressure_title"
+			android:summary="@string/pressure_summary"
+			android:dialogTitle="@string/pressure_dialog_title" 
+			android:dialogMessage="@string/pressure_dialog_message"   
+			android:defaultValue="@string/pressure_default" />
+
+	</PreferenceCategory>
+
+   	<PreferenceCategory
+		android:title="@string/prefs_vibration">
+
+		<CheckBoxPreference
+			android:key="@string/vibration_key"
+			android:title="@string/vibration_title"
+			android:summary="@string/vibration_summary" 
+			android:defaultValue="true" />
+	
+	</PreferenceCategory>
+
+   	<PreferenceCategory
+		android:title="@string/prefs_cursor">
+
+		<CheckBoxPreference
+			android:key="@string/cursor_touch_allow_key"
+			android:title="@string/cursor_touch_allow_title"
+			android:summary="@string/cursor_touch_allow_summary" 
+			android:defaultValue="true" />
+	
+		<EditTextPreference
+			android:key="@string/cursor_touch_color_key"
+			android:digits="0123456789abcdefABCDEF"
+			android:maxLength="8"	
+			android:dependency="@string/cursor_touch_allow_key"
+			android:title="@string/cursor_touch_color_title"
+			android:summary="@string/cursor_touch_color_summary"
+			android:dialogTitle="@string/cursor_touch_color_dialog_title" 
+			android:dialogMessage="@string/cursor_touch_color_dialog_message"   
+			android:defaultValue="@string/cursor_touch_color_default" />
+
+		<CheckBoxPreference
+			android:key="@string/cursor_stroke_allow_key"
+			android:title="@string/cursor_stroke_allow_title"
+			android:summary="@string/cursor_stroke_allow_summary" 
+			android:defaultValue="true" />
+	
+		<EditTextPreference
+			android:key="@string/cursor_stroke_color_key"
+			android:digits="0123456789abcdefABCDEF"
+			android:inputType="textCapCharacters"
+			android:dependency="@string/cursor_stroke_allow_key"
+			android:title="@string/cursor_stroke_color_title"
+			android:summary="@string/cursor_stroke_color_summary"
+			android:dialogTitle="@string/cursor_stroke_color_dialog_title" 
+			android:dialogMessage="@string/cursor_stroke_color_dialog_message"   
+			android:defaultValue="@string/cursor_stroke_color_default" />
+
+		</PreferenceCategory>
+
+</PreferenceScreen>
