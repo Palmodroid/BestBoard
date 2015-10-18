@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ 
+	<string name="parser_starting">"Parsing started…"</string>
+    <string name="parser_no_coat_file">"Could not find coat file…"</string>
+    <string name="parser_coat_file_invalid">"Coat file is not valid! Needed Coat version:"</string>
+    <string name="parser_coat_file_ok">"Coat file verification OK. Coat version:"</string>
+    <string name="parser_file_parsing_started">"Parsing of descriptor file has started."</string>
+    <string name="parser_file_parsing_finished">"Parsing of descriptor file has finished."</string>
+    <string name="parser_file_parsing_interrupted">"Unexpected closing bracket. Parsing terminated."</string>
+    <string name="parser_addsoftboard_data_missing">"Main command (AddSoftBoard) data is missing! ERROR IN DATABASE!"</string>
+
+    <string name="parser_bracket_missing">"Closing bracket is missing!"</string>
+    <string name="parser_result">"Returned:"</string>
+
+    <string name="parser_code">"Code:"</string>
+    <string name="parser_parameter_invalid">"This command/label is not allowed here as parameter:"</string>
+    <string name="parser_block_skipped">"Unexpected block is skipped!"</string>
+    <string name="parser_command_missing">"Command token (keyword) is invalid:"</string>
+    <string name="parser_data_missing">"Data for this parameter-command is missing! ERROR IN DATABASE!"</string>
+    <string name="parser_list_missing">"Complex parameter-list is missing!"</string>
+    <string name="parser_complex_started">"Complex parameter-list evaluation started."</string>
+    <string name="parser_complex_finished">"Evaluation of complex parameter finished, forwarded:"</string>
+    <string name="parser_one_finished">"Evaluation of one parameter finished, forwarded:"</string>
+    <string name="parser_method_called">"Method is called."</string>
+    <string name="parser_method_no_result">"Method returned with no result."</string>
+    <string name="parser_cannot_access_method">"Cannot access method! ERROR IN CODE!"</string>
+    <string name="parser_method_exception">"Exception is thrown by method! ERROR IN CODE!"</string>
+    <string name="parser_no_method_called">"No method to call."</string>
+
+    <string name="parser_invalid_numeric">"Numeric value is invalid!"</string>
+    <string name="parser_invalid_character">"Character value is invalid!"</string>
+    <string name="parser_invalid_string">"String value is invalid!"</string>
+    <string name="parser_invalid_keyword">"Keyword value is invalid!"</string>
+    <string name="parser_value_missing">"Value is missing!"</string>
+    <string name="parser_value_invalid">"Value is invalid!"</string>
+    <string name="parser_no_label">"Could not find label:"</string>
+    <string name="parser_invalid_char_value">"Invalid char value:"</string>
+    <string name="parser_invalid_color_value">"Invalid color value:"</string>
+    <string name="parser_invalid_int_value">"Invalid int value:"</string>
+    <string name="parser_no_file">"Could not find file:"</string>
+
+    <string name="parser_value_list_missing">"Value list is missing!"</string>
+
+    <string name="parser_terminated">"Descriptor file terminated unexpectedly!"</string>
+
+
+    <string name="parser_label_key_missing">"LET: parameter-pair is missing!"</string>
+    <string name="parser_label_key_invalid">"LET: Key parameter is invalid:"</string>
+    <string name="parser_label_value_missing">"LET: Key has no value! (Label is skipped.)"</string>
+    <string name="parser_label_value_invalid">"LET: Value is invalid: (Label is skipped.)"</string>
+    <string name="parser_label_complex_not_allowed">"LET: This command is not allowed as complex label!"</string>
+    <string name="parser_label_complex_one_allowed">"LET: Only one parameter is allowed in complex labels!"</string>
+    <string name="parser_label_complex_invalid">"LET: Complex has no value! (Label is skipped.) ERROR IN CODE!"</string>
+    <string name="parser_label_added">"label added:"</string>
+    <string name="parser_label_overwritten">"Warning! Label's previous value was overwritten!"</string>
+
+</resources>

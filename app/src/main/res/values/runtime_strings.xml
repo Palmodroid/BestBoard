@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="modify_missing">"Modification data is missing, id: "</string>
+
+</resources>

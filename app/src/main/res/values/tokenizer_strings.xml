@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+ 
+	<string name="note_bom_character">"BOM character detected, skipped."</string>
+	
+	<string name="error_escape_unknown">"Unknown escape sequence. Character is used as normal."</string>
+	<string name="error_escape_malformed">"Malformed escape sequence."</string>
+	
+	<string name="error_character_invalid">"Invalid character in token. Token is skipped.</string>
+	
+	<string name="error_integer_exceeds">"Integer exceeds the maximal number of digits. Numeric result is unpredictable!"</string>
+	<string name="error_integer_malformed_no_numeric">"Malformed integer. No numeric characters were found."</string>
+	<string name="error_integer_malformed_ending">"Malformed integer. Ending was truncated."</string>
+	
+	<string name="error_hexadecimal_exceeds">"Hexadecimal integer exceeds the maximal number of digits. Numeric result is unpredictable!"</string>
+	<string name="error_hexadecimal_malformed_no_numeric">"Malformed hexadecimal integer. No hexadecimal characters were found."</string>
+	<string name="error_hexadecimal_malformed_ending">"Malformed hexadecimal integer. Ending was truncated."</string>
+	
+	<string name="error_color_malformed_no_numeric">"Malformed color value. No numeric characters were found."</string>
+	<string name="error_color_malformed_returning_opaque">"Malformed color value. Returning opaque white color."</string>
+	<string name="error_color_malformed_ending">"Malformed color value. Ending was truncated."</string>
+	
+	<string name="error_fraction_exceeds">"Fraction exceeds the maxmaximal number of digits. Numeric result is unpredictable!"</string>
+	<string name="error_fraction_malformed_no_numeric">"Malformed fraction. No numeric characters were found."</string>
+	<string name="error_fraction_malformed_ending">"Malformed fraction. Ending was truncated."</string>
+
+	<string name="error_keyword_exceeds">"Keyword exceeds the maximal number of characters! Token hardKeyCode is not unique!</string>
+	<string name="error_keyword_malformed_ending">"Malformed keyword. Ending was truncated."</string>
+	
+	<string name="error_string_not_terminated">"String constant is not terminated properly."</string>
+
+	<string name="error_character_empty">"character constant is empty. Null is returned."</string>
+	<string name="error_character_missing">"Character constant is missing. Null is returned."</string>
+	<string name="error_character_not_terminated">"Character constant is not terminated properly. Remaining token part is skipped."</string>
+																									
+	<string name="error_token_unknown">"Unknown token type."</string>
+
+</resources>

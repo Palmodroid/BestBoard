@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="prefs_drawing">Board-drawing</string>
+
+    <string name="drawing_hide_upper_key">hideupper</string>
+    <string name="drawing_hide_upper_title">Hide upper part</string>
+    <string name="drawing_hide_upper_summary">Upper quater of the top row can be hidden</string>
+
+    <string name="drawing_hide_lower_key">hidelower</string>
+    <string name="drawing_hide_lower_title">Hide lower part</string>
+    <string name="drawing_hide_lower_summary">Lower quater of the bottom row can be hidden</string>
+
+
+
+
+    <string name="prefs_pressure">Pressure sensitivity</string>
+
+    <string name="pressure_key">pressure</string>
+    <string name="pressure_title">Sensitivity</string>
+    <string name="pressure_summary">"Enter pressure sensitivity level (%). Range: 0–120"</string>
+    <string name="pressure_dialog_title">Sensitivity for touches</string>
+    <string name="pressure_dialog_message">Sensitivity can be set between 0 and 120:</string>
+    <string name="pressure_default">100</string>
+    	
+    <string name="prefs_vibration">Tactile feedback</string>
+    <string name="vibration_key">vibration</string>
+    <string name="vibration_title">Allow vibration</string>
+    <string name="vibration_summary">Vibration is used for tactile feedback</string>
+
+    <string name="prefs_cursor">Visible touch control</string>
+    
+    <string name="cursor_touch_allow_key">touch</string>
+    <string name="cursor_touch_allow_title">Show touched keys</string>
+    <string name="cursor_touch_allow_summary">The color of the touched keys will be changed</string>
+    
+    <string name="cursor_touch_color_key">touchcolor</string>
+    <string name="cursor_touch_color_title">Color of touched keys</string>
+    <string name="cursor_touch_color_summary">Enter color for touched keys</string>
+    <string name="cursor_touch_color_dialog_title">Color of touched keys</string>
+    <string name="cursor_touch_color_dialog_message">Color in hexadecimal AARRGGBB format:</string>
+    <string name="cursor_touch_color_default">100</string>
+
+    <string name="cursor_stroke_allow_key">stroke</string>
+    <string name="cursor_stroke_allow_title">Show stroke on keyboard</string>
+    <string name="cursor_stroke_allow_summary">Last stroke will be shown as dots</string>
+    
+    <string name="cursor_stroke_color_key">strokecolor</string>
+    <string name="cursor_stroke_color_title">Color of the stroke</string>
+    <string name="cursor_stroke_color_summary">Enter color for stroke</string>
+    <string name="cursor_stroke_color_dialog_title">Color of stroke</string>
+    <string name="cursor_stroke_color_dialog_message">Color in hexadecimal AARRGGBB format:</string>
+    <string name="cursor_stroke_color_default">100</string>
+
+</resources>
