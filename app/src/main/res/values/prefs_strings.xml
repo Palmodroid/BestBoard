@@ -1,6 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="prefs_descriptor">Coat.descriptor</string>
+
+    <string name="descriptor_key">descriptor</string>
+    <string name="descriptor_title">Name of descriptor file</string>
+    <string name="descriptor_summary">Enter name of descriptor file!</string>
+    <string name="descriptor_dialog_title">Name of descriptor file</string>
+    <string name="descriptor_dialog_message">Descriptor file in coat format:</string>
+    <string name="descriptor_default">coat.txt</string>
+
+    <string name="descriptor_reload_key">reload</string>
+    <string name="descriptor_reload_title">Reload descriptor file</string>
+    <string name="descriptor_reload_summary">Touch to force reloading and parsing descriptor data</string>
+
+
     <string name="prefs_drawing">Board-drawing</string>
 
     <string name="drawing_hide_upper_key">hideupper</string>

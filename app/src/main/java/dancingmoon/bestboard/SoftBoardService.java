@@ -48,6 +48,13 @@ public class SoftBoardService extends InputMethodService implements
             }
 //		if ( key.equals( getString( R.string.package_limitation_key )))
 //			updatePackageLimitation(sharedPrefs);
+
+        if ( key.equals( "REL" ))
+            {
+            Scribe.note("SERVICE: Reload is forced!");
+            startSoftBoardParser();
+            }
+
         }
 
 

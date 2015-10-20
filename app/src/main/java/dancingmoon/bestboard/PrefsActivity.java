@@ -48,7 +48,26 @@ public class PrefsActivity extends Activity
 
             addPreferencesFromResource( R.xml.prefs );
 
+            Preference reloadButton = (Preference)findPreference(getString(R.string.descriptor_reload_key));
+            reloadButton.setOnPreferenceClickListener( new Preference.OnPreferenceClickListener() {
+                @Override
+                public boolean onPreferenceClick( Preference preference )
+                    {
 
+                    Scribe.error("Preference Button was touched!");
+
+                    // this = your fragment
+                    SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    SharedPreferences.Editor editor = sharedPrefs.edit();
+
+                    int cnt = sharedPrefs.getInt( "REL", 0 );
+                    cnt++;
+                    editor.putInt( "REL", cnt );
+                    editor.commit();
+
+                    return true;
+                    }
+                });
 
             }
 
