@@ -44,17 +44,75 @@ public class PrefsActivity extends Activity
         @Override
         public void onCreate(Bundle savedInstanceState)
             {
-            super.onCreate( savedInstanceState );
+            super.onCreate(savedInstanceState);
 
-            addPreferencesFromResource( R.xml.prefs );
+            addPreferencesFromResource(R.xml.prefs);
 
+            Preference reloadButton = findPreference(getString(R.string.descriptor_reload_key));
+            reloadButton.setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+            {
+            @Override
+            public boolean onPreferenceClick(Preference preference)
+                {
 
+                Scribe.error("Preference Button was touched!");
+
+                // this = your fragment
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+
+                int cnt = sharedPrefs.getInt("REL", 0);
+                cnt++;
+                editor.putInt("REL", cnt);
+                editor.apply();
+
+                return true;
+                }
+            });
 
             }
+        @Override
+        public void onResume()
+            {
+            super.onResume();
+
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .registerOnSharedPreferenceChangeListener(this);
+
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+
+            Scribe.note("Preferences are cleared completely");
+            SharedPreferences.Editor editor = sharedPrefs.edit();
+            editor.clear();
+            editor.apply();
+
+
+            Scribe.note("BEFORE DEFAULT: Default preferences: descriptor: " + sharedPrefs.getString(getString(R.string.descriptor_key), "nincs"));
+
+            // this should come to every entry points
+            PreferenceManager.setDefaultValues(getActivity(), R.xml.prefs, true);
+
+            Scribe.note("AFTER DEFAULT: Default preferences: descriptor: " + sharedPrefs.getString(getString(R.string.descriptor_key), "nincs"));
+            }
+
+        @Override
+        public void onPause()
+            {
+            super.onPause();
+
+            PreferenceManager.getDefaultSharedPreferences(getActivity())
+                    .unregisterOnSharedPreferenceChangeListener(this);
+            }
+
 
         @Override
         public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
             {
+            if ( key.equals( getString( R.string.descriptor_key )))
+                {
+                Scribe.note("PREFERENCES: descriptor has changed!");
+                }
+
             if ( key.equals( getString( R.string.drawing_hide_upper_key )))
                 {
                 Scribe.note("PREFERENCES: hide-upper has changed!");
@@ -71,7 +129,7 @@ public class PrefsActivity extends Activity
                     int cnt = sharedPrefs.getInt( "CNT", 0 );
                     cnt++;
                     editor.putInt( "CNT", cnt );
-                    editor.commit();
+                    editor.apply();
                     }
               /*  else
                     {
@@ -87,52 +145,25 @@ public class PrefsActivity extends Activity
 
         }
 
-    PrefsFragment prefsFragment;
 
     @Override
     public void onCreate( Bundle savedInstanceState )
         {
-        super.onCreate( savedInstanceState );
+        super.onCreate(savedInstanceState);
 
-        // this should come to every entry points
-        PreferenceManager.setDefaultValues( this, R.xml.prefs, false );
+        // Preference manager should save/recreate the fragment instance
+        PrefsFragment prefsFragment = (PrefsFragment)getFragmentManager()
+                .findFragmentById(android.R.id.content);
+        if ( prefsFragment == null )
+            {
+            prefsFragment = new PrefsFragment();
+            }
 
-        prefsFragment = new PrefsFragment();
-
+        // android.R.id.content is the root view
+        // but it can hidden behind action bar - http://stackoverflow.com/a/4488149 - !! not modified yet !!
         getFragmentManager().beginTransaction()
-                .replace( android.R.id.content, prefsFragment )
+                .replace(android.R.id.content, prefsFragment)
                 .commit();
         }
 
-    @Override
-    protected void onResume()
-    	{
-    	super.onResume();
-
-    	PreferenceManager.getDefaultSharedPreferences(this).registerOnSharedPreferenceChangeListener( prefsFragment );
-    	}
-
-    @Override
-    protected void onPause()
-    	{
-    	super.onPause();
-
-    	PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener( prefsFragment );
-    	}
-
-	/*
-	private void updatePackageLimitation( SharedPreferences sharedPrefs )
-		{
-      	String packageLimitationString = sharedPrefs.getString( getString(R.string.package_limitation_key), getString(R.string.package_limitation_default));
-		Preference packageLimitationField = findPreference( getString(R.string.package_limitation_key));
-		if ( packageLimitationString.length() == 0 )
-			{
-			packageLimitationField.setSummary( R.string.package_limitation_summary_empty );
-			}
-		else
-			{
-			packageLimitationField.setSummary( getString(R.string.package_limitation_summary_intro) + packageLimitationString );
-			}
-		}
-	*/
     }
