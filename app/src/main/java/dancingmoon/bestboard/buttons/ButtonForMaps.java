@@ -29,8 +29,8 @@ public class ButtonForMaps extends Button
         // board is stored in Button superclass
         this.board = board;
 
-        pixelRimQuaterHeight = (board.boardHeightInPixels * (100 - board.outerRimPercent)) / (board.boardHeightInGrids * 100);
-        pixelRimHalfWidth = (board.boardWidthInPixels * (100 - board.outerRimPercent)) / (board.boardWidthInGrids * 100);
+        pixelRimQuaterHeight = (board.boardHeightInPixels * (100 - board.softBoardData.outerRimPercent)) / (board.boardHeightInGrids * 100);
+        pixelRimHalfWidth = (board.boardWidthInPixels * (100 - board.softBoardData.outerRimPercent)) / (board.boardWidthInGrids * 100);
         }
 
 

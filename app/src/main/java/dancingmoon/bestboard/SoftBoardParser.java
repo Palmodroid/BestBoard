@@ -1,8 +1,10 @@
 package dancingmoon.bestboard;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.preference.PreferenceManager;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -1097,7 +1099,13 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             // Precision check for FILE parameter
             else if ( parameterType == Commands.PARAMETER_FILE )
                 {
-                File directory = new File( Environment.getExternalStorageDirectory(), SoftBoardService.WORKING_DIRECTORY );
+                SharedPreferences sharedPrefs = PreferenceManager.
+                        getDefaultSharedPreferences( caller.getApplicationContext() );
+                String directoryName =
+                        sharedPrefs.getString( caller.getApplicationContext().
+                                getString( R.string.descriptor_directory_key ), "" );
+
+                File directory = new File( Environment.getExternalStorageDirectory(), directoryName );
                 File file = new File( directory, (String) result );
 
                 if ( !file.exists() || !file.isFile() )

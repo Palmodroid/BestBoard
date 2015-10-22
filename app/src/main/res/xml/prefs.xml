@@ -5,12 +5,20 @@
 		android:title="@string/prefs_descriptor">
 
 		<EditTextPreference
-			android:key="@string/descriptor_key"
-			android:title="@string/descriptor_title"
-			android:summary="@string/descriptor_summary"
-			android:dialogTitle="@string/descriptor_dialog_title"
-			android:dialogMessage="@string/descriptor_dialog_message"
-			android:defaultValue="@string/descriptor_default" />
+			android:key="@string/descriptor_directory_key"
+			android:title="@string/descriptor_directory_title"
+			android:summary="@string/descriptor_directory_summary_invalid"
+			android:dialogTitle="@string/descriptor_directory_dialog_title"
+			android:dialogMessage="@string/descriptor_directory_dialog_message"
+			android:defaultValue="@string/descriptor_directory_default" />
+
+		<EditTextPreference
+			android:key="@string/descriptor_file_key"
+			android:title="@string/descriptor_file_title"
+			android:summary="@string/descriptor_file_summary_invalid"
+			android:dialogTitle="@string/descriptor_file_dialog_title"
+			android:dialogMessage="@string/descriptor_file_dialog_message"
+			android:defaultValue="@string/descriptor_file_default" />
 
 		<Preference
 			android:key="@string/descriptor_reload_key"
@@ -34,8 +42,84 @@
 			android:summary="@string/drawing_hide_lower_summary"
 			android:defaultValue="false" />
 
+		<EditTextPreference
+			android:key="@string/drawing_height_ratio_key"
+            android:inputType="number"
+			android:title="@string/drawing_height_ratio_title"
+			android:summary="@string/drawing_height_ratio_summary"
+			android:dialogTitle="@string/drawing_height_ratio_dialog_title"
+			android:dialogMessage="@string/drawing_height_ratio_dialog_message"
+			android:defaultValue="@string/drawing_height_ratio_default" />
+
+		<EditTextPreference
+			android:key="@string/drawing_landscape_offset_key"
+            android:inputType="number"
+			android:title="@string/drawing_landscape_offset_title"
+			android:summary="@string/drawing_landscape_offset_summary"
+			android:dialogTitle="@string/drawing_landscape_offset_dialog_title"
+			android:dialogMessage="@string/drawing_landscape_offset_dialog_message"
+			android:defaultValue="@string/drawing_landscape_offset_default" />
+
+		<EditTextPreference
+			android:key="@string/drawing_outer_rim_key"
+            android:inputType="number"
+			android:title="@string/drawing_outer_rim_title"
+			android:summary="@string/drawing_outer_rim_summary"
+			android:dialogTitle="@string/drawing_outer_rim_dialog_title"
+			android:dialogMessage="@string/drawing_outer_rim_dialog_message"
+			android:defaultValue="@string/drawing_outer_rim_default" />
+
 	</PreferenceCategory>
 
+	<PreferenceCategory
+		android:title="@string/prefs_cursor">
+
+		<CheckBoxPreference
+			android:key="@string/cursor_touch_allow_key"
+			android:title="@string/cursor_touch_allow_title"
+			android:summary="@string/cursor_touch_allow_summary"
+			android:defaultValue="true" />
+
+		<!--EditTextPreference
+			android:key="@string/cursor_touch_color_key"
+			android:digits="0123456789abcdefABCDEF"
+			android:maxLength="8"
+			android:dependency="@string/cursor_touch_allow_key"
+			android:title="@string/cursor_touch_color_title"
+			android:summary="@string/cursor_touch_color_summary"
+			android:dialogTitle="@string/cursor_touch_color_dialog_title"
+			android:dialogMessage="@string/cursor_touch_color_dialog_message"
+			android:defaultValue="@string/cursor_touch_color_default" /-->
+
+		<CheckBoxPreference
+			android:key="@string/cursor_stroke_allow_key"
+			android:title="@string/cursor_stroke_allow_title"
+			android:summary="@string/cursor_stroke_allow_summary"
+			android:defaultValue="true" />
+
+		<!--EditTextPreference
+			android:key="@string/cursor_stroke_color_key"
+			android:digits="0123456789abcdefABCDEF"
+			android:inputType="textCapCharacters"
+			android:dependency="@string/cursor_stroke_allow_key"
+			android:title="@string/cursor_stroke_color_title"
+			android:summary="@string/cursor_stroke_color_summary"
+			android:dialogTitle="@string/cursor_stroke_color_dialog_title"
+			android:dialogMessage="@string/cursor_stroke_color_dialog_message"
+			android:defaultValue="@string/cursor_stroke_color_default" /-->
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
+		android:title="@string/prefs_debug">
+
+		<CheckBoxPreference
+			android:key="@string/debug_key"
+			android:title="@string/debug_title"
+			android:summary="@string/debug_summary"
+			android:defaultValue="true" />
+
+	</PreferenceCategory>
 
 
 
@@ -54,17 +138,19 @@
 
 /* Board
 
-    public int outerRimPercent = 30;
     public int hideTop = 0;
     public int hideBottom = 0;
+
+	screenHeightInPixels *= 3;
+	screenHeightInPixels /= 4;
+
     public int landscapeOffsetPercent = 30;
+	public int outerRimPercent = 30;
 
     - ez miért nem boardview-ban van? -
     public boolean displayTouch = true;
     public boolean displayStroke = true;
 
-    screenHeightInPixels *= 3;
-    screenHeightInPixels /= 4;
 
 */
 
@@ -109,44 +195,5 @@
 			android:defaultValue="true" />
 	
 	</PreferenceCategory>
-
-   	<PreferenceCategory
-		android:title="@string/prefs_cursor">
-
-		<CheckBoxPreference
-			android:key="@string/cursor_touch_allow_key"
-			android:title="@string/cursor_touch_allow_title"
-			android:summary="@string/cursor_touch_allow_summary" 
-			android:defaultValue="true" />
-	
-		<EditTextPreference
-			android:key="@string/cursor_touch_color_key"
-			android:digits="0123456789abcdefABCDEF"
-			android:maxLength="8"	
-			android:dependency="@string/cursor_touch_allow_key"
-			android:title="@string/cursor_touch_color_title"
-			android:summary="@string/cursor_touch_color_summary"
-			android:dialogTitle="@string/cursor_touch_color_dialog_title" 
-			android:dialogMessage="@string/cursor_touch_color_dialog_message"   
-			android:defaultValue="@string/cursor_touch_color_default" />
-
-		<CheckBoxPreference
-			android:key="@string/cursor_stroke_allow_key"
-			android:title="@string/cursor_stroke_allow_title"
-			android:summary="@string/cursor_stroke_allow_summary" 
-			android:defaultValue="true" />
-	
-		<EditTextPreference
-			android:key="@string/cursor_stroke_color_key"
-			android:digits="0123456789abcdefABCDEF"
-			android:inputType="textCapCharacters"
-			android:dependency="@string/cursor_stroke_allow_key"
-			android:title="@string/cursor_stroke_color_title"
-			android:summary="@string/cursor_stroke_color_summary"
-			android:dialogTitle="@string/cursor_stroke_color_dialog_title" 
-			android:dialogMessage="@string/cursor_stroke_color_dialog_message"   
-			android:defaultValue="@string/cursor_stroke_color_default" />
-
-		</PreferenceCategory>
 
 </PreferenceScreen>

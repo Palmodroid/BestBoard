@@ -149,7 +149,7 @@ public class Button implements Cloneable
      */
     protected int getGridY( int rowInHexagons )
         {
-        return rowInHexagons * 3 + 2 - board.hideTop;
+        return rowInHexagons * 3 + 2 - board.softBoardData.hideTop;
         }
 
 

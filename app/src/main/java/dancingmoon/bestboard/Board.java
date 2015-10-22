@@ -18,49 +18,6 @@ import dancingmoon.bestboard.utils.Trilean;
 public class Board
     {
     /**
-     ** PREFERENCES - settings per device
-     **/
-
-    /**
-     * Size of the outer rim on buttons.
-     * Touch movement (stroke) will not fire from the outer rim, but touch down will do.
-     */
-    public int outerRimPercent = 30;
-
-    /**
-     * Hide grids from the top of the board - VALUE IS NOT VERIFIED!
-     * 0 - no hide
-     * 1 - hide one quater (one grid) from the top row
-     * 2 - hide one half (two grids) from the top row
-     */
-    public int hideTop = 0;
-
-    /**
-     * Hide grids from the bottom of the board - VALUE IS NOT VERIFIED!
-     * 0 - no hide
-     * 1 - hide one quater (one grid) from the bottom row
-     * 2 - hide one half (two grids) from the bottom row
-     */
-    public int hideBottom = 0;
-
-    /**
-     * Offset for non-wide boards in landscape mode
-     * (percent of the free area) - VALUE IS NOT VERIFIED!
-     */
-    public int landscapeOffsetPercent = 30;
-        
-    /**
-     * Background of the touched key is changed or not
-     */
-    public boolean displayTouch = true;
-
-    /**
-      * Stroke is displayed or not
-      */
-    public boolean displayStroke = true;
-
-
-    /**
      ** CLASS VARIABLES - LOADED FROM COAT DESCRIPTOR FILE
      **/
 
@@ -244,6 +201,9 @@ public class Board
         {
         // NON SCREEN-SPECIFIC DATA
 
+        // Common data is needed
+        this.softBoardData = data;
+
         // first two hidden, "side" halfcolumns are added, then full columns are calculated
         // even halfcolumns: last button can be in hidden position,
         // but starting with a half button it will appear
@@ -259,10 +219,7 @@ public class Board
         this.boardWidthInGrids = halfcolumns;
         // Each row has three quarters of hexagonal height (3 grids) + 1 for the last row
         // hideTop and hideBottom can "hide" 1 or 2 grids
-        this.boardHeightInGrids = rows * 3 + 1 - hideTop - hideBottom;
-
-        // Common data is needed
-        this.softBoardData = data;
+        this.boardHeightInGrids = rows * 3 + 1 - softBoardData.hideTop - softBoardData.hideBottom;
 
         this.rowsAlignOffset = oddRowsAligned ? 1 : 0;
 
@@ -387,8 +344,8 @@ public class Board
             // noinspection SuspiciousNameCombination
             newBoardWidthInPixels = screenHeightInPixels; // This is the shorter diameter
             this.xOffset = (screenWidthInPixels - newBoardWidthInPixels) *
-                    landscapeOffsetPercent / 100;
-            Scribe.debug("Normal keyboard for landcape. Offset:" + xOffset);
+                    softBoardData.landscapeOffsetPercent / 1000;
+            Scribe.debug("Normal keyboard for landscape. Offset:" + xOffset);
             }
         // LANDSCAPE board PORTRAIT mode - incompatible board! - !! NOW WE LET IT WORK (TESTING!!) !!
         else // if (wide && !landscape)

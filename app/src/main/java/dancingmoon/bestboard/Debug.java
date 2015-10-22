@@ -1,6 +1,8 @@
 package dancingmoon.bestboard;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import dancingmoon.bestboard.scribe.Scribe;
 
@@ -10,10 +12,6 @@ import dancingmoon.bestboard.scribe.Scribe;
  */
 public class Debug
 	{
-    // Logs are stored in working directory
-    // Get it from main file!!
-    // public static final String WORKING_DIRECTORY = "_bestboard";
-
 	// Constants for PRIMARY configuration
     private static final String LOG_TAG = "BEST";
 
@@ -37,14 +35,31 @@ public class Debug
 		{
 		// Scribe initialization: PRIMARY - debug 
 		Scribe.init(context); // Primary file name : package name
-		Scribe.setDirectoryName( SoftBoardService.WORKING_DIRECTORY ); // Primary directory name
+
+		SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
+
+		String directoryName =
+				sharedPrefs.getString( context.getString( R.string.descriptor_directory_key ), context.getString( R.string.descriptor_directory_default ) );
+		Scribe.setDirectoryName( directoryName ); // Primary directory name
 
 		Scribe.clearSysLog();
 		Scribe.enableSysLog( LOG_TAG ); // Primary log-tag : BESTBOARD
-		
+
+		// !! Service will be started only once, so this should go into a more frequent position
+        // InputMethodService.onWindowHidden() or .onFinishInput() could be a good place.
 		Scribe.checkLogFileLength(); // Primary log will log several runs
+
 		Scribe.logUncaughtExceptions(); // Primary log will store uncaught exceptions
-		
+
+        if ( sharedPrefs.getBoolean( context.getString( R.string.debug_key ), true ) )
+            {
+            Scribe.enable();
+            }
+        else
+            {
+            Scribe.disable();
+            }
+
 		Scribe.title("Best's Board started!");
 
         // Scribe initialization: SECONDARY - log for user

@@ -7,6 +7,7 @@ import dancingmoon.bestboard.scribe.Scribe;
 
 /**
  * Class to store text around cursor.
+ * !! Stored text should be validated by cursor movement !!
  */
 public class StoredText
     {

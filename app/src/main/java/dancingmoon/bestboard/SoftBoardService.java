@@ -34,46 +34,14 @@ public class SoftBoardService extends InputMethodService implements
         SharedPreferences.OnSharedPreferenceChangeListener
     {
 
+    /** Working directory - moved to preferences */
+    // public static final String WORKING_DIRECTORY = "_bestboard";
 
-    @Override
-    public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
-        {
-        if ( key.equals( "CNT" ))
-            {
-            Scribe.note("SERVICE: preference has changed!");
-            }
-        if ( key.equals( getString(R.string.drawing_hide_upper_key )))
-            {
-            Scribe.note("SERVICE: hide-upper has changed!");
-            }
-//		if ( key.equals( getString( R.string.package_limitation_key )))
-//			updatePackageLimitation(sharedPrefs);
-
-        if ( key.equals( "REL" ))
-            {
-            Scribe.note("SERVICE: Reload is forced!");
-            startSoftBoardParser();
-            }
-
-        }
-
-
-
-
-
-
-
-
-
-
-
-
-
-    /** Working directory */
-    public static final String WORKING_DIRECTORY = "_bestboard";
-
-    /** Name of coat descriptor file in working directory */
-    public static String coatFileName = "coat.txt"; // .descriptor
+    /**
+     * Name of coat descriptor file in working directory - moved to preferences
+     * Temporary storage for file name - it is needed in softBoardParserFinished() once more
+     */
+    public String coatFileName;
 
     /** Fullscreen is not implemented yet!! */
     private boolean denyFullScreen = true;
@@ -121,6 +89,59 @@ public class SoftBoardService extends InputMethodService implements
         }
 
 
+    /**
+     * Service is notified if it needs to react preference changes.
+     * Preference PREFS_COUNTER is incremented, and preference PREFS_TYPE identifies action.
+     * It is not necessary to check other changes.
+     * @param sharedPrefs shared preferences
+     * @param key key which is changed
+     */
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
+        {
+        if ( key.equals( PrefsActivity.PREFS_COUNTER ) )
+            {
+            switch ( sharedPrefs.getInt( PrefsActivity.PREFS_TYPE, -1 ) )
+                {
+                case PrefsActivity.PREFS_ACTION_RELOAD:
+                    Scribe.note( "SERVICE: get notification to reload descriptor." );
+                    startSoftBoardParser();
+                    break;
+
+                case PrefsActivity.PREFS_ACTION_REDRAW:
+                    Scribe.note( "SERVICE: get notification to redraw descriptor." );
+                    if ( softBoardData != null)
+                        {
+                        softBoardData.readPreferences();
+                        boardView.requestLayout();
+                        }
+                    break;
+
+                case PrefsActivity.PREFS_ACTION_REFRESH:
+                    Scribe.note( "SERVICE: get notification to refresh preferences." );
+                    if ( softBoardData != null)
+                        softBoardData.readPreferences();
+                    break;
+
+                default:
+                    Scribe.error( "SERVICE: preference action type is invalid!" );
+                }
+            }
+        }
+
+
+    /**
+     * Log should be checked regularly.
+     * Service could live longer, it is not enough to check only during creation.
+     * onWindowHidden() or onFinishInput() could be a good place.
+     */
+    @Override
+    public void onWindowHidden()
+        {
+        super.onWindowHidden();
+
+        Scribe.checkLogFileLength(); // Primary log will log several runs
+        }
 
 
     /**
@@ -205,13 +226,21 @@ public class SoftBoardService extends InputMethodService implements
     public void startSoftBoardParser()
         {
         Scribe.note( "Parsing has started." );
-        File directory = new File( Environment.getExternalStorageDirectory(), WORKING_DIRECTORY );
-        File coat = new File( directory, coatFileName );
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
+
+        String directoryName =
+                sharedPrefs.getString( getString( R.string.descriptor_directory_key ), "" );
+        File directoryFile = new File( Environment.getExternalStorageDirectory(), directoryName );
+
+        coatFileName =
+                sharedPrefs.getString( getString( R.string.descriptor_file_key ), "" );
+        File coatFileFile = new File( directoryFile, coatFileName );
 
         // Any previous parsing should stop now
         if ( softBoardParser != null )  softBoardParser.cancel(false);
 
-        softBoardParser = new SoftBoardParser(this, coat );
+        softBoardParser = new SoftBoardParser(this, coatFileFile );
         softBoardParser.execute();
 
         // SoftBoard returns in softBoardParserFinished() after parsing

@@ -1,8 +1,10 @@
 package dancingmoon.bestboard;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.preference.PreferenceManager;
 import android.util.LongSparseArray;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
@@ -220,6 +222,119 @@ public class SoftBoardData
     /** Color of stroke */
     public int strokeColor = Color.MAGENTA & 0x77FFFFFF;
 
+
+    /**
+     ** PREFERENCES - stored in softBoardData, because these variables affect all boards
+     ** Preferences are read by readPreferences() at start and at change, because:
+     ** - some of them needed frequently
+     ** - numeric preferences are stored as string
+     **/
+    public void readPreferences()
+        {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( softBoardListener.getApplicationContext() );
+
+        if ( sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString( R.string.drawing_hide_upper_key ),
+                false) )
+            {
+            hideTop = 1;
+            }
+        else
+            {
+            hideTop = 0;
+            }
+
+        if ( sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString( R.string.drawing_hide_lower_key ),
+                false) )
+            {
+            hideBottom = 1;
+            }
+        else
+            {
+            hideBottom = 0;
+            }
+
+        /** THIS SHOULD BE CHANGED !! Integer preference with min and max values is needed.**/
+        String landscapeOffsetString = sharedPrefs.getString(
+                softBoardListener.getApplicationContext().getString(R.string.drawing_landscape_offset_key), "" );
+        try
+            {
+            landscapeOffsetPercent = Integer.valueOf( landscapeOffsetString );
+            }
+        catch ( NumberFormatException nfe )
+            {
+            landscapeOffsetPercent = 0;
+            }
+        Scribe.note("Refreshed landscape-offset from preferences: " + landscapeOffsetPercent );
+
+
+        /** THIS SHOULD BE CHANGED !! Integer preference with min and max values is needed.**/
+        String outerRimString = sharedPrefs.getString(
+                softBoardListener.getApplicationContext().getString(R.string.drawing_outer_rim_key), "" );
+        try
+            {
+            outerRimPercent = Integer.valueOf( outerRimString );
+            }
+        catch ( NumberFormatException nfe )
+            {
+            outerRimPercent = 500;
+            }
+
+        displayTouch = sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString( R.string.cursor_touch_allow_key ),
+                true);
+
+        displayStroke = sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString( R.string.cursor_stroke_allow_key ),
+                true);
+        }
+
+
+    /**
+     * Hide grids from the top of the board - VALUE IS NOT VERIFIED!
+     * 0 - no hide
+     * 1 - hide one quater (one grid) from the top row
+     * 2 - hide one half (two grids) from the top row
+     */
+    public int hideTop = 0;
+
+    /**
+     * Hide grids from the bottom of the board - VALUE IS NOT VERIFIED!
+     * 0 - no hide
+     * 1 - hide one quater (one grid) from the bottom row
+     * 2 - hide one half (two grids) from the bottom row
+     */
+    public int hideBottom = 0;
+
+    /**
+     * Maximal screen height ratio which cen be occupied by the board
+     */
+    public int heightRatio = 500;
+
+    /**
+     * Offset for non-wide boards in landscape mode
+     * (percent of the free area) - VALUE IS NOT VERIFIED!
+     */
+    public int landscapeOffsetPercent;
+
+    /**
+     * Size of the outer rim on buttons.
+     * Touch movement (stroke) will not fire from the outer rim, but touch down will do.
+     */
+    public int outerRimPercent = 300;
+
+    /**
+     * Background of the touched key is changed or not
+     */
+    public boolean displayTouch = true;
+
+    /**
+     * Stroke is displayed or not
+     */
+    public boolean displayStroke = true;
+
+
     /**
      * STATES OF THE BOARD
      */
@@ -281,6 +396,7 @@ public class SoftBoardData
         Context getApplicationContext();
         // THIS IS NOT NEEDED (MAYBE) IF BOARD and BOARDVIEW IS DIVIDED
         // UseState.checkOrientation() needs context
+        // readPreferences() need context
 
         boolean sendKeyDown( long downTime, int keyEventCode );
         boolean sendKeyUp( long downTime, long eventTime, int keyEventCode );
@@ -328,6 +444,9 @@ public class SoftBoardData
         Slots.put(
                 defaultSlot,
                 new Slot( 0, 250, 1200, false, false, Color.BLACK ) );
+
+        // This could go into parsingFinished()
+        readPreferences();
         }
 
     /**

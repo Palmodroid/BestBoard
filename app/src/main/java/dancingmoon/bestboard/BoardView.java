@@ -105,6 +105,8 @@ public class BoardView extends View
         {
         // board-change needs recalculation
         validatedWidthInPixels = -1;
+        // ???
+        board.screenWidthInPixels = -1;
 
         super.requestLayout();
         }
@@ -673,7 +675,7 @@ public class BoardView extends View
             if (bowAction != TOUCH_HOLD)
                 {
                 strokePoints.add(strokePoint);
-                if (board.displayStroke) this.invalidate();
+                if (board.softBoardData.displayStroke) this.invalidate();
                 }
             }
         // if bowAction == TOUCH_UP - strokePoints will be cleared later
@@ -789,7 +791,7 @@ public class BoardView extends View
             if ( bowAction == TOUCH_UP )
                 {
                 strokePoints.clear(); // if we want the stroke to disappear
-                if (board.displayStroke) this.invalidate();
+                if (board.softBoardData.displayStroke) this.invalidate();
                 }
 
             // "outside" areas ends here
@@ -856,11 +858,11 @@ public class BoardView extends View
         board.drawChangedButtons(canvas);
 
         // TouchedButton - draw over the bitmap!
-        if (mainTouchBow.buttonMainTouch != null && board.displayTouch)
+        if (mainTouchBow.buttonMainTouch != null && board.softBoardData.displayTouch)
             mainTouchBow.buttonMainTouch.drawTouchedButton(canvas);
 
         // TouchedPoints - if needed
-        if (board.displayStroke)
+        if (board.softBoardData.displayStroke)
             {
             for (StrokePoint touchedPoint : strokePoints)
                 {

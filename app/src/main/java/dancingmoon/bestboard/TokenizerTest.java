@@ -35,7 +35,7 @@ public class TokenizerTest extends Activity
 			@Override
 			public void onClick(View v)
 				{
-                // seconadary is set for tokenizer temporarily
+                // secondary is set for tokenizer temporarily
                 // no parsing during TokenizerTest!
                 Bundle scribeConfig = Scribe.getConfigSecondary();
                 Scribe.enableFileLogSecondary( Debug.tokenLogFileName );
