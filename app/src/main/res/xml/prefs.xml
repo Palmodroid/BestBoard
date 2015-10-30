@@ -34,13 +34,13 @@
 			android:key="@string/drawing_hide_upper_key"
 			android:title="@string/drawing_hide_upper_title"
 			android:summary="@string/drawing_hide_upper_summary"
-			android:defaultValue="false" />
+			android:defaultValue="@bool/drawing_hide_upper_default" />
 
 		<CheckBoxPreference
 			android:key="@string/drawing_hide_lower_key"
 			android:title="@string/drawing_hide_lower_title"
 			android:summary="@string/drawing_hide_lower_summary"
-			android:defaultValue="false" />
+			android:defaultValue="@bool/drawing_hide_lower_default" />
 
 		<EditTextPreference
 			android:key="@string/drawing_height_ratio_key"
@@ -78,7 +78,7 @@
 			android:key="@string/cursor_touch_allow_key"
 			android:title="@string/cursor_touch_allow_title"
 			android:summary="@string/cursor_touch_allow_summary"
-			android:defaultValue="true" />
+			android:defaultValue="@bool/cursor_touch_allow_default" />
 
 		<!--EditTextPreference
 			android:key="@string/cursor_touch_color_key"
@@ -95,7 +95,7 @@
 			android:key="@string/cursor_stroke_allow_key"
 			android:title="@string/cursor_stroke_allow_title"
 			android:summary="@string/cursor_stroke_allow_summary"
-			android:defaultValue="true" />
+			android:defaultValue="@bool/cursor_stroke_allow_key" />
 
 		<!--EditTextPreference
 			android:key="@string/cursor_stroke_color_key"
@@ -117,7 +117,7 @@
 			android:key="@string/debug_key"
 			android:title="@string/debug_title"
 			android:summary="@string/debug_summary"
-			android:defaultValue="true" />
+			android:defaultValue="@bool/debug_default" />
 
 	</PreferenceCategory>
 

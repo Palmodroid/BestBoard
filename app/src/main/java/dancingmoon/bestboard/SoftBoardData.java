@@ -233,53 +233,14 @@ public class SoftBoardData
         {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( softBoardListener.getApplicationContext() );
 
-        if ( sharedPrefs.getBoolean(
-                softBoardListener.getApplicationContext().getString( R.string.drawing_hide_upper_key ),
-                false) )
-            {
-            hideTop = 1;
-            }
-        else
-            {
-            hideTop = 0;
-            }
+        hideTop = ( sharedPrefs.getBoolean( softBoardListener.getApplicationContext().getString( R.string.drawing_hide_upper_key ), false)) ? 1 : 0;
 
-        if ( sharedPrefs.getBoolean(
-                softBoardListener.getApplicationContext().getString( R.string.drawing_hide_lower_key ),
-                false) )
-            {
-            hideBottom = 1;
-            }
-        else
-            {
-            hideBottom = 0;
-            }
+        hideBottom = ( sharedPrefs.getBoolean( softBoardListener.getApplicationContext().getString( R.string.drawing_hide_lower_key ), false)) ? 1 : 0;
 
         /** THIS SHOULD BE CHANGED !! Integer preference with min and max values is needed.**/
-        String landscapeOffsetString = sharedPrefs.getString(
-                softBoardListener.getApplicationContext().getString(R.string.drawing_landscape_offset_key), "" );
-        try
-            {
-            landscapeOffsetPercent = Integer.valueOf( landscapeOffsetString );
-            }
-        catch ( NumberFormatException nfe )
-            {
-            landscapeOffsetPercent = 0;
-            }
-        Scribe.note("Refreshed landscape-offset from preferences: " + landscapeOffsetPercent );
+        landscapeOffsetPercent = sharedPrefs.getInt(PrefsFragment.DRAWING_LANDSCAPE_OFFSET_INT_KEY, 0);
 
-
-        /** THIS SHOULD BE CHANGED !! Integer preference with min and max values is needed.**/
-        String outerRimString = sharedPrefs.getString(
-                softBoardListener.getApplicationContext().getString(R.string.drawing_outer_rim_key), "" );
-        try
-            {
-            outerRimPercent = Integer.valueOf( outerRimString );
-            }
-        catch ( NumberFormatException nfe )
-            {
-            outerRimPercent = 500;
-            }
+        outerRimPercent = sharedPrefs.getInt( PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0);
 
         displayTouch = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString( R.string.cursor_touch_allow_key ),

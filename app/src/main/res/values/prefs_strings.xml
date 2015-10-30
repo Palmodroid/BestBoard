@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
+    <string name="prefs_range">Valid range:</string>
+
     <string name="prefs_descriptor">Descriptor file</string>
 
     <string name="descriptor_directory_key">directory</string>
@@ -9,7 +11,6 @@
     <string name="descriptor_directory_summary_invalid">Working directory cannot be found! </string>
     <string name="descriptor_directory_dialog_title">Name of working directory</string>
     <string name="descriptor_directory_dialog_message">Enter name of working directory! Directory should be below external storage directory.</string>
-    <string name="descriptor_directory_default">"_bestboard"</string>
 
     <string name="descriptor_file_key">descriptor</string>
     <string name="descriptor_file_title">Name of descriptor file</string>
@@ -17,7 +18,6 @@
     <string name="descriptor_file_summary_invalid">Descriptor file cannot be found! </string>
     <string name="descriptor_file_dialog_title">Name of descriptor file</string>
     <string name="descriptor_file_dialog_message">Enter name of descriptor file! File should be in coat format!</string>
-    <string name="descriptor_file_default">coat.txt</string>
 
     <string name="descriptor_reload_key">reload</string>
     <string name="descriptor_reload_title">Force reload of descriptor file</string>
@@ -34,26 +34,23 @@
     <string name="drawing_hide_lower_title">Hide lower part</string>
     <string name="drawing_hide_lower_summary">Lower quater of the bottom row can be hidden</string>
 
-    <string name="drawing_height_ratio_key">screenratio</string>
+    <string name="drawing_height_ratio_key">heightratio</string>
     <string name="drawing_height_ratio_title">Screen height ratio, which can be occupied by the board</string>
     <string name="drawing_height_ratio_summary">Allowed screen height ratio: </string>
     <string name="drawing_height_ratio_dialog_title">Screen height ratio, which can be occupied by the board</string>
-    <string name="drawing_height_ratio_dialog_message">Enter screen height ratio (per mill). Value should be between 200 and 700!</string>
-    <string name="drawing_height_ratio_default">500</string>
+    <string name="drawing_height_ratio_dialog_message">Enter screen height ratio (per mill)!</string>
 
     <string name="drawing_landscape_offset_key">landscapeoffset</string>
     <string name="drawing_landscape_offset_title">Vertical offset, if non-wide board is displayed in landscape view</string>
     <string name="drawing_landscape_offset_summary">Vertical offset in landscape view: </string>
     <string name="drawing_landscape_offset_dialog_title">Vertical offset, if non-wide board is displayed in landscape view</string>
-    <string name="drawing_landscape_offset_dialog_message">Enter vertical offset for non-wide boards (per mill). Value should be between 0 and 1000!</string>
-    <string name="drawing_landscape_offset_default">300</string>
+    <string name="drawing_landscape_offset_dialog_message">Enter vertical offset for non-wide boards (per mill)!</string>
 
     <string name="drawing_outer_rim_key">outerrim</string>
     <string name="drawing_outer_rim_title">Ratio of buttons\' outer rim </string>
     <string name="drawing_outer_rim_summary">Outer rim ratio: </string>
     <string name="drawing_outer_rim_dialog_title">Outer rim ratio </string>
-    <string name="drawing_outer_rim_dialog_message">Enter outer rim ratio (per mill). The outer rim on the buttons is sensitive to touches but not during touch movements. Value should be between 100 and 900!</string>
-    <string name="drawing_outer_rim_default">30</string>
+    <string name="drawing_outer_rim_dialog_message">Enter outer rim ratio (per mill). The outer rim on the buttons is sensitive to touches but not during touch movements.</string>
 
 
     <string name="prefs_cursor">Visible touch control</string>

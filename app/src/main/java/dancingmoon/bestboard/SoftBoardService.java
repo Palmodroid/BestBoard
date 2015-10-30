@@ -99,16 +99,16 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
         {
-        if ( key.equals( PrefsActivity.PREFS_COUNTER ) )
+        if ( key.equals( PrefsFragment.PREFS_COUNTER ) )
             {
-            switch ( sharedPrefs.getInt( PrefsActivity.PREFS_TYPE, -1 ) )
+            switch ( sharedPrefs.getInt( PrefsFragment.PREFS_TYPE, -1 ) )
                 {
-                case PrefsActivity.PREFS_ACTION_RELOAD:
+                case PrefsFragment.PREFS_ACTION_RELOAD:
                     Scribe.note( "SERVICE: get notification to reload descriptor." );
                     startSoftBoardParser();
                     break;
 
-                case PrefsActivity.PREFS_ACTION_REDRAW:
+                case PrefsFragment.PREFS_ACTION_REDRAW:
                     Scribe.note( "SERVICE: get notification to redraw descriptor." );
                     if ( softBoardData != null)
                         {
@@ -117,7 +117,7 @@ public class SoftBoardService extends InputMethodService implements
                         }
                     break;
 
-                case PrefsActivity.PREFS_ACTION_REFRESH:
+                case PrefsFragment.PREFS_ACTION_REFRESH:
                     Scribe.note( "SERVICE: get notification to refresh preferences." );
                     if ( softBoardData != null)
                         softBoardData.readPreferences();

@@ -22,6 +22,10 @@ public class Debug
     public static final String tokenLogFileName = "token.log";
     public static final String LOG_TAG_TOKEN = "TOKEN";
 
+    // Settings of debug levels
+    public static final int PREFS = 10;
+
+
 	// Other settings
 
 
