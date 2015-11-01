@@ -24,6 +24,8 @@ public class TokenizerTest extends Activity
 		
 		// primary scribe is started as normal
 		Debug.initScribe( this );
+		// Ignition.start( this ); need not be called,
+		// because TokenizerTest do not use any preferences.
 
         setContentView(R.layout.tokenizer_test);
 

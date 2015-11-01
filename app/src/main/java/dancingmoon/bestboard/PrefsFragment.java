@@ -35,6 +35,7 @@ public class PrefsFragment extends PreferenceFragment
      **/
 
     // Key of counter preference - service should react, if counter increases
+    // PREF_COUNTER is initialized during init(), so it signs, if this is the first run
     public static final String PREFS_COUNTER = "actioncounter";
 
     // Key of type preference - service should perform this action, if counter increases
@@ -72,23 +73,60 @@ public class PrefsFragment extends PreferenceFragment
      **/
 
     /**
-     * This should be called at every entry point.
-     * Init sets default values, checks and sets integer preferences.
+     * This should be called at every entry point
+     * Sets default values.
+     * Checks and sets integer preferences.
+     * Ignition.start() calls this.
      * @param context context
+     * @return true if this is the very first start
      */
-    public static void init(Context context)
+    public static boolean init(Context context)
         {
-        // Default preference values are set only at start
-        PreferenceManager.setDefaultValues( context, R.xml.prefs, false );
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
+        SharedPreferences.Editor editor = sharedPrefs.edit();
 
-        // Integer preferences should be set, too
-        // !! This will happen at every start, checking an int pref could avoid repeat !!
-        checkAndStoreHeightRatioPref( context );
-        checkAndStoreLandscapeOffsetPref( context );
-        checkAndStoreOuterRimPref( context );
+        ///* Testing default preferences
+        Scribe.note( "Testing. Preferences are cleared completely" );
+        editor.clear();
+        editor.apply();
+        Scribe.note("BEFORE SETTING DEFAULT VALUE - Contains sample preference: "
+                + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
+        PreferenceManager.setDefaultValues(context, R.xml.prefs, true);
+        Scribe.note("BEFORE SETTING DEFAULT VALUE - Contains sample preference: "
+                + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
+        //*/
 
-        // -- NEW INTEGER PREFERENCE CALLS SHOULD COME HERE -- //
+        // OR
+
+        if ( !sharedPrefs.contains( PREFS_COUNTER ) )
+            {
+            Scribe.note( "COUNTER Preference cannot be found. This is the very first start." );
+
+            // Default preference values are set only at start
+            // Default preference values are set only at start
+            PreferenceManager.setDefaultValues(context, R.xml.prefs, false);
+
+            // PREFS_COUNTER pref signs, that program was already started
+            editor.putInt( PREFS_COUNTER, 0 );
+
+            // Integer preferences should be set, too
+            // !! This will happen at every start, checking an int pref could avoid repeat !!
+            checkAndStoreHeightRatioPref(context);
+            checkAndStoreLandscapeOffsetPref( context );
+            checkAndStoreOuterRimPref( context );
+
+            // -- NEW INTEGER PREFERENCE CALLS SHOULD COME HERE -- //
+
+            Scribe.note( "Preferences are initialized." );
+            return true;
+            }
+        else
+            {
+            Scribe.note( "COUNTER Preference can be found. No further initialization is needed." );
+            return false;
+            }
         }
+
 
     /**
      * Checks and sets height-ratio integer preference
@@ -405,7 +443,8 @@ public class PrefsFragment extends PreferenceFragment
 
         if ( !directoryFile.exists() || !directoryFile.isDirectory() )
             {
-            Scribe.error( "PREFERENCES: working directory is missing!" );
+            Scribe.error( "PREFERENCES: working directory is missing: " +
+                    directoryFile.getAbsolutePath() );
             return false;
             }
 
@@ -421,12 +460,13 @@ public class PrefsFragment extends PreferenceFragment
 
         if ( !fileFile.exists() || !fileFile.isFile() )
             {
-            Scribe.error( "PREFERENCES: descriptor file is missing!" );
+            Scribe.error( "PREFERENCES: descriptor file is missing: " +
+                    fileFile.getAbsolutePath() );
             return false;
             }
 
         filePreference.setSummary( getString( R.string.descriptor_file_summary ) + " " +
-                fileName );
+                fileFile.getAbsolutePath() );
 
         reloadPreference.setEnabled( true );
 

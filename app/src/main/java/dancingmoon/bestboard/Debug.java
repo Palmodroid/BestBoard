@@ -55,7 +55,7 @@ public class Debug
 
 		Scribe.logUncaughtExceptions(); // Primary log will store uncaught exceptions
 
-        if ( sharedPrefs.getBoolean( context.getString( R.string.debug_key ), true ) )
+        if ( sharedPrefs.getBoolean( context.getString( R.string.debug_key ), context.getResources().getBoolean( R.bool.debug_default )))
             {
             Scribe.enable();
             }
@@ -63,8 +63,6 @@ public class Debug
             {
             Scribe.disable();
             }
-
-		Scribe.title("Best's Board started!");
 
         // Scribe initialization: SECONDARY - log for user
         Scribe.enableFileLogSecondary(coatLogFileName); // Secondary log activated, all other data come from primary log

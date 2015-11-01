@@ -33,10 +33,6 @@ public class SoftBoardService extends InputMethodService implements
         StoredText.Connection,
         SharedPreferences.OnSharedPreferenceChangeListener
     {
-
-    /** Working directory - moved to preferences */
-    // public static final String WORKING_DIRECTORY = "_bestboard";
-
     /**
      * Name of coat descriptor file in working directory - moved to preferences
      * Temporary storage for file name - it is needed in softBoardParserFinished() once more
@@ -186,7 +182,9 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onCreate()
         {
-        Debug.initScribe( this );
+        // This should be called at every starting point
+        Ignition.start(this);
+
         Scribe.title( "SOFT-BOARD-SERVICE HAS STARTED" );
         Scribe.locus();
 
@@ -227,14 +225,16 @@ public class SoftBoardService extends InputMethodService implements
         {
         Scribe.note( "Parsing has started." );
 
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
         String directoryName =
-                sharedPrefs.getString( getString( R.string.descriptor_directory_key ), "" );
+                sharedPrefs.getString( getString( R.string.descriptor_directory_key ),
+                        getString( R.string.descriptor_directory_default ));
         File directoryFile = new File( Environment.getExternalStorageDirectory(), directoryName );
 
         coatFileName =
-                sharedPrefs.getString( getString( R.string.descriptor_file_key ), "" );
+                sharedPrefs.getString( getString( R.string.descriptor_file_key ),
+                        getString( R.string.descriptor_file_default ));
         File coatFileFile = new File( directoryFile, coatFileName );
 
         // Any previous parsing should stop now

@@ -56,10 +56,8 @@ public class PrefsActivity extends Activity
         {
         super.onCreate(savedInstanceState);
 
-        PrefsFragment.init( this );
-
-        // initScribe should be started before any use of Scribe
-        Debug.initScribe( this );
+        // This should be called at every starting point
+        Ignition.start(this);
 
         Scribe.locus( Debug.PREFS );
 
