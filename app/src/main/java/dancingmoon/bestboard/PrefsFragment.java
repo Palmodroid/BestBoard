@@ -89,10 +89,10 @@ public class PrefsFragment extends PreferenceFragment
         Scribe.note( "Testing. Preferences are cleared completely" );
         editor.clear();
         editor.apply();
-        Scribe.note("BEFORE SETTING DEFAULT VALUE - Contains sample preference: "
+        Scribe.note("BEFORE SETTING DEFAULT VALUE - Prefs contains sample preference: "
                 + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
         PreferenceManager.setDefaultValues(context, R.xml.prefs, true);
-        Scribe.note("BEFORE SETTING DEFAULT VALUE - Contains sample preference: "
+        Scribe.note("AFTER SETTING DEFAULT VALUE - Prefs contains sample preference: "
                 + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
         //*/
 

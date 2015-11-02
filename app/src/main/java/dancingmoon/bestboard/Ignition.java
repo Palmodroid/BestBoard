@@ -2,12 +2,15 @@ package dancingmoon.bestboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 import dancingmoon.bestboard.scribe.Scribe;
 
@@ -38,6 +41,7 @@ public class Ignition
     /**
      * http://stackoverflow.com/a/11212942 - copy asset folder
      * http://stackoverflow.com/a/6187097 - compressed files in assets
+     * http://stackoverflow.com/a/27673773 - assets should be created below main
      * @param context context
      */
     public static void copyAssetFiles( Context context )
@@ -80,7 +84,24 @@ public class Ignition
 
             for ( String assetName : assetNames )
                 {
-                Scribe.debug( "Asset file: " + assetName );
+                try
+                    {
+                    InputStream input = assetManager.open(assetName);
+
+                    if (input.read() == -1)
+                        {
+                        Scribe.debug("Asset file: " + assetName + " is not a valid file!");
+                        }
+                    else
+                        {
+                        Scribe.debug("Asset file: " + assetName + " is OK!");
+                        }
+                    input.close();
+                    }
+                catch (FileNotFoundException f)
+                    {
+                    Scribe.debug("Asset file: " + assetName + " cannot be found!");
+                    }
                 }
             }
         catch ( IOException e )
