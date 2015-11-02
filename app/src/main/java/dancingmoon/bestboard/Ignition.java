@@ -2,7 +2,6 @@ package dancingmoon.bestboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -43,6 +42,7 @@ public class Ignition
      */
     public static void copyAssetFiles( Context context )
         {
+        // Check working directory
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
 
         String directoryName =
@@ -50,15 +50,45 @@ public class Ignition
                         context.getString( R.string.descriptor_directory_default ));
         File directoryFile = new File( Environment.getExternalStorageDirectory(), directoryName );
 
-        Scribe.note("Copying files from asset. Target directory: " + directoryFile.getAbsolutePath() );
+        if ( !directoryFile.exists() )
+            {
+            Scribe.error("Creating working directory: " + directoryName);
+            // Create even whole directory structure
+            directoryFile.mkdirs();
+            }
 
+        // mkdirs() can also fail
+        if ( !directoryFile.isDirectory() )
+            {
+            // Serious error!
+            Scribe.enableToastLog( context );
+            Scribe.error("Working directory cannot be used with these settings. Please, check directory: " +
+                    directoryFile.getAbsolutePath());
+            Scribe.disableToastLog();
+            return;
+            }
+
+        // Working directory is ready
+
+        Scribe.note("Copying files from asset. Target directory: " + directoryFile.getAbsolutePath() );
 
         AssetManager assetManager = context.getAssets();
 
+        try
+            {
+            String[] assetNames = assetManager.list( "" );
 
+            for ( String assetName : assetNames )
+                {
+                Scribe.debug( "Asset file: " + assetName );
+                }
+            }
+        catch ( IOException e )
+            {
+            e.printStackTrace();
+            }
 
-
-
+        /*
         AssetFileDescriptor afd = null;
         try {
         afd = am.openFd( "MyFile.dat");
@@ -72,6 +102,7 @@ public class Ignition
         } catch (IOException e) {
         e.printStackTrace();
         }
+        */
         }
 
     }
