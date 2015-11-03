@@ -2,7 +2,6 @@ package dancingmoon.bestboard;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
@@ -11,6 +10,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 
 import dancingmoon.bestboard.scribe.Scribe;
 
@@ -34,7 +34,7 @@ public class Ignition
         // Check whether this is the very first start
         if ( PrefsFragment.init(context) )
             {
-            copyAssetFiles( context );
+            copyAssets( context );
             }
         }
 
@@ -44,7 +44,7 @@ public class Ignition
      * http://stackoverflow.com/a/27673773 - assets should be created below main
      * @param context context
      */
-    public static void copyAssetFiles( Context context )
+    public static void copyAssets( Context context )
         {
         // Check working directory
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
@@ -84,46 +84,76 @@ public class Ignition
 
             for ( String assetName : assetNames )
                 {
-                try
-                    {
-                    InputStream input = assetManager.open(assetName);
-
-                    if (input.read() == -1)
-                        {
-                        Scribe.debug("Asset file: " + assetName + " is not a valid file!");
-                        }
-                    else
-                        {
-                        Scribe.debug("Asset file: " + assetName + " is OK!");
-                        }
-                    input.close();
-                    }
-                catch (FileNotFoundException f)
-                    {
-                    Scribe.debug("Asset file: " + assetName + " cannot be found!");
-                    }
+                copyAssetFile( assetManager, assetName, directoryFile );
                 }
             }
         catch ( IOException e )
             {
             e.printStackTrace();
             }
-
-        /*
-        AssetFileDescriptor afd = null;
-        try {
-        afd = am.openFd( "MyFile.dat");
-
-        // Create new file to copy into.
-        File file = new File(Environment.getExternalStorageDirectory() + java.io.File.separator + "NewFile.dat");
-        file.createNewFile();
-
-        copyFdToFile(afd.getFileDescriptor(), file);
-
-        } catch (IOException e) {
-        e.printStackTrace();
         }
-        */
+
+    private static void copyAssetFile( AssetManager assetManager, String assetName, File targetDirectory )
+        {
+        File targetFile = new File( targetDirectory, assetName );
+
+        if ( targetFile.exists() )
+            backupFile( targetFile );
+
+        StringBuilder stringBuilder = new StringBuilder( name );
+
+        int n = 0;
+        File backup;
+        do
+            {
+            backup = new File( dir, stringBuilder.append( n++ ).toString() );
+            } while ( backup.exists() );
+
+
+
+
+
+
+
+
+        InputStream inputStream = null;
+        OutputStream outPutStream = null;
+
+        try
+            {
+            InputStream input = assetManager.open( assetName );
+
+            if (input.read() == -1)
+                {
+                Scribe.debug("Asset file: " + assetName + " is not a valid file!");
+                }
+            else
+                {
+                Scribe.debug("Asset file: " + assetName + " is OK!");
+                }
+            input.close();
+            }
+        catch ( FileNotFoundException fnfe )
+            {
+            Scribe.debug("Asset file: " + assetName + " cannot be found!");
+            }
+        catch ( IOException ioe )
+            {
+
+            }
         }
+
+    private static void backupFile( File file )
+        {
+
+
+
+
+
+
+
+        }
+
+
 
     }
