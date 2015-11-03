@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -28,7 +29,7 @@ public class Ignition
         // initScribe should be started before any use of Scribe
         // This could come BEFORE PrefsFragment.initDefaultPrefs(context),
         // because initScribe uses default values from xml
-        Debug.initScribe( context );
+        Debug.initScribe(context);
 
         // Default and integer preferences should be initialized first
         // Check whether this is the very first start
@@ -46,6 +47,8 @@ public class Ignition
      */
     public static void copyAssets( Context context )
         {
+        Scribe.note("Copying files from asset.");
+
         // Check working directory
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
 
@@ -56,7 +59,7 @@ public class Ignition
 
         if ( !directoryFile.exists() )
             {
-            Scribe.error("Creating working directory: " + directoryName);
+            Scribe.note("Creating working directory:" + directoryName);
             // Create even whole directory structure
             directoryFile.mkdirs();
             }
@@ -73,14 +76,13 @@ public class Ignition
             }
 
         // Working directory is ready
+        Scribe.note("Working directory is ready: " + directoryFile.getAbsolutePath() );
 
-        Scribe.note("Copying files from asset. Target directory: " + directoryFile.getAbsolutePath() );
-
-        AssetManager assetManager = context.getAssets();
-
+        // Copying each file from assets
         try
             {
-            String[] assetNames = assetManager.list( "" );
+            AssetManager assetManager = context.getAssets();
+            String[] assetNames = assetManager.list("");
 
             for ( String assetName : assetNames )
                 {
@@ -89,71 +91,97 @@ public class Ignition
             }
         catch ( IOException e )
             {
-            e.printStackTrace();
+            // Serious error!
+            Scribe.enableToastLog( context );
+            Scribe.error("Could not copy files to sdcard! Keyboard cannot be used without sdcard.");
+            Scribe.disableToastLog();
             }
         }
 
+
     private static void copyAssetFile( AssetManager assetManager, String assetName, File targetDirectory )
+            throws IOException
         {
-        File targetFile = new File( targetDirectory, assetName );
-
-        if ( targetFile.exists() )
-            backupFile( targetFile );
-
-        StringBuilder stringBuilder = new StringBuilder( name );
-
-        int n = 0;
-        File backup;
-        do
-            {
-            backup = new File( dir, stringBuilder.append( n++ ).toString() );
-            } while ( backup.exists() );
-
-
-
-
-
-
-
-
         InputStream inputStream = null;
-        OutputStream outPutStream = null;
+        OutputStream outputStream = null;
 
         try
             {
-            InputStream input = assetManager.open( assetName );
+            inputStream = assetManager.open( assetName );
 
-            if (input.read() == -1)
-                {
-                Scribe.debug("Asset file: " + assetName + " is not a valid file!");
-                }
-            else
-                {
-                Scribe.debug("Asset file: " + assetName + " is OK!");
-                }
-            input.close();
-            }
-        catch ( FileNotFoundException fnfe )
-            {
-            Scribe.debug("Asset file: " + assetName + " cannot be found!");
-            }
-        catch ( IOException ioe )
-            {
+            Scribe.note("Copying asset: " + assetName);
 
+            File targetFile = new File( targetDirectory, assetName );
+
+            File backupFile = null;
+            String backupString;
+            if ( targetFile.exists() )
+                {
+
+                // compare these files
+
+
+
+
+
+
+
+
+
+
+
+
+
+                StringBuilder backupNameBuilder = new StringBuilder();
+                int n = 0;
+                do
+                    {
+                    backupNameBuilder.setLength(0);
+                    backupString = backupNameBuilder.append( assetName ).append( n++ ).toString();
+                    backupFile = new File( targetDirectory, backupString );
+                    } while ( backupFile.exists() );
+
+                targetFile.renameTo( backupFile );
+                Scribe.note("Target file backup: " + backupString);
+                }
+
+            outputStream = new FileOutputStream( targetFile );
+
+            byte[] buffer = new byte[1024];
+            int read;
+            while((read = inputStream.read(buffer)) != -1)
+                {
+                outputStream.write(buffer, 0, read);
+                }
+            }
+        catch ( FileNotFoundException fnfe)
+            {
+            Scribe.note("Asset skipped: " + assetName);
+            }
+        finally
+            {
+            if ( outputStream != null )
+                {
+                try
+                    {
+                    outputStream.close();
+                    }
+                catch ( IOException ioe )
+                    {
+                    ; // do nothing, this error cannot be noted
+                    }
+                }
+            if ( inputStream != null )
+                {
+                try
+                    {
+                    inputStream.close();
+                    }
+                catch ( IOException ioe )
+                    {
+                    ; // do nothing, this error cannot be noted
+                    }
+                }
             }
         }
-
-    private static void backupFile( File file )
-        {
-
-
-
-
-
-
-
-        }
-
-
-
     }
