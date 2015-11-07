@@ -6,7 +6,10 @@ import android.content.res.AssetManager;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
+import java.io.BufferedInputStream;
+import java.io.Closeable;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -29,7 +32,7 @@ public class Ignition
         // initScribe should be started before any use of Scribe
         // This could come BEFORE PrefsFragment.initDefaultPrefs(context),
         // because initScribe uses default values from xml
-        Debug.initScribe(context);
+        Debug.initScribe( context );
 
         // Default and integer preferences should be initialized first
         // Check whether this is the very first start
@@ -47,6 +50,7 @@ public class Ignition
      */
     public static void copyAssets( Context context )
         {
+        Scribe.locus();
         Scribe.note("Copying files from asset.");
 
         // Check working directory
@@ -59,7 +63,7 @@ public class Ignition
 
         if ( !directoryFile.exists() )
             {
-            Scribe.note("Creating working directory:" + directoryName);
+            Scribe.note("Could not find directory. Working directory is created:" + directoryName);
             // Create even whole directory structure
             directoryFile.mkdirs();
             }
@@ -99,15 +103,29 @@ public class Ignition
         }
 
 
+    /**
+     * Copy one asset file to target directory.
+     * If a file with the same name could be found in target directory,
+     * it will be checked first.
+     * If the two files are identical, then no copy is needed.
+     * If the two files are not the same, then first a backup will be created from target file.
+     * @param assetManager asset manager to reach assets
+     * @param assetName name of the file (it will be skipped, if this is not a valid file)
+     * @param targetDirectory target directory
+     * @throws IOException if reading error occurs
+     */
     private static void copyAssetFile( AssetManager assetManager, String assetName, File targetDirectory )
             throws IOException
         {
-        InputStream inputStream = null;
+        InputStream assetStream = null;
+        BufferedInputStream assetBufferedStream = null;
+        BufferedInputStream targetBufferedStream = null;
         OutputStream outputStream = null;
 
         try
             {
-            inputStream = assetManager.open( assetName );
+            // Open will throw FileNotFoundException, if this is not a valid file
+            assetStream = assetManager.open( assetName );
 
             Scribe.note("Copying asset: " + assetName);
 
@@ -115,73 +133,117 @@ public class Ignition
 
             File backupFile = null;
             String backupString;
+
+            // if target file already exists...
             if ( targetFile.exists() )
                 {
-
                 // compare these files
+                targetBufferedStream = new BufferedInputStream( new FileInputStream( targetFile ) );
+                assetBufferedStream = new BufferedInputStream( assetStream );
 
-
-
-
-
-
-
-
-
-
-
-
-
-                StringBuilder backupNameBuilder = new StringBuilder();
-                int n = 0;
-                do
+                // ... and it is identical with asset - copy should stop
+                if ( compareStreams( assetBufferedStream, targetBufferedStream ) )
                     {
-                    backupNameBuilder.setLength(0);
-                    backupString = backupNameBuilder.append( assetName ).append( n++ ).toString();
-                    backupFile = new File( targetDirectory, backupString );
-                    } while ( backupFile.exists() );
-
-                targetFile.renameTo( backupFile );
-                Scribe.note("Target file backup: " + backupString);
+                    Scribe.note("Asset and target files are identical, no copy is needed:" + assetName);
+                    return;
+                    }
+                // ... and it is not identical with asset - it should be backed up
+                else
+                    {
+                    StringBuilder backupNameBuilder = new StringBuilder();
+                    int n = 0;
+                    do  {
+                        backupNameBuilder.setLength( 0 );
+                        backupString = backupNameBuilder
+                                .append( n++ )
+                                .append( '_' )
+                                .append( assetName ).toString();
+                        backupFile = new File( targetDirectory, backupString );
+                        } while ( backupFile.exists() );
+                    targetFile.renameTo( backupFile );
+                    Scribe.note( "Target file with same name is backed up: " + backupString );
+                    }
                 }
 
+            assetStream.reset();
             outputStream = new FileOutputStream( targetFile );
 
-            byte[] buffer = new byte[1024];
-            int read;
-            while((read = inputStream.read(buffer)) != -1)
-                {
-                outputStream.write(buffer, 0, read);
-                }
+            copyStreams( assetStream, outputStream );
+            Scribe.note( "Asset file is copied: " + assetName );
             }
         catch ( FileNotFoundException fnfe)
             {
-            Scribe.note("Asset skipped: " + assetName);
+            Scribe.note("Asset is skipped: " + assetName);
             }
         finally
             {
-            if ( outputStream != null )
+            // Scribe.debug( "Closing streams silently" );
+            closeSilently( outputStream );
+            closeSilently( targetBufferedStream );
+            closeSilently( assetBufferedStream );
+            // if assetBufferedStream is not null, then assetStream will be already closed
+            closeSilently( assetStream );
+            }
+        }
+
+
+    /**
+     * Helper method to close a stream without throwing IOException.
+     * Android supports try-with only above API 19!
+     * @param closeable stream to close
+     */
+    private static void closeSilently( Closeable closeable )
+        {
+        if ( closeable != null )
+            {
+            try
                 {
-                try
-                    {
-                    outputStream.close();
-                    }
-                catch ( IOException ioe )
-                    {
-                    ; // do nothing, this error cannot be noted
-                    }
+                closeable.close();
                 }
-            if ( inputStream != null )
+            catch ( IOException ioe )
                 {
-                try
-                    {
-                    inputStream.close();
-                    }
-                catch ( IOException ioe )
-                    {
-                    ; // do nothing, this error cannot be noted
-                    }
+                ; // do nothing, this error cannot be noted
                 }
             }
         }
+
+
+    /**
+     * Compares two streams. The two streams should be buffered.
+     * @param streamA One stream
+     * @param streamB Other stream
+     * @return true, if streams are identical, false otherwise
+     * @throws IOException if reading error occurs
+     */
+    private static boolean compareStreams( InputStream streamA, InputStream streamB )
+            throws IOException
+        {
+        int data;
+
+        do
+            {
+            if ( ( data = streamA.read() ) != streamB.read() )
+                return false;
+            } while ( data != -1 );
+
+        return true;
+        }
+
+
+    /** Copies inputStream to outputStream. Streams should not be buffered.
+     * @param inputStream input stream
+     * @param outputStream output stream
+     * @throws IOException if reading error occurs
+     */
+    private static void copyStreams( InputStream inputStream, OutputStream outputStream )
+            throws IOException
+        {
+        byte[] buffer = new byte[1024];
+        int read;
+        while((read = inputStream.read(buffer)) != -1)
+            {
+            outputStream.write(buffer, 0, read);
+            }
+        }
+
     }

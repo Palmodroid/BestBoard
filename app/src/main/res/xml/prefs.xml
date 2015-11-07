@@ -25,6 +25,11 @@
 			android:title="@string/descriptor_reload_title"
 			android:summary="@string/descriptor_reload_summary" />
 
+		<Preference
+			android:key="@string/descriptor_assets_key"
+			android:title="@string/descriptor_assets_title"
+			android:summary="@string/descriptor_assets_summary" />
+
 	</PreferenceCategory>
 
 	<PreferenceCategory

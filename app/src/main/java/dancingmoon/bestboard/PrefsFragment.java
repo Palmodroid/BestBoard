@@ -331,6 +331,9 @@ public class PrefsFragment extends PreferenceFragment
         // Descriptor / Reload descriptor file
         // Defined in onCreate as Button
 
+        // Descriptor / Copy assets
+        // Defined in onCreate as Button
+
         // Drawing / Hide upper quoter
         if ( key.equals( getString( R.string.drawing_hide_upper_key )) || allKeys )
             {
@@ -534,6 +537,18 @@ public class PrefsFragment extends PreferenceFragment
                     {
                     // getActivity() cannot be null, when button is displayed
                     performAction(PREFS_ACTION_RELOAD);
+                    return true;
+                    }
+                });
+
+        findPreference(getString(R.string.descriptor_assets_key)).
+                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                    {
+                    // getActivity() cannot be null, when button is displayed
+                    Ignition.copyAssets( getActivity() );
                     return true;
                     }
                 });

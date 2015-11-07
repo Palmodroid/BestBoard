@@ -23,6 +23,10 @@
     <string name="descriptor_reload_title">Force reload of descriptor file</string>
     <string name="descriptor_reload_summary">Touch to reload and parse descriptor data!</string>
 
+    <string name="descriptor_assets_key">assets</string>
+    <string name="descriptor_assets_title">Force copy of sample files to working directory</string>
+    <string name="descriptor_assets_summary">Touch to copy bundled sample files. All previously changed files will be backed up! </string>
+
 
     <string name="prefs_drawing">Board layout</string>
 
