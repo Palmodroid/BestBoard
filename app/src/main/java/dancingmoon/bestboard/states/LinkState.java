@@ -1,11 +1,12 @@
 package dancingmoon.bestboard.states;
 
-import android.content.res.*;
+import android.content.res.Configuration;
 
 import dancingmoon.bestboard.Board;
+import dancingmoon.bestboard.Debug;
 import dancingmoon.bestboard.SoftBoardData;
-import dancingmoon.bestboard.scribe.*;
-import dancingmoon.bestboard.utils.*;
+import dancingmoon.bestboard.scribe.Scribe;
+import dancingmoon.bestboard.utils.ExternalDataException;
 
 public class LinkState
     {
@@ -14,8 +15,8 @@ public class LinkState
     // - SoftBoardService.softBoardParserFinished()
     // - SoftBoardService.onCreateInputView()
     // - SoftBoardService.setBoardUse()
-    
-    
+
+
     public static final int MAX_LINKS = 1000; // !! Just for trying!! Original: 16;
     public static final int LINK_PORTRAIT = 0;
     public static final int LINK_LANDSCAPE = 1;
@@ -25,11 +26,11 @@ public class LinkState
 
     // orientation: can be LINK_PORTRAIT or LINK_LANDSCAPE
     private int orientation = LINK_PORTRAIT;
-    
+
     // Connection to service
     private SoftBoardData.SoftBoardListener softBoardListener;
-    
-    
+
+
     // Constructor - UseState should be able to reach Service (SoftBoardDataListener)
     public LinkState( SoftBoardData.SoftBoardListener softBoardListener )
         {
@@ -43,34 +44,34 @@ public class LinkState
         {
         return setLinkBoardTable( index, board, board );
         }
-        
+
     // Use portrait/landscape board pair for activeIndex
     // SoftBoardParser calls it
     public boolean setLinkBoardTable( int index, Board portrait, Board landscape ) throws ExternalDataException
         {
         boolean err = false;
-        
+
         if ( index < 0 || index >= MAX_LINKS )
             {
             throw new ExternalDataException("UseBoard activeIndex is out of range!");
             }
-            
+
         if ( linkBoard[index][0] == null )
             err = true;
-            
+
         linkBoard[index][LINK_PORTRAIT] = portrait;
         linkBoard[index][LINK_LANDSCAPE] = landscape;
-        
+
         return err;
-        }    
-    
+        }
+
     // true if first (activeIndex 0) board is missing
     // UseBoard activeIndex 0 is obligatory
     public boolean isFirstBoardMissing()
         {
         return linkBoard[0][0] == null;
         }
-    
+
     // sets orientation
     // SoftBoardService.softBoardParserFinished() (!!this call could be in constructor!!)
     // and .SoftBoardService.onCreateInputView()
@@ -79,17 +80,17 @@ public class LinkState
         Configuration config = softBoardListener.getApplicationContext().getResources().getConfiguration();
         orientation = (config.orientation == Configuration.ORIENTATION_PORTRAIT ? LINK_PORTRAIT : LINK_LANDSCAPE );
         // Theoretically it could be undefinied, but then it will be treated as landscape
-        
-        Scribe.debug("Orientation is " + ( orientation == LINK_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ));
+
+        Scribe.debug( Debug.LINKSTATE, "Orientation is " + ( orientation == LINK_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
         }
-        
+
     // BoardView.onMeasure() and Board.setScreenData checks orientation
     // This can be used at least for error checking
     public boolean isLandscape()
         {
         return orientation == LINK_LANDSCAPE;
         }
-        
+
     // returns selected board
     // !! activeIndex cannot be invalid !!
     // All three SoftBoardService methods calls this
@@ -97,7 +98,7 @@ public class LinkState
         {
         return linkBoard[activeIndex][orientation];
         }
-    
+
 
     /** Board is active because of continuous touch of its button */
     public final static int TOUCHED = -1;
@@ -120,7 +121,7 @@ public class LinkState
      * After that board will return to board 0.
      */
     private int previousIndex = 0;
-    
+
     /**
      * state: HIDDEN / ACTIVE / LOCKED
      * Board 0 is always LOCKED.
@@ -177,7 +178,7 @@ public class LinkState
         {
         if ( activeIndex != previousIndex )
             {
-            Scribe.debug( "Returning to board: " + previousIndex );
+            Scribe.debug( Debug.LINKSTATE, "Returning to board: " + previousIndex );
             activeIndex = previousIndex;
             previousIndex = 0;
             state = LOCKED;
@@ -209,7 +210,7 @@ public class LinkState
         // NEW board - if exist
         else if ( linkBoard[index][0] != null )
             {
-            Scribe.debug("New board was selected: " + index);
+            Scribe.debug( Debug.LINKSTATE, "New board was selected: " + index );
             previousIndex = this.activeIndex;
             this.activeIndex = index;
             touchCounter = 1; // previous touches are cleared
@@ -223,7 +224,7 @@ public class LinkState
         // NEW board is missing - nothing happens
         else
             {
-            Scribe.error("Board missing, it cannot be selected: " + index);
+            Scribe.error( "Board missing, it cannot be selected: " + index );
             }
         }
 
@@ -235,7 +236,7 @@ public class LinkState
         {
         if ( touchCounter != 0)
             {
-            Scribe.error("UseState TOUCH remained! Counter: " + touchCounter);
+            Scribe.error( "UseState TOUCH remained! Counter: " + touchCounter );
             touchCounter = 0; // No change in use-state
             }
         }
@@ -277,11 +278,11 @@ public class LinkState
         if (isActive(index) && touchCounter > 0)
             {
             touchCounter--;
-            Scribe.debug("UseState RELEASE, counter: " + touchCounter);
+            Scribe.debug( Debug.LINKSTATE, "UseState RELEASE, counter: " + touchCounter );
 
             if (touchCounter == 0)
                 {
-                Scribe.debug("UseState: all button RELEASED.");
+                Scribe.debug( Debug.LINKSTATE, "UseState: all button RELEASED." );
                 if ( !typeFlag )
                     {
                     if (state == HIDDEN)
@@ -289,18 +290,18 @@ public class LinkState
                         if (lockKey)
                             {
                             state = LOCKED;
-                            Scribe.debug("UseState cycled to LOCKED by LOCK key.");
+                            Scribe.debug( Debug.LINKSTATE, "UseState cycled to LOCKED by LOCK key." );
                             }
                         else
                             {
                             state = ACTIVE;
-                            Scribe.debug( "UseState cycled to ACTIVE." );
+                            Scribe.debug( Debug.LINKSTATE, "UseState cycled to ACTIVE." );
                             }
                         }
                     else if (state == ACTIVE)
                         {
                         state = LOCKED;
-                        Scribe.debug("UseState cycled to LOCKED.");
+                        Scribe.debug( Debug.LINKSTATE, "UseState cycled to LOCKED." );
                         }
                     else
                         {
@@ -327,7 +328,7 @@ public class LinkState
             typeFlag = false;
             touchCounter = 0;
             state = LOCKED;
-            Scribe.debug("UseState cancelled to META_LOCK.");
+            Scribe.debug( Debug.LINKSTATE, "UseState cancelled to META_LOCK." );
             }
         }
     }

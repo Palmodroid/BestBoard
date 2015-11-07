@@ -1,7 +1,7 @@
 package dancingmoon.bestboard.buttons;
 
 import dancingmoon.bestboard.R;
-import dancingmoon.bestboard.SoftBoardParser;
+import dancingmoon.bestboard.Tokenizer;
 import dancingmoon.bestboard.modify.Modify;
 import dancingmoon.bestboard.scribe.Scribe;
 
@@ -46,7 +46,7 @@ public class ButtonModify extends ButtonMainTouch implements Cloneable
                 Scribe.error_secondary(
                         "[RUNTIME ERROR] " +
                         board.softBoardData.softBoardListener.getApplicationContext().getString( R.string.modify_missing ) +
-                        SoftBoardParser.regenerateKeyword( modifyId ) );
+                        Tokenizer.regenerateKeyword( modifyId ) );
                 }
             }
         }

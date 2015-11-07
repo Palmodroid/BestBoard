@@ -109,7 +109,7 @@ public class StoredText
 
         preTextReaderReset();
 
-        Scribe.debug("PreText and preTextReader are invalidated!");
+        Scribe.debug( Debug.TEXT, "PreText and preTextReader are invalidated!");
         }
 
 
@@ -131,7 +131,7 @@ public class StoredText
             preText.remove( 0 );
             }
 
-        Scribe.debug("PreText typed: " + toString());
+        Scribe.debug( Debug.TEXT, "PreText typed: " + toString());
         }
 
 
@@ -158,7 +158,7 @@ public class StoredText
             }
         preTextReady = true;
 
-        Scribe.debug("PreText synchronized: " + toString());
+        Scribe.debug( Debug.TEXT, "PreText synchronized: " + toString());
         }
 
 
@@ -271,7 +271,7 @@ public class StoredText
             preText.remove(counter);
             }
 
-        Scribe.debug("preText deleted: " + toString());
+        Scribe.debug( Debug.TEXT, "preText deleted: " + toString());
         }
 
 
@@ -288,7 +288,7 @@ public class StoredText
         postTextReady = false;
         postTextReaderReset();
 
-        Scribe.debug("PostText and PostTextReader are invalidated!");
+        Scribe.debug( Debug.TEXT, "PostText and PostTextReader are invalidated!");
         }
 
 
@@ -310,7 +310,7 @@ public class StoredText
         postTextStart = 0;
         postTextReady = true;
 
-        Scribe.debug("PostText synchronized: " + toString());
+        Scribe.debug( Debug.TEXT, "PostText synchronized: " + toString());
         }
 
 
@@ -376,7 +376,7 @@ public class StoredText
         if ( postText.length() >= LENGTH_LIMIT )
             postTextReady = false;
 
-        Scribe.debug("postText deleted: " + toString());
+        Scribe.debug( Debug.TEXT, "postText deleted: " + toString());
         }
 
 

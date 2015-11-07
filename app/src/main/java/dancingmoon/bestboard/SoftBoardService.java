@@ -100,12 +100,12 @@ public class SoftBoardService extends InputMethodService implements
             switch ( sharedPrefs.getInt( PrefsFragment.PREFS_TYPE, -1 ) )
                 {
                 case PrefsFragment.PREFS_ACTION_RELOAD:
-                    Scribe.note( "SERVICE: get notification to reload descriptor." );
+                    Scribe.note( Debug.SERVICE,  "SERVICE: get notification to reload descriptor." );
                     startSoftBoardParser();
                     break;
 
                 case PrefsFragment.PREFS_ACTION_REDRAW:
-                    Scribe.note( "SERVICE: get notification to redraw descriptor." );
+                    Scribe.note( Debug.SERVICE,  "SERVICE: get notification to redraw descriptor." );
                     if ( softBoardData != null)
                         {
                         softBoardData.readPreferences();
@@ -114,7 +114,7 @@ public class SoftBoardService extends InputMethodService implements
                     break;
 
                 case PrefsFragment.PREFS_ACTION_REFRESH:
-                    Scribe.note( "SERVICE: get notification to refresh preferences." );
+                    Scribe.note( Debug.SERVICE,  "SERVICE: get notification to refresh preferences." );
                     if ( softBoardData != null)
                         softBoardData.readPreferences();
                     break;
@@ -146,7 +146,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public View noKeyboardView()
         {
-        Scribe.locus();
+        Scribe.locus( Debug.SERVICE );
 
         View noKeyboardView = getLayoutInflater().inflate(R.layout.service_nokeyboard, null);
         noKeyboardView.setOnClickListener( new View.OnClickListener()
@@ -162,13 +162,13 @@ public class SoftBoardService extends InputMethodService implements
         // Warning comes from the onCreate method
         if ( warning != null )
             {
-            Scribe.debug( "Warning text has changed: " + warning );
+            Scribe.debug( Debug.SERVICE,  "Warning text has changed: " + warning );
             TextView warningText = (TextView) noKeyboardView.findViewById( R.id.warning_text );
             warningText.setText( warning );
             }
         else
             {
-            Scribe.debug( "Warning text is empty!");
+            Scribe.debug( Debug.SERVICE,  "Warning text is empty!");
             }
 
         return noKeyboardView;
@@ -186,7 +186,7 @@ public class SoftBoardService extends InputMethodService implements
         Ignition.start(this);
 
         Scribe.title( "SOFT-BOARD-SERVICE HAS STARTED" );
-        Scribe.locus();
+        Scribe.locus( Debug.SERVICE );
 
         super.onCreate();
 
@@ -204,7 +204,7 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onDestroy()
         {
-        Scribe.locus();
+        Scribe.locus( Debug.SERVICE );
         Scribe.title( "SOFT-BOARD-SERVICE HAS FINISHED" );
 
         super.onDestroy();
@@ -223,7 +223,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public void startSoftBoardParser()
         {
-        Scribe.note( "Parsing has started." );
+        Scribe.note( Debug.SERVICE,  "Parsing has started." );
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -256,16 +256,16 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public View onCreateInputView()
         {
-        Scribe.locus();
+        Scribe.locus( Debug.SERVICE );
 
         if (softBoardData == null)
             {
-            Scribe.note("Soft-board is not ready yet, no-keyboard-view will be displayed.");
+            Scribe.note( Debug.SERVICE, "Soft-board is not ready yet, no-keyboard-view will be displayed.");
             return noKeyboardView();
             }
         else
             {
-            Scribe.note("Soft-board ready, it will be displayed initially.");
+            Scribe.note( Debug.SERVICE, "Soft-board ready, it will be displayed initially.");
 
             // setting index is not necessary
             softBoardData.linkState.setOrientation();
@@ -306,11 +306,11 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void softBoardParserCriticalError(int errorInfo)
         {
-        Scribe.locus();
+        Scribe.locus( Debug.SERVICE );
 
         // Generating a new view
         warning = "Critical error happened!";
-        Scribe.debug( warning );
+        Scribe.debug( Debug.SERVICE,  warning );
         setInputView( noKeyboardView() );
 
         softBoardParser = null;
@@ -326,7 +326,7 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void softBoardParserFinished(SoftBoardData softBoardData, int errorCount)
         {
-        Scribe.locus();
+        Scribe.locus( Debug.SERVICE );
 
         // non-critical errors
         if ( errorCount != 0 )
@@ -335,7 +335,7 @@ public class SoftBoardService extends InputMethodService implements
             warning = "Parsing of <" + coatFileName + "> has finished with " +
                     errorCount + " errors.\n" +
                     "Please, check log-file for details!";
-            Scribe.debug( warning );
+            Scribe.debug( Debug.SERVICE,  warning );
             // Warning should be shown!
             Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
             }
@@ -344,7 +344,7 @@ public class SoftBoardService extends InputMethodService implements
             {
             // Generating a new view
             warning = "Parsing of <" + coatFileName + "> has finished.";
-            Scribe.debug( warning );
+            Scribe.debug( Debug.SERVICE,  warning );
             // Warning should be shown!
             Toast.makeText( this, warning, Toast.LENGTH_SHORT ).show();
             }
@@ -406,7 +406,7 @@ public class SoftBoardService extends InputMethodService implements
     public void onStartInput(EditorInfo attribute, boolean restarting)
         {
         super.onStartInput( attribute, restarting );
-        Scribe.locus();
+        Scribe.locus( Debug.SERVICE );
 
         initInput();
         }
@@ -423,7 +423,7 @@ public class SoftBoardService extends InputMethodService implements
         {
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
                 candidatesStart, candidatesEnd);
-        // Scribe.locus();
+        // Scribe.locus( Debug.SERVICE );
 
         // Text is NOT selected...
         if ( newSelStart == newSelEnd )
@@ -442,7 +442,7 @@ public class SoftBoardService extends InputMethodService implements
                 {
                 // Text was modified without our knowledge
                 // Correct inner variables!
-                // Scribe.debug(" - Cursor position was changed, last character is not known!");
+                // Scribe.debug( Debug.SERVICE, " - Cursor position was changed, last character is not known!");
                 storedText.invalidate(); //lastCharacter = UNKNOWN;
                 calculatedPosition = newSelStart;
                 }
@@ -451,7 +451,7 @@ public class SoftBoardService extends InputMethodService implements
         // Text is selected
         else // newSelStart != newSelEnd
             {
-            // Scribe.debug(" - Text selected, last character N/A!");
+            // Scribe.debug( Debug.SERVICE, " - Text selected, last character N/A!");
             storedText.invalidate(); //lastCharacter = TEXT_SELECTED;
             calculatedPosition = newSelStart;
             }
@@ -500,7 +500,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public boolean sendKeyDown( long downTime, int keyEventCode )
         {
-        Scribe.debug( keyEventCode + " hard button is down!" );
+        Scribe.debug( Debug.SERVICE,  keyEventCode + " hard button is down!" );
 
         return sendKeyEvent(downTime, downTime, KeyEvent.ACTION_DOWN, keyEventCode);
         }
@@ -515,7 +515,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public boolean sendKeyUp( long downTime, long eventTime, int keyEventCode )
         {
-        Scribe.debug( keyEventCode + " hard button is up!" );
+        Scribe.debug( Debug.SERVICE,  keyEventCode + " hard button is up!" );
 
         return sendKeyEvent( downTime, eventTime, KeyEvent.ACTION_UP, keyEventCode );
         }
@@ -528,7 +528,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public void sendKeyDownUp( int keyEventCode )
         {
-        Scribe.debug(keyEventCode + " hard button is down-up!");
+        Scribe.debug( Debug.SERVICE, keyEventCode + " hard button is down-up!");
 
         long downTime = SystemClock.uptimeMillis();
         if (sendKeyDown( downTime, keyEventCode ))
@@ -603,7 +603,7 @@ public class SoftBoardService extends InputMethodService implements
 
         deleteTextBeforeCursor( space );
 
-        Scribe.debug("Spaces deleted before cursor: " + space);
+        Scribe.debug( Debug.SERVICE, "Spaces deleted before cursor: " + space);
         return space;
         }
 
@@ -616,7 +616,7 @@ public class SoftBoardService extends InputMethodService implements
 
         deleteTextAfterCursor( space );
 
-        Scribe.debug( "Spaces deleted after cursor: " + space );
+        Scribe.debug( Debug.SERVICE,  "Spaces deleted after cursor: " + space );
         return space;
         }
 
@@ -672,8 +672,8 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
         {
-        //Scribe.locus();
-        //Scribe.note(" - keyCode: " + keyCode);
+        //Scribe.locus( Debug.SERVICE );
+        //Scribe.note( Debug.SERVICE, " - keyCode: " + keyCode);
         // TODO Auto-generated method stub
         return super.onKeyDown(keyCode, event);
         }
@@ -681,8 +681,8 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event)
         {
-        //Scribe.locus();
-        //Scribe.note(" - keyCode: " + keyCode);
+        //Scribe.locus( Debug.SERVICE );
+        //Scribe.note( Debug.SERVICE, " - keyCode: " + keyCode);
         // TODO Auto-generated method stub
         return super.onKeyUp(keyCode, event);
         }

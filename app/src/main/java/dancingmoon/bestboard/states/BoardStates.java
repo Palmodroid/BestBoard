@@ -6,6 +6,7 @@ import android.view.KeyEvent;
 import java.util.Arrays;
 
 import dancingmoon.bestboard.Commands;
+import dancingmoon.bestboard.Debug;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.ExtendedMap;
@@ -212,7 +213,7 @@ public class BoardStates
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 
-        Scribe.debug( "Binary Hard state ALT added: " + Integer.toBinaryString( binaryHardState ) );
+        Scribe.debug( Debug.BOARDSTATE,  "Binary Hard state ALT added: " + Integer.toBinaryString( binaryHardState ) );
 
         binaryHardState <<= HardState.FORCE_BITS;
 
@@ -220,7 +221,7 @@ public class BoardStates
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 
-        Scribe.debug( "Binary Hard state CTRL added: " + Integer.toBinaryString( binaryHardState ) );
+        Scribe.debug( Debug.BOARDSTATE,  "Binary Hard state CTRL added: " + Integer.toBinaryString( binaryHardState ) );
 
         binaryHardState <<= HardState.FORCE_BITS;
 
@@ -228,7 +229,7 @@ public class BoardStates
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 
-        Scribe.debug( "Binary Hard state SHIFT added, ready: " + Integer.toBinaryString( binaryHardState ) );
+        Scribe.debug( Debug.BOARDSTATE,  "Binary Hard state SHIFT added, ready: " + Integer.toBinaryString( binaryHardState ) );
 
         return binaryHardState;
         }

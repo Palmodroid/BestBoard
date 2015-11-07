@@ -50,8 +50,8 @@ public class Ignition
      */
     public static void copyAssets( Context context )
         {
-        Scribe.locus();
-        Scribe.note("Copying files from asset.");
+        Scribe.locus( Debug.IGNITION );
+        Scribe.debug( Debug.IGNITION, "Copying files from asset.");
 
         // Check working directory
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
@@ -63,7 +63,7 @@ public class Ignition
 
         if ( !directoryFile.exists() )
             {
-            Scribe.note("Could not find directory. Working directory is created:" + directoryName);
+            Scribe.debug( Debug.IGNITION, "Could not find directory. Working directory is created:" + directoryName);
             // Create even whole directory structure
             directoryFile.mkdirs();
             }
@@ -80,7 +80,7 @@ public class Ignition
             }
 
         // Working directory is ready
-        Scribe.note("Working directory is ready: " + directoryFile.getAbsolutePath() );
+        Scribe.debug( Debug.IGNITION, "Working directory is ready: " + directoryFile.getAbsolutePath() );
 
         // Copying each file from assets
         try
@@ -127,7 +127,7 @@ public class Ignition
             // Open will throw FileNotFoundException, if this is not a valid file
             assetStream = assetManager.open( assetName );
 
-            Scribe.note("Copying asset: " + assetName);
+            Scribe.debug( Debug.IGNITION, "Copying asset: " + assetName);
 
             File targetFile = new File( targetDirectory, assetName );
 
@@ -144,7 +144,7 @@ public class Ignition
                 // ... and it is identical with asset - copy should stop
                 if ( compareStreams( assetBufferedStream, targetBufferedStream ) )
                     {
-                    Scribe.note("Asset and target files are identical, no copy is needed:" + assetName);
+                    Scribe.debug( Debug.IGNITION, "Asset and target files are identical, no copy is needed:" + assetName);
                     return;
                     }
                 // ... and it is not identical with asset - it should be backed up
@@ -161,7 +161,7 @@ public class Ignition
                         backupFile = new File( targetDirectory, backupString );
                         } while ( backupFile.exists() );
                     targetFile.renameTo( backupFile );
-                    Scribe.note( "Target file with same name is backed up: " + backupString );
+                    Scribe.debug( Debug.IGNITION,  "Target file with same name is backed up: " + backupString );
                     }
                 }
 
@@ -169,15 +169,15 @@ public class Ignition
             outputStream = new FileOutputStream( targetFile );
 
             copyStreams( assetStream, outputStream );
-            Scribe.note( "Asset file is copied: " + assetName );
+            Scribe.debug( Debug.IGNITION,  "Asset file is copied: " + assetName );
             }
         catch ( FileNotFoundException fnfe)
             {
-            Scribe.note("Asset is skipped: " + assetName);
+            Scribe.debug( Debug.IGNITION, "Asset is skipped: " + assetName);
             }
         finally
             {
-            // Scribe.debug( "Closing streams silently" );
+            // Scribe.debug( Debug.IGNITION,  "Closing streams silently" );
             closeSilently( outputStream );
             closeSilently( targetBufferedStream );
             closeSilently( assetBufferedStream );

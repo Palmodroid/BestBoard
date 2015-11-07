@@ -1,5 +1,6 @@
 package dancingmoon.bestboard.states;
 
+import dancingmoon.bestboard.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 
 /**
@@ -128,7 +129,7 @@ public abstract class MetaState
         {
         touchCounter++;
         checkStateChanges(); // Touch state could change
-        Scribe.debug( "MetaState TOUCH, counter: " + touchCounter );
+        Scribe.debug( Debug.METASTATE, "MetaState TOUCH, counter: " + touchCounter );
         }
 
 
@@ -151,7 +152,7 @@ public abstract class MetaState
         else if ( isInternalStateOn() )
             {
             setInternalState( META_OFF );
-            Scribe.debug("MetaState set to META_OFF after typing the first non-meta key.");
+            Scribe.debug( Debug.METASTATE, "MetaState set to META_OFF after typing the first non-meta key.");
             }
         // META_OFF and META_LOCK states are not affected by type
 
@@ -167,7 +168,7 @@ public abstract class MetaState
     public void release( boolean lockKey )
         {
         touchCounter--;
-        Scribe.debug("MetaState RELEASE, counter: " + touchCounter);
+        Scribe.debug( Debug.METASTATE, "MetaState RELEASE, counter: " + touchCounter);
 
         // Just for error checking
         if ( touchCounter < 0 )
@@ -179,7 +180,7 @@ public abstract class MetaState
         // last touch released
         if ( touchCounter == 0 )
             {
-            Scribe.debug("MetaState: all button RELEASED.");
+            Scribe.debug( Debug.METASTATE, "MetaState: all button RELEASED.");
             // There was no typing during the released touches
             if ( !typeFlag )
                 {
@@ -188,23 +189,23 @@ public abstract class MetaState
                     if ( lockKey )
                         {
                         setInternalState( META_LOCK );
-                        Scribe.debug( "MetaState cycled to META_LOCK by LOCK key." );
+                        Scribe.debug( Debug.METASTATE,  "MetaState cycled to META_LOCK by LOCK key." );
                         }
                     else
                         {
                         setInternalState( META_ON );
-                        Scribe.debug( "MetaState cycled to META_ON." );
+                        Scribe.debug( Debug.METASTATE,  "MetaState cycled to META_ON." );
                         }
                     }
                 else if ( isInternalStateOn() ) // no difference between state and internal state
                     {
                     setInternalState( META_LOCK );
-                    Scribe.debug("MetaState cycled to META_LOCK.");
+                    Scribe.debug( Debug.METASTATE, "MetaState cycled to META_LOCK.");
                     }
                 else // state == META_LOCK or AUTOCAPS_ON
                     {
                     setInternalState( META_OFF );
-                    Scribe.debug("MetaState cycled to META_OFF.");
+                    Scribe.debug( Debug.METASTATE, "MetaState cycled to META_OFF.");
                     }
                 }
             else // type will not change internal state
@@ -226,7 +227,7 @@ public abstract class MetaState
     public void cancel()
         {
         touchCounter--;
-        Scribe.debug("MetaState CANCEL, counter: " + touchCounter);
+        Scribe.debug( Debug.METASTATE, "MetaState CANCEL, counter: " + touchCounter);
 
         // Just for error checking
         if ( touchCounter < 0 )
@@ -237,10 +238,10 @@ public abstract class MetaState
 
         if ( touchCounter == 0 )
             {
-            Scribe.debug("MetaState: all button CANCELLED.");
+            Scribe.debug( Debug.METASTATE, "MetaState: all button CANCELLED.");
             setInternalState( META_LOCK );
             typeFlag = false;
-            Scribe.debug("MetaState cancelled to META_LOCK.");
+            Scribe.debug( Debug.METASTATE, "MetaState cancelled to META_LOCK.");
             }
         }
 

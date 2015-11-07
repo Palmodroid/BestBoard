@@ -11,7 +11,7 @@ import dancingmoon.bestboard.scribe.Scribe;
 /**
  * ReaderTokenizer identifies keywords and data from a reader stream.
  * Keywords can contain only ASCII (<128) characters (letters, digits and underscore), 
- * while full BMP Unicode set is allowed in string and character constans.
+ * while full BMP Unicode set is allowed in string and character constants.
  * Tokens should be surrounded by white-spaces
  * (Currently ascii chars below space, '(' and ')' as section delimiters).
  * Recognition will skip to the next white-space from the first not-known character.
@@ -35,7 +35,7 @@ import dancingmoon.bestboard.scribe.Scribe;
  * <li>;notes - all characters (till textual EOL) are ignored after the note sign.</li>
  * </ul>
  * <p>
- * EOL - can be treated as normal white-space or as separte token.
+ * EOL - can be treated as normal white-space or as separate token.
  * ignoreEOL sets default behavior (from code), # toggles it (from stream).
  * <p>
  * Escape sequence can be used instead of any character. 
@@ -54,8 +54,8 @@ import dancingmoon.bestboard.scribe.Scribe;
  * getStringToken(), getIntegerToken, getDoubleToken can be used to retrieve the parameters:
  * <ul>
  * <li> TYPE_KEYWORD - string representation and generated token code </li>
- * <li> TYPE_STRING - string constant without double quation marks </li>
- * <li> TYPE_CHARACTER - character without single  quation marks as string and unicode value </li>
+ * <li> TYPE_STRING - string constant without double quotation marks </li>
+ * <li> TYPE_CHARACTER - character without single  quotation marks as string and unicode value </li>
  * <li> TYPE_INTEGER - long precision integer and original number as string </li>
  * <li> TYPE_FRACTION - double precision fraction and original number as string </li>
  * <li> TYPE_EOL and TYPE_EOF, </li>
@@ -95,7 +95,7 @@ public class Tokenizer
 	/** Keyword token, string representation and generated code are returned */
 	public static final int TYPE_KEYWORD = 1;
 
-	/** String constant token between double quation marks, only string representation is returned */
+	/** String constant token between double quotation marks, only string representation is returned */
 	public static final int TYPE_STRING = 2;
 
 	/** Character constant token, character as string, and unicode value as integer will be returned */
@@ -154,9 +154,9 @@ public class Tokenizer
 	 * String value of the token
 	 * TYPE_EOF, TYPE_EOL, TYPE_START, TYPE_END - Empty string;
 	 * TYPE_KEYWORD - lowercase token;
-	 * TYPE_STRING - string without quation marks;
+	 * TYPE_STRING - string without quotation marks;
 	 * TYPE_CHARACTER - one character long string;
-	 * TYPE_INTEGER, TYPE_FRACTON - original number as string;
+	 * TYPE_INTEGER, TYPE_FRACTION - original number as string;
 	 */
 	private StringBuilder tokenStringBuilder = new StringBuilder();
 
@@ -216,8 +216,8 @@ public class Tokenizer
 	 * @return string value as:
 	 * TYPE_OEF, TYPE_EOL, TYPE_START, TYPE END - Empty string;
 	 * TYPE_KEYWORD - lowercase token;
-	 * TYPE_STRING - string without quation marks;
-	 * TYPE_CHARACTER - one character long string without quation marks;
+	 * TYPE_STRING - string without quotation marks;
+	 * TYPE_CHARACTER - one character long string without quotation marks;
 	 * TYPE_INTEGER, TYPE_FRACTION - original number as string;
 	 */
 	public String getStringToken()
@@ -504,8 +504,94 @@ public class Tokenizer
 		}
 
 
-	/**
-	 ** ERROR HANDLING
+    /**
+     * Skips next block. Can be a token, or a complex block between parentheses.
+     * @throws IOException descriptor (coat) file reading fails
+     */
+    public void skipBlock() throws IOException
+        {
+        _block( 0 );
+        }
+
+    /**
+     * Stops evaluation of block. This block is a complex block, evaluation is between parentheses.
+     * !! Method will be added to Tokenizer later
+     * @throws IOException descriptor (coat) file reading fails
+     */
+    public void stopBlock() throws IOException
+        {
+        _block( 1 );
+        }
+
+    /**
+     * Helper method for skipBlock() and stopBlock().
+     * Scans for the ending of embedded blocks. Starting deepness can be set.
+     * 0 means: block is not entered jet, 1 means: tokenizer is after the first opening bracket.
+     * @param deep to come out from this deepness
+     * @throws IOException descriptor (coat) file reading fails
+     */
+    private void _block( int deep ) throws IOException
+        {
+        int tokenType;
+
+        while (true)
+            {
+            tokenType = nextToken();
+
+            if ( tokenType == Tokenizer.TYPE_START )
+                {
+                deep++;
+                }
+            else if ( tokenType == Tokenizer.TYPE_END )
+                {
+                deep--;
+                if ( deep == 0 )
+                    return;
+                else if ( deep < 0 )
+                    {
+                    pushBackLastToken();
+                    return;
+                    }
+                }
+            else if ( tokenType == Tokenizer.TYPE_EOF )
+                return;
+            }
+        }
+
+
+    /**
+     * Helper method for debugging - recreate keyword from keycode
+     * @param code keycode
+     * @return readable keyword
+     */
+    public static String regenerateKeyword(long code)
+        {
+        char val;
+        StringBuilder keyword = new StringBuilder();
+
+        while ( code > 0 )
+            {
+            val = (char) (code % TOKEN_CODE_RADIX);
+            code /= TOKEN_CODE_RADIX;
+
+            // Scribe.debug(" Code: " + code + " val: " + val);
+
+            if ( val == TOKEN_CODE_RADIX -1 )
+                keyword.insert(0, '_');
+            else if ( val >= 10 )
+                keyword.insert(0, (char)(val+'a'-10) );
+            else
+                keyword.insert(0, (char)(val+'0') );
+            }
+
+        // Scribe.debug(" Keyword: " + keyword.toString());
+
+        return keyword.toString();
+        }
+
+
+    /**
+     ** ERROR HANDLING
      **
      ** Log messages come through these methods.
      ** Line number is attached to all messages.
@@ -514,7 +600,7 @@ public class Tokenizer
      ** External classes can use these log handling,
      ** so their messages are completed with line number,
      ** and error messages are also counted.
-	 **/
+     **/
 
 	/** Line number. Needed for log messages */
 	private int lineNumber = 1;
