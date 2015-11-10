@@ -1,0 +1,964 @@
+; begin fejléc
+coat (2)
+name "Kinesa, csehesített, módosítós, cirillel, göröggel"
+version 21
+author "LAttilaD"
+;end
+; begin színek
+
+let (space 0cffc0c0)
+let (kinesa 0cffe580)
+let (czm 0cb2ff80)
+let (vfb 0c80ffb2)
+let (ouou 0c80e5ff)
+let (qwx 0cc0c0ff)
+let (punct1 0cf1daf5)
+let (punct2 0cf5f0c9)
+let (punct3 0cf5e4a2)
+let (punct4 0cf0cc40)
+let (punct5 0cd2d9c7)
+let (punct6 0cb2d6fb)
+let (arrow 0cf5ac78)
+let (arrowgreen 0c65cf85)
+let (shift 0c8080ff)
+let (delete 0cf8f)
+let (enter 0cff4)
+let (hanka 0cdac5b5)
+let (hankav 0cccffb2)
+let (hankaf 0cccec67)
+let (script 0c758b2f)
+let (numrow 0cace1af)
+let (dia1 0c368c20)
+let (dia2 0c267c10)
+let (dia3 0c469c30)
+let (cboard 0cE5B600)
+let (archgrkcolor 0cED8EE2)
+let (modgrkcolor 0cEDC98E)
+let (casebutton 0cEDBA68)
+; end
+
+; begin slotok
+
+addslot (id center size 2000)
+let (shiftcenter addtitle (size 2000 color shift))
+let (modifier addtitle (size 2000 color 0ce6ffad))
+let (greektitle addtitle (size 5000 color 0c00c))
+let (loft addtitle (yoffset -500 size 1200 color shift))
+; end
+; begin defaultok
+
+default (
+	slot center
+	boardcolor 0c210
+)
+
+titlefont "hunglingtesz.ttf"
+;   begin Enter
+let (entertext '✔')
+entertitle entertext
+gotitle entertext
+searchtitle entertext
+sendtitle entertext
+nexttitle entertext
+donetitle entertext
+prevtitle entertext
+nonetitle entertext
+unknowntitle entertext
+;   end
+; end
+; begin boardok
+
+addboard (id cseh halfcolumns 20 rows 8 align odds forcecaps off)
+addboard (id shcseh halfcolumns 20 rows 8 align odds forcecaps off)
+addboard (id num halfcolumns 20 rows 8 align odds forcecaps off)
+addboard (id shnum halfcolumns 20 rows 8 align odds forcecaps off)
+addboard (id cyr halfcolumns 20 rows 8 align odds forcecaps off)
+addboard (id shcyr halfcolumns 20 rows 8 align odds forcecaps on)
+addboard (id grk halfcolumns 20 rows 8 align odds forcecaps off)
+addboard (id shgrk halfcolumns 20 rows 8 align odds forcecaps on)
+addboard (id menu halfcolumns 16 rows 2 align odds)
+addboard (id modifyboard halfcolumns 21 rows 8 align evens)
+addboard (id experimental halfcolumns 16 rows 6 align evens)
+
+let (l_cseh 0)
+let (l_shcseh 1)
+let (l_num 2)
+let (l_shnum 3)
+let (l_menu 4)
+let (l_modif 5)
+let (l_cyr 6)
+let (l_shcyr 7)
+let (l_grk 8)
+let (l_shgrk 9)
+let (l_exp 19)
+;end
+
+; begin Kinesa
+cursor (none)
+cursor (also board cseh row 2 column 1)
+cursor (also board shcseh row 2 column 1)
+cursor (also board num row 2 column 1)
+cursor (also board shnum row 2 column 1)
+
+next
+button (text 'q' color qwx)
+button (text 'ö' color ouou)
+button (text 'v' color vfb)
+button (text 'c' color czm)
+button (text 'z' color czm)
+button (text 'm' color czm)
+button (text 'á' color vfb)
+nextrow next
+button (text 'w' color qwx)
+button (text 'ü' color ouou)
+button (text 'f' color vfb)
+button (text 'l' color czm)
+button (text 's' color kinesa)
+button (text 'e' color kinesa)
+button (text 't' color czm)
+button (text 'é' color vfb)
+nextrow next
+button (text 'x' color qwx)
+button (text 'b' color vfb)
+button (text 'r' color czm)
+button (text 'a' color kinesa)
+button (spacetravel color space autocaps hold)
+button (text 'n' color kinesa)
+button (text 'y' color czm)
+button (text 'í' color vfb)
+nextrow skip 2
+button (text 'ő' color ouou)
+button (text 'j' color vfb)
+button (text 'o' color czm)
+button (text 'k' color kinesa)
+button (text 'i' color kinesa)
+button (text 'g' color czm)
+button (text 'ó' color vfb)
+nextrow skip 2
+button (text 'ű' color ouou)
+button (text 'h' color vfb)
+button (text 'p' color czm)
+button (text 'u' color czm)
+button (text 'd' color czm)
+button (text 'ú' color vfb)
+;end
+; begin cirill
+cursor (none)
+cursor (also board cyr row 2 column 0)
+cursor (also board shcyr row 2 column 0)
+
+skip 1
+button (text 'є' color qwx)
+button (text 'э' color ouou)
+button (text 'ц' color vfb)
+button (text 'ы' color czm)
+button (text 'п' color czm)
+button (text 'д' color czm)
+button (text 'ь' color vfb)
+button (text 'і' color ouou)
+nextrow
+button (text 'ґ' color qwx addtitle (xoffset 500))
+button (text 'ѕ' color qwx)
+button (text 'щ' color ouou)
+button (text 'ю' color vfb)
+button (text 'у' color czm)
+button (text 'т' color kinesa)
+button (text 'о' color kinesa)
+button (text 'м' color czm)
+button (text 'г' color vfb)
+button (text 'ї' color ouou)
+button (text 'ѓ' color qwx addtitle (xoffset -500))
+nextrow skip 1
+button (text 'ф' color ouou)
+button (text 'ш' color vfb)
+button (text 'б' color czm)
+button (text 'и' color kinesa)
+button (spacetravel color space autocaps hold)
+button (text 'н' color kinesa)
+button (text 'к' color czm)
+button (text 'з' color vfb)
+button (text 'ў' color ouou)
+nextrow skip 2
+button (text 'ё' color ouou)
+button (text 'х' color vfb)
+button (text 'я' color czm)
+button (text 'е' color kinesa)
+button (text 'а' color kinesa)
+button (text 'р' color czm)
+button (text 'ч' color vfb)
+button (text 'њ' color ouou)
+button (text 'ћ' color qwx addtitle (xoffset -500))
+nextrow skip 2
+button (text 'ъ' color ouou)
+button (text 'ж' color vfb)
+button (text 'с' color czm)
+button (text 'л' color czm)
+button (text 'в' color czm)
+button (text 'й' color vfb)
+button (text 'љ' color ouou)
+button (text 'ђ' color qwx)
+nextrow skip 1
+button (text 'ѐ' color qwx)
+button (text 'ѝ' color qwx)
+skip 4
+button (text 'ј' color ouou)
+button (text 'џ' color ouou)
+button (text 'ќ' color qwx)
+;end
+; begin görög
+cursor (none)
+cursor (also board grk row 2 column 1)
+cursor (also board shgrk row 2 column 1)
+
+next
+button (modify oxia color archgrkcolor addtitle (text '´' greektitle))
+button (modify varia color archgrkcolor addtitle (text '`' greektitle))
+button (text 'ψ color vfb)
+button (text 'γ' color czm)
+button (text 'η' color czm)
+button (text 'δ' color czm)
+button (modify tonos color modgrkcolor addtitle (text '´' greektitle))
+
+nextrow next
+button (modify psili color archgrkcolor addtitle (text '᾿' greektitle))
+button (modify dasia color archgrkcolor addtitle (text '῾' greektitle))
+button (text 'χ' color vfb)
+button (text 'σ' color czm)
+button (text 'α' color kinesa)
+button (text 'τ' color kinesa)
+button (text 'ν' color czm)
+button (modify diaeresis color modgrkcolor addtitle (text '¨' greektitle))
+
+nextrow next
+button (modify perispomeni color archgrkcolor addtitle (text '῀' greektitle))
+button (text 'φ' color vfb)
+button (text 'κ' color czm)
+button (text 'ο' color kinesa)
+button (spacetravel color space autocaps hold)
+button (text 'ι' color kinesa)
+button (text 'μ' color czm)
+button (text 'ζ' color vfb)
+nextrow skip 2
+button (modify ipogegrameni color archgrkcolor addtitle (text 'ι' greektitle))
+button (text 'θ' color vfb)
+button (text 'υ' color czm)
+button (text 'ς' color kinesa)
+button (text 'ε' color kinesa)
+button (text 'π' color czm)
+button (text 'ξ' color vfb)
+nextrow skip 2
+button (text '·' color qwx)
+button (text 'ϑ' color ouou)
+button (text 'ρ' color czm)
+button (text 'λ' color czm)
+button (text 'ω' color czm)
+button (text 'β' color vfb)
+;end
+; begin írásjelek
+;   begin normál
+;     begin felső sor
+cursor (none)
+cursor (also board cseh row 1 column 1)
+cursor (also board num row 1 column 1)
+cursor (also board cyr row 1 column 1)
+cursor (also board grk row 1 column 1)
+
+button (text "!" erasespaces before autospace after autocaps on color punct1
+	addtitle ()
+	addtitle (loft text '['))
+button (text '?' erasespaces before autospace after autocaps on color punct1
+	addtitle ()
+	addtitle (loft text ']'))
+button (text '-' color punct1
+	addtitle ()
+	addtitle (loft text '('))
+button (text '…' color punct1
+	addtitle ()
+	addtitle (loft text ')'))
+button (text '–' erasespaces before autospace around autocaps hold color punct2
+	addtitle ()
+	addtitle (loft text '#'))
+button (text ',' erasespaces before autospace after autocaps off color punct3
+	addtitle ()
+	addtitle (loft text '+'))
+button (text '.' erasespaces before autospace after autocaps on color punct4
+	addtitle ()
+	addtitle (loft text '*'))
+;end
+;     begin bal csoport
+cursor (none)
+cursor (also board cseh row 2 column 1)
+cursor (also board num row 2 column 1)
+cursor (also board cyr row 2 column 0)
+cursor (also board grk row 2 column 1)
+
+button (text '’' color punct1
+	addtitle ()
+	addtitle (loft text '='))
+nextrow nextrow
+button (text '„' erasespaces before autospace before autocaps hold color punct3
+	addtitle ()
+	addtitle (loft text '»'))
+nextrow
+button (text '.' color punct6
+	addtitle (text ".̺͆")
+	addtitle (loft text "–̺͆"))
+button (text '”' erasespaces before autospace after autocaps hold color punct3
+	addtitle ()
+	addtitle (loft text '«'))
+nextrow
+button (text ':' erasespaces before autospace after color punct3
+	addtitle ()
+	addtitle (loft text '&'))
+button (text ';' erasespaces before autospace after color punct3
+	addtitle ()
+	addtitle (loft text '“'))
+;end
+;     begin jobb sarok
+cursor (none)
+cursor (also board cseh row 6 column 7)
+cursor (also board num row 6 column 7)
+cursor (also board grk row 6 column 7)
+
+skip 2
+button (text '>' color punct5
+	addtitle ()
+	addtitle (loft text '%'))
+nextrow
+button (text '@' color punct5
+	addtitle ()
+	addtitle (loft text '_'))
+button (text '<' color punct5
+	addtitle ()
+	addtitle (loft text '$'))
+button (text '/' color punct5
+	addtitle ()
+	addtitle (loft text '\\'))
+;     end jobb sarok
+;   end normál
+;   begin Shift
+;     begin felső sor
+cursor (none)
+cursor (also board shcseh row 1 column 1)
+cursor (also board shnum row 1 column 1)
+cursor (also board shcyr row 1 column 1)
+cursor (also board shgrk row 1 column 1)
+
+button (text '[' color punct1 erasespaces after
+	addtitle (shiftcenter))
+button (text ']' color punct1 erasespaces before
+	addtitle (shiftcenter))
+button (text '(' color punct1 erasespaces after
+	addtitle (shiftcenter))
+button (text ')' color punct1 erasespaces before
+	addtitle (shiftcenter))
+button (text '#' color punct2
+	addtitle (shiftcenter))
+button (text '+' color punct3
+	addtitle (shiftcenter))
+button (text '*' color punct4
+	addtitle (shiftcenter))
+;    end
+;     begin bal csoport
+cursor (none)
+cursor (also board shcseh row 2 column 1)
+cursor (also board shnum row 2 column 1)
+cursor (also board shcyr row 2 column 0)
+cursor (also board shgrk row 2 column 1)
+
+button (text '=' color punct1
+	addtitle (shiftcenter))
+nextrow nextrow
+button (text '»' color punct3
+	addtitle (shiftcenter))
+nextrow
+button (text '–' color punct6
+	addtitle (text "›–‹" shiftcenter))
+button (text '«' color punct3
+	addtitle (shiftcenter))
+nextrow
+button (text '&' color punct3
+	addtitle (shiftcenter))
+button (text '“' color punct3
+	addtitle (shiftcenter))
+;  end
+;     begin jobb sarok
+cursor (none)
+cursor (also board shcseh row 6 column 7)
+cursor (also board shnum row 6 column 7)
+cursor (also board shgrk row 6 column 7)
+
+skip 2
+button (text '%' color punct5
+	addtitle (shiftcenter))
+nextrow
+button (text '_' color punct5
+	addtitle (shiftcenter))
+button (text '$' color punct5
+	addtitle (shiftcenter))
+button (text '\\' color punct5
+	addtitle (shiftcenter))
+;  end
+;   end
+; end
+; begin ç
+
+cursor (none)
+cursor (also board cseh row 3 column 1)
+cursor (also board shcseh row 3 column 1)
+cursor (also board num row 3 column 1)
+cursor (also board shnum row 3 column 1)
+
+button (text 'ç' color punct4)
+;end
+; begin nyilak
+
+cursor (none)
+cursor (also board cseh row 7 column 3)
+cursor (also board shcseh row 7 column 3)
+cursor (also board num row 7 column 3)
+cursor (also board shnum row 7 column 3)
+cursor (also board cyr row 7 column 3)
+cursor (also board shcyr row 7 column 3)
+cursor (also board grk row 7 column 3)
+cursor (also board shgrk row 7 column 3)
+
+button (key keydpadup repeat addtitle (text '↑') color arrow)
+button (key keydpaddown repeat addtitle (text '↓') color arrow)
+button (key keydpadleft repeat addtitle (text '←') color arrowgreen)
+button (key keydpadright repeat addtitle (text '→') color arrowgreen)
+;end
+; begin Backspace
+
+cursor (none)
+cursor (also board cseh row 1 column 9)
+cursor (also board shcseh row 1 column 9)
+cursor (also board num row 1 column 9)
+cursor (also board shnum row 1 column 9)
+cursor (also board cyr row 1 column 9)
+cursor (also board shcyr row 1 column 9)
+cursor (also board grk row 1 column 9)
+cursor (also board shgrk row 1 column 9)
+
+button (do backspace repeat color delete addtitle (text "🚑" size 3000))
+;end
+; begin Enter
+
+cursor (none)
+cursor (also board cseh row 2 column 9)
+cursor (also board shcseh row 2 column 9)
+cursor (also board num row 2 column 9)
+cursor (also board shnum row 2 column 9)
+cursor (also board cyr row 2 column 9)
+cursor (also board shcyr row 2 column 9)
+cursor (also board grk row 2 column 9)
+cursor (also board shgrk row 2 column 9)
+
+button (enter color enter erasespaces around autocaps on addtitle (size 3000))
+;end
+; begin Caps Shift
+
+cursor (none)
+cursor (also board cseh row 1 column 8)
+cursor (also board shcseh row 1 column 8)
+cursor (also board num row 1 column 8)
+cursor (also board shnum row 1 column 8)
+; cursor (also board cyr row 1 column 10)
+; cursor (also board shcyr row 1 column 10)
+; cursor (also board grk row 1 column 10)
+; cursor (also board shgrk row 1 column 10)
+
+button (meta caps color shift addtitle (text "CAPS" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
+;end
+; begin Caps Lock
+
+cursor (none)
+cursor (also board cseh row 1 column 10)
+cursor (also board shcseh row 1 column 10)
+cursor (also board num row 1 column 10)
+cursor (also board shnum row 1 column 10)
+cursor (also board cyr row 1 column 10)
+cursor (also board shcyr row 1 column 10)
+cursor (also board grk row 1 column 10)
+cursor (also board shgrk row 1 column 10)
+
+button (meta caps lock color shift addtitle (text "CAPS" xoffset -500 yoffset -300 size 800 color 0cfe0) addtitle (text "LOCK" xoffset -500 yoffset 400 size 800 color 0cfe0))
+;end
+; begin cseh
+
+cursor (none)
+cursor (also board cseh row 0 column 0)
+cursor (also board shcseh row 0 column 0)
+
+button (text 'ď' color hanka)
+button (text 'ň' color hanka)
+button (text 'ť' color hanka)
+button (text 'ě' color hankav)
+button (text 'ů' color hankav)
+button (text 'ý' color hankav)
+button (text 'č' color hankaf)
+button (text 'ř' color hankaf)
+button (text 'š' color hankaf)
+button (text 'ž' color hankaf)
+;end
+; begin numerikus
+cursor (none)
+cursor (also board num row 0 column 0)
+cursor (also board cyr row 0 column 0)
+cursor (also board grk row 0 column 0)
+
+button (text '0' color numrow
+	addtitle ()
+	addtitle (text '{' loft))
+button (text '1' color numrow
+	addtitle ()
+	addtitle (text '}' loft))
+button (text '2' color numrow
+	addtitle ()
+	addtitle (text '|' loft))
+button (text '3' color numrow
+	addtitle ()
+	addtitle (text '~' loft))
+button (text '4' color numrow
+	addtitle ()
+	addtitle (text '^' loft))
+button (text '5' color numrow
+	addtitle ()
+	addtitle (text '`' loft))
+button (text '6' color numrow
+	addtitle ()
+	addtitle (text '\'' loft))
+button (text '7' color numrow
+	addtitle ()
+	addtitle (text '\"' loft))
+button (text '8' color numrow
+	addtitle ()
+	addtitle (text '°' loft))
+button (text '9' color numrow
+	addtitle ()
+	addtitle (text '§' loft))
+;end
+; begin numerikus Shift
+cursor (none)
+cursor (also board shnum row 0 column 0)
+cursor (also board shcyr row 0 column 0)
+cursor (also board shgrk row 0 column 0)
+
+button (text '{' color numrow addtitle (shiftcenter))
+button (text '}' color numrow addtitle (shiftcenter))
+button (text '|' color numrow addtitle (shiftcenter))
+button (text '~' color numrow addtitle (shiftcenter))
+button (text '^' color numrow addtitle (shiftcenter))
+button (text '`' color numrow addtitle (shiftcenter))
+button (text '\'' color numrow addtitle (shiftcenter))
+button (text '\"' color numrow addtitle (shiftcenter))
+button (text '°' color numrow addtitle (shiftcenter))
+button (text '§' color numrow addtitle (shiftcenter))
+;end
+; begin linkek
+;   begin Shift gomb
+
+; cseh → Shift
+cursor (only board cseh row 4 column 0)
+button (link l_shcseh color shift addtitle (text "SYMBOL" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
+; Shift → cseh
+cursor (only board shcseh row 4 column 0)
+button (link l_cseh color shift addtitle (text "SYMBOL" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
+; numerikus → Shift
+cursor (only board num row 4 column 0)
+button (link l_shnum color shift addtitle (text "SYMBOL" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
+; Shift → numerikus
+cursor (only board shnum row 4 column 0)
+button (link l_num color shift addtitle (text "SYMBOL" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
+; cirill → Shift
+cursor (only board cyr row 3 column 10)
+button (link l_shcyr color shift addtitle (text "🔺" xoffset -500))
+; Shift → cirill
+cursor (only board shcyr row 3 column 10)
+button (link l_cyr color shift addtitle (text "🔻" xoffset -500))
+; görög → Shift
+cursor (only board grk  row 3 column 10)
+button (link l_shgrk color shift addtitle (text "🔺" xoffset -500))
+; Shift → görög
+cursor (only board shgrk row 3 column 10)
+button (link l_grk color shift addtitle (text "🔻" xoffset -500))
+;end
+;   begin numerikus váltógomb
+
+; cseh → numerikus
+cursor (only board cseh row 5 column 10)
+button (link l_num lock color script addtitle (text "🎒" xoffset -500))
+; numerikus → cseh
+cursor (only board num row 5 column 10)
+button (link l_cseh lock color script addtitle (text "🎒" xoffset -500))
+; Shift cseh → Shift numerikus
+cursor (only board shcseh row 5 column 10)
+button (link l_shnum lock color script addtitle (text "🎒" xoffset -500))
+; Shift numerikus → Shift cseh
+cursor (only board shnum row 5 column 10)
+button (link l_shcseh lock color script addtitle (text "🎒" xoffset -500))
+;end
+;   begin menügomb
+
+cursor (none)
+cursor (also board cseh row 1 column 0)
+cursor (also board shcseh row 1 column 0)
+cursor (also board num row 1 column 0)
+cursor (also board shnum row 1 column 0)
+cursor (also board cyr row 1 column 0)
+cursor (also board shcyr row 1 column 0)
+cursor (also board grk row 1 column 0)
+cursor (also board shgrk row 1 column 0)
+cursor (also board modifyboard row 0 column 0)
+cursor (also board experimental row 0 column 0)
+button (link l_menu color cboard addtitle (text "🍝" xoffset 500))
+;end
+;   begin  gomb
+
+cursor (none)
+cursor (also board cseh row 2 column 0)
+cursor (also board shcseh row 2 column 0)
+cursor (also board num row 2 column 0)
+cursor (also board shnum row 2 column 0)
+button (link l_modif lock color dia1 addtitle (text ''))
+;end
+;end
+; begin menü
+
+cursor (only board menu row 0 column 0)
+cursor (also board modifyboard row 3 column 0)
+button (link l_cseh lock color cboard addtitle (text 'č'))
+button (link l_shcseh lock color cboard addtitle (text 'Č'))
+button (link l_num lock color cboard addtitle (text '9'))
+button (link l_shnum lock color cboard addtitle (text '§'))
+button (link l_cyr lock color cboard addtitle (text 'я'))
+button (link l_shcyr lock color cboard addtitle (text 'Я'))
+button (link l_grk lock color cboard addtitle (text 'ω'))
+button (link l_shgrk lock color cboard addtitle (text 'Ω'))
+nextrow
+button (link l_modif lock color cboard addtitle (text '' xoffset 500))
+button (link l_exp lock color cboard addtitle (text '‽'))
+;end
+; begin Draft
+
+cursor (none)
+cursor (also board cseh row 7 column 0)
+cursor (also board shcseh row 7 column 0)
+cursor (also board num row 7 column 0)
+cursor (also board shnum row 7 column 0)
+cursor (also board cyr row 7 column 0)
+cursor (also board shcyr row 7 column 0)
+cursor (also board grk row 7 column 0)
+cursor (also board shgrk row 7 column 0)
+
+button (do draft addtitle (text "♻" size 2000 xoffset 500))
+;end
+; begin Case gomb
+cursor (none)
+cursor (also board cseh row 3 column 10)
+cursor (also board shcseh row 3 column 10)
+cursor (also board num row 3 column 10)
+cursor (also board shnum row 3 column 10)
+cursor (also board cyr row 3 column 10)
+cursor (also board shcyr row 3 column 10)
+cursor (also board grk row 3 column 10)
+cursor (also board shgrk row 3 column 10)
+
+button (modify case color casebutton addtitle (text "✳" size 2000 xoffset -500))
+; end
+; begin Android Back
+
+cursor (none)
+cursor (also board cseh row 7 column 10)
+cursor (also board shcseh row 7 column 10)
+cursor (also board num row 7 column 10)
+cursor (also board shnum row 7 column 10)
+cursor (also board cyr row 7 column 10)
+cursor (also board shcyr row 7 column 10)
+cursor (also board grk row 7 column 10)
+cursor (also board shgrk row 7 column 10)
+
+button (key keyback addtitle (text "🔙" xoffset -500))
+;end
+; begin diakritikus billentyűzet
+
+cursor (only board modifyboard row 0 column 1)
+button (modify acute color dia1 addtitle (text 'ˊ' modifier))
+button (modify grave color dia2 addtitle (text 'ˋ' modifier))
+button (modify trema color dia3 addtitle (text '¨' modifier))
+button (modify tilde color dia1 addtitle (text '˜' modifier))
+button (modify hacek color dia2 addtitle (text 'ˇ' modifier))
+button (modify circumflex color dia3 addtitle (text 'ˆ' modifier))
+button (modify macron color dia1 addtitle (text 'ˉ' modifier))
+button (modify ogonek color dia2 addtitle (text '˛' modifier))
+button (modify dot color dia3 addtitle (text '˙' modifier))
+button (modify dotbelow color dia1 addtitle (text '.' modifier))
+button (modify eaccent color dia2 addtitle (text '' modifier))
+
+cursor (only board modifyboard row 1 column 0)
+button (modify horn  color dia2 addtitle (text '̉' modifier))
+button (modify stroke color dia3 addtitle (text '/' modifier))
+button (modify ring color dia1 addtitle (text '˚' modifier))
+button (modify ringbelow color dia2 addtitle (text '˳' modifier))
+button (modify breve color dia3 addtitle (text '˘' modifier))
+button (modify doublegrave color dia1 addtitle (text '̏' modifier))
+button (modify upside color dia2 addtitle (text 'ɔ' modifier))
+button (modify special color dia3 addtitle (text 'ß' modifier))
+button (modify invbreve color dia1 addtitle (text '̑' modifier))
+button (modify diaindex color dia2 addtitle (text '²' modifier))
+
+cursor (only board modifyboard row 2 column 1)
+button (modify down color dia1 addtitle (text '˯' modifier))
+button (modify up color dia2 addtitle (text '˰' modifier))
+button (modify left color dia3 addtitle (text '˱' modifier))
+button (modify right color dia1 addtitle (text '˲' modifier))
+button (modify smile color dia2 addtitle (text '̮' modifier))
+button (modify sad color dia3 addtitle (text '̯' modifier))
+button (modify misc color dia1 addtitle (text '̱' modifier))
+;end
+; begin ADDLINK
+
+addlink (index l_cseh board cseh)
+addlink (index l_shcseh board shcseh)
+addlink (index l_num board num)
+addlink (index l_shnum board shnum)
+addlink (index l_cyr board cyr)
+addlink (index l_shcyr board shcyr)
+addlink (index l_grk board grk)
+addlink (index l_shgrk board shgrk)
+addlink (index l_menu board menu)
+addlink (index l_modif board modifyboard)
+addlink (index l_exp board experimental)
+;end
+; begin módosítók táblázata
+;   begin latin
+addmodify (id acute ignorespace rolls (
+"ā" "š" "ž" "AÁ" "CĆ" "" "" "åǻ" "EÉ" "j" "" "GǴ" "IÍ" "KḰ" "LĹ" "MḾ" "NŃ" "q" "x" "" "" "" "OÓ" "PṔ" "RŔ" "SŚ" "UÚ" "V" "WẂ" "YÝ" "ZŹ" "aá" "b" "cć" "eé" "gǵ" "ií" "kḱ" "lĺ" "mḿ" "nń" "oó" "pṕ" "rŕ" "sś" "ṣ" "t" "uú" "v" "wẃ" "yý" "zź" "~" "ÂẤ" "ÆǼ" "ÊẾ" "ÔỐ" "ÕṌ" "Ö" "ØǾ" "ÜǗ" "ß" "âấ" "ä" "æǽ" "êế" "ë" "î" "ôố" "õṍ" "ö" "ŏ" "" "" "øǿ" "üǘ" "ĂẮ" "ăắ" "ą" "č" "ĒḖ" "ēḗ" "ę" "ė" "ī" "ŋ" "ŌṒ" "ōṓ" "ţ" "ŨṸ" "ũṹ" "ƠỚ" "ơớ" "ƯỨ" "ưứ" "ǫ" "ǭ" "ǹ" "ɛ" "ɢ" "ɵ" "ʒ" "ʙ" "β" "δ" "χ" "ṛ" "ṠṤ" "ṡṥ" "ṭ" "ọ" "ḁ" "" "" "" "" "" "ḛ" "" "" "" "ḭ" "" "" "" "" "ǭ" "" "" "" "" "" "" "" "" "" "" "" "" "ã" "ẽ" "ĩ" "į" "ų" "à" "è" "ì" "ò" "ù" "û"
+))
+addmodify (id grave ignorespace rolls (
+"AÀ" "EÈ" "IÌ" "NǸ" "OÒ" "UÙ" "WẀ" "YỲ" "Z" "aà" "eè" "g" "iì" "j" "k" "l" "m" "nǹ" "oò" "p" "r" "s" "" "" "t" "uù" "wẁ" "yỳ" "z" "ÂẦ" "ÊỀ" "ÔỒ" "âầ" "ä" "å" "êề" "ë" "ôồ" "ö" "ü" "ĂẰ" "ăằ" "ĒḔ" "ēḕ" "ę" "ľ" "ń" "ŌṐ" "ōṑ" "ś" "ƠỜ" "ơờ" "ƯỪ" "ưừ" "ǫ" "ȧ" "ȯ" "ə" "ɛ" "ɯ" "β" "δ" "л" "ḱ" "ṕ" "ẹ" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "á" "é" "í" "ó" "ú" "û" "î" "ï"
+))
+addmodify (id trema ignorespace rolls (
+"aä" "eë" "g" "hḧ" "iï" "j" "n" "oö" "tẗ" "uü" "v" "wẅ" "xẍ" "yÿ" "AÄ" "EË" "HḦ" "IÏ" "OÖ" "UÜ" "WẄ" "XẌ" "YŸ" "ūǖṻ" "" "ī" "" "" "ô" "ÍḮ" "Ó" "ÕṎ" "ÙǛ" "ÚǗ" "à" "á" "è" "é" "ê" "íḯ" "ò" "ó" "" "õṏ" "ùǜ" "úǘ" "û" "ĀǞ" "āǟ" "ă" "ē" "ę" "ŌȪ" "ōȫ" "ŏ" "ŪǕṺ" "ŭ" "ǓǙ" "ǔǚ" "ẽ" "ọ" "ụ" "" "" "" "" "" "ḙ" "" "" "ḛ" "" "" "" "" "" "" "" "" "" "" "" "" "" ))
+addmodify (id tilde ignorespace rolls (
+"AÃ" "EẼ" "IĨ" "NÑ" "OÕ" "UŨ" "VṼ" "YỸ" "aã" "eẽ" "iĩ" "j" "lɫ" "m" "nñ" "oõ" "p" "uũ" "vṽ" "w" "yỹ" "ę" "ÊỄ" "ÓṌ" "ÚṸ" "âẫ" "êễ" "ë" "óṍ" "ôỗ" "úṹ" "ĂẴ" "ăẵ" "ŋ" "ŌȬ" "ōȭ" "ƠỠ" "ơỡ" "ƯỮ" "ưữ" "ˊ" "" "r" "b" "á" "é" "í"
+))
+addmodify (id hacek ignorespace rolls (
+"ś" "ź" "AǍ" "CČ" "DĎ" "EĚ" "GǦ" "HȞ" "IǏ" "KǨ" "LĽ" "NŇ" "OǑ" "RŘ" "SŠ" "TŤ" "UǓ" "ZŽ" "aǎ" "cč" "dď" "eě" "gǧ" "hȟ" "iǐ" "jǰ" "kǩ" "lľ" "nň" "oǒ" "rř" "sš" "tť" "uǔ" "zž" "ć" "ē" "ƷǮ" "ə" "ʒǯ" "ṠṦ" "ṡṧ" "ṣ" "ẓ" "" "" "" "" "" "" "" "" "üǚ" "" "ζ" "κ" "λ" "ξ" "π" "σ" "τ" "Ζ" "Κ" "Λ" "Ξ" "Π" "Σ" "Τ"
+))
+addmodify (id circumflex ignorespace rolls (
+"aâ" "cĉ" "eê" "gĝ" "hĥ" "iî" "jĵ" "oô" "sŝ" "uû" "wŵ" "yŷ" "zẑ" "AÂ" "CĈ" "EÊ" "GĜ" "HĤ" "IÎ" "JĴ" "OÔ" "SŜ" "UÛ" "WŴ" "YŶ" "ZẐ" "ę" "" "ÀẦ" "ÁẤ" "ÃẪ" "ÈỀ" "ÉẾ" "ÒỒ" "ÓỐ" "ÕỖ" "ö" "àầ" "áấ" "ãẫ" "æ" "èề" "éế" "ë" "í" "òồ" "óố" "õỗ" "ü" "ą" "ȧ" "ə" "ɛ" "ẠẬ" "ạậ" "ẢẨ" "ảẩ" "ẸỆ" "ẹệ" "ẺỂ" "ē" "ẻể" "ẼỄ" "ẽễ" "ỌỘ" "ọộ" "ỎỔ" "ỏổ"
+))
+addmodify (id macron ignorespace rolls (
+"aā" "d" "eē" "gḡ" "iī" "j" "k" "l" "m" "n" "oō" "p" "r" "s" "uū" "w" "yȳ" "AĀ" "EĒ" "GḠ" "IĪ" "OŌ" "UŪ" "YȲ" "iī" "á" "èḕ" "üǖṻ" "ă" "" "" "ï" "ə" "ạ" "" "" "ẹ" "ÆǢ" "ÉḖ" "ÒṐ" "ÓṒ" "ÕȬ" "ÜǕ" "ä" "å" "æǣ" "éḗ" "ë" "ê" "í" "" "òṑ" "óṓ" "õȭ" "öȫ" "ė" "ę" "ě" "ĭ" "ŏ" "ţ" "ŭ" "ǫǭ" "ǻ" "ȧǡ" "ȮȰ" "ȯȱ" "ɛ" "ɜ" "ɯ" "χ" "ḶḸ" "ḷḹ" "ṚṜ" "ṛṝ" "ọ" "ụ" "ḁ" "" "" "" "" "ḙ" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "d" "" "" "ú" "à" "ì" "ò" "ù" "â" "î" "ô" "û"
+))
+addmodify (id ogonek ignorespace rolls (
+"aą" "cç" "dḑ" "eęȩ" "gģ" "hḩ" "iį" "kķ" "lļ" "nņ" "oǫ" "rŗ" "sş" "tţ" "uų" "AĄ" "CÇ" "DḐ" "EĘȨ" "GĢ" "HḨ" "IĮ" "KĶ" "LĻ" "NŅ" "OǪ" "RŖ" "SŞ" "TŢ" "UŲ" "kķ" "tţ" "ḗ" "ŏ" "" "" "ê" "ȏ" "á" "â" "è" "é" "ë" "ò" "ó" "ĆḈ" "ćḉ" "ē" "ĔḜ" "ĕḝ" "ŌǬ" "ōǭ" "š" "ȇ" "ȏ" "ə" "" "" "" "ẽ" "ṓ" "í" "ú"
+))
+addmodify (id dot ignorespace rolls (
+"AȦ" "BḂ" "CĊ" "DḊ" "EĖ" "FḞ" "GĠ" "HḢ" "Iİ" "" "LĿ" "MṀ" "NṄ" "OȮ" "PṖ" "RṘ" "SṠ" "TṪ" "WẆ" "XẊ" "YẎ" "ZŻ" "aȧ" "bḃ" "cċ" "dḋ" "eė" "fḟ" "gġ" "hḣ" "iı" "jȷ" "lŀ" "mṁ" "nṅ" "oȯ" "pṗ" "rṙ" "sṡ" "tṫ" "u" "v" "wẇ" "xẋ" "yẏ" "zż" "à" "â" "ò" "ù" "āǡ" "āǡ" "ă" "é" "ē" "ĕ" "ŌȰ" "ōȱ" "ŏ" "ŚṤ" "śṥ" "ŠṦ" "šṧ" "ū" "ſẛ" "ʒ" "ṢṨ" "ṣṩ" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+))
+addmodify (id dotbelow ignorespace rolls (
+"aạ" "bḅ" "c" "dḍ" "eẹ" "hḥ" "iị" "kḳ" "lḷ" "mṃ" "nṇ" "oọ" "rṛ" "sṣ" "tṭ" "uụ" "vṿ" "wẉ" "yỵ" "zẓ" "AẠ" "BḄ" "DḌ" "EẸ" "HḤ" "IỊ" "KḲ" "LḶ" "MṂ" "NṆ" "OỌ" "RṚ" "SṢ" "TṬ" "UỤ" "VṾ" "WẈ" "YỴ" "ZẒ" "ā" "ē" "ś" "ÂẬ" "ÊỆ" "ÔỘ" "á" "âậ" "è" "é" "êệ" "î" "ó" "ôộ" "ö" "ü" "ĂẶ" "ăặ" "č" "ē" "ō" "ŕ" "ś" "š" "ū" "ž" "ƠỢ" "ơợ" "ƯỰ" "ưự" "ȇ" "ȏ" "ȧ" "ɒ" "ə" "δ" "ḺḸ" "ḻḹ" "ṞṜ" "ṟṝ" "ṠṨ" "ṡṩ" "" "" "" "" "ṓ"
+))
+addmodify (id eaccent ignorespace rolls (
+"O" "U" "V" "a" "e" "i" "j" "y" "o" "u" "v" "w" "ú"
+))
+addmodify (id horn ignorespace rolls (
+"OƠỎỞ" "oơỏở" "AẢ" "EẺ" "IỈ" "YỶ" "aả" "eẻ" "iỉ" "w" "yỷ" "ÂẨ" "ÊỂ" "ÓỚ" "ÔỔ" "ÕỠ" "ÚỨ" "âẩ" "êể" "óớ" "ôổ" "õỡ" "úứ" "ĂẲ" "ăẳ" "ŨỮ" "ũữ" "ỌỢ" "ọợ" "ỤỰ" "ụự" "UƯỦỬ" "uưủử"
+))
+addmodify (id stroke ignorespace rolls (
+"oøɵ" "OØƟ" "ö" "0" "DÐ" "GǤ" "HĦ" "IƗ" "LŁ" "TŦ" "ZƵ" "bƀ" "dđ" "gǥ" "hħ" "lł" "tŧ" "zƶ" "ÓǾ" "ò" "óǿ" "ō" ""
+))
+addmodify (id ring ignorespace rolls (
+"AÅ" "UŮ" "aå" "e" "i" "uů" "wẘ" "W" "yẙ" "ÁǺ" "à" "áǻ" "ā" "ę" "ī" "ə" "" "" "" ""
+))
+addmodify (id ringbelow ignorespace rolls (
+"AḀ" "aḁ" "e" "i" "l" "m" "u" "n" "r" "s" "v" "á" "ë" "ā" "ľ" "ł" "ȋ" "ɒ" "ə" "" ""
+))
+addmodify (id breve ignorespace rolls (
+"ā" "AĂ" "EĔ" "GĞ" "IĬ" "ǫ" "OŎ" "UŬ" "aă" "eĕ" "gğ" "iĭ" "j" "k" "l" "n" "oŏ" "p" "r" "s" "t" "uŭ" "w" "y" "ÀẰ" "ÁẮ" "ÃẴ" "àằ" "áắ" "ãẵ" "ä" "ö" "ü" "ė" "ī" "ľ" "ń" "ō" "ū" "ȧ" "ȯ" "ó" "ý" "ẃ" "ɛ" "ɯ" "β" "л" "ḿ" "ẠẶ" "ạặ" "ẢẲ" "ảẳ" "" "" "" "" "" "" "" "" "" "" ""
+))
+addmodify (id doublegrave ignorespace rolls (
+"AȀ" "EȄ" "IȈ" "OȌŐ" "RȐ" "UȔŰ" "V" "aȁ" "eȅ" "g" "iȉ" "n" "" "" "oȍő" "rȑ" "uȕű" "v" "w" "y" "" ""
+))
+addmodify (id upside ignorespace rolls (
+"’‛‘" "2" "CƆ" "EƎƏ" "aɒɐ" "ē" "cɔ" "eə" "i" "mɯ" "ä" "å" "è" "é" "" "ê" "ö" "ü" "ė" "ę" "ě" "ȃ" "" "ȇ" "ȋ" "ȧ" "ɛɜ" "←→" "↑↓" "" "" "" "" "" "" "" "sƨ" "sƧ" "ʒƹ" "ƷƸ"
+))
+addmodify (id special ignorespace rolls (
+"2½" "3ɜ" "8" "AÆ" "BƁ" "DƊ" "EƐ" "GƓ" "KƘ" "" "ȏ" "NŊ" "OŒ" "TÞƬ" "YƳ" "ZƷ" "aæɑ" "bɓʙ" "cɕ" "dð" "eɛ" "fſ" "gɢ" "hʜ" "kƙ" "l" "nŋ" "oœ" "pƥ" "q" "sß" "tþƭ" "v" "x×" "yƴ" "zʒ" "|ǁǂ" "ÁǼ" "áǽ" "â" "" "è" "é" "ê" "ñ" "ò" "ó" "ö" "ĀǢ" "āǣ" "ď" "ē" "ĕ" "ń" "ō" "ŏ" "ź" "ż" "žǯ" "ǵ" "ḍ" "ḟẛ" "" "" "" "" "" "" "" "" "" "ḫ" "4¼¾"
+))
+addmodify (id invbreve ignorespace rolls (
+"AȂ" "EȆ" "IȊ" "OȎ" "RȒ" "UȖ" "aȃ" "eȇ" "iȋ" "" "oȏ" "rȓ" "ǫ" "s" "uȗ" "ę" "ɒ" "ə" "ṣ" "ẹ" "" "" ""
+))
+addmodify (id down ignorespace rolls (
+"a" "e" "h" "i" "o" "u" "è" "ë" "í" "ò" "ó" "ö" "ù" "ú" "ü" "ē" "ī" "ĭ" "ō" "ū" "ȯ" "ə" "" "ȱ" "ű" "å"
+))
+addmodify (id up ignorespace rolls (
+"DḒ" "EḘ" "LḼ" "NṊ" "TṰ" "UṶ" "a" "dḓ" "eḙ" "" "ȫ" "ő" "lḽ" "nṋ" "o" "s" "tṱ" "uṷ" "á" "ä" "è" "é" "ë" "ò" "ó" "ö" "ā" "ă" "ē" "ō" "ŏ" "ū" "ŭ" "ȧ" "ȯ" "ə" "" "" "" "" "ȱ" "" "" ""
+))
+addmodify (id left ignorespace rolls (
+"a" "e" "i" "k" "l" "s" "u" "z" "ä" "ḱ" "è" "é" "ì" "d" "ö" "ü" "ē" "ō" "ũ" "ǖ" "ȧ" "ɛ" "ɢ" "γ" "χ" "" "" "ŋ"
+))
+addmodify (id right ignorespace rolls (
+"a" "e" "i" "n" "o" "s" "t" "u" "á" "é" "í" "ó" "ú" "à" "è" "ì" "ò" "ù" "â" "ê" "î" "ô" "û" "ä" "ë" "ï" "ö" "ü" "ā" "" "š" "ł" "ō" "ū" "ŭ" "ȧ" "ə" "ɛ" "ḱ" "" "" "" "" "" "" "" "" "" "" "" "" ""
+))
+addmodify (id smile ignorespace rolls (
+"HḪ" "a" "e" "hḫ" "i" "l" "o" "u" "é" "" "" "ä" "è" "ë" "ì" "ā" "ē" "ī" "ĭ" "ȧ" "ȯ" "ɛ" "ϑ" "л" "ẹ" "" "ǡ" "" "" "χ"
+))
+addmodify (id sad ignorespace rolls (
+"a" "e" "h" "i" "o" "u" "ì" "ö" "ü" "ë" "ő" "v" "é" "w" "ə" "ė" "ĭ" "ɛ" "ɯ" "ī" ""
+))
+addmodify (id misc ignorespace rolls (
+"BḆ" "DḎ" "EḚ" "IḬ" "KḴ" "LḺ" "NṈ" "RṞ" "TṮ" "UṴṲ" "ZẔ" "a" "bḇ" "dḏ" "eḛ" "hẖ" "iḭ" "kḵ" "lḻ" "nṉ" "o" "p" "" "rṟ" "s" "tṯ" "uṵṳ" "x" "zẕ" "á" "å" "é" "ë" "í" "ò" "ô" "ó" "ö" "ā" "ō" "ŏ" "ȧ" "ȫ" "ə" "δ" "ǡ" ""
+))
+addmodify (id diaindex ignorespace rolls (
+"f" "i" "ə" "(" "A" "E" "G" "a" "ë" "b" "c" "d" "e" "g" "h" "0⁰₀" "1¹₁" "2²₂" "3³₃" "4⁴₄" "5⁵₅" "6⁶₆" "7⁷₇" "8⁸₈" "9⁹₉" "β" "ə" "m" "n" "o" "r" "s" "t" "u" "x" "æ" "ó" "ö" "ü" "ă" "ő" "ś" "ť" "ȧ" "ɛ" "ɯ" "γ" "ṇ" "" "" "" "" ""
+))
+addmodify (id case ignorespace rolls (
+"aA" "bB" "cC" "dD" "eE" "fF" "gG" "hH" "iI" "jJ" "kK" "lL" "mM" "nN" "oO" "pP" "qQ" "rR" "sS" "tT" "uU" "vV" "wW" "xX" "yY" "zZ" "áÁ" "âÂ" "äÄ" "ąĄ" "ćĆ" "čČ" "ďĎ" "éÉ" "èÈ" "ëË" "êÊ" "ěĚ" "ęĘ" "íÍ" "îÎ" "ïÏ" "ĺĹ" "ľĽ" "łŁ" "ńŃ" "ňŇ" "óÓ" "ôÔ" "öÖ" "őŐ" "ŕŔ" "řŘ" "śŚ" "šŠ" "ťŤ" "úÚ" "üÜ" "űŰ" "ůŮ" "ýÝ" "źŹ" "žŽ" "żŻ"
+))
+;  end
+;   begin görög
+ADDMODIFY (ID tonos ROLLS (
+	"αά" "εέ" "ηή" "ιί" "ϊΐ" "οό" "υύ" "ϋΰ" "ωώ"
+	"ΑΆ" "ΕΈ" "ΗΉ" "ΙΊ" "Ϊΐ" "ΟΌ" "ΥΎ" "Ϋΰ" "ΩΏ"
+))
+ADDMODIFY (ID dialitika ROLLS (
+	"ιϊ" "ίΐ" "υϋ" "ύΰ"
+	"ίΐ" "ὶῒ" "ύΰ" "ὺῢ" "ῖῗ" "ῦῧ"
+	"ΙΪ" "ΥΫ"
+))
+ADDMODIFY (ID oxia ROLLS (
+	"αά" "εέ" "ηή" "ιί" "οό" "υύ" "ωώ"
+	"ἁἅ" "ἀἄ" "ἑἕ" "ἐἔ" "ἡἥ" "ἠἤ" "ἱἵ" "ἰἴ" "ὁὅ" "ὀὄ" "ὑὕ" "ὐὔ" "ὡὥ" "ὠὤ"
+	"ᾳᾴ" "ῃῄ" "ῳῴ"
+	"ᾁᾅ" "ᾑᾕ" "ᾡᾥ"
+	"ᾀᾄ" "ᾐᾔ" "ᾠᾤ"
+	"ΑΆ" "ΕΈ" "ΗΉ" "ΙΊ" "ΟΌ" "ΥΎ" "ΩΏ"
+	"ἉἍ" "ἈἌ" "ἙἝ" "ἘἜ" "ἩἭ" "ἨἬ" "ἹἽ" "ἸἼ" "ὉὍ" "ὈὌ" "ὙὝ" "ὩὭ" "ὨὬ"
+	"ᾉᾍ" "ᾙᾝ" "ᾩᾭ"
+	"ᾈᾌ" "ᾘᾜ" "ᾨᾬ"
+))
+ADDMODIFY (ID varia ROLLS (
+	"αὰ" "εὲ" "ηὴ" "ιὶ" "οὸ" "υὺ" "ωὼ"
+	"ἁἃ" "ἀἂ" "ἑἓ" "ἐἒ" "ἡἣ" "ἠἢ" "ἱἳ" "ἰἲ" "ὁὃ" "ὀὂ" "ὑὓ" "ὐὒ" "ὡὣ" "ὠὢ"
+	"ᾳᾲ" "ῃῂ" "ῳῲ"
+	"ᾁᾃ" "ᾑᾓ" "ᾡᾣ"
+	"ᾀᾂ" "ᾐᾒ" "ᾠᾢ"
+	"ΑᾺ" "ΕῈ" "ΗῊ" "ΙῚ" "ΟῸ" "ΥῪ" "ΩῺ"
+	"ἉἋ" "ἈἊ" "ἙἛ" "ἘἚ" "ἩἫ" "ἨἪ" "ἹἻ" "ἸἺ" "ὉὋ" "ὈὊ" "ὙὛ" "ὩὫ" "ὨὪ"
+	"ᾉᾋ" "ᾙᾛ" "ᾩᾫ"
+	"ᾈᾊ" "ᾘᾚ" "ᾨᾪ"
+))
+ADDMODIFY (ID perispomeni ROLLS (
+	"αᾶ" "ηῆ" "ιῖ" "υῦ" "ωῶ"
+	"ἁἇ" "ἀἆ" "ἡἧ" "ἠἦ" "ἱἷ" "ἰἶ" "ὑὗ" "ὐὖ" "ὡὧ" "ὠὦ"
+	"ᾳᾷ" "ῃῇ" "ῳῷ"
+	"ᾁᾇ" "ᾑᾗ" "ᾡᾧ"
+	"ᾀᾆ" "ᾐᾖ" "ᾠᾦ"
+	"ἉἏ" "ἈἎ" "ἩἯ" "ἨἮ" "ἹἿ" "ἸἾ" "ὙὟ" "ὐὖ" "ὩὯ" "ὨὮ"
+	"ᾉᾏ" "ᾙᾟ" "ᾩᾯ"
+	"ᾈᾎ" "ᾘᾞ" "ᾨᾮ"
+))
+ADDMODIFY (ID dasia ROLLS (
+	"αἁ" "εἑ" "ηἡ" "ιἱ" "οὁ" "υὑ" "ωὡ" "ρῥ"
+	"άἅ" "ὰἃ" "έἕ" "ὲἓ" "ήἥ" "ὴἣ" "ίἵ" "ὶἳ" "όὅ" "ὸὃ" "ύὕ" "ὺὓ" "ώὥ" "ὼὣ"
+	"ᾶἇ" "ῆἧ" "ῖἷ" "ῦὗ" "ῶὧ"
+	"ᾳᾁ" "ῃᾑ" "ῳᾡ"
+	"ᾴᾅ" "ῄᾕ" "ῴᾥ"
+	"ᾲᾃ" "ῂᾓ" "ῲᾣ"
+	"ᾷᾇ" "ῇᾗ" "ῷᾧ"
+	"ΑἉ" "ΕἙ" "ΗἩ" "ΙἹ" "ΟὉ" "ΥὙ" "ΩὩ"
+	"ΆἍ" "ᾺἋ" "ΈἝ" "ῈἛ" "ΉἭ" "ῊἫ" "ΊἽ" "ῚἻ" "ΌὍ" "ῸὋ" "ΎὝ" "ῪὛ" "ΏὭ" "ῺὫ"
+	"ᾼᾉ" "ῌᾙ" "ῼᾩ"
+))
+ADDMODIFY (ID psili ROLLS (
+	"αἀ" "εἐ" "ηἠ" "ιἰ" "οὀ" "υὐ" "ωὠ" "ρῤ"
+	"άἄ" "ὰἂ" "έἔ" "ὲἒ" "ήἤ" "ὴἢ" "ίἴ" "ὶἲ" "όὄ" "ὸὂ" "ύὔ" "ὺὒ" "ώὤ" "ὼὢ"
+	"ᾶἆ" "ῆἦ" "ῖἶ" "ῦὖ" "ῶὦ"
+	"ᾳᾀ" "ῃᾐ" "ῳᾠ"
+	"ᾴᾄ" "ῄᾔ" "ῴᾤ"
+	"ᾲᾂ" "ῂᾒ" "ῲᾢ"
+	"ᾷᾆ" "ῇᾖ" "ῷᾦ"
+	"ΑἈ" "ΕἘ" "ΗἨ" "ΙἸ" "ΟὈ" "ΩὨ"
+	"ΆἌ" "ᾺἊ" "ΈἜ" "ῈἚ" "ΉἬ" "ῊἪ" "ΊἼ" "ῚἺ" "ΌὌ" "ῸὊ" "ΏὬ" "ῺὪ"
+	"ᾼᾈ" "ῌᾘ" "ῼᾨ"
+))
+ADDMODIFY (ID ipogegrameni ROLLS (
+	"αᾳ" "ηῃ" "ωῳ"
+	"άᾴ" "ήῄ" "ώῴ"
+	"ὰᾲ" "ὴῂ" "ὼῲ"
+	"ἁᾁ" "ἡᾑ" "ὡᾡ"
+	"ἀᾀ" "ἠᾐ" "ὠᾠ"
+	"ᾶᾷ" "ῆῇ" "ῶῷ"
+	"ἅᾅ" "ἥᾕ" "ὥᾥ"
+	"ἄᾄ" "ἤᾔ" "ὤᾤ"
+	"ἃᾃ" "ἣᾓ" "ὣᾣ"
+	"ἂᾂ" "ἢᾒ" "ὢᾢ"
+	"ἇᾇ" "ἧᾗ" "ὧᾧ"
+	"ἆᾆ" "ἦᾖ" "ὦᾦ"
+	"Αᾼ" "Ηῌ" "Ωῼ"
+	"Ἁᾉ" "Ἡᾙ" "Ὡᾩ"
+	"Ἀᾈ" "Ἠᾘ" "Ὠᾨ"
+	"Ἅᾍ" "Ἥᾝ" "Ὥᾭ"
+	"Ἄᾌ" "Ἤᾜ" "Ὤᾬ"
+	"Ἃᾋ" "Ἣᾛ" "Ὣᾫ"
+	"Ἂᾊ" "Ἢᾚ" "Ὢᾪ"
+	"Ἇᾏ" "Ἧᾟ" "Ὧᾯ"
+	"Ἆᾎ" "Ἦᾞ" "Ὦᾮ"
+))
+;   end
+;end
+; begin experimental
+
+cursor (only board experimental row 0 column 1)
+
+button (text 'ť')
+button (text 'c')
+button (text 'h')
+button (text 'r')
+button (text 'u')
+button (text 'ž')
+button (text 'ú')
+nextrow
+button (text 'á')
+button (text 'm')
+button (text 'e')
+button (text 'l')
+button (text 'd')
+button (text 'í')
+button (text 'f')
+nextrow
+button (text 'é')
+button (text 'k')
+button (text 'n')
+button (spacetravel)
+button (text 'o')
+button (text 'p')
+button (text 'ř')
+nextrow
+button (text 'z')
+button (text 'a')
+button (spacetravel)
+button (spacetravel)
+button (text 't')
+button (text 'ě')
+button (do draft)
+nextrow
+button (text 'ď')
+button (text 'j')
+button (text 's')
+button (text 'i')
+button (text 'v')
+button (text 'y')
+button (text 'g')
+nextrow
+button (text 'ň')
+button (text 'č')
+button (text 'b')
+button (text 'š')
+button (text 'ý')
+button (text 'ů')
+button (text 'ó')
+;end
