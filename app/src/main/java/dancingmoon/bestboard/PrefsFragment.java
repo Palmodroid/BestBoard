@@ -44,11 +44,14 @@ public class PrefsFragment extends PreferenceFragment
     /** Coat.descriptor should be reloaded */
     public static final int PREFS_ACTION_RELOAD = 1;
 
-    /** All layouts should be redrawn */
-    public static final int PREFS_ACTION_REDRAW = 2;
+    /** All layouts should be recalculated */
+    public static final int PREFS_ACTION_RECALCULATE = 2;
 
-    /** Refresh preference variables */
-    public static final int PREFS_ACTION_REFRESH = 3;
+    /** All layouts should be recalculated and pictures redrawn */
+    public static final int PREFS_ACTION_REDRAW = 3;
+
+    /** Refresh preference variables, layouts are not affected */
+    public static final int PREFS_ACTION_REFRESH = 4;
 
 
     /**
@@ -82,32 +85,34 @@ public class PrefsFragment extends PreferenceFragment
      */
     public static boolean init(Context context)
         {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
-        SharedPreferences.Editor editor = sharedPrefs.edit();
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
-        ///* Testing default preferences
-        Scribe.note( "Testing. Preferences are cleared completely" );
+        /* Testing default preferences
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        Scribe.note( Debug.PREF,  "Testing. Preferences are cleared completely" );
         editor.clear();
         editor.apply();
-        Scribe.note("BEFORE SETTING DEFAULT VALUE - Prefs contains sample preference: "
+        Scribe.note( Debug.PREF, "BEFORE SETTING DEFAULT VALUE - Prefs contains sample preference: "
                 + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
         PreferenceManager.setDefaultValues(context, R.xml.prefs, true);
-        Scribe.note("AFTER SETTING DEFAULT VALUE - Prefs contains sample preference: "
+        Scribe.note( Debug.PREF, "AFTER SETTING DEFAULT VALUE - Prefs contains sample preference: "
                 + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
-        //*/
+        */
 
         // OR
 
         if ( !sharedPrefs.contains( PREFS_COUNTER ) )
             {
-            Scribe.note( "COUNTER Preference cannot be found. This is the very first start." );
+            Scribe.note( Debug.PREF,  "COUNTER Preference cannot be found. This is the very first start." );
 
             // Default preference values are set only at start
             // Default preference values are set only at start
             PreferenceManager.setDefaultValues(context, R.xml.prefs, false);
 
             // PREFS_COUNTER pref signs, that program was already started
+            SharedPreferences.Editor editor = sharedPrefs.edit();
             editor.putInt( PREFS_COUNTER, 0 );
+            editor.apply();
 
             // Integer preferences should be set, too
             // !! This will happen at every start, checking an int pref could avoid repeat !!
@@ -117,12 +122,12 @@ public class PrefsFragment extends PreferenceFragment
 
             // -- NEW INTEGER PREFERENCE CALLS SHOULD COME HERE -- //
 
-            Scribe.note( "Preferences are initialized." );
+            Scribe.note( Debug.PREF,  "Preferences are initialized." );
             return true;
             }
         else
             {
-            Scribe.note( "COUNTER Preference can be found. No further initialization is needed." );
+            Scribe.note( Debug.PREF,  "COUNTER Preference can be found. No further initialization is needed." );
             return false;
             }
         }
@@ -302,7 +307,7 @@ public class PrefsFragment extends PreferenceFragment
         // Descriptor / Working directory
         if ( key.equals( getString( R.string.descriptor_directory_key )) || allKeys )
             {
-            Scribe.note( "PREFERENCES: working directory has changed!" );
+            Scribe.note( Debug.PREF,  "PREFERENCES: working directory has changed!" );
             // If directory (and descriptor file) is valid,
             // then working directory for debug should be also changed
             // Debug is needed for preferences, too - so directory will be changed directly
@@ -320,7 +325,7 @@ public class PrefsFragment extends PreferenceFragment
         // Descriptor / Coat descriptor file
         if ( key.equals( getString( R.string.descriptor_file_key )) || allKeys )
             {
-            Scribe.note( "PREFERENCES: descriptor file has changed!" );
+            Scribe.note( Debug.PREF,  "PREFERENCES: descriptor file has changed!" );
             // If new descriptor file is valid, then it should be reloaded
             if ( checkDescriptorFilePreferences( sharedPrefs ) && !allKeys )
                 {
@@ -331,18 +336,35 @@ public class PrefsFragment extends PreferenceFragment
         // Descriptor / Reload descriptor file
         // Defined in onCreate as Button
 
+        // Descriptor / Copy assets
+        // Defined in onCreate as Button
+
         // Drawing / Hide upper quoter
         if ( key.equals( getString( R.string.drawing_hide_upper_key )) || allKeys )
             {
-            Scribe.note( "PREFERENCES: Hide upper behavior has changed!" );
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.drawing_hide_upper_key ) );
+            boolean value = sharedPrefs.getBoolean(getString(R.string.drawing_hide_upper_key),
+                    getResources().getBoolean(R.bool.drawing_hide_upper_default)); 
+            preference.setSummary( getString( value ?
+                    R.string.drawing_hide_upper_on : R.string.drawing_hide_upper_off ));
 
+            Scribe.note( Debug.PREF, "PREFERENCES: Hide upper set to: " + value );
+            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
             }
 
         // Drawing / Hide lower quoter
         if ( key.equals( getString( R.string.drawing_hide_lower_key )) || allKeys )
             {
-            Scribe.note( "PREFERENCES: Hide lower behavior has changed!" );
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.drawing_hide_lower_key ) );
+            boolean value = sharedPrefs.getBoolean(getString(R.string.drawing_hide_lower_key),
+                    getResources().getBoolean(R.bool.drawing_hide_lower_default));
+            preference.setSummary( getString( value ?
+                    R.string.drawing_hide_lower_on : R.string.drawing_hide_lower_off ));
 
+            Scribe.note( Debug.PREF, "PREFERENCES: Hide lower set to: " + value );
+            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
             }
 
         // Drawing / Screen height ratio
@@ -354,7 +376,7 @@ public class PrefsFragment extends PreferenceFragment
             Preference heightRatioPreference = findPreference( getString( R.string.drawing_height_ratio_key ) );
             heightRatioPreference.setSummary(getString(R.string.drawing_height_ratio_summary) + " " +
                     Integer.toString(heightRatio));
-            Scribe.note("PREFERENCES: Screen height ratio has changed: " + heightRatio);
+            Scribe.note( Debug.PREF, "PREFERENCES: Screen height ratio has changed: " + heightRatio);
             if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
             }
 
@@ -366,8 +388,8 @@ public class PrefsFragment extends PreferenceFragment
             Preference landscapeOffsetPreference = findPreference( getString( R.string.drawing_landscape_offset_key ) );
             landscapeOffsetPreference.setSummary(getString(R.string.drawing_landscape_offset_summary) + " " +
                     Integer.toString(landscapeOffset));
-            Scribe.note("PREFERENCES: Landscape offset for non-wide boards has changed: " + landscapeOffset);
-            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
+            Scribe.note( Debug.PREF, "PREFERENCES: Landscape offset for non-wide boards has changed: " + landscapeOffset);
+            if ( !allKeys )     performAction(PREFS_ACTION_RECALCULATE);
             }
 
         // Drawing / Outer rim ratio
@@ -378,14 +400,14 @@ public class PrefsFragment extends PreferenceFragment
             Preference outerRimPreference = findPreference( getString( R.string.drawing_outer_rim_key ) );
             outerRimPreference.setSummary(getString(R.string.drawing_outer_rim_summary) + " " +
                     Integer.toString(outerRim));
-            Scribe.note("PREFERENCES: Outer rim ratio has changed!" + outerRim);
+            Scribe.note( Debug.PREF, "PREFERENCES: Outer rim ratio has changed!" + outerRim);
             if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
             }
 
         // Cursor / Touch allow
         if ( key.equals( getString( R.string.cursor_touch_allow_key )) || allKeys )
             {
-            Scribe.note("PREFERENCES: Cursor touch indicator has changed!");
+            Scribe.note( Debug.PREF, "PREFERENCES: Cursor touch indicator has changed!");
 
             if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
             }
@@ -393,7 +415,7 @@ public class PrefsFragment extends PreferenceFragment
         // Cursor / Stroke allow
         if ( key.equals( getString( R.string.cursor_stroke_allow_key )) || allKeys )
             {
-            Scribe.note( "PREFERENCES: Cursor stroke indicator has changed!" );
+            Scribe.note( Debug.PREF,  "PREFERENCES: Cursor stroke indicator has changed!" );
 
             if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
             }
@@ -401,7 +423,7 @@ public class PrefsFragment extends PreferenceFragment
         // Debug
         if ( key.equals( getString( R.string.debug_key )) || allKeys )
             {
-            Scribe.note( "PREFERENCES: debug has changed!" );
+            Scribe.note( Debug.PREF,  "PREFERENCES: debug has changed!" );
 
             // !! Parametrized Scribe.enable() is needed
             if ( sharedPrefs.getBoolean( getString(R.string.debug_key), true ) )
@@ -495,11 +517,19 @@ public class PrefsFragment extends PreferenceFragment
         switch ( type )
             {
             case PREFS_ACTION_RELOAD:
-                Scribe.note("PREFERENCE: server is notified to reload descriptor.");
+                Scribe.note( Debug.PREF, "PREFERENCE: server is notified to reload descriptor.");
+                break;
+
+            case PREFS_ACTION_RECALCULATE:
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to recalculate layouts." );
                 break;
 
             case PREFS_ACTION_REDRAW:
-                Scribe.note( "PREFERENCE: server is notified to redraw layouts." );
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to redraw layouts." );
+                break;
+
+            case PREFS_ACTION_REFRESH:
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to refresh preferences." );
                 break;
 
             default:
@@ -520,7 +550,7 @@ public class PrefsFragment extends PreferenceFragment
     public void onCreate(Bundle savedInstanceState)
         {
         super.onCreate( savedInstanceState );
-        Scribe.locus();
+        Scribe.locus( Debug.PREF );
 
         // Load preferences from resources
         addPreferencesFromResource(R.xml.prefs);
@@ -534,6 +564,18 @@ public class PrefsFragment extends PreferenceFragment
                     {
                     // getActivity() cannot be null, when button is displayed
                     performAction(PREFS_ACTION_RELOAD);
+                    return true;
+                    }
+                });
+
+        findPreference(getString(R.string.descriptor_assets_key)).
+                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                    {
+                    // getActivity() cannot be null, when button is displayed
+                    Ignition.copyAssets( getActivity() );
                     return true;
                     }
                 });
@@ -557,7 +599,7 @@ public class PrefsFragment extends PreferenceFragment
     public void onResume()
         {
         super.onResume();
-        Scribe.locus();
+        Scribe.locus( Debug.PREF );
 
         // Change listener is registered
         PreferenceManager.getDefaultSharedPreferences( getActivity() )
@@ -575,7 +617,7 @@ public class PrefsFragment extends PreferenceFragment
     public void onPause()
         {
         super.onPause();
-        Scribe.locus();
+        Scribe.locus( Debug.PREF );
 
         // Change listener is unregistered
         PreferenceManager.getDefaultSharedPreferences( getActivity() )

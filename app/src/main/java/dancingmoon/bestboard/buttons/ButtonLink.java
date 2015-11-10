@@ -1,8 +1,9 @@
 package dancingmoon.bestboard.buttons;
 
-import android.graphics.*;
+import android.graphics.Canvas;
 
-import dancingmoon.bestboard.scribe.*;
+import dancingmoon.bestboard.Debug;
+import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.LinkState;
 
 public class ButtonLink extends ButtonMultiTouch implements
@@ -57,17 +58,17 @@ public class ButtonLink extends ButtonMultiTouch implements
 
         if ( phase == ButtonMultiTouch.META_TOUCH )
             {
-            Scribe.debug("Index " + index + " USE Button TOUCH.");
+            Scribe.debug( Debug.BUTTON, "Index " + index + " USE Button TOUCH.");
             board.softBoardData.linkState.touch( index );
             }
         else if ( phase == ButtonMultiTouch.META_RELEASE )
             {
-            Scribe.debug("Index " + index + " USE Button RELEASE.");
+            Scribe.debug( Debug.BUTTON, "Index " + index + " USE Button RELEASE.");
             board.softBoardData.linkState.release( index, lockKey );
             }
         else if ( phase == ButtonMultiTouch.META_CANCEL )
             {
-            Scribe.debug("Index " + index + " USE Button CANCEL.");
+            Scribe.debug( Debug.BUTTON, "Index " + index + " USE Button CANCEL.");
             board.softBoardData.linkState.cancel( index );
             }
         }

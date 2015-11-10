@@ -23,10 +23,6 @@ import dancingmoon.bestboard.states.MetaState;
 public class BoardView extends View
     {
     /**
-     ** PREFERENCES - settings per device
-     **/
-
-    /**
      ** CLASS VARIABLES
      **/
 
@@ -51,7 +47,7 @@ public class BoardView extends View
      **      setShift - sets the shift levels by descriptor file
      ** Displaying phase (BoardView):
      **   3. onMeasure - receives screen diameters
-     **   4. setScreenData - screen specific information set by onMeasure
+     **   4. calculateScreenData - screen specific information set by onMeasure
      **/
 
     /**
@@ -60,7 +56,8 @@ public class BoardView extends View
      */
     public BoardView(Context context)
         {
-        super(context);
+        super(context );
+        Scribe.locus( Debug.VIEW );
 
         strokePaint = new Paint();
         strokePaint.setStyle(Paint.Style.FILL);
@@ -76,6 +73,8 @@ public class BoardView extends View
      */
     public void setBoard(Board board)
         {
+        Scribe.locus( Debug.VIEW );
+
         // same board can be at several use levels
         // orientation change will cancel touches
         if ( this.board != board )
@@ -103,10 +102,10 @@ public class BoardView extends View
     @Override
     public void requestLayout()
         {
+        Scribe.locus( Debug.VIEW );
+
         // board-change needs recalculation
         validatedWidthInPixels = -1;
-        // ???
-        board.screenWidthInPixels = -1;
 
         super.requestLayout();
         }
@@ -116,17 +115,17 @@ public class BoardView extends View
      * Therefore the parameters are: EXACTLY screen_width and AT_MOST screen_height values.
      * There are two (several?) cycles of measuring. Calculation is performed during the first cycle,
      * after that boardHeightInPixels will be set, and the second calculations are skipped.
-     * Screen width is stored in screenWidthInPixels, so new calculations with this with are skipped.
+     * Screen width is stored in validatedWidthInPixels, so new calculations with this with are skipped.
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) throws InflateException
         {
-        Scribe.locus();
+        Scribe.locus( Debug.VIEW );
 
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
-        // onMeasure will be called severel times.
+        // onMeasure will be called several times.
         // Calculation will be performed only when screen parameters are changed 
         // (screen rotated or board changed (requestLayout())
         if (widthSize != validatedWidthInPixels)
@@ -145,15 +144,16 @@ public class BoardView extends View
 
 
             // boardWidthInPixels and boardHeightInPixels are set here
-            board.setScreenData(widthSize, heightSize);
+            board.calculateScreenData( widthSize, heightSize );
 
-            Scribe.debug("FIRST Calculation");
-            Scribe.debug("- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
-            Scribe.debug("- Calculated boardheight: " + board.boardHeightInPixels);
-            } else
+            Scribe.debug( Debug.VIEW, "FIRST Calculation");
+            Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
+            Scribe.debug( Debug.VIEW, "- Calculated boardheight: " + board.boardHeightInPixels);
+            }
+        else
             {
-            Scribe.debug("CONSECUTIVE Calculations");
-            Scribe.debug("- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
+            Scribe.debug( Debug.VIEW, "CONSECUTIVE Calculations");
+            Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
             }
 
         setMeasuredDimension(widthSize, board.boardHeightInPixels);
@@ -192,7 +192,7 @@ public class BoardView extends View
      try
      {
      prefsPressureThreshold = (float)Integer.parseInt( prefsPressureThresholdString ) / 100f ;
-     Scribe.debug(" prefsPressureThreshold was set to: " + prefsPressureThreshold);
+     Scribe.debug( Debug.VIEW, " prefsPressureThreshold was set to: " + prefsPressureThreshold);
      }
      catch (NumberFormatException nfe)
      {
@@ -398,7 +398,7 @@ public class BoardView extends View
         int index;
         int id;
 
-        // Scribe.debug(this.toString() + " touchEvent " + event.getActionMasked());
+        // Scribe.debug( Debug.VIEW, this.toString() + " touchEvent " + event.getActionMasked());
 
         pointerChangeFlag = NO_CHANGE;
 
@@ -487,16 +487,16 @@ public class BoardView extends View
 
                                 if (newTouchCode != multiTouchPointer.getValue().touchCode)
                                     {
-                                    Scribe.debug("META pointer left its button.");
+                                    Scribe.debug( Debug.VIEW, "META pointer left its button.");
                                     multiTouchPointer.getValue().buttonMultiTouch.multiTouchEvent(ButtonMultiTouch.META_RELEASE);
                                     // META (indicator) keys change without the change of the MAIN
                                     this.invalidate();
 
                                     if (strokePointerId == -1)
                                         {
-                                        Scribe.debug("META pointer changed to MAIN.");
+                                        Scribe.debug( Debug.VIEW, "META pointer changed to MAIN.");
                                         strokePointerId = multiTouchPointer.getKey();
-                                        Scribe.debug("strokePointerId: " + strokePointerId);
+                                        Scribe.debug( Debug.VIEW, "strokePointerId: " + strokePointerId);
                                         // BowTouchCode == EMPTY_TOUCH_CODE; like ACTION_DOWN
                                         // BowButton == null; like ACTION_DOWN
 
@@ -568,7 +568,7 @@ public class BoardView extends View
 
                     if (multiTouchBow != null)
                         {
-                        Scribe.debug("META pointer UP. TouchCode: " + multiTouchBow.touchCode);
+                        Scribe.debug( Debug.VIEW, "META pointer UP. TouchCode: " + multiTouchBow.touchCode);
 
                         multiTouchBow.buttonMultiTouch.multiTouchEvent(ButtonMultiTouch.META_RELEASE);
                         // META (indicator) keys change without the change of the MAIN
@@ -587,7 +587,7 @@ public class BoardView extends View
 
             case MotionEvent.ACTION_CANCEL:
 
-                Scribe.debug("ALL pointers CANCEL");
+                Scribe.debug( Debug.VIEW, "ALL pointers CANCEL");
 
                 // CANCEL stores more touches (all touches if SPen nears to the screen)
                 // ALL MAIN and META touches are cancelled
@@ -624,11 +624,11 @@ public class BoardView extends View
         {
         if (canvasPressure > prefsPressureThreshold && canvasPressure != 1.0f)
             {
-            Scribe.debug(" prefsPressureThreshold: " + prefsPressureThreshold + ", canvasPressure: " + canvasPressure);
+            Scribe.debug( Debug.VIEW, " prefsPressureThreshold: " + prefsPressureThreshold + ", canvasPressure: " + canvasPressure);
             mainTouchBow.increasePressureCounter();
             }
 
-        // Scribe.debug("StrokePoints size: " + strokePoints.size() );
+        // Scribe.debug( Debug.VIEW, "StrokePoints size: " + strokePoints.size() );
         StrokePoint strokePoint = new StrokePoint(canvasX, canvasY);
         if (strokePoints.get(strokePoints.size() - 1).canvasX == strokePoint.canvasX &&
                 strokePoints.get(strokePoints.size() - 1).canvasY == strokePoint.canvasY)
@@ -686,7 +686,7 @@ public class BoardView extends View
         if (bowAction == TOUCH_DOWN)
             {
             newBowTouchCode = Board.touchCodeFromColor(board.colorFromMap(strokePoint.canvasX, strokePoint.canvasY));
-            Scribe.debug("MAIN pointer DOWN.");
+            Scribe.debug( Debug.VIEW, "MAIN pointer DOWN.");
             }
         else if (bowAction == TOUCH_MOVE)
             {
@@ -701,7 +701,7 @@ public class BoardView extends View
             {
             // UP is the same as MOVE to an empty button
             newBowTouchCode = Board.EMPTY_TOUCH_CODE;
-            Scribe.debug("MAIN pointer UP.");
+            Scribe.debug( Debug.VIEW, "MAIN pointer UP.");
             }
         // TOUCH_HOLD will not change the touchCode
 
@@ -709,7 +709,7 @@ public class BoardView extends View
         if (mainTouchBow.touchCode != newBowTouchCode)
             {
             // THE TOUCHED BUTTON IS CHANGED!
-            Scribe.debug("MAIN pointer TouchCode changed to: " + newBowTouchCode);
+            Scribe.debug( Debug.VIEW, "MAIN pointer TouchCode changed to: " + newBowTouchCode);
 
             // view should be invalidated
             // not only because the touch (controlled by displayTouch),
@@ -766,7 +766,7 @@ public class BoardView extends View
                     {
                     // if MULTI -> put in MULTI
                     // MULTI TOUCH can start here only!!
-                    Scribe.debug("MAIN pointer changed to MULTI. TouchCode: " + newBowTouchCode);
+                    Scribe.debug( Debug.VIEW, "MAIN pointer changed to MULTI. TouchCode: " + newBowTouchCode);
 
                     multiTouchPointers.put(strokePointerId, new MultiTouchBow(newBowTouchCode, (ButtonMultiTouch) newBowButton));
 

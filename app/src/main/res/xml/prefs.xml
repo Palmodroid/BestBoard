@@ -25,6 +25,11 @@
 			android:title="@string/descriptor_reload_title"
 			android:summary="@string/descriptor_reload_summary" />
 
+		<Preference
+			android:key="@string/descriptor_assets_key"
+			android:title="@string/descriptor_assets_title"
+			android:summary="@string/descriptor_assets_summary" />
+
 	</PreferenceCategory>
 
 	<PreferenceCategory
@@ -33,13 +38,11 @@
 		<CheckBoxPreference
 			android:key="@string/drawing_hide_upper_key"
 			android:title="@string/drawing_hide_upper_title"
-			android:summary="@string/drawing_hide_upper_summary"
 			android:defaultValue="@bool/drawing_hide_upper_default" />
 
 		<CheckBoxPreference
 			android:key="@string/drawing_hide_lower_key"
 			android:title="@string/drawing_hide_lower_title"
-			android:summary="@string/drawing_hide_lower_summary"
 			android:defaultValue="@bool/drawing_hide_lower_default" />
 
 		<EditTextPreference

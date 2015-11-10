@@ -2,6 +2,7 @@ package dancingmoon.bestboard.buttons;
 
 import android.graphics.Canvas;
 
+import dancingmoon.bestboard.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.CapsState;
@@ -93,17 +94,17 @@ public class ButtonMeta extends ButtonMultiTouch implements
 
         if ( phase == META_TOUCH )
             {
-            Scribe.debug("Type " + type + " META Button TOUCH.");
+            Scribe.debug( Debug.BUTTON, "Type " + type + " META Button TOUCH.");
             board.softBoardData.boardStates.metaStates[type].touch();
             }
         else if ( phase == META_RELEASE )
             {
-            Scribe.debug("Type " + type + " META Button RELEASE.");
+            Scribe.debug( Debug.BUTTON, "Type " + type + " META Button RELEASE.");
             board.softBoardData.boardStates.metaStates[type].release( lockKey );
             }
         else if ( phase == META_CANCEL )
             {
-            Scribe.debug("Type " + type + " META Button CANCEL.");
+            Scribe.debug( Debug.BUTTON, "Type " + type + " META Button CANCEL.");
             board.softBoardData.boardStates.metaStates[type].cancel();
             }
         }

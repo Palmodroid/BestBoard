@@ -139,24 +139,24 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 		{
         super();
 
-        Scribe.locus();
+        Scribe.locus( Debug.PARSER );
 
 		this.caller = caller;
 		this.descriptorFile = descriptorFile;
 		}
 
-	
+
 	/**
 	 * Background thread will parse information from descriptor file into softBoardData class.
 	 * Cancellation is signalled as CancellationException through the inner methods.
-	 * @return 0: ok; 
-	 * negative values: critical error, execution was stopped; 
+	 * @return 0: ok;
+	 * negative values: critical error, execution was stopped;
 	 * positive values: non-critical errors were logged, execution was finished successfully
 	 */
 	@Override
 	protected Integer doInBackground(Void... voids)
 		{
-        Scribe.locus();
+        Scribe.locus( Debug.PARSER );
 
         try
             {
@@ -188,14 +188,14 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 	/**
 	 * Background work was finished.
 	 * (Cancellation calls onCancel(), this method is NOT called!)
-	 * @param error 0: ok; 
-	 * negative values: critical error, execution was stopped; 
+	 * @param error 0: ok;
+	 * negative values: critical error, execution was stopped;
 	 * positive values: non-critical errors were logged, execution was finished successfully
 	 */
 	@Override
-	protected void onPostExecute(Integer error) 
+	protected void onPostExecute(Integer error)
 		{
-        Scribe.locus();
+        Scribe.locus( Debug.PARSER );
 
 		if ( error >= 0 )
 			caller.softBoardParserFinished(softBoardData, error);
@@ -220,7 +220,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      */
     public int parseDescriptorFile(File descriptorFile) throws TaskCancelledException, IOException, InvalidCoatFileException, ExternalDataException
         {
-        Scribe.locus();
+        Scribe.locus( Debug.PARSER );
         Scribe.note_secondary(caller.getApplicationContext().getString(R.string.parser_starting));
 
         // Descriptor file check
@@ -273,7 +273,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
     private void parseSoftBoard()
             throws TaskCancelledException, IOException, InvalidCoatFileException, ExternalDataException
         {
-        Scribe.locus();
+        Scribe.locus( Debug.PARSER );
 
         Object temp;
         // COAT 2 - MUST BE the first parameter-command!
@@ -377,7 +377,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     catch (InvalidKeyException e)
                         {
                         tokenizer.error(commandString, R.string.parser_parameter_invalid,
-                                regenerateKeyword( commandCode ));
+                                Tokenizer.regenerateKeyword( commandCode ));
                         // parameter-block (if any) will be skipped as unexpected block
                         }
 
@@ -399,7 +399,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 {
                 tokenizer.error( R.string.parser_block_skipped );
                 tokenizer.pushBackLastToken();
-                skipBlock( tokenizer );
+                tokenizer.skipBlock();
                 continue;
                 }
 
@@ -522,7 +522,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             else if ( commandData.getParameterType() == Commands.MESSAGE_STOP )
                 {
                 // force to finish this block
-                stopBlock( tokenizer );
+                tokenizer.stopBlock();
                 break;
                 }
 
@@ -1129,66 +1129,6 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
 
     /**
-     * Skips next block. Can be a token, or a comlex block between parentheses.
-     * !! Method will be added to Tokenizer later
-     * @param tokenizer tokenizer of the descriptor file
-     * @throws IOException descriptor (coat) file reading fails
-     */
-    public static void skipBlock( Tokenizer tokenizer ) throws IOException
-        {
-        _block(tokenizer, 0);
-        }
-
-    /**
-     * Stops evaluation of block. This block is a comlex block, evaluation is between parentheses.
-     * !! Method will be added to Tokenizer later
-     * @param tokenizer tokenizer of the descriptor file
-     * @throws IOException descriptor (coat) file reading fails
-     */
-    public static void stopBlock( Tokenizer tokenizer ) throws IOException
-        {
-        _block(tokenizer, 1);
-        }
-
-    /**
-     * Helper method for skipBlock() and stopBlock().
-     * Scans for the ending of enbedded blocks. Starting deepness can be set.
-     * 0 means: block is not entered jet, 1 means: tokinezir is after the first opening bracket.
-     * !! Method will be added to Tokenizer later
-     * @param tokenizer tokenizer of the descriptor file
-     * @param deep to come out from this deepness
-     * @throws IOException descriptor (coat) file reading fails
-     */
-    private static void _block( Tokenizer tokenizer, int deep ) throws IOException
-        {
-        int tokenType;
-
-        while (true)
-            {
-            tokenType = tokenizer.nextToken();
-
-            if ( tokenType == Tokenizer.TYPE_START )
-                {
-                deep++;
-                }
-            else if ( tokenType == Tokenizer.TYPE_END )
-                {
-                deep--;
-                if ( deep == 0 )
-                    return;
-                else if ( deep < 0 )
-                    {
-                    tokenizer.pushBackLastToken();
-                    return;
-                    }
-                }
-            else if ( tokenType == Tokenizer.TYPE_EOF )
-                return;
-            }
-        }
-
-
-    /**
      * Helper method to create String from PARAMETER_TEXT
      * @param text String or Character object - CANNOT CALLED WITH OTHER TYPES!
      * @return String equivalent
@@ -1205,12 +1145,12 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
 
     /**
-     * Simple utility to check wether array contains item.
+     * Simple utility to check whether array contains item.
      * As generics don't support primitives, it is an extra method for long.
      * ((http://stackoverflow.com/questions/2721546/why-dont-java-generics-support-primitive-types ;
-     * http://stackoverflow.com/a/12635769 a nice algorythm with generics ;
+     * http://stackoverflow.com/a/12635769 a nice algorithm with generics ;
      * http://stackoverflow.com/questions/2250031/null-check-in-an-enhanced-for-loop))
-     * !! Method will be added to Utils later
+     * !! Method could be added to Utils later
      * @param array to check (cannot be null!)
      * @param item to look for
      * @return true if array contains item
@@ -1222,40 +1162,6 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 return true;
 
         return false;
-        }
-
-    /** Number of characters used for keywords */
-    private final static int TOKEN_CODE_RADIX = 'Z' - 'A' + 12;
-
-    /**
-     * Helper method for debugging - recreate keyword from keycode
-     * @param code keycode
-     * @return readable keyword
-     * !! Method will be added to Tokenizer later
-     */
-    public static String regenerateKeyword(long code)
-        {
-        char val;
-        StringBuilder keyword = new StringBuilder();
-
-        while ( code > 0 )
-            {
-            val = (char) (code % TOKEN_CODE_RADIX);
-            code /= TOKEN_CODE_RADIX;
-
-            // Scribe.debug(" Code: " + code + " val: " + val);
-
-            if ( val == TOKEN_CODE_RADIX -1 )
-                keyword.insert(0, '_');
-            else if ( val >= 10 )
-                keyword.insert(0, (char)(val+'a'-10) );
-            else
-                keyword.insert(0, (char)(val+'0') );
-            }
-
-        // Scribe.debug(" Keyword: " + keyword.toString());
-
-        return keyword.toString();
         }
 
     }

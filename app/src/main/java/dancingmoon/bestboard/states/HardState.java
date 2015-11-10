@@ -1,5 +1,6 @@
 package dancingmoon.bestboard.states;
 
+import dancingmoon.bestboard.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 
 /**
@@ -60,7 +61,7 @@ public class HardState extends MetaState
             {
             if ( !boardStates.isSimulatedMetaButtonPressed( selfMetaState ) )
                 {
-                Scribe.debug( selfMetaState + " hard state's button is pressed! " );
+                Scribe.debug( Debug.HARDSTATE, selfMetaState + " hard state's button is pressed! " );
                 boardStates.pressSimulatedMetaButton( selfMetaState );
                 }
             }
@@ -68,7 +69,7 @@ public class HardState extends MetaState
             {
             if ( boardStates.isSimulatedMetaButtonPressed( selfMetaState) )
                 {
-                Scribe.debug( selfMetaState + " hard state's button is released! ");
+                Scribe.debug( Debug.HARDSTATE, selfMetaState + " hard state's button is released! ");
                 boardStates.releaseSimulatedMetaButton( selfMetaState );
                 }
             }

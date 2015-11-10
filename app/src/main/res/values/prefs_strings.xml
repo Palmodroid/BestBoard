@@ -23,34 +23,40 @@
     <string name="descriptor_reload_title">Force reload of descriptor file</string>
     <string name="descriptor_reload_summary">Touch to reload and parse descriptor data!</string>
 
+    <string name="descriptor_assets_key">assets</string>
+    <string name="descriptor_assets_title">Force copy of sample files to working directory</string>
+    <string name="descriptor_assets_summary">Touch to copy bundled sample files. All previously changed files will be backed up! </string>
+
 
     <string name="prefs_drawing">Board layout</string>
 
     <string name="drawing_hide_upper_key">hideupper</string>
     <string name="drawing_hide_upper_title">Hide upper part</string>
-    <string name="drawing_hide_upper_summary">Upper quater of the top row can be hidden</string>
+    <string name="drawing_hide_upper_on">Upper quarter of the top is hidden</string>
+    <string name="drawing_hide_upper_off">Full size top row can be seen</string>
 
     <string name="drawing_hide_lower_key">hidelower</string>
     <string name="drawing_hide_lower_title">Hide lower part</string>
-    <string name="drawing_hide_lower_summary">Lower quater of the bottom row can be hidden</string>
+    <string name="drawing_hide_lower_on">Lower quarter of the top is hidden</string>
+    <string name="drawing_hide_lower_off">Full size bottom row can be seen</string>
 
     <string name="drawing_height_ratio_key">heightratio</string>
     <string name="drawing_height_ratio_title">Screen height ratio, which can be occupied by the board</string>
     <string name="drawing_height_ratio_summary">Allowed screen height ratio: </string>
     <string name="drawing_height_ratio_dialog_title">Screen height ratio, which can be occupied by the board</string>
-    <string name="drawing_height_ratio_dialog_message">Enter screen height ratio (per mill)!</string>
+    <string name="drawing_height_ratio_dialog_message">Enter screen height ratio (per mille)!</string>
 
     <string name="drawing_landscape_offset_key">landscapeoffset</string>
     <string name="drawing_landscape_offset_title">Vertical offset, if non-wide board is displayed in landscape view</string>
     <string name="drawing_landscape_offset_summary">Vertical offset in landscape view: </string>
     <string name="drawing_landscape_offset_dialog_title">Vertical offset, if non-wide board is displayed in landscape view</string>
-    <string name="drawing_landscape_offset_dialog_message">Enter vertical offset for non-wide boards (per mill)!</string>
+    <string name="drawing_landscape_offset_dialog_message">Enter vertical offset for non-wide boards (per mille)!</string>
 
     <string name="drawing_outer_rim_key">outerrim</string>
     <string name="drawing_outer_rim_title">Ratio of buttons\' outer rim </string>
     <string name="drawing_outer_rim_summary">Outer rim ratio: </string>
     <string name="drawing_outer_rim_dialog_title">Outer rim ratio </string>
-    <string name="drawing_outer_rim_dialog_message">Enter outer rim ratio (per mill). The outer rim on the buttons is sensitive to touches but not during touch movements.</string>
+    <string name="drawing_outer_rim_dialog_message">Enter outer rim ratio (per mille)! The outer rim on the buttons is sensitive to touches but not during touch movements.</string>
 
 
     <string name="prefs_cursor">Visible touch control</string>

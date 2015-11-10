@@ -56,7 +56,7 @@ import java.util.Locale;
  * Configuration:
  * There are two separate configurations, one for odd, and one for even message levels.
  * Odd messages will enable secondary configuration, which will be a copy of the primary configuration at start.
- * Methods with the secondary configuration (without explicite level setting) have "Secondary" endings.
+ * Methods with the secondary configuration (without explicit level setting) have "Secondary" endings.
  * Secondary log is useful if we want to separate two logs, one for the programmer and one for the user. 
  * <p>
  * Message types:
@@ -99,7 +99,17 @@ public class Scribe
 	 *                                                          *
 	 ************************************************************/
 
-	/** Log file's default extension */
+    /** Log file will be archived above this size */
+    public static final long MAX_LOGFILE_LENGTH = 1024*1024;
+    /** Maximum number of archived log files */
+    public static final int MAX_LOGFILE = 8;
+
+    /** Debug cannot be limited above this value */
+    public static final int NO_LIMIT = 1000;
+    /** Not limited level value for secondary config */
+    public static final int NO_LIMIT_SECONDARY = NO_LIMIT + 1;
+
+    /** Log file's default extension */
 	public static final String DEFAULT_FILE_EXT = ".log";
 	/** Log file's default name */
 	public static final String DEFAULT_FILE_NAME = "scribe" + DEFAULT_FILE_EXT;
@@ -108,15 +118,20 @@ public class Scribe
 	/** Default tag for system log */
 	public static final String DEFAULT_LOG_TAG = "SCRIBE";
 
-	/** Log file will be archived above this size */
-	public static final long MAX_LOGFILE_LENGTH = 1024*1024;
-	/** Maximum number of archived log files */
-	public static final int MAX_LOGFILE = 8;
-
-	/** Debug cannot be limited above this value */
-	public static final int NO_LIMIT = 1000;
-	/** Not limited level value for secondary config */
-	public static final int NO_LIMIT_SECONDARY = NO_LIMIT + 1;
+    /** Default enabled switch */
+    private static final boolean DEFAULT_ENABLED = true;
+    /** Default debug enabled switch */
+    private static final boolean DEFAULT_DEBUG_ENABLED = true;
+    /** Default limit - 0 == all messages enabled */
+    private static final int DEFAULT_LIMIT = 0;
+    /** Default lower inspection level - inspection is only needed below limit */
+    private static final int DEFAULT_LOWER = NO_LIMIT;
+    /** Default upper inspection level - inspection is only needed below limit */
+    private static final int DEFAULT_UPPER = NO_LIMIT;
+    /** Default time stamp enabled switch */
+    private static final boolean DEFAULT_TIME_STAMP = true;
+    /** Default space stamp enabled switch */
+    private static final boolean DEFAULT_SPACE_STAMP = false;
 
 	// Constants returned by methods
 	/** Returned value: everything was OK */
@@ -134,6 +149,24 @@ public class Scribe
 	/** Secondary config */
 	private static final int SECONDARY_CONFIG = 1;
 
+    /************************************************************
+     *                                                          *
+     *  Tags for bundle of settings                             *
+     *                                                          *
+     ************************************************************/
+
+    public static String ENABLED = "Enabled";
+    public static String DEBUG_ENABLED = "DebugEnabled";
+    public static String LOG_TAG = "LogTag";
+    public static String FILE_NAME = "FileName";
+    public static String DIRECTORY_NAME = "DirectoryName";
+    public static String LIMIT = "Limit";
+    public static String LOWER = "Lower";
+    public static String UPPER = "Upper";
+    public static String TIME_STAMP = "TimeStamp";
+    public static String SPACE_STAMP = "SpaceStamp";
+
+    public static String PACKAGE = "PackageName";
 
 	/************************************************************
 	 *                                                          *
@@ -254,6 +287,7 @@ public class Scribe
 
 	/**
 	 * Resets all log config settings to original values.
+     * Default values should be identical with setAll!!
 	 * @param conf PRIMARY/SECONDARY configuration
 	 */
 	private static void resetAll( int conf )
@@ -261,21 +295,21 @@ public class Scribe
 		activateSecondaryConfig( conf );
 		synchronized ( lock[conf] )
 			{
-			config[conf].enabled = true;
-			config[conf].debugEnabled = true;
+			config[conf].enabled = DEFAULT_ENABLED;
+			config[conf].debugEnabled = DEFAULT_DEBUG_ENABLED;
 			config[conf].logTag = DEFAULT_LOG_TAG;
 			config[conf].fileName = defaultFileName;
 			config[conf].directoryName = DEFAULT_DIRECTORY;
-			config[conf].limit = 0;
-			config[conf].inspectLower = NO_LIMIT;
-			config[conf].inspectUpper = NO_LIMIT;
-			config[conf].timeStampEnabled = true;
-			config[conf].spaceStampEnabled = false;
+			config[conf].limit = DEFAULT_LIMIT;
+			config[conf].inspectLower = DEFAULT_LOWER;
+			config[conf].inspectUpper = DEFAULT_UPPER;
+			config[conf].timeStampEnabled = DEFAULT_TIME_STAMP;
+			config[conf].spaceStampEnabled = DEFAULT_SPACE_STAMP;
 			config[conf].context = null;
 			}
 		}
 
-	/**
+    /**
 	 * Sets enabled state (main switch)
 	 * @param conf PRIMARY/SECONDARY configuration
 	 * @param enable true if enabled
@@ -700,34 +734,55 @@ public class Scribe
 
 	/**
 	 * Returns to previously saved config settings. Toast-log will be disabled.
+     * setAll can be used to explicitly set scribe settings,
+     * missing settings will be set to their default values.
+     * Default file name will be set only, if bundle contains it.
+     * Default values should be identical with resetAll!!
 	 * @param conf PRIMARY/SECONDARY configuration
 	 * @param state  settings returned by {@link #getAll(int)}
 	 */
 	private static void setAll( int conf, Bundle state )
 		{
+        // defaultPackageName will be set only, if bundle contains it!
+        if ( state.containsKey( PACKAGE ))
+            {
+            defaultFileName = state.getString( PACKAGE ) + DEFAULT_FILE_EXT;
+            }
+
 		activateSecondaryConfig( conf );
 		synchronized ( lock[conf] )
 			{
-			config[conf].enabled = state.getBoolean("ENABLED", true);
-			config[conf].debugEnabled = state.getBoolean("DEBUG_ENABLED", true);
-			config[conf].logTag = state.getString("LOG_TAG");
-            // Can be null! == Disabled
-			// if ( config[conf].logTag == null )
-			//  config[conf].logTag = DEFAULT_LOG_TAG;
-			config[conf].fileName = state.getString("FILE_NAME");
-            // Can be null! == Disabled
-			// if ( config[conf].fileName == null )
-			//	config[conf].fileName = defaultFileName;
-			config[conf].directoryName = state.getString("DIRECTORY_NAME");
+			config[conf].enabled = state.getBoolean( ENABLED, DEFAULT_ENABLED );
+			config[conf].debugEnabled = state.getBoolean( DEBUG_ENABLED, DEFAULT_DEBUG_ENABLED );
+
+			if ( state.containsKey( LOG_TAG ))
+                {
+                // Can be null! == Disabled
+                config[conf].logTag = state.getString( LOG_TAG );
+                }
+            else
+                {
+                config[conf].logTag = DEFAULT_LOG_TAG;
+                }
+
+            if ( state.containsKey( FILE_NAME ))
+                {
+                // Can be null! == Disabled
+                config[conf].fileName = state.getString( FILE_NAME );
+                }
+            else
+                {
+                config[conf].fileName = defaultFileName;
+                }
+
             // Cannot be null !
-			if ( config[conf].directoryName == null )
-				config[conf].directoryName = DEFAULT_DIRECTORY;
-			config[conf].limit = state.getInt("LIMIT", 0);
-			config[conf].inspectLower = state.getInt("LOWER", NO_LIMIT);
-			config[conf].inspectUpper = state.getInt("UPPER", NO_LIMIT);
-			config[conf].timeStampEnabled = state.getBoolean("TIME_STAMP_ENABLED", true);
-			config[conf].spaceStampEnabled = state.getBoolean("SPACE_STAMP_ENABLED", true);
-			config[conf].context = null;  // Ezt veszélyes hosszan használni, töltésnél is kikapcsoljuk!
+			config[conf].directoryName = state.getString( DIRECTORY_NAME, DEFAULT_DIRECTORY);
+			config[conf].limit = state.getInt( LIMIT, DEFAULT_LIMIT );
+			config[conf].inspectLower = state.getInt( LOWER, DEFAULT_LOWER );
+			config[conf].inspectUpper = state.getInt( UPPER, DEFAULT_UPPER );
+			config[conf].timeStampEnabled = state.getBoolean( TIME_STAMP, DEFAULT_TIME_STAMP );
+			config[conf].spaceStampEnabled = state.getBoolean( SPACE_STAMP, DEFAULT_SPACE_STAMP );
+			config[conf].context = null;  // Context can be stored only temporary! It is switched of during save/load.
 			}
 		}
 
@@ -742,17 +797,17 @@ public class Scribe
 
 		synchronized ( lock[conf] )
 			{
-			state.putBoolean("ENABLED", config[conf].enabled);
-			state.putBoolean("DEBUG_ENABLED", config[conf].debugEnabled);
-			state.putString("LOG_TAG", config[conf].logTag);
-			state.putString("FILE_NAME", config[conf].fileName);
-			state.putString("DIRECTORY_NAME", config[conf].directoryName);
-			state.putInt("LIMIT", config[conf].limit);
-			state.putInt("LOWER", config[conf].inspectLower);
-			state.putInt("UPPER", config[conf].inspectUpper);
-			state.putBoolean("TIME_STAMP_ENABLED", config[conf].timeStampEnabled);
-			state.putBoolean("SPACE_STAMP_ENABLED", config[conf].spaceStampEnabled);
-			config[conf].context = null; // Ezt veszélyes hosszan használni, mentésnél is kikapcsoljuk!
+			state.putBoolean( ENABLED, config[conf].enabled);
+			state.putBoolean( DEBUG_ENABLED, config[conf].debugEnabled);
+			state.putString( LOG_TAG, config[conf].logTag);
+			state.putString( FILE_NAME, config[conf].fileName);
+			state.putString( DIRECTORY_NAME, config[conf].directoryName);
+			state.putInt( LIMIT, config[conf].limit);
+			state.putInt( LOWER, config[conf].inspectLower);
+			state.putInt( UPPER, config[conf].inspectUpper);
+			state.putBoolean( TIME_STAMP, config[conf].timeStampEnabled);
+			state.putBoolean( SPACE_STAMP, config[conf].spaceStampEnabled);
+            config[conf].context = null;  // Context can be stored only temporary! It is switched of during save/load.
 			}
 		return state;
 		}
@@ -772,6 +827,7 @@ public class Scribe
 	/**
 	 * Configs reset to initial values, secondary config is inactivated.
 	 * Default file name resets to DEFAULT_FILE_NAME.
+     * !! ScribeSettings should be preferred !!
 	 */
 	public static void init()
 		{
@@ -787,6 +843,7 @@ public class Scribe
 	/**
 	 * Configs reset to initial values, secondary config is inactivated.
 	 * Default file name will be the package name.
+     * !! ScribeSettings should be preferred !!
 	 */
 	public static void init( Context context )
 		{
@@ -799,6 +856,15 @@ public class Scribe
 			}
 		}
 
+    /**
+     * Helper method to return a new instance of ScribeSettings.
+     * This instance could be used to set Scribe config.
+     * @return a new, empty ScribeSettings instance
+     */
+    public static ScribeSettings setConfig()
+        {
+        return new ScribeSettings();
+        }
 
 	/************************************************************
 	 *                                                          *
@@ -825,7 +891,7 @@ public class Scribe
 		}
 
 	/**
-	 * Returns to previously saved config settings. Toast-log will be disabled.
+	 * Returns to previously saved or explicite config settings. Toast-log will be disabled.
 	 * PRIMARY Config - valid for ALL/EVEN levels after activation of sec. config
 	 * @param state  settings returned by {@link #getAll( int )}
 	 * <p>
@@ -981,12 +1047,12 @@ public class Scribe
 		}
 
 	/**
-	 * Resets limit to its original NO_LIMIT value. No messages will be limited.
+	 * Resets limit to its original 0 value. No messages will be limited.
 	 * PRIMARY Config - valid for ALL/EVEN levels after activation of sec. config
 	 */
 	public static void unLimit( )
 		{
-		setLimit( PRIMARY_CONFIG, NO_LIMIT );
+		setLimit( PRIMARY_CONFIG, 0 );
 		}
 
 	/**
@@ -1059,7 +1125,7 @@ public class Scribe
 		}
 
 	/**
-	 * Returns to previously saved config settings. Toast-log will be disabled.
+	 * Returns to previously saved or explicite config settings. Toast-log will be disabled.
 	 * SECONDARY Config - valid for ODD levels. Secondary config will be activated
 	 * @param state  settings returned by {@link #getConfigSecondary()}
 	 * <p>
@@ -1215,12 +1281,12 @@ public class Scribe
 		}
 
 	/**
-	 * Resets limit to its original NO_LIMIT value. No messages will be limited.
+	 * Resets limit to its original 0 value. No messages will be limited.
 	 * SECONDARY Config - valid for ODD levels. Secondary config will be activated
 	 */
 	public static void unLimitSecondary( )
 		{
-		setLimit( SECONDARY_CONFIG, NO_LIMIT );
+		setLimit( SECONDARY_CONFIG, 0 );
 		}
 
 	/**
@@ -1681,7 +1747,7 @@ public class Scribe
 		File logFile = getLogFile( conf );
 		String err;
 
-		if ( logFile == null )
+		if ( logFile == null || !logFile.exists() )
 			return OFF;
 
 		if ( logFile.delete() )

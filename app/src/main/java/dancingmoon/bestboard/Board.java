@@ -116,10 +116,10 @@ public class Board
      **/
 
     /**
-     * screen width is stored to check whether new measurement is needed
-     * in setScreenData
+     * screen width is stored to check whether new measurement is needed in calculateScreenData
+     * if new calculation is needed, then this value should be invalidated (-1)
      */
-    public int screenWidthInPixels = -1;
+    public int validatedWidthInPixels = -1;
 
     /**
      * board width in pixels (equals to screen's lower diameter for non-wide boards)
@@ -175,7 +175,7 @@ public class Board
      **      setShift - sets the shift levels by descriptor file
      ** Displaying phase:
      **   3. onMeasure - receives screen diameters
-     **   4. setScreenData - screen specific information set by onMeasure
+     **   4. calculateScreenData - screen specific information set by onMeasure
      **/
 
     /**
@@ -183,7 +183,7 @@ public class Board
      * It needs information about the measures of the board.
      * All specific data (buttons etc.) will be added later.
      * Screen information is needed to draw the board.
-     * It will added in the setScreenData() method.
+     * It will added in the calculateScreenData() method.
      *
      * @param data           softBoardData for all boards
      * @param halfcolumns    width in half hexagons (grids)
@@ -199,6 +199,7 @@ public class Board
                  boolean oddRowsAligned, boolean wide, int color,
                  Trilean[] metaStates ) throws ExternalDataException
         {
+        Scribe.locus( Debug.BOARD );
         // NON SCREEN-SPECIFIC DATA
 
         // Common data is needed
@@ -210,16 +211,15 @@ public class Board
         this.boardWidthInHexagons = (halfcolumns + 2) / 2;
         this.boardHeightInHexagons = rows;
 
+        // Each row has one more half hexagon column
+        this.boardWidthInGrids = halfcolumns;
+
+        // boardHeightInGrids is set by calculateScreenData, because it contains changeable preferences
+
         if (!isValidDimension(boardWidthInHexagons, boardHeightInHexagons))
             {
             throw new ExternalDataException("Board cannot be created with these arguments!");
             }
-
-        // Each row has one more half hexagon column
-        this.boardWidthInGrids = halfcolumns;
-        // Each row has three quarters of hexagonal height (3 grids) + 1 for the last row
-        // hideTop and hideBottom can "hide" 1 or 2 grids
-        this.boardHeightInGrids = rows * 3 + 1 - softBoardData.hideTop - softBoardData.hideBottom;
 
         this.rowsAlignOffset = oddRowsAligned ? 1 : 0;
 
@@ -305,25 +305,26 @@ public class Board
      * - textSize
      * It is called by BoardView.onMeasure() when screen (width) is changed or
      * board is changed. Recalculation is needed only, when ScreenWidthInPixels changed.
-     *
+     * This method also calculates data from preferences.
+     * If those data are changed, invalidateCalculations should be called, to invalidate data.
      * @param screenWidthInPixels  screen width
      * @param screenHeightInPixels screen height
      */
-    public void setScreenData(int screenWidthInPixels, int screenHeightInPixels)
+    public void calculateScreenData( int screenWidthInPixels, int screenHeightInPixels )
         {
-        Scribe.locus();
+        Scribe.locus( Debug.BOARD );
         
-        // setScreenData is needed only, if orientation was changed
-        if ( screenWidthInPixels == this.screenWidthInPixels )
+        // calculateScreenData is needed only, if orientation was changed
+        if ( screenWidthInPixels == this.validatedWidthInPixels )
             return;           
-        this.screenWidthInPixels = screenWidthInPixels;
+        this.validatedWidthInPixels = screenWidthInPixels;
 
         // GENERATE SCREEN SPECIFIC VALUES
         boolean landscape = (screenWidthInPixels > screenHeightInPixels);
         
         // orientation can be found in UseState also
         if ( landscape != softBoardData.linkState.isLandscape() )
-            Scribe.error("Orientation in onMeasure and in usetate is not the same!");
+            Scribe.error("Orientation in onMeasure and in linkstate is not the same!");
 
         // temporary variables are needed to check whether board dimension is changed
         int newBoardWidthInPixels;
@@ -336,7 +337,7 @@ public class Board
             {
             newBoardWidthInPixels = screenWidthInPixels;
             this.xOffset = 0;
-            Scribe.debug("Full width keyboard");
+            Scribe.debug( Debug.BOARD, "Full width keyboard");
             }
         // NORMAL board for LANDSCAPE mode - change values
         else if (!wide) // && landscape)
@@ -344,16 +345,22 @@ public class Board
             // noinspection SuspiciousNameCombination
             newBoardWidthInPixels = screenHeightInPixels; // This is the shorter diameter
             this.xOffset = (screenWidthInPixels - newBoardWidthInPixels) *
-                    softBoardData.landscapeOffsetPercent / 1000;
-            Scribe.debug("Normal keyboard for landscape. Offset:" + xOffset);
+                    softBoardData.landscapeOffsetPermil / 1000;
+            Scribe.debug( Debug.BOARD, "Normal keyboard for landscape. Offset:" + xOffset);
             }
         // LANDSCAPE board PORTRAIT mode - incompatible board! - !! NOW WE LET IT WORK (TESTING!!) !!
         else // if (wide && !landscape)
             {
             newBoardWidthInPixels = screenWidthInPixels; // Board will be distorted!!
             this.xOffset = 0;
-            Scribe.debug("Wide keyboard for portrait! NOT POSSIBLE! Keyboard is distorted.");
+            Scribe.debug( Debug.BOARD, "Wide keyboard for portrait! NOT POSSIBLE! Keyboard is distorted.");
             }
+
+        // boardWidthInGrids is set by constructor
+
+        // Each row has three quarters of hexagonal height (3 grids) + 1 for the last row
+        // hideTop and hideBottom can "hide" 1 or 2 grids
+        this.boardHeightInGrids = boardHeightInHexagons * 3 + 1 - softBoardData.hideTop - softBoardData.hideBottom;
 
         // Calculate BoardHeight
 
@@ -362,11 +369,11 @@ public class Board
         newBoardHeightInPixels = ((boardHeightInGrids * newBoardWidthInPixels * 1000) /
                 (boardWidthInGrids * 1732));
 
-        // Only 3/4 of the real height can be occupied
+        // Only part of the real height can be occupied, this can be set by prefs
         // this true even for NORMAL board: the actual height (== width of the board) should be calculated
-        screenHeightInPixels *= 3;
-        screenHeightInPixels /= 4;
-
+        screenHeightInPixels *= softBoardData.heightRatioPermil;
+        screenHeightInPixels /= 1000;
+        
         // If board height exceeds maximal value, board will be distorted
         if (newBoardHeightInPixels > screenHeightInPixels)
             newBoardHeightInPixels = screenHeightInPixels;
@@ -388,6 +395,25 @@ public class Board
 
         halfHexagonHeightInPixels = 2 * boardHeightInPixels / boardHeightInGrids;
         halfHexagonWidthInPixels = screenWidthInPixels / boardWidthInGrids;
+        }
+
+
+    /**
+     * Data calculated from screen size and preferences is invalidated.
+     * Stored pictures could be deleted, too.
+     * This method should be called if preferences are changed.
+     * Screen changes do not need this method, those changes are followed by calculateScreenData.
+     * @param erasePictures
+     */
+    public void invalidateCalculations( boolean erasePictures )
+        {
+        validatedWidthInPixels = -1;
+
+        if ( erasePictures )
+            {
+            layoutMap = null;
+            layoutSkin = null;
+            }
         }
 
 
@@ -577,6 +603,8 @@ public class Board
             return layoutSkin;
             }
 
+        Scribe.debug( Debug.BOARD, "Layout skin is created for " + toString());
+
         layoutSkin = createLayoutSkin();
 
         return layoutSkin;
@@ -617,6 +645,7 @@ public class Board
     public void setBoardId( long boardId )
         {
         this.boardId = boardId;
+        Scribe.debug( Debug.BOARD, "Board is created: " + toString());
         }
     
     // toString is needed only for debuging
@@ -624,7 +653,7 @@ public class Board
     public String toString()
         {
         StringBuilder result = new StringBuilder();
-        result.append("Board ").append( SoftBoardParser.regenerateKeyword( boardId ));
+        result.append("Board ").append( Tokenizer.regenerateKeyword( boardId ));
         result.append(" - C:").append(boardWidthInHexagons);
         result.append("/R:").append(boardHeightInHexagons);
         return result.toString();

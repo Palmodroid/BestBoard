@@ -92,7 +92,7 @@ public class TokenizerTest extends Activity
 									tokenizer.getStringToken().toUpperCase(Locale.US) +
 									" = 0x" + Long.toHexString( tokenizer.getIntegerToken() ) + "L;");
 
-                            SoftBoardParser.regenerateKeyword( tokenizer.getIntegerToken() );
+                            Tokenizer.regenerateKeyword( tokenizer.getIntegerToken() );
 							}
 						else if (type == Tokenizer.TYPE_INTEGER )
 							{

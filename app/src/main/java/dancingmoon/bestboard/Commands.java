@@ -245,7 +245,7 @@ public class Commands
      */
     private static Map<Long, Data> createDataMap()
         {
-        Scribe.locus();
+        Scribe.locus( Debug.COMMANDS );
 
         Map<Long, Data> result = new HashMap<>();
 

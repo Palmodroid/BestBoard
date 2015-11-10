@@ -237,10 +237,12 @@ public class SoftBoardData
 
         hideBottom = ( sharedPrefs.getBoolean( softBoardListener.getApplicationContext().getString( R.string.drawing_hide_lower_key ), false)) ? 1 : 0;
 
-        /** THIS SHOULD BE CHANGED !! Integer preference with min and max values is needed.**/
-        landscapeOffsetPercent = sharedPrefs.getInt(PrefsFragment.DRAWING_LANDSCAPE_OFFSET_INT_KEY, 0);
+        heightRatioPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_HEIGHT_RATIO_INT_KEY, 0);
 
-        outerRimPercent = sharedPrefs.getInt( PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0);
+        
+        landscapeOffsetPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_LANDSCAPE_OFFSET_INT_KEY, 0);
+
+        outerRimPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0);
 
         displayTouch = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString( R.string.cursor_touch_allow_key ),
@@ -255,7 +257,7 @@ public class SoftBoardData
     /**
      * Hide grids from the top of the board - VALUE IS NOT VERIFIED!
      * 0 - no hide
-     * 1 - hide one quater (one grid) from the top row
+     * 1 - hide one quarter (one grid) from the top row
      * 2 - hide one half (two grids) from the top row
      */
     public int hideTop = 0;
@@ -263,27 +265,27 @@ public class SoftBoardData
     /**
      * Hide grids from the bottom of the board - VALUE IS NOT VERIFIED!
      * 0 - no hide
-     * 1 - hide one quater (one grid) from the bottom row
+     * 1 - hide one quarter (one grid) from the bottom row
      * 2 - hide one half (two grids) from the bottom row
      */
     public int hideBottom = 0;
 
     /**
-     * Maximal screen height ratio which cen be occupied by the board
+     * Maximal screen height ratio which can be occupied by the board
      */
-    public int heightRatio = 500;
+    public int heightRatioPermil;
 
     /**
      * Offset for non-wide boards in landscape mode
      * (percent of the free area) - VALUE IS NOT VERIFIED!
      */
-    public int landscapeOffsetPercent;
+    public int landscapeOffsetPermil;
 
     /**
      * Size of the outer rim on buttons.
      * Touch movement (stroke) will not fire from the outer rim, but touch down will do.
      */
-    public int outerRimPercent = 300;
+    public int outerRimPermil;
 
     /**
      * Background of the touched key is changed or not
@@ -446,48 +448,48 @@ public class SoftBoardData
             {
             // !! Just for checking input fields - it should be NONE ??
             action = ACTION_MULTILINE;
-            Scribe.debug( "Ime action: MULTILINE because of NO ENTER ACTION flag." );
+            Scribe.debug( Debug.DATA, "Ime action: MULTILINE because of NO ENTER ACTION flag." );
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_NONE) != 0)
             {
             action = ACTION_NONE;
-            Scribe.debug("Ime action: NONE.");
+            Scribe.debug( Debug.DATA, "Ime action: NONE.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_GO) != 0)
             {
             action = ACTION_GO;
-            Scribe.debug("Ime action: GO.");
+            Scribe.debug( Debug.DATA, "Ime action: GO.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_SEARCH) != 0)
             {
             action = ACTION_SEARCH;
-            Scribe.debug("Ime action: SEARCH.");
+            Scribe.debug( Debug.DATA, "Ime action: SEARCH.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_SEND) != 0)
             {
             action = ACTION_SEND;
-            Scribe.debug("Ime action: SEND.");
+            Scribe.debug( Debug.DATA, "Ime action: SEND.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_NEXT) != 0)
             {
             action = ACTION_NEXT;
-            Scribe.debug("Ime action: NEXT.");
+            Scribe.debug( Debug.DATA, "Ime action: NEXT.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_DONE) != 0)
             {
             action = ACTION_DONE;
-            Scribe.debug("Ime action: DONE.");
+            Scribe.debug( Debug.DATA, "Ime action: DONE.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_PREVIOUS) != 0)
             {
             action = ACTION_PREVIOUS;
-            Scribe.debug("Ime action: PREVIOUS.");
+            Scribe.debug( Debug.DATA, "Ime action: PREVIOUS.");
             }
         else // EditorInfo.IME_ACTION_UNSPECIFIED
             {
             // !! Just for checking input fields - it should be NONE ??
             action = ACTION_UNSPECIFIED;
-            Scribe.debug("Ime action: UNSPECIFIED, because action is not known.");
+            Scribe.debug( Debug.DATA, "Ime action: UNSPECIFIED, because action is not known.");
             }
         }
 
@@ -611,11 +613,11 @@ public class SoftBoardData
                 {
                 defaultSlot = (long)temp;
                 tokenizer.note(R.string.data_default_titleslot,
-                        SoftBoardParser.regenerateKeyword( defaultSlot ));
+                        Tokenizer.regenerateKeyword( defaultSlot ));
                 }
             else
                 tokenizer.error(R.string.data_titleslot_invalid,
-                        SoftBoardParser.regenerateKeyword((long)temp));
+                        Tokenizer.regenerateKeyword((long)temp));
             }
         }
 
@@ -752,7 +754,7 @@ public class SoftBoardData
 
         Slot slot = new Slot( xOffset, yOffset, size, bold, italics, color );
         Slots.put( id, slot );
-        tokenizer.note( SoftBoardParser.regenerateKeyword( (long)id),
+        tokenizer.note( Tokenizer.regenerateKeyword( (long)id),
                 R.string.data_slot_added,
                 slot.toString());
         }
@@ -794,7 +796,7 @@ public class SoftBoardData
                 }
             else
                 {
-                tokenizer.error(SoftBoardParser.regenerateKeyword((long) id),
+                tokenizer.error(Tokenizer.regenerateKeyword((long) id),
                         R.string.data_columns_missing);
                 return;
                 }
@@ -803,7 +805,7 @@ public class SoftBoardData
         temp = parameters.get( Commands.TOKEN_ROWS );
         if (temp == null)
             {
-            tokenizer.error( SoftBoardParser.regenerateKeyword( (long)id),
+            tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_rows_missing );
             return;
             }
@@ -818,7 +820,7 @@ public class SoftBoardData
         else if ( alignFlag == Commands.TOKEN_EVENS )
             oddRowsAligned = false;
         else if ( alignFlag != -1L )
-            tokenizer.error( SoftBoardParser.regenerateKeyword( (long)id),
+            tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_align_bad_parameter );
 
         color = (int)parameters.get( Commands.TOKEN_COLOR, defaultBoardColor);
@@ -847,7 +849,7 @@ public class SoftBoardData
             boardPlans.put( id, boardPlan );
             includedBoardPlans.add( boardPlan );
 
-            tokenizer.note( SoftBoardParser.regenerateKeyword( (long)id),
+            tokenizer.note( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_board_added,
                     board.toString());
 
@@ -860,7 +862,7 @@ public class SoftBoardData
             }
         catch (ExternalDataException ede)
             {
-            tokenizer.error( SoftBoardParser.regenerateKeyword( (long)id),
+            tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_board_error );
             }
         }
@@ -903,7 +905,7 @@ public class SoftBoardData
         BoardPlan boardPlan = boardPlans.get( boardId );
         if ( boardPlan == null )
             {
-            tokenizer.error( SoftBoardParser.regenerateKeyword( (long)boardId),
+            tokenizer.error( Tokenizer.regenerateKeyword( (long)boardId),
                     R.string.data_no_board );
             return;
             }
@@ -914,7 +916,7 @@ public class SoftBoardData
         boardPlan.cursorRow = row;
         boardPlan.transform = transform;
 
-        tokenizer.note( SoftBoardParser.regenerateKeyword( (long)boardId),
+        tokenizer.note( Tokenizer.regenerateKeyword( (long)boardId),
                 R.string.data_cursor_set,
                 boardPlan.toString() );
         }
@@ -967,7 +969,7 @@ public class SoftBoardData
             {
             counter++;
             buttonFunction = new ButtonPacket( packet, parameters.containsKey( Commands.TOKEN_REPEAT) );
-            Scribe.debug("Simple Packet is defined");
+            Scribe.debug( Debug.DATA, "Simple Packet is defined");
             }
 
         temp = parameters.get( Commands.TOKEN_LINK );
@@ -1287,7 +1289,7 @@ public class SoftBoardData
             if (ts == null)
                 tokenizer.error( text != null ? text : "ADDTITLE",
                         R.string.data_titleslot_invalid,
-                        SoftBoardParser.regenerateKeyword( titleSlotId ));
+                        Tokenizer.regenerateKeyword( titleSlotId ));
             }
 
         if (ts == null) // default SLOT should be used
@@ -1401,7 +1403,7 @@ public class SoftBoardData
             if ( boardPlan == null )
                 {
                 tokenizer.error( "BOARD", R.string.data_no_board,
-                        SoftBoardParser.regenerateKeyword( (long)boardId));
+                        Tokenizer.regenerateKeyword( (long)boardId));
                 return;
                 }
 
@@ -1412,7 +1414,7 @@ public class SoftBoardData
                 linkState.setLinkBoardTable( index, boardPlan.board );
 
                 tokenizer.note( index.toString(), R.string.data_addlink_board_set,
-                               SoftBoardParser.regenerateKeyword( (long)boardId));
+                               Tokenizer.regenerateKeyword( (long)boardId));
                 }
             catch (ExternalDataException e)
                 {
@@ -1439,7 +1441,7 @@ public class SoftBoardData
                 else
                     {
                     tokenizer.error( "PORTRAIT", R.string.data_no_board,
-                            SoftBoardParser.regenerateKeyword( (long)portraitId));
+                            Tokenizer.regenerateKeyword( (long)portraitId));
                     }
                 }
             else
@@ -1460,7 +1462,7 @@ public class SoftBoardData
                 else
                     {
                     tokenizer.error( "LANDSCAPE", R.string.data_no_board,
-                            SoftBoardParser.regenerateKeyword( (long)landscapeId));
+                            Tokenizer.regenerateKeyword( (long)landscapeId));
                     }
                 }
             else
@@ -1478,9 +1480,9 @@ public class SoftBoardData
                     linkState.setLinkBoardTable( index, portrait, landscape );
 
                     tokenizer.note( index.toString(), R.string.data_addlink_board_set,
-                                   SoftBoardParser.regenerateKeyword( (long)portraitId) +
+                                   Tokenizer.regenerateKeyword( (long)portraitId) +
                                    "/" +
-                                   SoftBoardParser.regenerateKeyword( (long)landscapeId));
+                                   Tokenizer.regenerateKeyword( (long)landscapeId));
                     }
                 catch (ExternalDataException e)
                     {
@@ -1559,27 +1561,27 @@ public class SoftBoardData
 
         if (counter > 1)
             {
-            tokenizer.error( SoftBoardParser.regenerateKeyword( id ),
+            tokenizer.error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_modify_one_allowed );
             }
 
         // No roll could be added!
         if ( empty )
             {
-            tokenizer.error( SoftBoardParser.regenerateKeyword( id ),
+            tokenizer.error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_modify_no_rolls );
             return;
             }
 
         if ( modify.get( id ) != null )
             {
-            tokenizer.error( SoftBoardParser.regenerateKeyword( id ),
+            tokenizer.error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_modify_overwritten );
             }
 
         modify.put( id, mod );
 
-        tokenizer.note( SoftBoardParser.regenerateKeyword( id ),
+        tokenizer.note( Tokenizer.regenerateKeyword( id ),
                 R.string.data_modify_added );
         }
 

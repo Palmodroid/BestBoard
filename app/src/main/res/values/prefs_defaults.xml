@@ -2,7 +2,7 @@
 <resources>
 
     <string name="descriptor_directory_default">"_bestboard"</string>
-    <string name="descriptor_file_default">coat.txt</string>
+    <string name="descriptor_file_default">kinesa.txt</string>
 
     <bool name="drawing_hide_upper_default">false</bool>
     <bool name="drawing_hide_lower_default">false</bool>
@@ -15,9 +15,9 @@
     <integer name="drawing_landscape_offset_min">0</integer>
     <integer name="drawing_landscape_offset_max">1000</integer>
 
-    <string name="drawing_outer_rim_default">30</string>
-    <integer name="drawing_outer_rim_min">20</integer>
-    <integer name="drawing_outer_rim_max">80</integer>
+    <string name="drawing_outer_rim_default">300</string>
+    <integer name="drawing_outer_rim_min">200</integer>
+    <integer name="drawing_outer_rim_max">800</integer>
 
     <bool name="cursor_touch_allow_default">true</bool>
     <bool name="cursor_stroke_allow_key">true</bool>

@@ -1,14 +1,7 @@
 package dancingmoon.bestboard;
 
 import android.app.Activity;
-import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.os.Environment;
-import android.preference.Preference;
-import android.preference.PreferenceFragment;
-import android.preference.PreferenceManager;
-
-import java.io.File;
 
 import dancingmoon.bestboard.scribe.Scribe;
 
@@ -59,19 +52,19 @@ public class PrefsActivity extends Activity
         // This should be called at every starting point
         Ignition.start(this);
 
-        Scribe.locus( Debug.PREFS );
+        Scribe.locus( Debug.PREF );
 
         // Preference manager should save/recreate the fragment instance
         PrefsFragment prefsFragment = (PrefsFragment)getFragmentManager()
                 .findFragmentByTag(PREFS_FRAGMENT_TAG);
         if ( prefsFragment == null )
             {
-            Scribe.note(Debug.PREFS, "New preference fragment is created.");
+            Scribe.debug( Debug.PREF, "New preference fragment is created." );
             prefsFragment = new PrefsFragment();
             }
         else
             {
-            Scribe.note(Debug.PREFS, "Preference fragment is restored.");
+            Scribe.debug( Debug.PREF, "Preference fragment is restored." );
             }
 
         // android.R.id.content is the root view
