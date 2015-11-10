@@ -47,7 +47,7 @@ public class BoardView extends View
      **      setShift - sets the shift levels by descriptor file
      ** Displaying phase (BoardView):
      **   3. onMeasure - receives screen diameters
-     **   4. setScreenData - screen specific information set by onMeasure
+     **   4. calculateScreenData - screen specific information set by onMeasure
      **/
 
     /**
@@ -106,8 +106,6 @@ public class BoardView extends View
 
         // board-change needs recalculation
         validatedWidthInPixels = -1;
-        // ???
-        board.screenWidthInPixels = -1;
 
         super.requestLayout();
         }
@@ -117,7 +115,7 @@ public class BoardView extends View
      * Therefore the parameters are: EXACTLY screen_width and AT_MOST screen_height values.
      * There are two (several?) cycles of measuring. Calculation is performed during the first cycle,
      * after that boardHeightInPixels will be set, and the second calculations are skipped.
-     * Screen width is stored in screenWidthInPixels, so new calculations with this with are skipped.
+     * Screen width is stored in validatedWidthInPixels, so new calculations with this with are skipped.
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) throws InflateException
@@ -127,7 +125,7 @@ public class BoardView extends View
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
-        // onMeasure will be called severel times.
+        // onMeasure will be called several times.
         // Calculation will be performed only when screen parameters are changed 
         // (screen rotated or board changed (requestLayout())
         if (widthSize != validatedWidthInPixels)
@@ -146,12 +144,13 @@ public class BoardView extends View
 
 
             // boardWidthInPixels and boardHeightInPixels are set here
-            board.setScreenData(widthSize, heightSize);
+            board.calculateScreenData( widthSize, heightSize );
 
             Scribe.debug( Debug.VIEW, "FIRST Calculation");
             Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
             Scribe.debug( Debug.VIEW, "- Calculated boardheight: " + board.boardHeightInPixels);
-            } else
+            }
+        else
             {
             Scribe.debug( Debug.VIEW, "CONSECUTIVE Calculations");
             Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);

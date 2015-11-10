@@ -116,10 +116,10 @@ public class Board
      **/
 
     /**
-     * screen width is stored to check whether new measurement is needed
-     * in setScreenData
+     * screen width is stored to check whether new measurement is needed in calculateScreenData
+     * if new calculation is needed, then this value should be invalidated (-1)
      */
-    public int screenWidthInPixels = -1;
+    public int validatedWidthInPixels = -1;
 
     /**
      * board width in pixels (equals to screen's lower diameter for non-wide boards)
@@ -175,7 +175,7 @@ public class Board
      **      setShift - sets the shift levels by descriptor file
      ** Displaying phase:
      **   3. onMeasure - receives screen diameters
-     **   4. setScreenData - screen specific information set by onMeasure
+     **   4. calculateScreenData - screen specific information set by onMeasure
      **/
 
     /**
@@ -183,7 +183,7 @@ public class Board
      * It needs information about the measures of the board.
      * All specific data (buttons etc.) will be added later.
      * Screen information is needed to draw the board.
-     * It will added in the setScreenData() method.
+     * It will added in the calculateScreenData() method.
      *
      * @param data           softBoardData for all boards
      * @param halfcolumns    width in half hexagons (grids)
@@ -214,7 +214,7 @@ public class Board
         // Each row has one more half hexagon column
         this.boardWidthInGrids = halfcolumns;
 
-        // boardHeightInGrids is set by setScreenData, because it contains changeable preferences
+        // boardHeightInGrids is set by calculateScreenData, because it contains changeable preferences
 
         if (!isValidDimension(boardWidthInHexagons, boardHeightInHexagons))
             {
@@ -305,18 +305,19 @@ public class Board
      * - textSize
      * It is called by BoardView.onMeasure() when screen (width) is changed or
      * board is changed. Recalculation is needed only, when ScreenWidthInPixels changed.
-     *
+     * This method also calculates data from preferences.
+     * If those data are changed, invalidateCalculations should be called, to invalidate data.
      * @param screenWidthInPixels  screen width
      * @param screenHeightInPixels screen height
      */
-    public void setScreenData(int screenWidthInPixels, int screenHeightInPixels)
+    public void calculateScreenData( int screenWidthInPixels, int screenHeightInPixels )
         {
         Scribe.locus( Debug.BOARD );
         
-        // setScreenData is needed only, if orientation was changed
-        if ( screenWidthInPixels == this.screenWidthInPixels )
+        // calculateScreenData is needed only, if orientation was changed
+        if ( screenWidthInPixels == this.validatedWidthInPixels )
             return;           
-        this.screenWidthInPixels = screenWidthInPixels;
+        this.validatedWidthInPixels = screenWidthInPixels;
 
         // GENERATE SCREEN SPECIFIC VALUES
         boolean landscape = (screenWidthInPixels > screenHeightInPixels);
@@ -394,6 +395,25 @@ public class Board
 
         halfHexagonHeightInPixels = 2 * boardHeightInPixels / boardHeightInGrids;
         halfHexagonWidthInPixels = screenWidthInPixels / boardWidthInGrids;
+        }
+
+
+    /**
+     * Data calculated from screen size and preferences is invalidated.
+     * Stored pictures could be deleted, too.
+     * This method should be called if preferences are changed.
+     * Screen changes do not need this method, those changes are followed by calculateScreenData.
+     * @param erasePictures
+     */
+    public void invalidateCalculations( boolean erasePictures )
+        {
+        validatedWidthInPixels = -1;
+
+        if ( erasePictures )
+            {
+            layoutMap = null;
+            layoutSkin = null;
+            }
         }
 
 

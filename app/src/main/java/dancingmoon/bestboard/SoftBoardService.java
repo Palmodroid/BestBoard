@@ -104,11 +104,22 @@ public class SoftBoardService extends InputMethodService implements
                     startSoftBoardParser();
                     break;
 
+                case PrefsFragment.PREFS_ACTION_RECALCULATE:
+                    Scribe.note( Debug.SERVICE, "SERVICE: get notification to recalculate descriptor." );
+                    if ( softBoardData != null)
+                        {
+                        softBoardData.readPreferences();
+                        softBoardData.linkState.invalidateCalculations( false );
+                        boardView.requestLayout();
+                        }
+                    break;
+
                 case PrefsFragment.PREFS_ACTION_REDRAW:
                     Scribe.note( Debug.SERVICE,  "SERVICE: get notification to redraw descriptor." );
                     if ( softBoardData != null)
                         {
                         softBoardData.readPreferences();
+                        softBoardData.linkState.invalidateCalculations( true );
                         boardView.requestLayout();
                         }
                     break;
@@ -116,7 +127,9 @@ public class SoftBoardService extends InputMethodService implements
                 case PrefsFragment.PREFS_ACTION_REFRESH:
                     Scribe.note( Debug.SERVICE,  "SERVICE: get notification to refresh preferences." );
                     if ( softBoardData != null)
+                        {
                         softBoardData.readPreferences();
+                        }
                     break;
 
                 default:

@@ -44,11 +44,14 @@ public class PrefsFragment extends PreferenceFragment
     /** Coat.descriptor should be reloaded */
     public static final int PREFS_ACTION_RELOAD = 1;
 
-    /** All layouts should be redrawn */
-    public static final int PREFS_ACTION_REDRAW = 2;
+    /** All layouts should be recalculated */
+    public static final int PREFS_ACTION_RECALCULATE = 2;
 
-    /** Refresh preference variables */
-    public static final int PREFS_ACTION_REFRESH = 3;
+    /** All layouts should be recalculated and pictures redrawn */
+    public static final int PREFS_ACTION_REDRAW = 3;
+
+    /** Refresh preference variables, layouts are not affected */
+    public static final int PREFS_ACTION_REFRESH = 4;
 
 
     /**
@@ -338,13 +341,14 @@ public class PrefsFragment extends PreferenceFragment
         if ( key.equals( getString( R.string.drawing_hide_upper_key )) || allKeys )
             {
             Scribe.note( Debug.PREF,  "PREFERENCES: Hide upper behavior has changed!" );
-
+            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
             }
 
         // Drawing / Hide lower quoter
         if ( key.equals( getString( R.string.drawing_hide_lower_key )) || allKeys )
             {
             Scribe.note( Debug.PREF,  "PREFERENCES: Hide lower behavior has changed!" );
+            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
 
             }
 
@@ -370,7 +374,7 @@ public class PrefsFragment extends PreferenceFragment
             landscapeOffsetPreference.setSummary(getString(R.string.drawing_landscape_offset_summary) + " " +
                     Integer.toString(landscapeOffset));
             Scribe.note( Debug.PREF, "PREFERENCES: Landscape offset for non-wide boards has changed: " + landscapeOffset);
-            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
+            if ( !allKeys )     performAction(PREFS_ACTION_RECALCULATE);
             }
 
         // Drawing / Outer rim ratio
@@ -499,6 +503,10 @@ public class PrefsFragment extends PreferenceFragment
             {
             case PREFS_ACTION_RELOAD:
                 Scribe.note( Debug.PREF, "PREFERENCE: server is notified to reload descriptor.");
+                break;
+
+            case PREFS_ACTION_RECALCULATE:
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to recalculate layouts." );
                 break;
 
             case PREFS_ACTION_REDRAW:

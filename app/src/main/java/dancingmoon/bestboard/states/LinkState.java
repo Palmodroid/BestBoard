@@ -84,7 +84,7 @@ public class LinkState
         Scribe.debug( Debug.LINKSTATE, "Orientation is " + ( orientation == LINK_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
         }
 
-    // BoardView.onMeasure() and Board.setScreenData checks orientation
+    // BoardView.onMeasure() and Board.calculateScreenData checks orientation
     // This can be used at least for error checking
     public boolean isLandscape()
         {
@@ -97,6 +97,26 @@ public class LinkState
     public Board getActiveBoard()
         {
         return linkBoard[activeIndex][orientation];
+        }
+
+
+    /**
+     * All calculations should be cleared in all boards, if preference changes.
+     * After this clear a new requestLayout() call will refresh the screen.
+     * @param erasePictures pictures will be deleted, if true
+     */
+    public void invalidateCalculations( boolean erasePictures )
+        {
+        for ( int b = 0; b < MAX_LINKS; b++ )
+            {
+            for ( int o = 0; o < 2; o++ )
+                {
+                if ( linkBoard[b][o] != null )
+                    {
+                    linkBoard[b][o].invalidateCalculations( erasePictures );
+                    }
+                }
+            }
         }
 
 
