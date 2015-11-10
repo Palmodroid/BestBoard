@@ -1,0 +1,992 @@
+﻿COAT 2
+
+; #############################################
+; Boards:
+;	lit (0)
+;	prog (20)
+;	mini (30) - minimaths (33) - minisigns (35)
+;       wmini (30) - wminimaths (33)
+
+; Parts:
+; table of boards 
+; link
+; central part of kinesa
+; accented part of kinesa
+; rare part of kinesa
+; reverse rare part of kinesa
+; net
+; numeric circular
+; numeric cube
+; joystick
+
+; lit commands
+; lit symbols
+; prog commands
+; prog symbols
+; mini commands
+; wmini commands
+; minimaths commands
+; minimaths symbols
+; wminimaths commands
+; wminimaths symbols
+; minisigns commands
+; minisigns symbols
+
+; #############################################
+
+
+NAME "Kompleton"
+VERSION 3
+AUTHOR "Thon"
+ADDTAGS ( "kinesa" "mini" "tablet" "programmer" "literature" )
+DESCRIPTION "Thon komplex billentyűzetgyűjteménye"
+; DOCFILE "file" 
+; DOCURI "string"
+
+; LOCALE ( LANGUAGE "string" COUNTRY "string" VARIANT "string" )
+
+LET ( black 0c0 )
+LET ( green 0c8e8 )
+LET ( yellow 0cee4 )
+LET ( blue 0c99e )
+LET ( rose 0ce6b2ab )
+LET ( brown 0ccb2 )
+LET ( pink 0cfcf )
+LET ( darkpink 0ce99 )
+LET ( purple 0cc673d9 )
+LET ( gray 0c9 )
+LET ( white 0cffe )
+LET ( orange 0cf84 )
+LET ( khaki 0cd4ddaa )
+LET ( magenta 0c800080 )
+LET ( red 0ca00 )
+
+; ADDSLOT ( ID keyword XOFFSET milli YOFFSET milli SIZE milli BOLD ITALICS COLOR color)
+
+ADDSLOT ( ID center SIZE 1900 )
+ADDSLOT ( ID script YOFFSET +300 SIZE 1400 BOLD COLOR magenta)
+ADDSLOT ( ID link YOFFSET +300 SIZE 1400 BOLD COLOR white)
+ADDSLOT ( ID north YOFFSET -350 SIZE 1400 COLOR red )
+ADDSLOT ( ID south YOFFSET +400 SIZE 1800 )
+
+DEFAULT (
+;	BOARDCOLOR color
+;	BUTTONCOLOR color
+	SLOT center )
+
+; METACOLOR color
+; LOCKCOLOR color
+; AUTOCOLOR color
+; TOUCHCOLOR color
+; STROKECOLOR color
+; TITLEFONT "font.ttf"
+
+; ENTERTITLE "text"
+; GOTITLE "text"
+; SEARCHTITLE "text"
+; SENDTITLE "text"
+; NEXTTITLE "text"
+; DONETITLE "text"
+; PREVTITLE "text"
+; NONETITLE "text"
+UNKNOWNTITLE "ENTER"
+
+
+; TOKEN_ADDBOARD ( ID keyword HEXAGONAL WIDE
+;	COLUMNS / HALFCOLUMNS num ROWS num
+; 	ALIGN EVENS / ODDS COLOR color ; default ODDS (0, 2...)
+; 	FORCECAPS FORCESHIFT FORCECTRL FORCEALT ON / OFF TRUE / FALSE )
+
+ADDBOARD ( ID lit HEXAGONAL COLUMNS 12 ROWS 7 ALIGN ODDS  FORCECAPS OFF )
+
+ADDBOARD ( ID prog HEXAGONAL COLUMNS 13 ROWS 6 ALIGN EVENS FORCECAPS OFF )
+
+ADDBOARD ( ID mini HEXAGONAL HALFCOLUMNS 15 ROWS 5 ALIGN EVENS FORCESHIFT OFF )
+ADDBOARD ( ID wmini WIDE HEXAGONAL HALFCOLUMNS 24 ROWS 5 ALIGN ODDS FORCESHIFT OFF )
+
+ADDBOARD ( ID minimaths HEXAGONAL HALFCOLUMNS 15 ROWS 5 ALIGN EVENS FORCESHIFT OFF )
+ADDBOARD ( ID wminimaths WIDE HEXAGONAL HALFCOLUMNS 24 ROWS 5 ALIGN ODDS FORCESHIFT OFF )
+
+ADDBOARD ( ID minisigns HEXAGONAL HALFCOLUMNS 15 ROWS 5 ALIGN EVENS FORCESHIFT OFF )
+
+
+; table of boards 
+; #############################################
+
+; ADDLINK ( INDEX index BOARD board / PORTRAIT board LANDSCAPE board )
+
+ADDLINK ( INDEX 0 BOARD lit )
+ADDLINK ( INDEX 20 BOARD prog )
+ADDLINK ( INDEX 30 PORTRAIT mini LANDSCAPE wmini )
+ADDLINK ( INDEX 33 PORTRAIT minimaths LANDSCAPE wminimaths)
+ADDLINK ( INDEX 35 BOARD minisigns )
+
+
+; link
+; #############################################
+
+CURSOR ( BOARD lit ONLY ROW 6)
+BUTTON ( LINK 20 LOCK
+	ADDTITLE ( TEXT "MINTA" SLOT link ) COLOR magenta )
+
+CURSOR ( BOARD prog ONLY ROW 5)
+BUTTON ( LINK 30 LOCK
+	ADDTITLE ( TEXT "Prog" SLOT link ) COLOR magenta ) 
+
+CURSOR ( BOARD mini ONLY COLUMN 1 )
+BUTTON ( LINK 0 LOCK
+	ADDTITLE ( TEXT "Mini" SLOT link ) COLOR magenta ) 
+
+CURSOR ( BOARD wmini ONLY COLUMN 0 )
+BUTTON ( LINK 0 LOCK
+	ADDTITLE ( TEXT "Mini" SLOT link ) COLOR magenta ) 
+
+	
+; central part of kinesa
+; #############################################
+
+; CURSOR ( NONE
+; 	ALSO / ONLY BOARD board COLUMN num ROW num )
+
+CURSOR ( NONE )          
+CURSOR ( BOARD lit ALSO COLUMN 2 TRANSFORM )
+CURSOR ( BOARD prog ALSO COLUMN 2 )
+CURSOR ( BOARD mini ALSO COLUMN 1 )
+CURSOR ( BOARD wmini ALSO COLUMN 2 TRANSFORM )
+
+NEXT
+BUTTON ( TEXT 'v' COLOR blue ) 
+BUTTON ( TEXT 'c' COLOR green ) 
+BUTTON ( TEXT 'z' COLOR green ) 
+BUTTON ( TEXT 'm' COLOR green ) 
+NEXTROW
+
+BUTTON ( TEXT 'b' COLOR blue ) 
+BUTTON ( TEXT 'l' COLOR green ) 
+BUTTON ( TEXT 's' COLOR yellow ) 
+BUTTON ( TEXT 'e' COLOR yellow ) 
+BUTTON ( TEXT 't' COLOR green ) 
+NEXTROW
+
+BUTTON ( TEXT 'f' COLOR blue )
+BUTTON ( TEXT 'r' COLOR green ) 
+BUTTON ( TEXT 'a' COLOR yellow ) 
+BUTTON ( SPACETRAVEL 
+  ERASESPACES AROUND
+  AUTOCAPS HOLD
+  COLOR darkpink ) 
+BUTTON ( TEXT 'n' COLOR yellow ) 
+BUTTON ( TEXT 'y' COLOR green ) 
+NEXTROW
+
+BUTTON ( TEXT 'j' COLOR blue ) 
+BUTTON ( TEXT 'o' COLOR green ) 
+BUTTON ( TEXT 'k' COLOR yellow ) 
+BUTTON ( TEXT 'i' COLOR yellow ) 
+BUTTON ( TEXT 'g' COLOR green ) 
+NEXTROW
+
+NEXT
+BUTTON ( TEXT 'h' COLOR blue ) 
+BUTTON ( TEXT 'p' COLOR green ) 
+BUTTON ( TEXT 'u' COLOR green ) 
+BUTTON ( TEXT 'd' COLOR green ) 
+
+
+; accented part of kinesa
+; #############################################
+
+CURSOR ( NONE )          
+CURSOR ( BOARD lit ALSO COLUMN 1 TRANSFORM )
+CURSOR ( BOARD wmini ALSO COLUMN 1 TRANSFORM )
+
+NEXT
+BUTTON ( TEXT 'í' COLOR purple )
+SKIP 4
+BUTTON ( TEXT 'á' COLOR purple )
+NEXTROW
+
+SKIP 6
+BUTTON ( TEXT 'é' COLOR purple )
+NEXTROW
+
+BUTTON ( TEXT 'ú' COLOR purple )
+SKIP 6
+BUTTON ( TEXT 'ó' COLOR purple )
+NEXTROW
+
+BUTTON ( TEXT 'ü' COLOR rose )
+SKIP 5
+BUTTON ( TEXT 'ö' COLOR rose )
+NEXTROW
+
+NEXT
+BUTTON ( TEXT 'ű' COLOR rose )
+SKIP 4
+BUTTON ( TEXT 'ő' COLOR rose )
+
+
+; rare part of kinesa
+; #############################################
+
+CURSOR ( NONE )
+CURSOR ( BOARD lit ALSO COLUMN 0 TRANSFORM )
+CURSOR ( BOARD minimaths ALSO )
+CURSOR ( BOARD wmini ALSO TRANSFORM )
+
+NEXT
+BUTTON ( TEXT 'q' COLOR brown )
+NEXTROW
+
+BUTTON ( TEXT 'w' COLOR brown )
+BUTTON ( TEXT 'x' COLOR brown )
+
+
+; reverse rare part of kinesa
+; #############################################
+
+CURSOR ( BOARD prog ONLY )
+
+NEXT
+BUTTON ( TEXT 'q' COLOR brown )
+BUTTON ( TEXT 'x' COLOR brown )
+NEXTROW
+
+NEXT
+BUTTON ( TEXT 'w' COLOR brown )
+
+
+; net
+; #############################################
+
+CURSOR ( NONE )
+CURSOR ( BOARD lit ALSO COLUMN 9 ROW 5 )
+CURSOR ( BOARD prog ALSO COLUMN 10 ROW 4 )
+CURSOR ( BOARD wmini ALSO COLUMN 10 ROW 3 )
+CURSOR ( BOARD minisigns ALSO COLUMN 5 ROW 3 TRANSFORM)
+
+NEXT
+BUTTON ( TEXT '@' COLOR blue )
+NEXTROW
+BUTTON ( TEXT '\\' COLOR blue )
+BUTTON ( TEXT '_' COLOR blue )
+
+
+; numeric circular
+; #############################################
+
+CURSOR ( NONE )
+CURSOR ( BOARD prog ALSO ROW 1 )
+CURSOR ( BOARD lit ALSO ROW 2 )
+
+BUTTON ( TEXT '0' COLOR pink )
+NEXTROW
+
+NEXT
+BUTTON ( TEXT '1' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "" SLOT north ) )
+NEXTROW 
+
+NEXT
+BUTTON ( TEXT '2' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "abc" SLOT north ) )
+NEXTROW
+
+SKIP 2
+BUTTON ( TEXT '3' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "def" SLOT north ) )
+NEXTROW
+
+SKIP 2
+BUTTON ( TEXT '4' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "ghi" SLOT north ) )
+BUTTON ( TEXT '5' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "jkl" SLOT north ) )
+BUTTON ( TEXT '6' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "mno" SLOT north ) )
+BUTTON ( TEXT '7' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "pqrs" SLOT north ) )
+BUTTON ( TEXT '8' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "tuv" SLOT north ) )
+BUTTON ( TEXT '9' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "wxyz" SLOT north ) )
+BUTTON ( TEXT '.' COLOR darkpink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "ABR" SLOT north ) )
+
+
+; numeric cube
+; #############################################
+
+CURSOR ( NONE )
+CURSOR ( BOARD minimaths ALSO COLUMN 2 )
+CURSOR ( BOARD wminimaths ALSO COLUMN 6 TRANSFORM )
+
+BUTTON ( TEXT '1' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "" SLOT north ) )
+BUTTON ( TEXT '2' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "abc" SLOT north ) )
+BUTTON ( TEXT '3' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "def" SLOT north ) )
+NEXTROW
+
+BUTTON ( TEXT '4' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "ghi" SLOT north ) )
+BUTTON ( TEXT '5' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "jkl" SLOT north ) )
+BUTTON ( TEXT '6' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "mno" SLOT north ) )
+NEXTROW
+
+NEXT
+BUTTON ( TEXT '7' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "pqrs" SLOT north ) )
+BUTTON ( TEXT '8' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "tuv" SLOT north ) )
+BUTTON ( TEXT '9' COLOR pink ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "wxyz" SLOT north ) )
+NEXTROW
+
+SKIP 2
+BUTTON ( TEXT '0' COLOR pink )
+; ADDTITLE ( ) ADDTITLE ( TEXT '’' SLOT north ) )
+
+
+; joystick
+; #############################################
+
+CURSOR ( NONE )
+CURSOR ( BOARD minimaths ALSO  COLUMN  6 )
+CURSOR ( BOARD wminimaths ALSO  COLUMN  10 )
+
+BUTTON ( KEY 'C' FORCECTRL ON FORCESHIFT OFF 
+	ADDTITLE ( TEXT "COPY" SLOT script COLOR white ) COLOR blue )
+BUTTON ( KEY 'V' FORCECTRL ON FORCESHIFT OFF 
+	ADDTITLE ( TEXT "PASTE" SLOT script COLOR white ) COLOR blue )
+
+CURSOR ( NONE )
+CURSOR ( BOARD lit ALSO COLUMN 9 ROW 4 )
+CURSOR ( BOARD prog ALSO COLUMN 10 ROW 3 )
+CURSOR ( BOARD minimaths ALSO COLUMN 3 ROW 2 TRANSFORM)
+CURSOR ( BOARD wminimaths ALSO COLUMN 8 ROW 2 )
+
+SKIP 2
+BUTTON ( KEY KEYDPADUP REPEAT
+	ADDTITLE ( TEXT '▲' SLOT script COLOR black ) COLOR gray )
+NEXTROW
+
+BUTTON ( META SHIFT LOCK ADDTITLE ( SLOT script ) COLOR white )
+NEXT
+BUTTON ( KEY KEYDPADLEFT REPEAT
+	ADDTITLE ( TEXT '◀' SLOT script COLOR black ) COLOR gray )
+BUTTON ( KEY KEYDPADRIGHT REPEAT 
+	ADDTITLE ( TEXT '▶' SLOT script COLOR black ) COLOR gray ) 
+NEXTROW
+
+SKIP 2
+BUTTON ( KEY KEYDPADDOWN REPEAT 
+	ADDTITLE ( TEXT '▼' SLOT script COLOR black ) COLOR gray )
+
+
+; lit commands
+; #############################################
+
+CURSOR ( NONE )
+CURSOR ( BOARD lit ALSO TRANSFORM )
+
+BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" SLOT script ) COLOR white )
+SKIP 7
+BUTTON ( DO BACKSPACE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+SKIP 2
+BUTTON ( DO DELETE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+SKIP 8
+BUTTON ( ENTER ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+NEXTROW
+
+SKIP 11
+BUTTON ( DO DRAFT ADDTITLE ( SLOT script ) COLOR RED ) ; 
+NEXTROW
+
+BUTTON ( META CTRL ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+BUTTON ( META CAPS ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+NEXT
+BUTTON ( MODIFY charsmod ADDTITLE ( TEXT '↺' SLOT script SIZE 2000 ) COLOR white )
+
+
+; lit symbols
+; #############################################
+
+CURSOR ( BOARD lit ONLY COLUMN 7 )
+
+SKIP 2
+BUTTON ( TEXT '?' COLOR orange 
+	ERASESPACES AROUND AUTOSPACE AFTER AUTOCAPS ON)
+BUTTON ( TEXT '=' COLOR khaki
+	ERASESPACES AROUND AUTOSPACE AROUND)
+NEXTROW
+
+SKIP 3
+BUTTON ( TEXT '!' COLOR orange 
+	ERASESPACES AROUND AUTOSPACE AFTER AUTOCAPS ON)
+BUTTON ( TEXT '*' COLOR green )
+BUTTON ( TEXT '/' COLOR green )
+NEXTROW
+
+SKIP 2
+BUTTON ( TEXT '–' COLOR orange
+	ERASESPACES AROUND AUTOSPACE AROUND)
+BUTTON ( TEXT '-' COLOR green ADDTITLE ( SLOT south ) )	 
+BUTTON ( TEXT '+' COLOR green ADDTITLE ( SLOT south ) )	 
+NEXTROW
+
+SKIP 2
+BUTTON ( TEXT '.' COLOR orange 
+	ERASESPACES AROUND AUTOSPACE AFTER AUTOCAPS ON)
+BUTTON ( TEXT ':' COLOR khaki 
+	ERASESPACES AROUND AUTOSPACE AFTER)
+BUTTON ( TEXT '…' COLOR khaki 
+	ERASESPACES AROUND AUTOSPACE AFTER AUTOCAPS ON)
+NEXTROW
+
+NEXT
+BUTTON ( TEXT ',' COLOR orange 
+	ERASESPACES AROUND AUTOSPACE AFTER)
+BUTTON ( TEXT ';' COLOR khaki 
+	ERASESPACES AROUND AUTOSPACE AFTER)
+BUTTON ( TEXT ' ' COLOR darkpink )
+
+CURSOR ( BOARD lit ONLY ROW 5 COLUMN 3 )
+
+BUTTON ( TEXT '„' COLOR khaki ADDTITLE ( SLOT south ) 
+	ERASESPACES AROUND AUTOSPACE BEFORE )
+BUTTON ( TEXT '”' COLOR khaki ADDTITLE ( SLOT south ) 
+	ERASESPACES AROUND AUTOSPACE AFTER )
+BUTTON ( TEXT '(' COLOR orange ADDTITLE ( SLOT south ) 
+	ERASESPACES AROUND AUTOSPACE BEFORE )
+BUTTON ( TEXT ')' COLOR orange ADDTITLE ( SLOT south ) 
+	ERASESPACES AROUND AUTOSPACE AFTER )
+BUTTON ( TEXT '\'' COLOR khaki ADDTITLE ( SLOT south ) )
+BUTTON ( TEXT '\"' COLOR khaki ADDTITLE ( SLOT south ) )
+
+
+; prog commands
+; #############################################
+
+CURSOR ( NONE )
+CURSOR ( BOARD prog ALSO )
+
+SKIP 7
+BUTTON ( DO BACKSPACE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+SKIP 5
+BUTTON ( DO DELETE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+SKIP 7
+BUTTON ( ENTER ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+SKIP 5
+BUTTON ( SPACETRAVEL COLOR darkpink OVERWRITE )
+NEXTROW
+
+BUTTON ( META CTRL ADDTITLE ( SLOT script ) COLOR white )
+SKIP 6
+BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" SLOT script ) COLOR white )
+NEXTROW
+
+NEXT
+BUTTON ( META CAPS ADDTITLE ( SLOT script ) COLOR white )
+
+NEXTROW
+
+NEXT
+BUTTON ( MODIFY charsacc ADDTITLE ( TEXT '↺' SLOT script SIZE 2000 ) COLOR white )
+
+; prog symbols - [`] [^] [~] [$] are not used 
+; #############################################
+
+CURSOR ( NONE )
+CURSOR ( BOARD prog ALSO )
+
+SKIP 8
+BUTTON ( TEXT '?' COLOR yellow )
+BUTTON ( TEXT ':' COLOR yellow )
+BUTTON ( TEXT '<' COLOR khaki )
+BUTTON ( TEXT '=' COLOR khaki )
+BUTTON ( TEXT '>' COLOR khaki )
+NEXTROW
+
+SKIP 8
+BUTTON ( TEXT '!' COLOR khaki )
+BUTTON ( TEXT '|' COLOR khaki )
+BUTTON ( TEXT '&' COLOR khaki )
+BUTTON ( TEXT '*' COLOR green )
+BUTTON ( TEXT '/' COLOR green )
+NEXTROW
+
+SKIP 8
+BUTTON ( TEXT ";\n" ADDTITLE ( TEXT ";" ) COLOR orange )
+BUTTON ( TEXT "{\n" ADDTITLE ( TEXT "{" ) COLOR orange )
+BUTTON ( TEXT "}\n" ADDTITLE ( TEXT "}" ) COLOR orange )
+BUTTON ( TEXT '-' COLOR green )
+BUTTON ( TEXT '+' COLOR green )
+BUTTON ( TEXT '%' COLOR khaki )
+NEXTROW
+
+SKIP 8
+BUTTON ( TEXT '[' COLOR khaki )
+BUTTON ( TEXT ']' COLOR khaki )
+BUTTON ( TEXT '\'' COLOR khaki )
+BUTTON ( TEXT '\"' COLOR khaki )
+NEXTROW
+
+SKIP 7
+BUTTON ( TEXT '#' COLOR rose )
+BUTTON ( TEXT '(' COLOR khaki )
+BUTTON ( TEXT ')' COLOR khaki )
+NEXTROW
+
+SKIP 9
+BUTTON ( TEXT ',' COLOR khaki )
+
+
+; mini commands
+; #############################################
+
+CURSOR ( BOARD mini ONLY )
+
+;NEXT
+;BUTTON ( TEXT '' ADDTITLE ( TEXT "Mini" SLOT link ) COLOR magenta )
+SKIP 6
+BUTTON ( DO BACKSPACE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+
+NEXTROW
+BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" SLOT script ) COLOR white 
+  ERASESPACES AROUND
+  AUTOCAPS HOLD )
+SKIP 5
+BUTTON ( ENTER ADDTITLE ( SLOT script ) COLOR white 
+  ERASESPACES AROUND 
+  AUTOCAPS ON )
+NEXTROW
+
+SKIP 7
+BUTTON ( LINK 35 
+	ADDTITLE ( TEXT "&#?" SLOT link ) COLOR magenta )
+NEXTROW
+
+BUTTON ( META CAPS ADDTITLE ( SLOT script ) COLOR white )
+SKIP 5
+BUTTON ( TEXT '.' COLOR orange
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER 
+	AUTOCAPS ON )
+NEXTROW
+
+NEXT
+BUTTON ( MODIFY charsacc ADDTITLE ( TEXT "o↺ő" SLOT script ) COLOR white )
+SKIP 4
+BUTTON ( TEXT ',' COLOR orange
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER ) 
+BUTTON ( LINK 33 LOCK
+	ADDTITLE ( TEXT "123" SLOT link ) COLOR magenta ) 
+
+
+; wmini commands
+; #############################################
+
+CURSOR ( BOARD wmini ONLY )
+
+;BUTTON ( TEXT ' ' ADDTITLE ( TEXT "Mini" SLOT link ) COLOR magenta )
+SKIP 8
+BUTTON ( DO BACKSPACE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+BUTTON ( TEXT '?' COLOR khaki
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER 
+	AUTOCAPS ON )
+BUTTON ( TEXT '\"' COLOR khaki)	
+BUTTON ( DO DELETE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+SKIP 9
+BUTTON ( ENTER ADDTITLE ( SLOT script ) COLOR white 
+  ERASESPACES AROUND 
+  AUTOCAPS ON )
+BUTTON ( TEXT '!' COLOR khaki
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER 
+	AUTOCAPS ON )
+BUTTON ( TEXT '-' COLOR khaki)
+NEXTROW
+
+BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" SLOT script ) COLOR white 
+  ERASESPACES AROUND
+  AUTOCAPS HOLD )
+SKIP 8
+BUTTON ( LINK 35 
+	ADDTITLE ( TEXT "&#?" SLOT link ) COLOR magenta )
+BUTTON ( TEXT '(' COLOR orange 
+    ERASESPACES AROUND
+    AUTOSPACE BEFORE )
+BUTTON ( TEXT ')' COLOR orange
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+NEXTROW
+
+NEXT
+BUTTON ( META CAPS ADDTITLE ( SLOT script ) COLOR white )
+SKIP 7
+BUTTON ( TEXT '.' COLOR orange
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER 
+	AUTOCAPS ON )
+BUTTON ( TEXT ':' COLOR khaki
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER )
+NEXTROW
+
+NEXT
+BUTTON ( MODIFY charsacc ADDTITLE ( TEXT "o↺ő" SLOT script ) COLOR white )
+SKIP 6
+BUTTON ( TEXT ',' COLOR orange
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER ) 
+BUTTON ( LINK 33 LOCK
+	ADDTITLE ( TEXT "123" SLOT link ) COLOR magenta )
+
+
+; minimaths commands
+; #############################################
+
+CURSOR ( BOARD minimaths ONLY )
+
+SKIP 5
+BUTTON ( DO BACKSPACE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+SKIP 5
+BUTTON ( ENTER REPEAT ADDTITLE ( SLOT script ) COLOR white )
+BUTTON ( TEXT ' ' REPEAT COLOR darkpink )
+NEXTROW
+
+SKIP 7
+BUTTON ( LINK 35 
+	ADDTITLE ( TEXT "&#?" SLOT link ) COLOR magenta ) 
+NEXTROW
+
+NEXTROW
+
+SKIP 7
+BUTTON ( LINK 30 LOCK
+	ADDTITLE ( TEXT "BACK" SLOT link ) COLOR magenta ) 
+NEXTROW
+
+
+; minimaths symbols
+; #############################################
+
+CURSOR ( BOARD minimaths ONLY ROW 2 )
+
+NEXT 
+BUTTON ( TEXT '*' COLOR green )
+BUTTON ( TEXT '/' COLOR green )
+NEXTROW
+
+BUTTON ( TEXT '=' COLOR khaki )
+BUTTON ( TEXT '-' COLOR green ) 
+BUTTON ( TEXT '+' COLOR green )
+NEXTROW
+
+NEXT 
+BUTTON ( TEXT '#' COLOR khaki )
+BUTTON ( TEXT '(' COLOR orange )
+BUTTON ( TEXT ')' COLOR orange  )
+BUTTON ( TEXT ',' COLOR rose )
+BUTTON ( TEXT '.' COLOR rose ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "ABR" SLOT north ) )
+NEXTROW
+
+
+; wminimaths commands
+; #############################################
+
+CURSOR ( BOARD wminimaths COLUMN 4 ONLY TRANSFORM )
+
+SKIP 5
+BUTTON ( DO BACKSPACE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+NEXTROW
+
+SKIP 5
+BUTTON ( ENTER REPEAT ADDTITLE ( SLOT script ) COLOR white )
+BUTTON ( TEXT ' ' REPEAT COLOR darkpink )
+NEXTROW
+
+SKIP 7
+BUTTON ( LINK 35 
+	ADDTITLE ( TEXT "&#?" SLOT link ) COLOR magenta ) 
+NEXTROW
+
+NEXTROW
+
+SKIP 7
+BUTTON ( LINK 30 LOCK
+	ADDTITLE ( TEXT "BACK" SLOT link ) COLOR magenta ) 
+NEXTROW
+
+
+; wminimaths symbols
+; #############################################
+
+CURSOR ( BOARD wminimaths  ONLY TRANSFORM )
+
+NEXT
+BUTTON ( TEXT '<' COLOR khaki )
+BUTTON ( TEXT '=' COLOR khaki )
+BUTTON ( TEXT '>' COLOR khaki )
+BUTTON ( TEXT '\'' COLOR khaki )
+BUTTON ( TEXT '?' COLOR rose
+    ERASESPACES AROUND
+    AUTOSPACE AFTER 
+    AUTOCAPS ON )
+NEXTROW
+
+BUTTON ( TEXT '*' COLOR green )
+BUTTON ( TEXT '/' COLOR green )
+BUTTON ( TEXT '|' COLOR khaki )
+BUTTON ( TEXT '&' COLOR khaki )
+BUTTON ( TEXT '\"' COLOR khaki )
+BUTTON ( TEXT '!' COLOR rose 
+    ERASESPACES AROUND
+    AUTOSPACE AFTER 
+    AUTOCAPS ON )
+NEXTROW
+
+BUTTON ( TEXT '#' COLOR khaki )
+BUTTON ( TEXT '-' COLOR green )
+BUTTON ( TEXT '+' COLOR green )
+BUTTON ( TEXT '–' COLOR rose )
+BUTTON ( TEXT '{' COLOR khaki
+    ERASESPACES AROUND
+    AUTOSPACE BEFORE )
+BUTTON ( TEXT '}' COLOR khaki
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+BUTTON ( TEXT '$' )
+NEXTROW
+
+BUTTON ( TEXT '%' COLOR khaki )
+BUTTON ( TEXT '’' COLOR orange )
+BUTTON ( TEXT '…' COLOR rose )
+BUTTON ( TEXT '[' COLOR khaki )
+BUTTON ( TEXT ']' COLOR khaki )
+BUTTON ( TEXT ';' COLOR rose ) 
+BUTTON ( TEXT '^' )
+NEXTROW
+
+BUTTON ( MODIFY charsacc ADDTITLE (  TEXT "o↺ő" SLOT script ) COLOR white )
+BUTTON ( TEXT '„' COLOR orange
+    ERASESPACES AROUND
+    AUTOSPACE BEFORE )
+BUTTON ( TEXT '”' COLOR orange
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+BUTTON ( TEXT '(' COLOR orange ) 
+BUTTON ( TEXT ')' COLOR orange )
+BUTTON ( TEXT ':' COLOR rose )
+BUTTON ( TEXT '`' )
+BUTTON ( TEXT '~' )
+BUTTON ( TEXT ',' COLOR rose )
+BUTTON ( TEXT '.' COLOR rose ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "ABR" SLOT north ) )
+
+
+; minisigns commands
+; #############################################
+
+CURSOR ( BOARD minisigns ONLY ROW 2 COLUMN 7 )
+
+BUTTON ( TEXT 0 
+	ADDTITLE ( TEXT "BACK" SLOT link ) COLOR magenta ) 
+
+
+; minisigns symbols
+; #############################################
+
+CURSOR ( BOARD minisigns )
+
+NEXT
+BUTTON ( TEXT '<' COLOR khaki )
+BUTTON ( TEXT '=' COLOR khaki )
+BUTTON ( TEXT '>' COLOR khaki )
+BUTTON ( TEXT '„' COLOR orange
+    ERASESPACES AROUND
+    AUTOSPACE BEFORE )
+BUTTON ( TEXT '”' COLOR orange
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+BUTTON ( TEXT '?' COLOR rose
+    ERASESPACES AROUND
+    AUTOSPACE AFTER 
+    AUTOCAPS ON )
+BUTTON ( TEXT '’' COLOR orange )
+NEXTROW
+
+BUTTON ( TEXT '*' COLOR green )
+BUTTON ( TEXT '/' COLOR green )
+BUTTON ( TEXT '|' COLOR khaki )
+BUTTON ( TEXT '&' COLOR khaki )
+BUTTON ( TEXT '\'' COLOR khaki )
+BUTTON ( TEXT '\"' COLOR khaki )
+BUTTON ( TEXT '!' COLOR rose 
+    ERASESPACES AROUND
+    AUTOSPACE AFTER 
+    AUTOCAPS ON )
+NEXTROW
+
+NEXT
+BUTTON ( TEXT '-' COLOR green )
+BUTTON ( TEXT '+' COLOR green )
+BUTTON ( TEXT '–' COLOR rose )
+BUTTON ( TEXT '{' COLOR khaki
+    ERASESPACES AROUND
+    AUTOSPACE BEFORE )
+BUTTON ( TEXT '}' COLOR khaki
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+BUTTON ( TEXT '.' COLOR rose ADDTITLE ( SLOT south ) 
+	 ADDTITLE ( TEXT "ABR" SLOT north ) )
+NEXTROW
+
+BUTTON ( TEXT '#' COLOR khaki )
+BUTTON ( TEXT '%' COLOR khaki )
+BUTTON ( TEXT '…' COLOR rose
+    ERASESPACES AROUND
+    AUTOSPACE AFTER 
+    AUTOCAPS ON )
+BUTTON ( TEXT '[' COLOR khaki
+    ERASESPACES AROUND
+    AUTOSPACE BEFORE )
+BUTTON ( TEXT ']' COLOR khaki
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+BUTTON ( TEXT ':' COLOR rose 
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+NEXTROW
+
+BUTTON ( DO DRAFT ADDTITLE ( SLOT script COLOR white ) COLOR red )
+BUTTON ( TEXT '`' )
+BUTTON ( TEXT '~' )
+BUTTON ( TEXT '(' COLOR orange 
+    ERASESPACES AROUND
+    AUTOSPACE BEFORE )
+BUTTON ( TEXT ')' COLOR orange
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+BUTTON ( TEXT ';' COLOR rose
+    ERASESPACES AROUND
+    AUTOSPACE AFTER )
+
+
+; button help 
+; #############################################
+
+; NEXT  
+; NEXTROW
+; SKIP num
+; SKIPROW num
+; BUTTON (
+; 	TEXT "text" 
+; 	AUTOCAPS ON / OFF / WAIT / HOLD
+; 	STRINGCAPS 
+; 	ERASESPACES BEFORE / AFTER / AROUND 
+; 	AUTOSPACE BEFORE / AFTER / AROUND 
+; 	REPEAT
+; 	
+; 	KEY num	FORCECAPS FORCESHIFT FORCECTRL FORCEALT REPEAT
+; 	
+; 	DO DELETE / BACKSPACE REPEAT
+; 
+; 	SPACETRAVEL
+; 
+; 	ENTER REPEAT
+; 
+; 	META CAPS / SHIFT / CTRL / ALT LOCK
+; 
+; 	LINK num LOCK
+; 
+; 	MODIFY keyword REVERSE
+; 
+; 	ADDTITLE ( TEXT "text " BOLD ITALICS COLOR color SLOT keyword )
+; 
+; 	COLOR color )
+
+
+; modifications
+; #############################################
+
+; ADDMODIFY (ID keyword ADDROLL string-list / ROLLS stringlist IGNORESPACE )
+
+ADDMODIFY (ID charsacc IGNORESPACE 
+	ROLLS (
+	"aáAÁ"
+	"bßB"
+	"c¢©C"
+	"dD"
+	"eé€EÉ"
+	"f£F"
+	"gG" 
+	"hH"
+	"iíIÍ"
+	"jJ"
+	"kK" 
+	"lL"
+	"mµM"
+	"nN"
+	"oóöőOÓÖŐ"
+	"p§P¶"
+	"qQ"
+	"r®R"
+	"s$S"
+	"tT"
+	"uúüűUÚÜŰ"
+	"v¤V"
+	"wW"
+	"xX"
+	"y¥Y"
+	"zZ"
+	"({[<«"
+	")}]>»"
+	"\"„”"
+	"\'’"
+	".?!…"
+	",;:"
+	"-–"
+	"/÷"
+	"+±†‡"
+	"%‰"
+	"*×"
+	"0°"
+	"  ‑" ; non-breaking space and non breaking hyphen.
+	"#`~^") ) ; Special symbols, rarely needed
+ STOP
+
+; #############################################
+; #############################################
