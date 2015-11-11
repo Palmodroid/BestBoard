@@ -127,29 +127,30 @@ public class Button implements Cloneable
 
     // !! Always use X-Y or Column-Row pairs !!
     // GridX = HX * 2 + ( (HY + HK) % 2 )
+    // + 1 because board is wider then area
 
     /**
      * Converts columns (hexagon) into grids
-     * This is only needed by the constructor!
+     * This is only needed by the constructor and ButtonForMaps!
      * @param columnInHexagons hexagonal column
      * @param rowInHexagons hexagonal row
      * @return Y-grid
      */
     protected int getGridX( int columnInHexagons, int rowInHexagons )
         {
-        return columnInHexagons * 2 + ( (rowInHexagons + board.rowsAlignOffset) % 2 );
+        return columnInHexagons * 2 + ( (rowInHexagons + board.rowsAlignOffset) % 2 ) + 1;
         }
 
 
     /**
      * Converts rows (hexagon) into grids
-     * This is only needed by the constructor!
+     * This is only needed by the constructor and ButtonForMaps!
      * @param rowInHexagons hexagonal row
      * @return Y-grid
      */
     protected int getGridY( int rowInHexagons )
         {
-        return rowInHexagons * 3 + 2 - board.softBoardData.hideTop;
+        return rowInHexagons * 3 + 2;
         }
 
 
@@ -160,12 +161,12 @@ public class Button implements Cloneable
      * Converts X-grid to X-pixel
      * (Center and corners of the hexagon)
      * @param gridX grid X coordinate
-     * @param offsetInPixel X offset in pixels
+     * @param xOffsetInPixel X offset in pixels
      * @return pixel X coordinate
      */
-    protected int getPixelX( int gridX, int offsetInPixel )
+    protected int getPixelX( int gridX, int xOffsetInPixel )
         {
-        return gridX * board.boardWidthInPixels / board.boardWidthInGrids + offsetInPixel;
+        return gridX * board.areaWidthInPixels / board.areaWidthInGrids + xOffsetInPixel;
         }
 
 
@@ -173,35 +174,38 @@ public class Button implements Cloneable
      * Converts Y-grid to Y-pixel
      * (Center and corners of the hexagon)
      * @param gridY grid Y coordinate
+     * @param yOffsetInPixel Y offset in pixels
      * @return pixel Y coordinate
      */
-    protected int getPixelY( int gridY )
+    protected int getPixelY( int gridY, int yOffsetInPixel )
         {
-        return gridY * board.boardHeightInPixels / board.boardHeightInGrids;
+        return gridY * board.boardHeightInPixels / board.boardHeightInGrids + yOffsetInPixel;
         }
 
 
     /**
      * Creates button's hexagon with the use of the grids
      * The created path can be used both for outline and fill
-     * @param offsetInPixel x offset in pixels
+     * @param xOffsetInPixel x offset in pixels
      * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
+     * @param yOffsetInPixel y offset in pixels
+     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
      * @return created path
      */
-    protected Path hexagonPath( int offsetInPixel)
+    protected Path hexagonPath( int xOffsetInPixel, int yOffsetInPixel)
         {
         Path path = new Path();
 
-        int xminus = getPixelX( columnInGrids - 1, offsetInPixel );
-        int xcenter = getPixelX( columnInGrids, offsetInPixel );
-        int xplus = getPixelX( columnInGrids + 1, offsetInPixel );
-        int yminus = getPixelY( rowInGrids - 1 );
-        int yplus = getPixelY( rowInGrids + 1 );
+        int xminus = getPixelX( columnInGrids - 1, xOffsetInPixel );
+        int xcenter = getPixelX( columnInGrids, xOffsetInPixel );
+        int xplus = getPixelX( columnInGrids + 1, xOffsetInPixel );
+        int yminus = getPixelY( rowInGrids - 1, yOffsetInPixel );
+        int yplus = getPixelY( rowInGrids + 1, yOffsetInPixel );
 
-        path.moveTo(xcenter, getPixelY( rowInGrids - 2 ));
+        path.moveTo(xcenter, getPixelY( rowInGrids - 2, yOffsetInPixel ));
         path.lineTo(xplus, yminus);
         path.lineTo(xplus, yplus);
-        path.lineTo(xcenter, getPixelY( rowInGrids + 2 ));
+        path.lineTo(xcenter, getPixelY( rowInGrids + 2, yOffsetInPixel ));
         path.lineTo(xminus, yplus);
         path.lineTo(xminus, yminus);
         path.close();
@@ -218,7 +222,8 @@ public class Button implements Cloneable
      */
     public void drawTouchedButton( Canvas canvas )
         {
-        drawButton( canvas, board.softBoardData.touchColor, board.xOffset );
+        drawButton( canvas, board.softBoardData.touchColor,
+                board.xOffset - board.areaXOffset, - board.areaYOffset );
         }
 
 
@@ -230,7 +235,7 @@ public class Button implements Cloneable
      */
     public void drawButton( Canvas canvas )
         {
-        drawButton(canvas, color, 0);
+        drawButton( canvas, color, 0, 0 );
         }
 
 
@@ -238,16 +243,18 @@ public class Button implements Cloneable
      * Draw button with the specified background color and with the specified x-offset in pixel
      * @param canvas canvas to draw on
      * @param color background color
-     * @param offsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
+     * @param xOffsetInPixel x offset in pixels
+     * (can be 0 (layout bitmap) or board.xOffset-board.areaXOffset (direct draw on screen)
+     * @param yOffsetInPixel y offset in pixels
+     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
      */
-    protected void drawButton( Canvas canvas, int color, int offsetInPixel )
+    protected void drawButton( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
         // draw the background
-        drawButtonBackground( canvas, color, offsetInPixel );
+        drawButtonBackground( canvas, color, xOffsetInPixel, yOffsetInPixel );
 
         // draw the titles
-        drawButtonTitles(canvas, offsetInPixel );
+        drawButtonTitles(canvas, xOffsetInPixel, yOffsetInPixel );
         }
 
 
@@ -256,14 +263,16 @@ public class Button implements Cloneable
      * with the specified x-offset in pixel
      * @param canvas canvas to draw on
      * @param color background color
-     * @param offsetInPixel x offset in pixels
+     * @param xOffsetInPixel x offset in pixels
      * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
+     * @param yOffsetInPixel y offset in pixels
+     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
      */
-    protected void drawButtonBackground( Canvas canvas, int color, int offsetInPixel )
+    protected void drawButtonBackground( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
         hexagonFillPaint.setColor( color );
 
-        Path hexagonPath = hexagonPath(offsetInPixel);
+        Path hexagonPath = hexagonPath( xOffsetInPixel, yOffsetInPixel );
         canvas.drawPath(hexagonPath, hexagonFillPaint);
         canvas.drawPath(hexagonPath, hexagonStrokePaint);
         }
@@ -274,17 +283,19 @@ public class Button implements Cloneable
      * drawButton will calculate pixel coordinates previously
      * This method could be changed, if not all titles are needed
      * @param canvas canvas to draw on
-     * @param offsetInPixel x offset in pixels
+     * @param xOffsetInPixel x offset in pixels
      * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
+     * @param yOffsetInPixel y offset in pixels
+     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
      */
-    protected void drawButtonTitles( Canvas canvas, int offsetInPixel )
+    protected void drawButtonTitles( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
         {
         // index (in buttons[][index]) == touchCode (this is always true)
         // Theoretically from index/touchCode the buttons position can be calculated.
         // BUT this is NOT obligatory!! So the buttons will store their position.
 
-        int centerX = getPixelX( columnInGrids, offsetInPixel);
-        int centerY = getPixelY( rowInGrids );
+        int centerX = getPixelX( columnInGrids, xOffsetInPixel);
+        int centerY = getPixelY( rowInGrids, yOffsetInPixel );
 
         for ( TitleDescriptor title : titles )
             {

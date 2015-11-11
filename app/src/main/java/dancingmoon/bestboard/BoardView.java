@@ -156,7 +156,9 @@ public class BoardView extends View
             Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
             }
 
-        setMeasuredDimension(widthSize, board.boardHeightInPixels);
+        // calculateScreen data has calculated height of the area
+        setMeasuredDimension( widthSize, board.areaHeightInPixels +
+                (board.softBoardData.monitorRow ? board.halfHexagonHeightInPixels : 0));
         }
 
 
@@ -848,10 +850,10 @@ public class BoardView extends View
         {
         // Scribe.locus();
 
-        // board.drawMap(canvas);
-        // board.drawLayoutSkin(canvas, 0);
+        // board.drawBoardMap(canvas);
+        // board.drawBoardLayout(canvas, 0);
 
-        board.drawLayoutSkin(canvas);
+        board.drawBoardLayout( canvas );
 
         // ChangedButtons - draw over the bitmap, too
         // !! ha nem touched ??

@@ -42,12 +42,15 @@ public class ButtonLink extends ButtonMultiTouch implements
     public void drawChangingButton(Canvas canvas)
         {
         if ( board.softBoardData.linkState.getState( index ) == LinkState.ACTIVE )
-            drawButton( canvas, board.softBoardData.metaColor, board.xOffset );
+            drawButton( canvas, board.softBoardData.metaColor,
+                    board.xOffset - board.areaXOffset, - board.areaYOffset );
         else if ( board.softBoardData.linkState.getState( index ) == LinkState.LOCKED )
-            drawButton( canvas, board.softBoardData.lockColor, board.xOffset );
+            drawButton( canvas, board.softBoardData.lockColor,
+                    board.xOffset - board.areaXOffset, - board.areaYOffset );
         else if ( board.softBoardData.linkState.getState( index ) == LinkState.TOUCHED &&
                 board.softBoardData.displayTouch)
-            drawButton( canvas, board.softBoardData.touchColor, board.xOffset );
+            drawButton( canvas, board.softBoardData.touchColor,
+                    board.xOffset - board.areaXOffset, - board.areaYOffset );
         // If state == HIDDEN, then no redraw is needed
         }
 

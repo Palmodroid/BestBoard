@@ -244,6 +244,10 @@ public class SoftBoardData
 
         outerRimPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0);
 
+        monitorRow = sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString( R.string.drawing_monitor_row_key ),
+                false );
+
         displayTouch = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString( R.string.cursor_touch_allow_key ),
                 true);
@@ -286,6 +290,11 @@ public class SoftBoardData
      * Touch movement (stroke) will not fire from the outer rim, but touch down will do.
      */
     public int outerRimPermil;
+
+    /**
+     * Switches monitor row at the bottom
+     */
+    public boolean monitorRow;
 
     /**
      * Background of the touched key is changed or not

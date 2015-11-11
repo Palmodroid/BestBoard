@@ -21,7 +21,7 @@ public class ButtonForMaps extends Button
         hexagonMapPaint.setDither(false);
         }
 
-    private int pixelRimQuaterHeight;
+    private int pixelRimQuarterHeight;
     private int pixelRimHalfWidth;
 
     public ButtonForMaps(Board board)
@@ -29,23 +29,25 @@ public class ButtonForMaps extends Button
         // board is stored in Button superclass
         this.board = board;
 
-        pixelRimQuaterHeight = (board.boardHeightInPixels * (1000 - board.softBoardData.outerRimPermil)) / (board.boardHeightInGrids * 1000);
-        pixelRimHalfWidth = (board.boardWidthInPixels * (1000 - board.softBoardData.outerRimPermil)) / (board.boardWidthInGrids * 1000);
+        pixelRimQuarterHeight = (board.boardHeightInPixels * (1000 - board.softBoardData.outerRimPermil)) /
+                (board.boardHeightInGrids * 1000);
+        pixelRimHalfWidth = (board.areaWidthInPixels * (1000 - board.softBoardData.outerRimPermil))
+                / (board.areaWidthInGrids * 1000);
         }
 
 
     private Path RimHexagonPath()
         {
         int pixelX = getPixelX(columnInGrids, 0);
-        int pixelY = getPixelY(rowInGrids);
+        int pixelY = getPixelY(rowInGrids, 0);
         Path path = new Path();
 
-        path.moveTo(pixelX, pixelY - 2 * pixelRimQuaterHeight);
-        path.lineTo(pixelX + pixelRimHalfWidth, pixelY - pixelRimQuaterHeight);
-        path.lineTo(pixelX + pixelRimHalfWidth, pixelY + pixelRimQuaterHeight);
-        path.lineTo(pixelX, pixelY + 2 * pixelRimQuaterHeight);
-        path.lineTo(pixelX - pixelRimHalfWidth, pixelY + pixelRimQuaterHeight);
-        path.lineTo(pixelX - pixelRimHalfWidth, pixelY - pixelRimQuaterHeight);
+        path.moveTo(pixelX, pixelY - 2 * pixelRimQuarterHeight );
+        path.lineTo(pixelX + pixelRimHalfWidth, pixelY - pixelRimQuarterHeight );
+        path.lineTo(pixelX + pixelRimHalfWidth, pixelY + pixelRimQuarterHeight );
+        path.lineTo(pixelX, pixelY + 2 * pixelRimQuarterHeight );
+        path.lineTo(pixelX - pixelRimHalfWidth, pixelY + pixelRimQuarterHeight );
+        path.lineTo(pixelX - pixelRimHalfWidth, pixelY - pixelRimQuarterHeight );
         path.close();
 
         return path;
@@ -60,7 +62,7 @@ public class ButtonForMaps extends Button
         hexagonMapPaint.setColor(
                 board.colorFromTouchCode(
                         board.touchCodeFromPosition(columnInHexagons, rowInHexagons), false));
-        canvas.drawPath(hexagonPath(0), hexagonMapPaint);
+        canvas.drawPath(hexagonPath( 0,0 ), hexagonMapPaint);
 
         hexagonMapPaint.setColor(
                 board.colorFromTouchCode(
@@ -82,7 +84,7 @@ public class ButtonForMaps extends Button
 
 
     @Override
-    protected void drawButton( Canvas canvas, int color, int offsetInPixel )
+    protected void drawButton( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
         throw new UnsupportedOperationException();
         }

@@ -72,17 +72,21 @@ public class ButtonMeta extends ButtonMultiTouch implements
         {
         if ( board.softBoardData.boardStates.metaStates[type].getState() == MetaState.IN_TOUCH &&
                 board.softBoardData.displayTouch)
-            drawButton( canvas, board.softBoardData.touchColor, board.xOffset );
+            drawButton( canvas, board.softBoardData.touchColor,
+                    board.xOffset - board.areaXOffset, - board.areaYOffset );
 
         else if ( board.softBoardData.boardStates.metaStates[type].getState() == MetaState.META_ON )
-            drawButton( canvas, board.softBoardData.metaColor, board.xOffset );
+            drawButton( canvas, board.softBoardData.metaColor,
+                    board.xOffset - board.areaXOffset, - board.areaYOffset );
 
         else if ( board.softBoardData.boardStates.metaStates[type].getState() == MetaState.META_LOCK )
-            drawButton( canvas, board.softBoardData.lockColor, board.xOffset );
+            drawButton( canvas, board.softBoardData.lockColor,
+                    board.xOffset - board.areaXOffset, - board.areaYOffset );
 
         // It is only needed by CAPS, but all meta-buttons will know it.
         else if ( board.softBoardData.boardStates.metaStates[type].getState() == CapsState.AUTOCAPS_ON )
-            drawButton( canvas, board.softBoardData.autoColor, board.xOffset );
+            drawButton( canvas, board.softBoardData.autoColor,
+                    board.xOffset - board.areaXOffset, - board.areaYOffset );
 
         // If state == META_OFF, then no redraw is needed
         }

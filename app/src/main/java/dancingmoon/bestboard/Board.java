@@ -62,11 +62,13 @@ public class Board
 
     /**
      * displayed half hexagons in one row (this value is used for calculations)
+     * board is one hexagon wider
      */
-    public int boardWidthInGrids;
+    public int areaWidthInGrids;
 
     /**
-     * displayed quarter hexagon rows (this value is used for calculations)
+     * board height in quarter hexagon rows (this value is used for calculations)
+     * displayed area can be smaller if hideTop or hideBottom are active
      */
     public int boardHeightInGrids;
 
@@ -122,7 +124,7 @@ public class Board
     public int validatedWidthInPixels = -1;
 
     /**
-     * board width in pixels (equals to screen's lower diameter for non-wide boards)
+     * board width in pixels - it contains the non-visible half-hexagons, too
      */
     public int boardWidthInPixels;
 
@@ -135,6 +137,26 @@ public class Board
      * offset in landscape if board is not wide
      */
     public int xOffset = 0;
+
+    /**
+     * width of the visible area (equals to screen's lower diameter for non-wide boards)
+     */
+    public int areaWidthInPixels;
+
+    /**
+     * visible height: height of the board - hidden edges + monitor
+     */
+    public int areaHeightInPixels;
+
+    /**
+     * equals with a half hexagon width
+     */
+    public int areaXOffset;
+
+    /**
+     * equals with a quarter of hexagon, if upper edge is hidden
+     */
+    public int areaYOffset;
 
     /**
      * Text with this size:
@@ -158,12 +180,12 @@ public class Board
     /**
      * Map contains the touchCodes for all levels
      */
-    private Bitmap layoutMap;
+    private Bitmap boardMap;
 
     /**
      * Layout skin for the current layout.
      */
-    private Bitmap layoutSkin = null;
+    private Bitmap boardLayout = null;
 
 
     /**
@@ -212,9 +234,10 @@ public class Board
         this.boardHeightInHexagons = rows;
 
         // Each row has one more half hexagon column
-        this.boardWidthInGrids = halfcolumns;
+        this.areaWidthInGrids = halfcolumns;
 
-        // boardHeightInGrids is set by calculateScreenData, because it contains changeable preferences
+        // Each row has three quarters of hexagonal height (3 grids) + 1 for the last row
+        this.boardHeightInGrids = boardHeightInHexagons * 3 + 1;
 
         if (!isValidDimension(boardWidthInHexagons, boardHeightInHexagons))
             {
@@ -315,6 +338,7 @@ public class Board
         Scribe.locus( Debug.BOARD );
         
         // calculateScreenData is needed only, if orientation was changed
+        // invalidateCalculations invalidates it to force calculations
         if ( screenWidthInPixels == this.validatedWidthInPixels )
             return;           
         this.validatedWidthInPixels = screenWidthInPixels;
@@ -324,18 +348,23 @@ public class Board
         
         // orientation can be found in UseState also
         if ( landscape != softBoardData.linkState.isLandscape() )
-            Scribe.error("Orientation in onMeasure and in linkstate is not the same!");
+            Scribe.error("Orientation in onMeasure and in link-state is not the same!");
 
         // temporary variables are needed to check whether board dimension is changed
-        int newBoardWidthInPixels;
+
+        // IMPORTANT!
+        // New area WIDTH is calculated, real board width is wider with one hexagon, and
+        // New board HEIGHT is calculated, real height is calculated from hideupper/lower and monitor
+
+        int newAreaWidthInPixels;
         int newBoardHeightInPixels;
 
-        // Calculate BoardWidth and Offset
+        // Calculate AreaWidth and Offset
 
         // WIDE board for LANDSCAPE mode OR NORMAL board for PORTRAIT mode
         if (wide == landscape)
             {
-            newBoardWidthInPixels = screenWidthInPixels;
+            newAreaWidthInPixels = screenWidthInPixels;
             this.xOffset = 0;
             Scribe.debug( Debug.BOARD, "Full width keyboard");
             }
@@ -343,31 +372,25 @@ public class Board
         else if (!wide) // && landscape)
             {
             // noinspection SuspiciousNameCombination
-            newBoardWidthInPixels = screenHeightInPixels; // This is the shorter diameter
-            this.xOffset = (screenWidthInPixels - newBoardWidthInPixels) *
+            newAreaWidthInPixels = screenHeightInPixels; // This is the shorter diameter
+            this.xOffset = (screenWidthInPixels - newAreaWidthInPixels) *
                     softBoardData.landscapeOffsetPermil / 1000;
             Scribe.debug( Debug.BOARD, "Normal keyboard for landscape. Offset:" + xOffset);
             }
         // LANDSCAPE board PORTRAIT mode - incompatible board! - !! NOW WE LET IT WORK (TESTING!!) !!
         else // if (wide && !landscape)
             {
-            newBoardWidthInPixels = screenWidthInPixels; // Board will be distorted!!
+            newAreaWidthInPixels = screenWidthInPixels; // Board will be distorted!!
             this.xOffset = 0;
             Scribe.debug( Debug.BOARD, "Wide keyboard for portrait! NOT POSSIBLE! Keyboard is distorted.");
             }
 
-        // boardWidthInGrids is set by constructor
-
-        // Each row has three quarters of hexagonal height (3 grids) + 1 for the last row
-        // hideTop and hideBottom can "hide" 1 or 2 grids
-        this.boardHeightInGrids = boardHeightInHexagons * 3 + 1 - softBoardData.hideTop - softBoardData.hideBottom;
-
-        // Calculate BoardHeight
+        // Calculate BoardHeight - from AreaWidth
 
         // Board pixel height is calculated with the ratio of a regular hexagon
         // after this point all the measurements are calculated from pixelHeight backwards
-        newBoardHeightInPixels = ((boardHeightInGrids * newBoardWidthInPixels * 1000) /
-                (boardWidthInGrids * 1732));
+        newBoardHeightInPixels = ((boardHeightInGrids * newAreaWidthInPixels * 1000) /
+                ( areaWidthInGrids * 1732));
 
         // Only part of the real height can be occupied, this can be set by prefs
         // this true even for NORMAL board: the actual height (== width of the board) should be calculated
@@ -378,23 +401,37 @@ public class Board
         if (newBoardHeightInPixels > screenHeightInPixels)
             newBoardHeightInPixels = screenHeightInPixels;
 
-        // Check if board dimensions are changed
-        if (newBoardWidthInPixels != boardWidthInPixels ||
+        // If board dimensions are changed then layout should be redrawn
+        if (newAreaWidthInPixels != areaWidthInPixels ||
                 newBoardHeightInPixels != boardHeightInPixels)
             {
-            boardWidthInPixels = newBoardWidthInPixels;
-            boardHeightInPixels = newBoardHeightInPixels;
-
             // release layout picture
-            layoutMap = null;
-            layoutSkin = null;
+            boardMap = null;
+            boardLayout = null;
             }
+
+        // if dimensions are changed, all variables should be recalculated
+
+        areaWidthInPixels = newAreaWidthInPixels;
+        boardHeightInPixels = newBoardHeightInPixels;
+
+        halfHexagonWidthInPixels = areaWidthInPixels / areaWidthInGrids;
+        int quarterHexagonHeightInPixels = boardHeightInPixels / boardHeightInGrids;
+        halfHexagonHeightInPixels = 2 * quarterHexagonHeightInPixels;
+
+        // Area is one hexagon wider, then board width
+        areaXOffset = halfHexagonWidthInPixels;
+        boardWidthInPixels = areaWidthInPixels + 2* halfHexagonWidthInPixels;
+
+        areaYOffset = softBoardData.hideTop * quarterHexagonHeightInPixels;
+        areaHeightInPixels = boardHeightInPixels
+                - softBoardData.hideTop * quarterHexagonHeightInPixels
+                - softBoardData.hideBottom * quarterHexagonHeightInPixels;
+
+        // Monitor is only set by onMeasure
 
         // CALCULATE FONT PARAMETERS
         textSize = TitleDescriptor.calculateTextSize(this);
-
-        halfHexagonHeightInPixels = 2 * boardHeightInPixels / boardHeightInGrids;
-        halfHexagonWidthInPixels = screenWidthInPixels / boardWidthInGrids;
         }
 
 
@@ -411,8 +448,8 @@ public class Board
 
         if ( erasePictures )
             {
-            layoutMap = null;
-            layoutSkin = null;
+            boardMap = null;
+            boardLayout = null;
             }
         }
 
@@ -505,13 +542,13 @@ public class Board
 		{
 		int mapX = canvasX - xOffset;
 
-		if ( mapX < 0 || mapX >= getMap().getWidth() )
+		if ( mapX < 0 || mapX >= getBoardMap().getWidth() )
 			return Board.EMPTY_TOUCH_CODE;
 
-		if ( canvasY < 0 || canvasY >= getMap().getHeight() )
+		if ( canvasY < 0 || canvasY >= getBoardMap().getHeight() )
 			return Board.EMPTY_TOUCH_CODE;
 
-		int color = getMap().getPixel( mapX, canvasY );
+		int color = getBoardMap().getPixel( mapX, canvasY );
 
 		return Board.touchCodeFromColor(color);
 		}
@@ -519,15 +556,16 @@ public class Board
 
     public int colorFromMap(int canvasX, int canvasY)
         {
-        int mapX = canvasX - xOffset;
+        int mapX = canvasX - xOffset + areaXOffset;
+        int mapY = canvasY + areaYOffset;
 
-        if (mapX < 0 || mapX >= getMap().getWidth())
+        if (mapX < 0 || mapX >= getBoardMap().getWidth())
             return Board.EMPTY_TOUCH_CODE;
 
-        if (canvasY < 0 || canvasY >= getMap().getHeight())
+        if (mapY < 0 || mapY >= getBoardMap().getHeight())
             return Board.EMPTY_TOUCH_CODE;
 
-        int color = getMap().getPixel(mapX, canvasY);
+        int color = getBoardMap().getPixel( mapX, mapY );
 
         return color;
         }
@@ -537,20 +575,20 @@ public class Board
      * * CREATE BOARD MAP
      */
 
-    private void createMap()
+    private void createBoardMap()
         {
-        layoutMap = Bitmap.createBitmap(boardWidthInPixels, boardHeightInPixels, Bitmap.Config.RGB_565);
-        layoutMap.eraseColor(colorFromTouchCode(EMPTY_TOUCH_CODE, false));
+        boardMap = Bitmap.createBitmap(boardWidthInPixels, boardHeightInPixels, Bitmap.Config.RGB_565);
+        boardMap.eraseColor( colorFromTouchCode( EMPTY_TOUCH_CODE, false ) );
 
-        Canvas canvas = new Canvas(layoutMap);
+        Canvas canvas = new Canvas( boardMap );
 
         // Cannot be created before setting screen specific data
         ButtonForMaps buttonForMaps = new ButtonForMaps(this);
 
-        // hatszög "sorok"
+        // hexagon rows
         for (int row = 0; row < boardHeightInHexagons; row++)
             {
-            // hatszög oszlopok
+            // hexagon columns
             for (int col = 0; col < boardWidthInHexagons; col++)
                 {
                 buttonForMaps.drawButtonForMap(canvas, col, row);
@@ -558,27 +596,27 @@ public class Board
             }
         }
 
-    public Bitmap getMap()
+    public Bitmap getBoardMap()
         {
-        if (layoutMap == null)
-            createMap();
-        return layoutMap;
+        if ( boardMap == null)
+            createBoardMap();
+        return boardMap;
         }
 
     // Just for debugging purposes
-    public void drawMap(Canvas canvas)
+    public void drawBoardMap( Canvas canvas )
         {
-        canvas.drawBitmap(getMap(), (float) xOffset, 0f, null);
+        canvas.drawBitmap( getBoardMap(), (float) xOffset - (float) areaXOffset, - (float) areaYOffset, null);
         }
 
 
     /**
-     * * CREATE LAYOUT SKIN
+     * * CREATE BOARD LAYOUT
      */
 
-    public void drawLayoutSkin(Canvas canvas)
+    public void drawBoardLayout( Canvas canvas )
         {
-        canvas.drawBitmap(getLayoutSkin(), (float) xOffset, 0f, null);
+        canvas.drawBitmap( getBoardLayout(), (float) xOffset - (float) areaXOffset, - (float) areaYOffset, null);
         }
 
     public void drawChangedButtons(Canvas canvas)
@@ -592,25 +630,25 @@ public class Board
         
     /*
      * Not all layout can be stored as bitmap because of memory problems.
-     * Now only one layout is cached in layoutSkin.
+     * Now only one layout is cached in boardLayout.
      * The process could be quicker, if bitmaps (same size!) could be reused.
      * Now a new bitmap will be generated for every bitmap.
      */
-    public Bitmap getLayoutSkin()
+    public Bitmap getBoardLayout()
         {
-        if (layoutSkin != null)
+        if ( boardLayout != null)
             {
-            return layoutSkin;
+            return boardLayout;
             }
 
         Scribe.debug( Debug.BOARD, "Layout skin is created for " + toString());
 
-        layoutSkin = createLayoutSkin();
+        boardLayout = createBoardLayout();
 
-        return layoutSkin;
+        return boardLayout;
         }
 
-    private Bitmap createLayoutSkin()
+    private Bitmap createBoardLayout()
         {
         Bitmap skin = Bitmap.createBitmap(boardWidthInPixels, boardHeightInPixels, Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(skin);

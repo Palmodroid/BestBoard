@@ -58,6 +58,11 @@
     <string name="drawing_outer_rim_dialog_title">Outer rim ratio </string>
     <string name="drawing_outer_rim_dialog_message">Enter outer rim ratio (per mille)! The outer rim on the buttons is sensitive to touches but not during touch movements.</string>
 
+    <string name="drawing_monitor_row_key">monitorrow</string>
+    <string name="drawing_monitor_row_title">Monitor row</string>
+    <string name="drawing_monitor_row_on">Monitor row is visible below the board</string>
+    <string name="drawing_monitor_row_off">Monitor row is switched off</string>
+
 
     <string name="prefs_cursor">Visible touch control</string>
 

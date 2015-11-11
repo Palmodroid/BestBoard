@@ -349,8 +349,8 @@ public class PrefsFragment extends PreferenceFragment
             preference.setSummary( getString( value ?
                     R.string.drawing_hide_upper_on : R.string.drawing_hide_upper_off ));
 
-            Scribe.note( Debug.PREF, "PREFERENCES: Hide upper set to: " + value );
-            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
+            Scribe.note( Debug.PREF, "PREFERENCES: Hide upper is set to: " + value );
+            if ( !allKeys )     performAction(PREFS_ACTION_RECALCULATE);
             }
 
         // Drawing / Hide lower quoter
@@ -363,8 +363,8 @@ public class PrefsFragment extends PreferenceFragment
             preference.setSummary( getString( value ?
                     R.string.drawing_hide_lower_on : R.string.drawing_hide_lower_off ));
 
-            Scribe.note( Debug.PREF, "PREFERENCES: Hide lower set to: " + value );
-            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
+            Scribe.note( Debug.PREF, "PREFERENCES: Hide lower is set to: " + value );
+            if ( !allKeys )     performAction(PREFS_ACTION_RECALCULATE);
             }
 
         // Drawing / Screen height ratio
@@ -383,7 +383,7 @@ public class PrefsFragment extends PreferenceFragment
         // Drawing / Landscape offset for non-wide boards
         if ( key.equals( getString( R.string.drawing_landscape_offset_key )) || allKeys )
             {
-            int landscapeOffset = checkAndStoreLandscapeOffsetPref(getActivity());
+            int landscapeOffset = checkAndStoreLandscapeOffsetPref( getActivity() );
             // Cannot be null, if prefs.xml is valid
             Preference landscapeOffsetPreference = findPreference( getString( R.string.drawing_landscape_offset_key ) );
             landscapeOffsetPreference.setSummary(getString(R.string.drawing_landscape_offset_summary) + " " +
@@ -395,13 +395,27 @@ public class PrefsFragment extends PreferenceFragment
         // Drawing / Outer rim ratio
         if ( key.equals( getString( R.string.drawing_outer_rim_key )) || allKeys )
             {
-            int outerRim = checkAndStoreOuterRimPref(getActivity());
+            int outerRim = checkAndStoreOuterRimPref( getActivity() );
             // Cannot be null, if prefs.xml is valid
             Preference outerRimPreference = findPreference( getString( R.string.drawing_outer_rim_key ) );
             outerRimPreference.setSummary(getString(R.string.drawing_outer_rim_summary) + " " +
                     Integer.toString(outerRim));
             Scribe.note( Debug.PREF, "PREFERENCES: Outer rim ratio has changed!" + outerRim);
             if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
+            }
+
+        // Drawing / Monitor row
+        if ( key.equals( getString( R.string.drawing_monitor_row_key )) || allKeys )
+            {
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.drawing_monitor_row_key ) );
+            boolean value = sharedPrefs.getBoolean( getString( R.string.drawing_monitor_row_key ),
+                    getResources().getBoolean( R.bool.drawing_monitor_row_default ) );
+            preference.setSummary( getString( value ?
+                    R.string.drawing_monitor_row_on : R.string.drawing_monitor_row_off ));
+
+            Scribe.note( Debug.PREF, "PREFERENCES: Monitor row is set to: " + value );
+            if ( !allKeys )     performAction(PREFS_ACTION_RECALCULATE);
             }
 
         // Cursor / Touch allow

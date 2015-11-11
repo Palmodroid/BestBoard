@@ -64,9 +64,9 @@ public class TitleDescriptor
         int textSizeFromHeight = 1000 * board.boardHeightInPixels / (board.boardHeightInGrids * textHeight) ;
 
         // Calculate font size from the width of "MMMMM" characters
-        // intendedWidthInPixels is one hexagon (2 grids) == 2 * boardWidthInPixels / boardWidthInGrids
+        // intendedWidthInPixels is one hexagon (2 grids) == 2 * areaWidthInPixels / areaWidthInGrids
         // Ratio => SIZE : intendedWidthInPixels = 1000f : bounds.width()
-        int textSizeFromWidth = 2 * 1000 * board.boardWidthInPixels / (board.boardWidthInGrids * textWidth);
+        int textSizeFromWidth = 2 * 1000 * board.areaWidthInPixels / (board.areaWidthInGrids * textWidth);
 
         // In most cases textSizeFromWidth is smaller
         // Now text with max. 5 characters can fit in the width of a hexagon

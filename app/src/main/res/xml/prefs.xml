@@ -72,6 +72,11 @@
 			android:dialogMessage="@string/drawing_outer_rim_dialog_message"
 			android:defaultValue="@string/drawing_outer_rim_default" />
 
+		<CheckBoxPreference
+			android:key="@string/drawing_monitor_row_key"
+			android:title="@string/drawing_monitor_row_title"
+			android:defaultValue="@bool/drawing_monitor_row_default" />
+
 	</PreferenceCategory>
 
 	<PreferenceCategory
