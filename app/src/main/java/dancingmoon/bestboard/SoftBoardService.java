@@ -159,7 +159,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public View noKeyboardView()
         {
-        Scribe.locus( Debug.SERVICE );
+        Scribe.locus(Debug.SERVICE);
 
         View noKeyboardView = getLayoutInflater().inflate(R.layout.service_nokeyboard, null);
         noKeyboardView.setOnClickListener( new View.OnClickListener()
@@ -204,7 +204,7 @@ public class SoftBoardService extends InputMethodService implements
         super.onCreate();
 
         // Connect to preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener( this );
+        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener(this);
 
         // Start the first parsing
         startSoftBoardParser();
@@ -217,13 +217,13 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onDestroy()
         {
-        Scribe.locus( Debug.SERVICE );
-        Scribe.title( "SOFT-BOARD-SERVICE HAS FINISHED" );
+        Scribe.locus(Debug.SERVICE);
+        Scribe.title("SOFT-BOARD-SERVICE HAS FINISHED");
 
         super.onDestroy();
 
         // Release preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener( this );
+        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener(this);
 
         // Stop any ongoing parsing
         if ( softBoardParser != null)   softBoardParser.cancel(false);
@@ -236,7 +236,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public void startSoftBoardParser()
         {
-        Scribe.note( Debug.SERVICE,  "Parsing has started." );
+        Scribe.note(Debug.SERVICE, "Parsing has started.");
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -269,7 +269,7 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public View onCreateInputView()
         {
-        Scribe.locus( Debug.SERVICE );
+        Scribe.locus(Debug.SERVICE);
 
         if (softBoardData == null)
             {
@@ -319,12 +319,31 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void softBoardParserCriticalError(int errorInfo)
         {
-        Scribe.locus( Debug.SERVICE );
+        Scribe.locus(Debug.SERVICE);
 
-        // Generating a new view
-        warning = "Critical error happened!";
-        Scribe.debug( Debug.SERVICE,  warning );
-        setInputView( noKeyboardView() );
+        switch ( errorInfo )
+            {
+            case SoftBoardParser.CRITICAL_FILE_NOT_FOUND_ERROR:
+                warning = "Critical error! Could not find coat file! Please, check preferences!";
+                break;
+            case SoftBoardParser.CRITICAL_IO_ERROR:
+                warning = "Critical error! Could not read sd-card!";
+                break;
+            case SoftBoardParser.CRITICAL_NOT_VALID_FILE_ERROR:
+                warning = "Critical error! Coat file is not valid! Please, correct it, or a choose an other coat file in the preferences!";
+                break;
+            case SoftBoardParser.CRITICAL_PARSING_ERROR:
+                warning = "Critical error! No board is defined in coat file! Please, correct it!";
+                break;
+            // no warning is necessary for CANCEL
+            default:
+                warning = "Critical error!";
+            }
+        // Generating a new view with the warning
+        Scribe.debug(Debug.SERVICE, warning);
+        setInputView(noKeyboardView());
+        // Warning should be shown! Keyboard can be hidden
+        Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
 
         softBoardParser = null;
         }

@@ -157,8 +157,7 @@ public class BoardView extends View
             }
 
         // calculateScreen data has calculated height of the area
-        setMeasuredDimension( widthSize, board.areaHeightInPixels +
-                (board.softBoardData.monitorRow ? board.halfHexagonHeightInPixels : 0));
+        setMeasuredDimension( widthSize, board.areaHeightInPixels );
         }
 
 

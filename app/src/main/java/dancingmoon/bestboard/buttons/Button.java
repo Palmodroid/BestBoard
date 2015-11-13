@@ -189,7 +189,7 @@ public class Button implements Cloneable
      * @param xOffsetInPixel x offset in pixels
      * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
      * @return created path
      */
     protected Path hexagonPath( int xOffsetInPixel, int yOffsetInPixel)
@@ -222,8 +222,7 @@ public class Button implements Cloneable
      */
     public void drawTouchedButton( Canvas canvas )
         {
-        drawButton( canvas, board.softBoardData.touchColor,
-                board.xOffset - board.areaXOffset, - board.areaYOffset );
+        drawButton( canvas, board.softBoardData.touchColor, board.boardXOffset, board.boardYOffset);
         }
 
 
@@ -244,9 +243,9 @@ public class Button implements Cloneable
      * @param canvas canvas to draw on
      * @param color background color
      * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or board.xOffset-board.areaXOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or board.xOffset-board.boardXOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
      */
     protected void drawButton( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
@@ -266,7 +265,7 @@ public class Button implements Cloneable
      * @param xOffsetInPixel x offset in pixels
      * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
      */
     protected void drawButtonBackground( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
@@ -286,7 +285,7 @@ public class Button implements Cloneable
      * @param xOffsetInPixel x offset in pixels
      * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
      */
     protected void drawButtonTitles( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
         {

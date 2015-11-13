@@ -124,7 +124,26 @@ public class Board
     public int validatedWidthInPixels = -1;
 
     /**
-     * board width in pixels - it contains the non-visible half-hexagons, too
+     ** areaWidth and boardHeight are measured and calculated first
+     ** boardWidth is two halfhexagons wider then areaWidth,
+     ** Xoffset is one (-)halfhexagon and the offset of the whole board
+     ** (non-wide on wide screen oe 0)
+     ** areaHeight depends on hidden edges and on monitor row,
+     ** Yoffset depends on hidden upper part
+     **/
+
+    /**
+     * width of the visible area (equals to screen's lower diameter for non-wide boards)
+     */
+    public int areaWidthInPixels;
+
+    /**
+     * visible height: height of the board - hidden edges and monitor
+     */
+    public int areaHeightInPixels;
+
+    /**
+     * board width in pixels - it contains the non-visible two half-hexagons, too
      */
     public int boardWidthInPixels;
 
@@ -134,29 +153,14 @@ public class Board
     public int boardHeightInPixels;
 
     /**
-     * offset in landscape if board is not wide
+     * offset in landscape if board is not wide - a half hexagon width
      */
-    public int xOffset = 0;
-
-    /**
-     * width of the visible area (equals to screen's lower diameter for non-wide boards)
-     */
-    public int areaWidthInPixels;
-
-    /**
-     * visible height: height of the board - hidden edges + monitor
-     */
-    public int areaHeightInPixels;
-
-    /**
-     * equals with a half hexagon width
-     */
-    public int areaXOffset;
+    public int boardXOffset;
 
     /**
      * equals with a quarter of hexagon, if upper edge is hidden
      */
-    public int areaYOffset;
+    public int boardYOffset;
 
     /**
      * Text with this size:
@@ -365,7 +369,7 @@ public class Board
         if (wide == landscape)
             {
             newAreaWidthInPixels = screenWidthInPixels;
-            this.xOffset = 0;
+            boardXOffset = 0;
             Scribe.debug( Debug.BOARD, "Full width keyboard");
             }
         // NORMAL board for LANDSCAPE mode - change values
@@ -373,15 +377,15 @@ public class Board
             {
             // noinspection SuspiciousNameCombination
             newAreaWidthInPixels = screenHeightInPixels; // This is the shorter diameter
-            this.xOffset = (screenWidthInPixels - newAreaWidthInPixels) *
+            boardXOffset = (screenWidthInPixels - newAreaWidthInPixels) *
                     softBoardData.landscapeOffsetPermil / 1000;
-            Scribe.debug( Debug.BOARD, "Normal keyboard for landscape. Offset:" + xOffset);
+            Scribe.debug( Debug.BOARD, "Normal keyboard for landscape. Offset:" + boardXOffset);
             }
         // LANDSCAPE board PORTRAIT mode - incompatible board! - !! NOW WE LET IT WORK (TESTING!!) !!
         else // if (wide && !landscape)
             {
             newAreaWidthInPixels = screenWidthInPixels; // Board will be distorted!!
-            this.xOffset = 0;
+            boardXOffset = 0;
             Scribe.debug( Debug.BOARD, "Wide keyboard for portrait! NOT POSSIBLE! Keyboard is distorted.");
             }
 
@@ -420,13 +424,14 @@ public class Board
         halfHexagonHeightInPixels = 2 * quarterHexagonHeightInPixels;
 
         // Area is one hexagon wider, then board width
-        areaXOffset = halfHexagonWidthInPixels;
+        boardXOffset -= halfHexagonWidthInPixels;
         boardWidthInPixels = areaWidthInPixels + 2* halfHexagonWidthInPixels;
 
-        areaYOffset = softBoardData.hideTop * quarterHexagonHeightInPixels;
+        boardYOffset = - softBoardData.hideTop * quarterHexagonHeightInPixels;
         areaHeightInPixels = boardHeightInPixels
                 - softBoardData.hideTop * quarterHexagonHeightInPixels
-                - softBoardData.hideBottom * quarterHexagonHeightInPixels;
+                - softBoardData.hideBottom * quarterHexagonHeightInPixels
+                + (softBoardData.monitorRow ? halfHexagonHeightInPixels : 0);
 
         // Monitor is only set by onMeasure
 
@@ -556,8 +561,8 @@ public class Board
 
     public int colorFromMap(int canvasX, int canvasY)
         {
-        int mapX = canvasX - xOffset + areaXOffset;
-        int mapY = canvasY + areaYOffset;
+        int mapX = canvasX - boardXOffset;
+        int mapY = canvasY - boardYOffset;
 
         if (mapX < 0 || mapX >= getBoardMap().getWidth())
             return Board.EMPTY_TOUCH_CODE;
@@ -606,7 +611,7 @@ public class Board
     // Just for debugging purposes
     public void drawBoardMap( Canvas canvas )
         {
-        canvas.drawBitmap( getBoardMap(), (float) xOffset - (float) areaXOffset, - (float) areaYOffset, null);
+        canvas.drawBitmap( getBoardMap(), (float) boardXOffset, (float) boardYOffset, null);
         }
 
 
@@ -616,7 +621,7 @@ public class Board
 
     public void drawBoardLayout( Canvas canvas )
         {
-        canvas.drawBitmap( getBoardLayout(), (float) xOffset - (float) areaXOffset, - (float) areaYOffset, null);
+        canvas.drawBitmap( getBoardLayout(), (float) boardXOffset, (float) boardYOffset, null);
         }
 
     public void drawChangedButtons(Canvas canvas)

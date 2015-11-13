@@ -90,7 +90,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
     /** Not valid descriptor file */
     public static final int CRITICAL_NOT_VALID_FILE_ERROR = -4;
 
-    /** Critical error during parsing phase: no board is definied */
+    /** Critical error during parsing phase: no board is defined */
     public static final int CRITICAL_PARSING_ERROR = -5;
 
 

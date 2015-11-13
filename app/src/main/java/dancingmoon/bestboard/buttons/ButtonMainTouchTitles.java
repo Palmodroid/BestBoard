@@ -24,7 +24,7 @@ public abstract class ButtonMainTouchTitles extends ButtonMainTouch
      * @param xOffsetInPixel x offset in pixels
      * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.areaYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
      */
     @Override
     protected void drawButtonTitles( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
@@ -52,8 +52,8 @@ public abstract class ButtonMainTouchTitles extends ButtonMainTouch
     @Override
     public void drawChangingButton(Canvas canvas)
         {
-        int centerX = getPixelX( columnInGrids, board.xOffset - board.areaXOffset );
-        int centerY = getPixelY( rowInGrids, - board.areaYOffset );
+        int centerX = getPixelX( columnInGrids, board.boardXOffset);
+        int centerY = getPixelY( rowInGrids, board.boardYOffset);
 
         titles.getLast().drawTitle(canvas, board, getChangingString(), centerX, centerY);
         }
