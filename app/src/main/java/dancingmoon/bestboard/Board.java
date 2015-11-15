@@ -582,6 +582,8 @@ public class Board
 
     private void createBoardMap()
         {
+        Scribe.debug( Debug.BOARD, "Board Map is created - W: " + boardWidthInPixels + " H: " + boardHeightInPixels );
+
         boardMap = Bitmap.createBitmap(boardWidthInPixels, boardHeightInPixels, Bitmap.Config.RGB_565);
         boardMap.eraseColor( colorFromTouchCode( EMPTY_TOUCH_CODE, false ) );
 
@@ -655,6 +657,8 @@ public class Board
 
     private Bitmap createBoardLayout()
         {
+        Scribe.debug( Debug.BOARD, "Board Layout is created - W: " + boardWidthInPixels + " H: " + boardHeightInPixels );
+
         Bitmap skin = Bitmap.createBitmap(boardWidthInPixels, boardHeightInPixels, Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(skin);
         skin.eraseColor(boardColor);
