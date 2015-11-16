@@ -114,7 +114,7 @@ public class BoardView extends View
 
             strokePaint.setColor( board.softBoardData.strokeColor );
 
-            Scribe.debug(Debug.VIEW, "Board is set.");
+            Scribe.debug( Debug.VIEW, "Board is set." );
             }
         // !!!!!!! SIZE CONTROL IS STILL MISSING !!!!!!!!!
         }
@@ -401,6 +401,7 @@ public class BoardView extends View
         int index;
         int id;
 
+        Scribe.locus( Debug.TOUCH );
         // Scribe.debug( Debug.VIEW, this.toString() + " touchEvent " + event.getActionMasked());
 
         pointerChangeFlag = NO_CHANGE;
@@ -411,12 +412,17 @@ public class BoardView extends View
 
                 // Security valve: there is only THE FIRST touch now;
                 // all remained (abandoned) touches should be finished first
+                Scribe.debug( Debug.TOUCH, "First pointer is DOWN. Checking abandoned pointers." );
 
                 // MAIN stroke - like UP
                 if (strokePointerId != -1)
                     {
-                    Scribe.error("Abandoned MAIN pointer!");
+                    Scribe.error("Abandoned MAIN pointer! Pointer is lifted UP:" + strokePointerId);
                     _touchEventUp();
+                    }
+                else
+                    {
+                    Scribe.debug( Debug.TOUCH, "MAIN pointer is empty." );
                     }
 
                 // META stroke - RELEASE - ?? CLEARing state should be better ??
@@ -424,7 +430,7 @@ public class BoardView extends View
                     {
                     for (MultiTouchBow multiTouchBow : multiTouchPointers.values())
                         {
-                        Scribe.error("Abandoned META pointer! TouchCode:" + multiTouchBow.touchCode);
+                        Scribe.error("Abandoned META pointer! TouchCode is released:" + multiTouchBow.touchCode);
                         multiTouchBow.buttonMultiTouch.multiTouchEvent(ButtonMultiTouch.META_RELEASE);
                         }
                     multiTouchPointers.clear();
@@ -434,6 +440,10 @@ public class BoardView extends View
 
                     // MAIN clears it, but after MAIN->META change, META should clear it, too
                     strokePoints.clear();
+                    }
+                else
+                    {
+                    Scribe.debug( Debug.TOUCH, "MULTI pointer array is empty." );
                     }
 
                 // just for security use- and meta-states are checked, that no touch remained
@@ -446,13 +456,16 @@ public class BoardView extends View
             case MotionEvent.ACTION_POINTER_DOWN:
 
                 // Only one new touch point, no historical values.
+                Scribe.debug( Debug.TOUCH, "Pointer is DOWN." );
 
                 // bowPointerId should be empty to start new bow (there is no bow currently)
                 // THIS CAN START A NEW BOW ON A PREVIOUSLY HIDDEN BOARD
                 if (strokePointerId < 0)
                     {
                     index = event.getActionIndex(); // index of the newest touch
-                    strokePointerId = event.getPointerId(index);
+                    strokePointerId = event.getPointerId( index );
+
+                    Scribe.debug( Debug.TOUCH, "MAIN pointer was empty, new stroke is started:" + strokePointerId );
 
                     // Touched StrokePoints
                     StrokePoint strokePoint = new StrokePoint((int) event.getX(index), (int) event.getY(index));
@@ -469,6 +482,10 @@ public class BoardView extends View
 
             case MotionEvent.ACTION_MOVE:
 
+                Scribe.debug( Debug.TOUCH, "Pointer is in HOLD/MOVE." );
+
+                Scribe.debug( Debug.TOUCH, "META pointers to evaluate: " + multiTouchPointers.size());
+
                 // Check all META pointers for movement - NO Historical values are checked
                 Iterator<Map.Entry<Integer, MultiTouchBow>> iterator =
                         multiTouchPointers.entrySet().iterator();
@@ -480,7 +497,7 @@ public class BoardView extends View
                     index = event.findPointerIndex(multiTouchPointer.getKey());
                     if (index != -1)
                         {
-                        Scribe.debug( Debug.BOARD, "META pointer refresh.");
+                        Scribe.debug( Debug.TOUCH, "META pointer check:" + index );
 
                         int color = board.colorFromMap((int) event.getX(index), (int) event.getY(index));
                         int newTouchCode = Board.touchCodeFromColor(color);
@@ -491,28 +508,31 @@ public class BoardView extends View
                             // new button (touchCode) will behave, as the previous one on the previous board
                             if ( multiTouchPointer.getValue().touchCode == Board.EMPTY_TOUCH_CODE )
                                 {
-                                Scribe.debug( Debug.BOARD, "META button will refer to new touchcode on new board: " + newTouchCode);
+                                Scribe.debug( Debug.TOUCH, "META button will refer to new touchCode on new board: " + newTouchCode);
                                 multiTouchPointer.getValue().touchCode = newTouchCode;
                                 }
                             // if button-center was reached
                             else if (!Board.outerRimFromColor(color))
                                 {
-                                Scribe.debug( Debug.VIEW, "META pointer left its button.");
+                                Scribe.debug( Debug.TOUCH, "META pointer left its button.");
                                 multiTouchPointer.getValue().buttonMultiTouch.multiTouchEvent(ButtonMultiTouch.META_RELEASE);
                                 // META (indicator) keys change without the change of the MAIN
                                 this.invalidate();
 
                                 if (strokePointerId == -1)
                                     {
-                                    Scribe.debug( Debug.VIEW, "META pointer changed to MAIN.");
                                     strokePointerId = multiTouchPointer.getKey();
-                                    Scribe.debug( Debug.VIEW, "strokePointerId: " + strokePointerId);
+                                    Scribe.debug( Debug.TOUCH, "META pointer changed to MAIN. Pointer: " + strokePointerId);
                                     // BowTouchCode == EMPTY_TOUCH_CODE; like ACTION_DOWN
                                     // BowButton == null; like ACTION_DOWN
 
                                     // newly started MAIN will be NOT evaluated in this turn,
                                     // it will be evaluated as MAIN, without the historical part
                                     pointerChangeFlag = META_TO_MAIN_CHANGE;
+                                    }
+                                else
+                                    {
+                                    Scribe.debug( Debug.TOUCH, "META pointer finished. MAIN is already occupied: " + strokePointerId);
                                     }
 
                                 iterator.remove();
@@ -521,13 +541,15 @@ public class BoardView extends View
                         else
                             {
                             // pointer disappeared without UP
-                            Scribe.error("META pointer disapperaed without up. TouchCode: "
-                                    + multiTouchPointer.getValue().touchCode);
+                            Scribe.error("META pointer disappeared without up: "
+                                    + multiTouchPointer.getKey());
                             }
                         }
                     }
 
                 // Check MAIN pointer
+
+                Scribe.debug( Debug.TOUCH, "MAIN Pointer to evaluate: " + strokePointerId);
 
                 // strokePointerId can be -1, this is not checked!!
                 index = event.findPointerIndex(strokePointerId);
@@ -567,6 +589,7 @@ public class BoardView extends View
                 // MAIN stroke UP
                 if (id == strokePointerId) // Cannot be -1
                     {
+                    Scribe.debug( Debug.TOUCH, "MAIN Pointer is UP:" + id );
                     _touchEventUp();
                     }
 
@@ -577,7 +600,7 @@ public class BoardView extends View
 
                     if (multiTouchBow != null)
                         {
-                        Scribe.debug( Debug.VIEW, "META pointer UP. TouchCode: " + multiTouchBow.touchCode);
+                        Scribe.debug( Debug.VIEW, "META Pointer UP. Id: " + id + " TouchCode: " + multiTouchBow.touchCode);
 
                         multiTouchBow.buttonMultiTouch.multiTouchEvent(ButtonMultiTouch.META_RELEASE);
                         // META (indicator) keys change without the change of the MAIN
@@ -633,7 +656,7 @@ public class BoardView extends View
         {
         if (canvasPressure > prefsPressureThreshold && canvasPressure != 1.0f)
             {
-            Scribe.debug( Debug.VIEW, " prefsPressureThreshold: " + prefsPressureThreshold + ", canvasPressure: " + canvasPressure);
+            Scribe.debug( Debug.TOUCH, " prefsPressureThreshold: " + prefsPressureThreshold + ", canvasPressure: " + canvasPressure);
             mainTouchBow.increasePressureCounter();
             }
 
@@ -673,6 +696,8 @@ public class BoardView extends View
      */
     private void evaluateMain(int bowAction, StrokePoint strokePoint)
         {
+        Scribe.locus( Debug.TOUCH );
+
         // At TOUCH_DOWN strokePoint storage is always needed (even if it will be a META stroke),
         // otherwise ACTION_MOVE cannot differentiate between HOLD and MOVE
         // ((or it should imply one more 'if'))
@@ -696,7 +721,7 @@ public class BoardView extends View
         if (bowAction == TOUCH_DOWN)
             {
             newBowTouchCode = Board.touchCodeFromColor(board.colorFromMap(strokePoint.canvasX, strokePoint.canvasY));
-            Scribe.debug( Debug.VIEW, "MAIN pointer DOWN.");
+            Scribe.debug( Debug.TOUCH, "MAIN pointer DOWN.");
             }
         else if (bowAction == TOUCH_MOVE)
             {
@@ -711,7 +736,7 @@ public class BoardView extends View
             {
             // UP is the same as MOVE to an empty button
             newBowTouchCode = Board.EMPTY_TOUCH_CODE;
-            Scribe.debug( Debug.VIEW, "MAIN pointer UP.");
+            Scribe.debug( Debug.TOUCH, "MAIN pointer UP.");
             }
         // TOUCH_HOLD will not change the touchCode
 
@@ -719,7 +744,7 @@ public class BoardView extends View
         if (mainTouchBow.touchCode != newBowTouchCode)
             {
             // THE TOUCHED BUTTON IS CHANGED!
-            Scribe.debug( Debug.VIEW, "MAIN pointer TouchCode changed to: " + newBowTouchCode);
+            Scribe.debug( Debug.TOUCH, "MAIN pointer arrived to a new touchCode: " + mainTouchBow.touchCode + " -> " + newBowTouchCode);
 
             // view should be invalidated
             // not only because the touch (controlled by displayTouch),
@@ -729,6 +754,8 @@ public class BoardView extends View
             //  check bow's finish - finish previous button
             if (mainTouchBow.buttonMainTouch != null)
                 {
+                Scribe.debug( Debug.TOUCH, "Previous button should finish." );
+
                 if (bowAction == TOUCH_UP)
                     mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_UP);
                 else
@@ -748,6 +775,7 @@ public class BoardView extends View
                 // if board was changed during type, no further buttons could be evaluated!
                 if ( pointerChangeFlag == BOARD_CHANGE )
                 	{
+                    Scribe.debug( Debug.TOUCH, "Board was changed automatically because typing." );
                     return;
                     }
 
@@ -761,6 +789,7 @@ public class BoardView extends View
                 // Button is on MAIN TOUCH
                 if (newBowButton instanceof ButtonMainTouch)
                     {
+                    Scribe.debug( Debug.TOUCH, "A new MAIN bow is started, button first press activated." );
                     // start a new MAIN bow
                     mainTouchBow = new MainTouchBow( newBowTouchCode, (ButtonMainTouch)newBowButton );
 
@@ -779,7 +808,7 @@ public class BoardView extends View
                     {
                     // if MULTI -> put in MULTI
                     // MULTI TOUCH can start here only!!
-                    Scribe.debug( Debug.VIEW, "MAIN pointer changed to MULTI. TouchCode: " + newBowTouchCode);
+                    Scribe.debug( Debug.TOUCH, "MAIN pointer changed to MULTI. TouchCode: " + newBowTouchCode);
 
                     multiTouchPointers.put(strokePointerId, new MultiTouchBow(newBowTouchCode, (ButtonMultiTouch) newBowButton));
 
@@ -817,6 +846,8 @@ public class BoardView extends View
                 {
                 if ( mainTouchBow.buttonMainTouch != null)
                     {
+                    Scribe.debug( Debug.TOUCH, "LONG touch is detected." );
+
                     // alternative touches are restarted together
                     mainTouchBow.moveCounter = 0;
                     mainTouchBow.pressureCounter = 0;
@@ -831,6 +862,8 @@ public class BoardView extends View
                 {
                 if ( mainTouchBow.buttonMainTouch != null)
                     {
+                    Scribe.debug( Debug.TOUCH, "PRESS touch is detected." );
+
                     // alternative touches are restarted together
                     mainTouchBow.moveCounter = 0;
                     mainTouchBow.pressureCounter = 0;
@@ -845,6 +878,8 @@ public class BoardView extends View
                 {
                 if ( mainTouchBow.buttonMainTouch != null)
                     {
+                    Scribe.debug( Debug.TOUCH, "REPEAT touch is detected." );
+
                     mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_REPEAT);
                     }
                 }
@@ -859,7 +894,7 @@ public class BoardView extends View
     @Override
     protected void onDraw(Canvas canvas)
         {
-        // Scribe.locus();
+        Scribe.locus( Debug.DRAW );
 
         // board.drawBoardMap(canvas);
         // board.drawBoardLayout(canvas, 0);

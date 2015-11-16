@@ -259,6 +259,10 @@ public class LinkState
             Scribe.error( "UseState TOUCH remained! Counter: " + touchCounter );
             touchCounter = 0; // No change in use-state
             }
+        else
+            {
+            Scribe.debug( Debug.TOUCH, "UseState TOUCH is empty." );
+            }
         }
 
     /**

@@ -257,6 +257,10 @@ public abstract class MetaState
             touchCounter = 0;    // No change in internal state ??
             checkStateChanges(); // State could change
             }
+        else
+            {
+            Scribe.debug( Debug.TOUCH, "MetaState TOUCH is empty." );
+            }
         }
 
     /**

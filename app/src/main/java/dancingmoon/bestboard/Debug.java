@@ -23,8 +23,10 @@ public class Debug
     public static final String LOG_TAG_TOKEN = "TOKEN";
 
     // Settings of debug levels
-    public static final int PREF = 510;
+    public static final int PREF = 10;
     public static final int BOARD = 520;
+    public static final int TOUCH = 525;
+    public static final int DRAW = 526;
     public static final int VIEW = 530;
     public static final int COMMANDS = 40;
     public static final int IGNITION = 50;
