@@ -256,12 +256,12 @@ public class LinkState
         {
         if ( touchCounter != 0)
             {
-            Scribe.error( "UseState TOUCH remained! Counter: " + touchCounter );
+            Scribe.error( "UseState TOUCH remained! Touch-counter: " + touchCounter );
             touchCounter = 0; // No change in use-state
             }
         else
             {
-            Scribe.debug( Debug.TOUCH, "UseState TOUCH is empty." );
+            Scribe.debug( Debug.TOUCH_VERBOSE, "UseState TOUCH is empty." );
             }
         }
 
@@ -302,11 +302,11 @@ public class LinkState
         if (isActive(index) && touchCounter > 0)
             {
             touchCounter--;
-            Scribe.debug( Debug.LINKSTATE, "UseState RELEASE, counter: " + touchCounter );
+            Scribe.debug( Debug.LINKSTATE, "LinkState RELEASE, touch-counter: " + touchCounter );
 
             if (touchCounter == 0)
                 {
-                Scribe.debug( Debug.LINKSTATE, "UseState: all button RELEASED." );
+                Scribe.debug( Debug.LINKSTATE, "LinkState: all button RELEASED." );
                 if ( !typeFlag )
                     {
                     if (state == HIDDEN)
@@ -314,18 +314,18 @@ public class LinkState
                         if (lockKey)
                             {
                             state = LOCKED;
-                            Scribe.debug( Debug.LINKSTATE, "UseState cycled to LOCKED by LOCK key." );
+                            Scribe.debug( Debug.LINKSTATE, "LinkState cycled to LOCKED by LOCK key." );
                             }
                         else
                             {
                             state = ACTIVE;
-                            Scribe.debug( Debug.LINKSTATE, "UseState cycled to ACTIVE." );
+                            Scribe.debug( Debug.LINKSTATE, "LinkState cycled to ACTIVE." );
                             }
                         }
                     else if (state == ACTIVE)
                         {
                         state = LOCKED;
-                        Scribe.debug( Debug.LINKSTATE, "UseState cycled to LOCKED." );
+                        Scribe.debug( Debug.LINKSTATE, "LinkState cycled to LOCKED." );
                         }
                     else
                         {
@@ -352,7 +352,7 @@ public class LinkState
             typeFlag = false;
             touchCounter = 0;
             state = LOCKED;
-            Scribe.debug( Debug.LINKSTATE, "UseState cancelled to META_LOCK." );
+            Scribe.debug( Debug.LINKSTATE, "LinkState cancelled to META_LOCK." );
             }
         }
     }

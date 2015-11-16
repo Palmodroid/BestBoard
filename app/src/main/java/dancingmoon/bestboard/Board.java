@@ -117,6 +117,7 @@ public class Board
      ** CLASS VARIABLES - CALCULATED FROM SCREEN SPECIFIC DATA
      **/
 
+
     /**
      * screen width is stored to check whether new measurement is needed in calculateScreenData
      * if new calculation is needed, then this value should be invalidated (-1)

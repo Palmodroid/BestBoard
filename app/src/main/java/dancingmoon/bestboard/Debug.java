@@ -22,10 +22,11 @@ public class Debug
     public static final String tokenLogFileName = "token.log";
     public static final String LOG_TAG_TOKEN = "TOKEN";
 
-    // Settings of debug levels
+    // Settings of debug levels - only EVEN numbers!
     public static final int PREF = 10;
     public static final int BOARD = 520;
-    public static final int TOUCH = 525;
+    public static final int TOUCH = 524;
+    public static final int TOUCH_VERBOSE = 24;
     public static final int DRAW = 526;
     public static final int VIEW = 530;
     public static final int COMMANDS = 40;
@@ -38,8 +39,8 @@ public class Debug
     public static final int BOARDSTATE = 100;
     public static final int CAPSSTATE = 100;
     public static final int HARDSTATE = 100;
-    public static final int LINKSTATE = 100;
-    public static final int METASTATE = 100;
+    public static final int LINKSTATE = 600;
+    public static final int METASTATE = 600;
 
     public static final int BUTTON = 110;
 

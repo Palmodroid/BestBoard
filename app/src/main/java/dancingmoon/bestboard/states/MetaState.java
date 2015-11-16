@@ -168,7 +168,7 @@ public abstract class MetaState
     public void release( boolean lockKey )
         {
         touchCounter--;
-        Scribe.debug( Debug.METASTATE, "MetaState RELEASE, counter: " + touchCounter);
+        Scribe.debug( Debug.METASTATE, "MetaState RELEASE, touch-counter: " + touchCounter);
 
         // Just for error checking
         if ( touchCounter < 0 )
@@ -253,13 +253,13 @@ public abstract class MetaState
         {
         if ( touchCounter != 0)
             {
-            Scribe.error("MetaState TOUCH remained! Counter: " + touchCounter);
+            Scribe.error("MetaState TOUCH remained! Touch-counter: " + touchCounter);
             touchCounter = 0;    // No change in internal state ??
             checkStateChanges(); // State could change
             }
         else
             {
-            Scribe.debug( Debug.TOUCH, "MetaState TOUCH is empty." );
+            Scribe.debug( Debug.TOUCH_VERBOSE, "MetaState TOUCH is empty." );
             }
         }
 
