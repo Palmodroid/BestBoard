@@ -239,14 +239,25 @@ public class SoftBoardData
 
         heightRatioPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_HEIGHT_RATIO_INT_KEY, 0);
 
-        
         landscapeOffsetPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_LANDSCAPE_OFFSET_INT_KEY, 0);
 
-        outerRimPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0);
+        outerRimPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0 );
 
         monitorRow = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString( R.string.drawing_monitor_row_key ),
                 false );
+
+        longBowCount = sharedPrefs.getInt( PrefsFragment.TOUCH_LONG_COUNT_INT_KEY, 0 );
+
+        pressBowCount = sharedPrefs.getInt( PrefsFragment.TOUCH_PRESS_COUNT_INT_KEY, 0 );
+
+        pressBowThreshold = (float)sharedPrefs.getInt( PrefsFragment.TOUCH_PRESS_THRESHOLD_INT_KEY, 0 ) / 1000f;
+
+        stayBowTime = sharedPrefs.getInt( PrefsFragment.TOUCH_STAY_TIME_INT_KEY, 0 ) * 1000000;
+
+        repeatTime = sharedPrefs.getInt( PrefsFragment.TOUCH_REPEAT_TIME_INT_KEY, 0 ) * 1000000;
+
+
 
         displayTouch = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString( R.string.cursor_touch_allow_key ),
@@ -297,6 +308,31 @@ public class SoftBoardData
     public boolean monitorRow;
 
     /**
+     * Length of CIRCLE to start secondary function
+     */
+    public int longBowCount;
+
+    /**
+     * Number of HARD PRESSES to start secondary function
+     */
+    public int pressBowCount;
+
+    /**
+     * Threshold for HARD PRESS - 1000 = 1.0f
+     */
+    public float pressBowThreshold;
+
+    /**
+     * Time of STAY to start secondary function - nanosec
+     */
+    public int stayBowTime;
+
+    /**
+     * Time to repeat (repeat rate) - nanosec
+     */
+    public int repeatTime;
+
+    /**
      * Background of the touched key is changed or not
      */
     public boolean displayTouch = true;
@@ -308,10 +344,9 @@ public class SoftBoardData
 
 
     /**
-     * STATES OF THE BOARD
-     */
+     ** STATES NEEDED BY THE SOFTBOARD
+     **/
 
-    /** Meta states - data is moved to the BoardStates class */
     public BoardStates boardStates;
 
     // defined in constructor, because SoftBoardDataListener is needed

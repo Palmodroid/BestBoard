@@ -64,6 +64,39 @@
     <string name="drawing_monitor_row_off">Monitor row is switched off</string>
 
 
+    <string name="prefs_touch">Touch fine-tuning</string>
+
+    <string name="touch_long_count_key">longcount</string>
+    <string name="touch_long_count_title">Length of circle </string>
+    <string name="touch_long_count_summary">Length of circle to start secondary button function: </string>
+    <string name="touch_long_count_dialog_title">Length of circle </string>
+    <string name="touch_long_count_dialog_message">Enter length of circular movement. Secondary button function (if available) is triggered if movement on the same button reaches this limit.</string>
+
+    <string name="touch_press_count_key">presscount</string>
+    <string name="touch_press_count_title">Length of hard press </string>
+    <string name="touch_press_count_summary">Length of hard press to start secondary button function: </string>
+    <string name="touch_press_count_dialog_title">Length of hard press </string>
+    <string name="touch_press_count_dialog_message">Enter length of hard press. Secondary button function (if available) is triggered if hard presses on the same button reach this limit. Hard press is not working on all devices! It can be used instead of circular movement.</string>
+
+    <string name="touch_press_threshold_key">pressthreshold</string>
+    <string name="touch_press_threshold_title">Threshold of hard-press force </string>
+    <string name="touch_press_threshold_summary">Limit of hard-press force to increase hard-press counter: </string>
+    <string name="touch_press_threshold_dialog_title">Threshold of hard-press force </string>
+    <string name="touch_press_threshold_dialog_message">Enter limit for threshold of hard-press force! Hard-press is triggered when force of press exceeds this limit. Hard press is not working on all devices!</string>
+
+    <string name="touch_stay_time_key">staytime</string>
+    <string name="touch_stay_time_title">Time of stay </string>
+    <string name="touch_stay_time_summary">Time of stay on the same button to start secondary button function: </string>
+    <string name="touch_stay_time_dialog_title">Time of stay </string>
+    <string name="touch_stay_time_dialog_message">Enter time of stay (in ms)! Secondary button function (if available) is triggered time spent on the button reaches this limit.</string>
+
+    <string name="touch_repeat_time_key">repeattime</string>
+    <string name="touch_repeat_time_title">Time of repeat </string>
+    <string name="touch_repeat_time_summary">Time between two repeats: </string>
+    <string name="touch_repeat_time_dialog_title">Time of repeat </string>
+    <string name="touch_repeat_time_dialog_message">Enter time of repeat (in ms)! Repeat rate can be set with this value. </string>
+
+
     <string name="prefs_cursor">Visible touch control</string>
 
     <string name="cursor_touch_allow_key">touch</string>
@@ -98,15 +131,6 @@
 
 
 
-    <string name="prefs_pressure">Pressure sensitivity NOT IMPLEMENTED</string>
-
-    <string name="pressure_key">pressure</string>
-    <string name="pressure_title">Sensitivity NOT IMPLEMENTED</string>
-    <string name="pressure_summary">"Enter pressure sensitivity level (%). Range: 0–120"</string>
-    <string name="pressure_dialog_title">Sensitivity for touches</string>
-    <string name="pressure_dialog_message">Sensitivity can be set between 0 and 120:</string>
-    <string name="pressure_default">100</string>
-    	
     <string name="prefs_vibration">Tactile feedback NOT IMPLEMENTED</string>
     <string name="vibration_key">vibration</string>
     <string name="vibration_title">Allow vibration</string>

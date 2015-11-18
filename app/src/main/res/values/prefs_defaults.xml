@@ -21,6 +21,26 @@
 
     <bool name="drawing_monitor_row_default">false</bool>
 
+    <string name="touch_long_count_default">80</string>
+    <integer name="touch_long_count_min">0</integer>
+    <integer name="touch_long_count_max">1000</integer>
+
+    <string name="touch_press_count_default">3</string>
+    <integer name="touch_press_count_min">0</integer>
+    <integer name="touch_press_count_max">1000</integer>
+
+    <string name="touch_press_threshold_default">1000</string>
+    <integer name="touch_press_threshold_min">0</integer>
+    <integer name="touch_press_threshold_max">10000</integer>
+
+    <string name="touch_stay_time_default">500</string>
+    <integer name="touch_stay_time_min">0</integer>
+    <integer name="touch_stay_time_max">1000</integer>
+
+    <string name="touch_repeat_time_default">300</string>
+    <integer name="touch_repeat_time_min">0</integer>
+    <integer name="touch_repeat_time_max">1000</integer>
+
     <bool name="cursor_touch_allow_default">true</bool>
     <bool name="cursor_stroke_allow_key">true</bool>
 

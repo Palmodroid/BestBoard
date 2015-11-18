@@ -67,6 +67,21 @@ public class PrefsFragment extends PreferenceFragment
     /** Ratio of the outer rim */
     public static String DRAWING_OUTER_RIM_INT_KEY = "intouterrim";
 
+    /** Length of circular movements */
+    public static String TOUCH_LONG_COUNT_INT_KEY = "intlongcount";
+
+    /** Count of hard presses */
+    public static String TOUCH_PRESS_COUNT_INT_KEY = "intpresscount";
+
+    /** Threshold of hard presses */
+    public static String TOUCH_PRESS_THRESHOLD_INT_KEY = "intpressthreshold";
+
+    /** Time of stay */
+    public static String TOUCH_STAY_TIME_INT_KEY = "intstaytime";
+
+    /** Time of repeat */
+    public static String TOUCH_REPEAT_TIME_INT_KEY = "intrepeattime";
+
     // -- NEW INTEGER PREFERENCE KEYS SHOULD COME HERE -- //
 
 
@@ -119,6 +134,12 @@ public class PrefsFragment extends PreferenceFragment
             checkAndStoreHeightRatioPref(context);
             checkAndStoreLandscapeOffsetPref( context );
             checkAndStoreOuterRimPref( context );
+
+            checkAndStoreLongCountPref( context );
+            checkAndStorePressCountPref( context );
+            checkAndStorePressThresholdPref( context );
+            checkAndStoreStayTimePref( context );
+            checkAndStoreRepeatTimePref( context );
 
             // -- NEW INTEGER PREFERENCE CALLS SHOULD COME HERE -- //
 
@@ -177,6 +198,82 @@ public class PrefsFragment extends PreferenceFragment
                 R.integer.drawing_outer_rim_min,
                 R.integer.drawing_outer_rim_max );
         }
+
+    /**
+     * Checks and sets long count integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStoreLongCountPref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.touch_long_count_key,
+                TOUCH_LONG_COUNT_INT_KEY,
+                R.string.touch_long_count_default,
+                R.integer.touch_long_count_min,
+                R.integer.touch_long_count_max );
+        }
+
+    /**
+     * Checks and sets press count integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStorePressCountPref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.touch_press_count_key,
+                TOUCH_PRESS_COUNT_INT_KEY,
+                R.string.touch_press_count_default,
+                R.integer.touch_press_count_min,
+                R.integer.touch_press_count_max );
+        }
+
+    /**
+     * Checks and sets press threshold integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStorePressThresholdPref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.touch_press_threshold_key,
+                TOUCH_PRESS_THRESHOLD_INT_KEY,
+                R.string.touch_press_threshold_default,
+                R.integer.touch_press_threshold_min,
+                R.integer.touch_press_threshold_max );
+        }
+
+    /**
+     * Checks and sets stay time integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStoreStayTimePref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.touch_stay_time_key,
+                TOUCH_STAY_TIME_INT_KEY,
+                R.string.touch_stay_time_default,
+                R.integer.touch_stay_time_min,
+                R.integer.touch_stay_time_max );
+        }
+
+    /**
+     * Checks and sets repeat time integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStoreRepeatTimePref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.touch_repeat_time_key,
+                TOUCH_REPEAT_TIME_INT_KEY,
+                R.string.touch_repeat_time_default,
+                R.integer.touch_repeat_time_min,
+                R.integer.touch_repeat_time_max );
+        }
+
 
     // -- NEW INTEGER PREFERENCE METHODS SHOULD COME HERE -- //
 
@@ -266,6 +363,31 @@ public class PrefsFragment extends PreferenceFragment
                 R.string.drawing_outer_rim_dialog_message,
                 R.integer.drawing_outer_rim_min,
                 R.integer.drawing_outer_rim_max );
+
+        _prepareDialogMessage( R.string.touch_long_count_key,
+                R.string.touch_long_count_dialog_message,
+                R.integer.touch_long_count_min,
+                R.integer.touch_long_count_max );
+
+        _prepareDialogMessage( R.string.touch_press_count_key,
+                R.string.touch_press_count_dialog_message,
+                R.integer.touch_press_count_min,
+                R.integer.touch_press_count_max );
+
+        _prepareDialogMessage( R.string.touch_press_threshold_key,
+                R.string.touch_press_threshold_dialog_message,
+                R.integer.touch_press_threshold_min,
+                R.integer.touch_press_threshold_max );
+
+        _prepareDialogMessage( R.string.touch_stay_time_key,
+                R.string.touch_stay_time_dialog_message,
+                R.integer.touch_stay_time_min,
+                R.integer.touch_stay_time_max );
+
+        _prepareDialogMessage( R.string.touch_repeat_time_key,
+                R.string.touch_repeat_time_dialog_message,
+                R.integer.touch_repeat_time_min,
+                R.integer.touch_repeat_time_max );
 
         // -- NEW INTEGER PREFERENCE DIALOG MESSAGE PREPS SHOULD COME HERE -- //
         }
@@ -373,8 +495,8 @@ public class PrefsFragment extends PreferenceFragment
             int heightRatio = checkAndStoreHeightRatioPref( getActivity() );
 
             // Cannot be null, if prefs.xml is valid
-            Preference heightRatioPreference = findPreference( getString( R.string.drawing_height_ratio_key ) );
-            heightRatioPreference.setSummary(getString(R.string.drawing_height_ratio_summary) + " " +
+            Preference preference = findPreference( getString( R.string.drawing_height_ratio_key ) );
+            preference.setSummary(getString(R.string.drawing_height_ratio_summary) + " " +
                     Integer.toString(heightRatio));
             Scribe.note( Debug.PREF, "PREFERENCES: Screen height ratio has changed: " + heightRatio);
             if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
@@ -385,8 +507,8 @@ public class PrefsFragment extends PreferenceFragment
             {
             int landscapeOffset = checkAndStoreLandscapeOffsetPref( getActivity() );
             // Cannot be null, if prefs.xml is valid
-            Preference landscapeOffsetPreference = findPreference( getString( R.string.drawing_landscape_offset_key ) );
-            landscapeOffsetPreference.setSummary(getString(R.string.drawing_landscape_offset_summary) + " " +
+            Preference preference = findPreference( getString( R.string.drawing_landscape_offset_key ) );
+            preference.setSummary(getString(R.string.drawing_landscape_offset_summary) + " " +
                     Integer.toString(landscapeOffset));
             Scribe.note( Debug.PREF, "PREFERENCES: Landscape offset for non-wide boards has changed: " + landscapeOffset);
             if ( !allKeys )     performAction(PREFS_ACTION_RECALCULATE);
@@ -397,8 +519,8 @@ public class PrefsFragment extends PreferenceFragment
             {
             int outerRim = checkAndStoreOuterRimPref( getActivity() );
             // Cannot be null, if prefs.xml is valid
-            Preference outerRimPreference = findPreference( getString( R.string.drawing_outer_rim_key ) );
-            outerRimPreference.setSummary(getString(R.string.drawing_outer_rim_summary) + " " +
+            Preference preference = findPreference( getString( R.string.drawing_outer_rim_key ) );
+            preference.setSummary(getString(R.string.drawing_outer_rim_summary) + " " +
                     Integer.toString(outerRim));
             Scribe.note( Debug.PREF, "PREFERENCES: Outer rim ratio has changed!" + outerRim);
             if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
@@ -416,6 +538,66 @@ public class PrefsFragment extends PreferenceFragment
 
             Scribe.note( Debug.PREF, "PREFERENCES: Monitor row is set to: " + value );
             if ( !allKeys )     performAction(PREFS_ACTION_RECALCULATE);
+            }
+
+        // Touch / Long count
+        if ( key.equals( getString( R.string.touch_long_count_key )) || allKeys )
+            {
+            int longCount = checkAndStoreLongCountPref( getActivity() );
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.touch_long_count_key ) );
+            preference.setSummary(getString(R.string.touch_long_count_summary) + " " +
+                    Integer.toString(longCount));
+            Scribe.note( Debug.PREF, "PREFERENCES: Long counter has changed!" + longCount);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
+        // Touch / Press counter
+        if ( key.equals( getString( R.string.touch_press_count_key )) || allKeys )
+            {
+            int pressCount = checkAndStorePressCountPref( getActivity() );
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.touch_press_count_key ) );
+            preference.setSummary(getString(R.string.touch_press_count_summary) + " " +
+                    Integer.toString(pressCount));
+            Scribe.note( Debug.PREF, "PREFERENCES: Press counter has changed!" + pressCount);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
+        // Touch / Press threshold
+        if ( key.equals( getString( R.string.touch_press_threshold_key )) || allKeys )
+            {
+            int pressThreshold = checkAndStorePressThresholdPref( getActivity() );
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.touch_press_threshold_key ) );
+            preference.setSummary(getString(R.string.touch_press_threshold_summary) + " " +
+                    Integer.toString(pressThreshold));
+            Scribe.note( Debug.PREF, "PREFERENCES: Press threshold has changed!" + pressThreshold);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
+        // Touch / Stay time
+        if ( key.equals( getString( R.string.touch_stay_time_key )) || allKeys )
+            {
+            int stayTime = checkAndStoreStayTimePref( getActivity() );
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.touch_stay_time_key ) );
+            preference.setSummary(getString(R.string.touch_stay_time_summary) + " " +
+                    Integer.toString(stayTime));
+            Scribe.note( Debug.PREF, "PREFERENCES: Stay time has changed!" + stayTime);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
+        // Touch / Repeat time
+        if ( key.equals( getString( R.string.touch_repeat_time_key )) || allKeys )
+            {
+            int repeatTime = checkAndStoreRepeatTimePref( getActivity() );
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.touch_repeat_time_key ) );
+            preference.setSummary(getString(R.string.touch_repeat_time_summary) + " " +
+                    Integer.toString(repeatTime));
+            Scribe.note( Debug.PREF, "PREFERENCES: Repeat time has changed!" + repeatTime);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
             }
 
         // Cursor / Touch allow

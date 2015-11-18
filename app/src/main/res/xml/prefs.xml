@@ -80,6 +80,56 @@
 	</PreferenceCategory>
 
 	<PreferenceCategory
+		android:title="@string/prefs_touch">
+
+		<EditTextPreference
+			android:key="@string/touch_long_count_key"
+			android:inputType="number"
+			android:title="@string/touch_long_count_title"
+			android:summary="@string/touch_long_count_summary"
+			android:dialogTitle="@string/touch_long_count_dialog_title"
+			android:dialogMessage="@string/touch_long_count_dialog_message"
+			android:defaultValue="@string/touch_long_count_default" />
+
+		<EditTextPreference
+			android:key="@string/touch_press_count_key"
+			android:inputType="number"
+			android:title="@string/touch_press_count_title"
+			android:summary="@string/touch_press_count_summary"
+			android:dialogTitle="@string/touch_press_count_dialog_title"
+			android:dialogMessage="@string/touch_press_count_dialog_message"
+			android:defaultValue="@string/touch_press_count_default" />
+
+        <EditTextPreference
+            android:key="@string/touch_press_threshold_key"
+            android:inputType="number"
+            android:title="@string/touch_press_threshold_title"
+            android:summary="@string/touch_press_threshold_summary"
+            android:dialogTitle="@string/touch_press_threshold_dialog_title"
+            android:dialogMessage="@string/touch_press_threshold_dialog_message"
+            android:defaultValue="@string/touch_press_threshold_default" />
+
+        <EditTextPreference
+            android:key="@string/touch_stay_time_key"
+            android:inputType="number"
+            android:title="@string/touch_stay_time_title"
+            android:summary="@string/touch_stay_time_summary"
+            android:dialogTitle="@string/touch_stay_time_dialog_title"
+            android:dialogMessage="@string/touch_stay_time_dialog_message"
+            android:defaultValue="@string/touch_stay_time_default" />
+
+        <EditTextPreference
+            android:key="@string/touch_repeat_time_key"
+            android:inputType="number"
+            android:title="@string/touch_repeat_time_title"
+            android:summary="@string/touch_repeat_time_summary"
+            android:dialogTitle="@string/touch_repeat_time_dialog_title"
+            android:dialogMessage="@string/touch_repeat_time_dialog_message"
+            android:defaultValue="@string/touch_repeat_time_default" />
+        
+    </PreferenceCategory>
+
+	<PreferenceCategory
 		android:title="@string/prefs_cursor">
 
 		<CheckBoxPreference
@@ -129,69 +179,6 @@
 
 	</PreferenceCategory>
 
-
-
-
-
-/* BoardView
-
-    private int longBow = 80;
-    private int pressBow = 1;
-    private int startRepeat = 500 * 1000000;
-    private int repeatRepeat = 100 * 1000000;
-    // private boolean prefsVibrationAllowed;
-    private float prefsPressureThreshold = 1.0f;
-
-*/
-
-/* Board
-
-    public int hideTop = 0;
-    public int hideBottom = 0;
-
-	screenHeightInPixels *= 3;
-	screenHeightInPixels /= 4;
-
-    public int landscapeOffsetPercent = 30;
-	public int outerRimPercent = 30;
-
-    - ez miért nem boardview-ban van? -
-    public boolean displayTouch = true;
-    public boolean displayStroke = true;
-
-
-*/
-
-/*
-    Primary debug
-*/
-
-/* SoftBoardService
-
-    public static String coatFileName = "coat.txt"; // .descriptor
-    public static final String WORKING_DIRECTORY = "_bestboard";
-
-*/
-
-
-
-
-
-
-
-    <PreferenceCategory
-		android:title="@string/prefs_pressure">
-
-		<EditTextPreference
-			android:key="@string/pressure_key"
-			android:inputType="numberDecimal"
-			android:title="@string/pressure_title"
-			android:summary="@string/pressure_summary"
-			android:dialogTitle="@string/pressure_dialog_title" 
-			android:dialogMessage="@string/pressure_dialog_message"   
-			android:defaultValue="@string/pressure_default" />
-
-	</PreferenceCategory>
 
    	<PreferenceCategory
 		android:title="@string/prefs_vibration">

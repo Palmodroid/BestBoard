@@ -88,6 +88,13 @@ public class BoardView extends View
             
             this.board = board;
 
+            // mainTouchBow cannot be null, but it cannot get value before setBoard
+            // !! THIS SHOULD BE ORGANISED ON AN OTHER WAY !!
+            if ( mainTouchBow == null )
+                {
+                mainTouchBow = new MainTouchBow();
+                }
+
             board.forceMetaStates();
 
             /**
@@ -180,53 +187,8 @@ public class BoardView extends View
 
 
     /**
-     * * PREFERENCES AND TEMPORARY VARIABLES FOR PREFERENCES
-     * * Preferences are stored temporally, and not read at every touch.
-     * * They are read at BoardService.onWindowShown()
-     */
-
-    private int longBow = 80;
-
-    private int pressBow = 1;
-
-    private int startRepeat = 500 * 1000000;
-
-    private int repeatRepeat = 100 * 1000000;
-
-
-    private boolean prefsVibrationAllowed;
-
-    private float prefsPressureThreshold = 1.0f;
-
-    /*
-     public void updatePreferences()
-     {
-     SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( getContext() );
-
-     prefsVibrationAllowed = sharedPrefs.getBoolean( getContext().getString( R.string.vibration_key ), false);
-
-     String prefsPressureThresholdString = sharedPrefs.getString( getContext().getString( R.string.pressure_key),
-     getContext().getString( R.string.pressure_default));
-
-     try
-     {
-     prefsPressureThreshold = (float)Integer.parseInt( prefsPressureThresholdString ) / 100f ;
-     Scribe.debug( Debug.VIEW, " prefsPressureThreshold was set to: " + prefsPressureThreshold);
-     }
-     catch (NumberFormatException nfe)
-     {
-     ; //
-     }
-
-     if ( prefsPressureThreshold > 10f ) prefsPressureThreshold = 10f;
-     if ( prefsPressureThreshold < 0f ) prefsPressureThreshold = 0f;
-     }
-     */
-
-    /**
-     * * CLASS VARIABLES FOR TOUCHES
+     ** CLASS VARIABLES FOR TOUCHES
      **/
-
 
     private final static int TOUCH_DOWN = 0;
     private final static int TOUCH_MOVE = 1;
@@ -306,7 +268,7 @@ public class BoardView extends View
 
         boolean isLong()
             {
-            return moveCounter == longBow;
+            return moveCounter == board.softBoardData.longBowCount;
             }
 
 
@@ -320,18 +282,18 @@ public class BoardView extends View
 
         boolean isPressed()
             {
-            return pressureCounter == pressBow;
+            return pressureCounter == board.softBoardData.pressBowCount;
             }
 
 
         // time, when touch should repeat
-        long nextRepeatTime = System.nanoTime() + startRepeat; // ?? or NEVER ??
+        long nextRepeatTime = System.nanoTime() +  board.softBoardData.stayBowTime; // ?? or NEVER ??
 
         boolean isNextRepeat()
             {
             if (nextRepeatTime < System.nanoTime())
                 {
-                nextRepeatTime += repeatRepeat;
+                nextRepeatTime +=  board.softBoardData.repeatTime;
                 return true;
                 }
             return false;
@@ -345,7 +307,7 @@ public class BoardView extends View
      * strokePointerId == -1 means an elevated touch
      * (because empty buttons have got the same MainTouchBow; elevated is a special empty button)
      */
-    private MainTouchBow mainTouchBow = new MainTouchBow();
+    private MainTouchBow mainTouchBow;
 
 
     // MULTI TOUCH - ButtonMultiTouch subclasses can work with multiple touches
@@ -665,9 +627,9 @@ public class BoardView extends View
     // Helper for onTouchEvents() - both MOVE and HOLD touches come here
     private void _touchEventsHoldAndMove(int canvasX, int canvasY, float canvasPressure)
         {
-        if (canvasPressure > prefsPressureThreshold && canvasPressure != 1.0f)
+        if (canvasPressure > board.softBoardData.pressBowThreshold && canvasPressure != 1.0f)
             {
-            Scribe.debug( Debug.TOUCH, " prefsPressureThreshold: " + prefsPressureThreshold + ", canvasPressure: " + canvasPressure);
+            Scribe.debug( Debug.TOUCH, " prefsPressureThreshold: " + board.softBoardData.pressBowThreshold + ", canvasPressure: " + canvasPressure);
             mainTouchBow.increasePressureCounter();
             }
 
