@@ -25,12 +25,32 @@ public class ButtonPacket extends ButtonMainTouch implements Cloneable
         return packet.getString();
         }
 
+    /**
+     * Packet is sent independently from touch down/move
+     */
     @Override
-    public void mainTouchEvent(int phase)
+    public void mainTouchStart( boolean isTouchDown )
         {
-        if ( phase == MAIN_START || phase == MAIN_DOWN ||
-                ( phase == MAIN_REPEAT && repeat ))
+        packet.send();
+        }
+
+    @Override
+    public void mainTouchEnd( boolean isTouchUp )
+        { }
+
+    @Override
+    public void mainTouchOnCircle( boolean isHardPress )
+        { }
+
+    @Override
+    public boolean mainTouchOnStay()
+        {
+        if ( repeat )
+            {
             packet.send();
+            return true;
+            }
+        return false;
         }
 
     }

@@ -30,28 +30,45 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
         return board.softBoardData.getActionTitle();
         }
 
-    /**
-     * Button performs its action by fire method.
-     * It is called at several phases by Board.evaluateTouch()
-     * @param phase
-     */
     @Override
-    public void mainTouchEvent( int phase )
+    public void mainTouchStart( boolean isTouchDown )
+        {
+        fire();
+        }
+
+    @Override
+    public void mainTouchEnd( boolean isTouchUp )
+        { }
+
+    @Override
+    public void mainTouchOnCircle( boolean isHardPress )
+        { }
+
+    @Override
+    public boolean mainTouchOnStay()
+        {
+        if ( repeat )
+            {
+            fire();
+            return true;
+            }
+        return false;
+        }
+
+    private void fire( )
         {
         if ( board.softBoardData.isActionSupplied() )
             {
-            if ( phase == MAIN_START || phase == MAIN_DOWN )
+            // fromEnterKey parameter is useless, because multiline actions are performed separately
+            // ?? What to do with repeat here ??
+            if ( !board.softBoardData.softBoardListener.sendDefaultEditorAction( true ) )
                 {
-                // fromEnterKey parameter is useless, because multiline actions are performed separately
-                if ( !board.softBoardData.softBoardListener.sendDefaultEditorAction( true ) )
-                    {
-                    Scribe.error( "ENTER: default action was not accepted by editor!" );
-                    }
+                Scribe.error( "ENTER: default action was not accepted by editor!" );
                 }
             }
+
         // No action is defined
-        else if ( phase == MAIN_START || phase == MAIN_DOWN ||
-                    ( phase == MAIN_REPEAT && repeat ) )
+        else
             {
             // editor
             if ( board.softBoardData.action == SoftBoardData.ACTION_MULTILINE )

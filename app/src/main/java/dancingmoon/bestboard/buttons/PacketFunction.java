@@ -32,7 +32,6 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_BACKSPACE )
             return;
 
-        // !!!!!!! JUST DRAFT DO NOT USE IT !!!!!!!
         if ( functionCode == Commands.TOKEN_DRAFT )
             return;
 
@@ -54,7 +53,6 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_BACKSPACE )
             return "BS";
 
-        // !!!!!!! JUST DRAFT DO NOT USE IT !!!!!!!
         if ( functionCode == Commands.TOKEN_DRAFT )
             return "DRAFT";
 
@@ -79,7 +77,6 @@ public class PacketFunction extends Packet
             softBoardData.softBoardListener.deleteTextBeforeCursor( 1 );
             }
 
-        // !!!!!!! JUST DRAFT DO NOT USE IT !!!!!!!
         else if ( functionCode == Commands.TOKEN_DRAFT )
             {
             softBoardData.softBoardListener.startSoftBoardParser();

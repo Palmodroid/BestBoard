@@ -260,10 +260,25 @@ public class BoardView extends View
 
         // length of the bow
         int moveCounter = 0;
+        // strong presses applied to this bow
+        int pressureCounter = 0;
+        // time, when touch should repeat
+        long nextRepeatTime = System.nanoTime() +  board.softBoardData.stayBowTime;
 
         void increaseMoveCounter()
             {
             moveCounter++;
+            }
+
+        void increasePressureCounter()
+            {
+            pressureCounter++;
+            }
+
+        void resetMoveAndPressureCounter()
+            {
+            moveCounter = 0;
+            pressureCounter = 0;
             }
 
         boolean isLong()
@@ -271,32 +286,20 @@ public class BoardView extends View
             return moveCounter == board.softBoardData.longBowCount;
             }
 
-
-        // strong presses applied to this bow
-        int pressureCounter = 0;
-
-        void increasePressureCounter()
-            {
-            pressureCounter++;
-            }
-
         boolean isPressed()
             {
             return pressureCounter == board.softBoardData.pressBowCount;
             }
 
-
-        // time, when touch should repeat
-        long nextRepeatTime = System.nanoTime() +  board.softBoardData.stayBowTime; // ?? or NEVER ??
+        void setNextRepeat( boolean isRepeating )
+            {
+            nextRepeatTime = System.nanoTime() +
+                    ( isRepeating ? board.softBoardData.repeatTime : board.softBoardData.stayBowTime );
+            }
 
         boolean isNextRepeat()
             {
-            if (nextRepeatTime < System.nanoTime())
-                {
-                nextRepeatTime +=  board.softBoardData.repeatTime;
-                return true;
-                }
-            return false;
+            return nextRepeatTime < System.nanoTime();
             }
 
         }
@@ -361,7 +364,7 @@ public class BoardView extends View
         int index;
         int id;
 
-        Scribe.locus( Debug.TOUCH );
+        Scribe.locus( Debug.TOUCH_VERBOSE );
         // Scribe.debug( Debug.VIEW, this.toString() + " touchEvent " + event.getActionMasked());
 
         pointerChangeFlag = NO_CHANGE;
@@ -457,9 +460,9 @@ public class BoardView extends View
                     return true;
                     }
 
-                Scribe.debug( Debug.TOUCH, "Pointer is in HOLD/MOVE." );
+                Scribe.debug( Debug.TOUCH_VERBOSE, "Pointer is in HOLD/MOVE." );
 
-                Scribe.debug( Debug.TOUCH, "META pointers to evaluate: " + multiTouchPointers.size());
+                Scribe.debug( Debug.TOUCH_VERBOSE, "META pointers to evaluate: " + multiTouchPointers.size());
 
                 // Check all META pointers for movement - NO Historical values are checked
                 Iterator<Map.Entry<Integer, MultiTouchBow>> iterator =
@@ -472,7 +475,7 @@ public class BoardView extends View
                     index = event.findPointerIndex( multiTouchPointer.getKey() );
                     if (index != -1)
                         {
-                        Scribe.debug(Debug.TOUCH, "META pointer check: " + index);
+                        Scribe.debug(Debug.TOUCH_VERBOSE, "META pointer check: " + index);
 
                         int color = board.colorFromMap((int) event.getX(index), (int) event.getY(index));
                         int newTouchCode = Board.touchCodeFromColor(color);
@@ -522,7 +525,7 @@ public class BoardView extends View
                     }
 
                 // Check MAIN pointer
-                Scribe.debug( Debug.TOUCH, "MAIN Pointer to evaluate: " + strokePointerId);
+                Scribe.debug( Debug.TOUCH_VERBOSE, "MAIN Pointer to evaluate: " + strokePointerId);
 
                 // strokePointerId can be -1, this is not checked!!
                 index = event.findPointerIndex(strokePointerId);
@@ -645,7 +648,8 @@ public class BoardView extends View
             }
         else // point was moved
             {
-            mainTouchBow.increaseMoveCounter();
+            // mainTouchBow.increaseMoveCounter(); -> evaluateMain - TOUCH_MOVE part
+            // It is increased only if touch touches it's own button. On the surrounding buttons move counter is skipped.
             evaluateMain(TOUCH_MOVE, strokePoint);
             }
         }
@@ -689,7 +693,7 @@ public class BoardView extends View
         // if bowAction == TOUCH_UP - strokePoints will be cleared later
 
         // FIRST: find out the touchCode for this new touch
-        int newBowTouchCode = mainTouchBow.touchCode;
+        int newBowTouchCode;
 
         if (bowAction == TOUCH_DOWN)
             {
@@ -700,9 +704,18 @@ public class BoardView extends View
             {
             // touchCode changes only if move arrives inside the rim
             int color = board.colorFromMap(strokePoint.canvasX, strokePoint.canvasY);
-            if (!Board.outerRimFromColor(color))
+            newBowTouchCode = Board.touchCodeFromColor(color);
+
+            // touch is on the same button - independently from center/outer rim
+            if ( newBowTouchCode == mainTouchBow.touchCode )
                 {
-                newBowTouchCode = Board.touchCodeFromColor(color);
+                mainTouchBow.increaseMoveCounter();
+                }
+
+            // invalidate touch code if touch is not arrived in the center of an other button
+            else if ( Board.outerRimFromColor(color) )
+                {
+                newBowTouchCode = mainTouchBow.touchCode;
                 }
             }
         else if (bowAction == TOUCH_UP)
@@ -716,7 +729,11 @@ public class BoardView extends View
             // Because this.invalidate will be called in the next section, this is not needed:
             // if (board.softBoardData.displayStroke) this.invalidate();
             }
-        // TOUCH_HOLD will not change the touchCode
+        else
+            {
+            // TOUCH_HOLD will not change the touchCode
+            newBowTouchCode = mainTouchBow.touchCode;
+            }
 
 
         if (mainTouchBow.touchCode != newBowTouchCode)
@@ -735,9 +752,9 @@ public class BoardView extends View
                 Scribe.debug( Debug.TOUCH, "Previous button is released: " + mainTouchBow.buttonMainTouch.getString() );
 
                 if (bowAction == TOUCH_UP)
-                    mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_UP);
+                    mainTouchBow.buttonMainTouch.mainTouchEnd( true );
                 else
-                    mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_END);
+                    mainTouchBow.buttonMainTouch.mainTouchEnd( false );
 
                 // meta check could be here, after finishing the next main-stream button
                 // but in this case we should finish here
@@ -771,9 +788,9 @@ public class BoardView extends View
                     mainTouchBow = new MainTouchBow( newBowTouchCode, (ButtonMainTouch)newBowButton );
 
                     if (bowAction == TOUCH_DOWN)
-                        mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_DOWN);
+                        mainTouchBow.buttonMainTouch.mainTouchStart( true );
                     else
-                        mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_START);
+                        mainTouchBow.buttonMainTouch.mainTouchStart( false );
 
                     // meta check could be here, just after the first event
 
@@ -813,46 +830,26 @@ public class BoardView extends View
         else // same bow
             {
             // check bow's long
-            if ( mainTouchBow.isLong() )
+            if ( mainTouchBow.isLong() && mainTouchBow.buttonMainTouch != null)
                 {
-                if ( mainTouchBow.buttonMainTouch != null)
-                    {
-                    Scribe.debug( Debug.TOUCH, "LONG touch is detected." );
-
-                    // alternative touches are restarted together
-                    mainTouchBow.moveCounter = 0;
-                    mainTouchBow.pressureCounter = 0;
-                    // or increaseMoveCounter(); // cannot get it twice
-
-                    mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_LONG);
-                    }
+                Scribe.debug( Debug.TOUCH, "LONG touch is detected." );
+                mainTouchBow.buttonMainTouch.mainTouchOnCircle( false );
+                mainTouchBow.resetMoveAndPressureCounter();
                 }
 
             // check bow's press
-            if ( mainTouchBow.isPressed() )
+            if ( mainTouchBow.isPressed() && mainTouchBow.buttonMainTouch != null)
                 {
-                if ( mainTouchBow.buttonMainTouch != null)
-                    {
-                    Scribe.debug( Debug.TOUCH, "PRESS touch is detected." );
-
-                    // alternative touches are restarted together
-                    mainTouchBow.moveCounter = 0;
-                    mainTouchBow.pressureCounter = 0;
-                    // or increasePressureCounter(); // cannot get it twice
-
-                    mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_PRESS);
-                    }
+                Scribe.debug( Debug.TOUCH, "PRESS touch is detected." );
+                mainTouchBow.buttonMainTouch.mainTouchOnCircle( true );
+                mainTouchBow.resetMoveAndPressureCounter();
                 }
 
-            // check bow's repeat !!!! isRepeatable should be checked !!!!
-            if ( mainTouchBow.isNextRepeat() ) // isNextRepeat sets the new time if needed
+            // check bow's repeat
+            if ( mainTouchBow.isNextRepeat() && mainTouchBow.buttonMainTouch != null)
                 {
-                if ( mainTouchBow.buttonMainTouch != null)
-                    {
-                    Scribe.debug( Debug.TOUCH, "REPEAT touch is detected." );
-
-                    mainTouchBow.buttonMainTouch.mainTouchEvent(ButtonMainTouch.MAIN_REPEAT);
-                    }
+                Scribe.debug( Debug.TOUCH, "REPEAT touch is detected." );
+                mainTouchBow.setNextRepeat( mainTouchBow.buttonMainTouch.mainTouchOnStay() );
                 }
             }
         }
@@ -865,7 +862,7 @@ public class BoardView extends View
     @Override
     protected void onDraw(Canvas canvas)
         {
-        Scribe.locus( Debug.DRAW );
+        Scribe.locus( Debug.DRAW_VERBOSE );
 
         // board.drawBoardMap(canvas);
         // board.drawBoardLayout(canvas, 0);

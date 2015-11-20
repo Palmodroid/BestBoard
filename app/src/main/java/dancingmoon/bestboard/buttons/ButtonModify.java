@@ -28,26 +28,38 @@ public class ButtonModify extends ButtonMainTouch implements Cloneable
         }
 
     @Override
-    public void mainTouchEvent(int phase)
+    public void mainTouchStart( boolean isTouchDown )
         {
-        if ( phase == MAIN_START || phase == MAIN_DOWN )
+        Modify modify = board.softBoardData.modify.get( modifyId );
+        if ( modify != null )
             {
-            Modify modify = board.softBoardData.modify.get( modifyId );
-            if ( modify != null )
-                {
-                if ( reverse )
-                    modify.changeBack();
-                else
-                    modify.change();
-                }
+            if ( reverse )
+                modify.changeBack();
             else
-                {
-                // Error message should mimic tokenizer error
-                Scribe.error_secondary(
-                        "[RUNTIME ERROR] " +
-                        board.softBoardData.softBoardListener.getApplicationContext().getString( R.string.modify_missing ) +
-                        Tokenizer.regenerateKeyword( modifyId ) );
-                }
+                modify.change();
+            }
+        else
+            {
+            // Error message should mimic tokenizer error
+            Scribe.error_secondary(
+                    "[RUNTIME ERROR] " +
+                            board.softBoardData.softBoardListener.getApplicationContext().getString( R.string.modify_missing ) +
+                            Tokenizer.regenerateKeyword( modifyId ) );
             }
         }
+
+    @Override
+    public void mainTouchEnd( boolean isTouchUp )
+        { }
+
+    @Override
+    public void mainTouchOnCircle( boolean isHardPress )
+        { }
+
+    @Override
+    public boolean mainTouchOnStay()
+        {
+        return false;
+        }
+
     }

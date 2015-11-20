@@ -11,26 +11,29 @@ public abstract class ButtonMainTouch extends Button
         return (ButtonMainTouch)super.clone();
         }
 
-
-    /** Stroke and bow started by touch down. */
-    public static int MAIN_DOWN = 0;
-    /** Bow started by move (and not by touch down!) */
-    public static int MAIN_START = 1;
-    /** Long bow */
-    public static int MAIN_LONG = 2;
-    /** Hard pressed bow */
-    public static int MAIN_PRESS = 3;
-    /** Repeated bow */
-    public static int MAIN_REPEAT = 4;
-    /** Bow finished by move (and not by release!) */
-    public static int MAIN_END = 5;
-    /** Stroke finished by touch release. */
-    public static int MAIN_UP = 6;
-
+   /**
+     * New bow is started, button is touched.
+     * @param isTouchDown true if button is touched by touch down and not by touch move
+     */
+    public abstract void mainTouchStart( boolean isTouchDown );
 
     /**
-     * Button performs its action by fire method.
-     * It is called at several phases by Board.evaluateTouch()
+     * Bow is ended, button is released.
+     * @param isTouchUp true if button is released by touch up and not by touch move
      */
-    public abstract void mainTouchEvent(int phase);
+    public abstract void mainTouchEnd( boolean isTouchUp );
+
+    /**
+     * Touch is circling on button (or button is hard pressed)
+     * @param isHardPress true if method is triggered by hard press
+     */
+    public abstract void mainTouchOnCircle( boolean isHardPress );
+
+    /**
+     * Touch is stayed on button
+     * @return true if button could be repeated quickly (repeat)
+     * or false if button should wait for next "on stay" trigger
+     */
+    public abstract boolean mainTouchOnStay();
+
     }

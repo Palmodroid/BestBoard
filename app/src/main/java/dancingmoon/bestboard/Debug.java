@@ -28,6 +28,7 @@ public class Debug
     public static final int TOUCH = 524;
     public static final int TOUCH_VERBOSE = 24;
     public static final int DRAW = 526;
+    public static final int DRAW_VERBOSE = 26;
     public static final int VIEW = 530;
     public static final int COMMANDS = 40;
     public static final int IGNITION = 50;

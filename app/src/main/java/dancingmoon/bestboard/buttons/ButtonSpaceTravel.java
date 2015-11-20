@@ -26,26 +26,37 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
         }
 
     @Override
-    public void mainTouchEvent(int phase)
+    public void mainTouchStart( boolean isTouchDown )
         {
-        if ( phase == MAIN_DOWN )
+        if ( isTouchDown )
             {
             packet.send();
             done = true;
             }
-
-        else if ( phase == MAIN_UP )
-            {
-            if ( done )
-                done = false;
-            else
-                packet.send();
-            }
-
-        else if ( phase == MAIN_END )
+        else
             {
             done = false;
             }
+        }
+
+    @Override
+    public void mainTouchEnd( boolean isTouchUp )
+        {
+        if ( isTouchUp && !done )
+            {
+            packet.send();
+            }
+        // done = false; // this is not needed, because bow will always start first
+        }
+
+    @Override
+    public void mainTouchOnCircle( boolean isHardPress )
+        { }
+
+    @Override
+    public boolean mainTouchOnStay()
+        {
+        return false;
         }
 
     }
