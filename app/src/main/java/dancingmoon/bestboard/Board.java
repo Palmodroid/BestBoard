@@ -432,7 +432,7 @@ public class Board
         areaHeightInPixels = boardHeightInPixels
                 - softBoardData.hideTop * quarterHexagonHeightInPixels
                 - softBoardData.hideBottom * quarterHexagonHeightInPixels
-                + (softBoardData.monitorRow ? halfHexagonHeightInPixels : 0);
+                + (softBoardData.monitorRow ? halfHexagonHeightInPixels * 3 / 2 : 0);
 
         // Monitor is only set by onMeasure
 

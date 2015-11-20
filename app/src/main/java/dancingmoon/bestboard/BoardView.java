@@ -3,6 +3,7 @@ package dancingmoon.bestboard;
 
 import android.content.Context;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Paint;
 import android.view.InflateException;
 import android.view.MotionEvent;
@@ -56,7 +57,7 @@ public class BoardView extends View
      */
     public BoardView(Context context)
         {
-        super(context );
+        super( context );
         Scribe.locus( Debug.VIEW );
 
         strokePaint = new Paint();
@@ -122,6 +123,7 @@ public class BoardView extends View
             strokePaint.setColor( board.softBoardData.strokeColor );
             }
         // !!!!!!! SIZE CONTROL IS STILL MISSING !!!!!!!!!
+
         }
 
     @Override
@@ -180,6 +182,17 @@ public class BoardView extends View
             Scribe.debug( Debug.VIEW, "CONSECUTIVE Calculations");
             Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
             }
+
+
+
+        // !!!!!!!!!!! JUST PROBING !!!!!!!!!!!
+
+        probe.setTextSize( board.textSize * 2 );
+        probe.setColor( Color.CYAN );
+        probe.setFlags( Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
+                Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG );
+
+
 
         // calculateScreen data has calculated height of the area
         setMeasuredDimension( widthSize, board.areaHeightInPixels );
@@ -886,6 +899,10 @@ public class BoardView extends View
                 }
             }
 
+        canvas.drawText( board.softBoardData.softBoardListener.getStoredText().toString(),
+                20f, (float)(board.boardHeightInPixels + board.halfHexagonHeightInPixels), probe );
         }
+
+    Paint probe = new Paint();
 
     }
