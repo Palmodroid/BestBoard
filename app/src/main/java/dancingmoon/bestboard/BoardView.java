@@ -188,14 +188,15 @@ public class BoardView extends View
         // !!!!!!!!!!! JUST PROBING !!!!!!!!!!!
 
         probe.setTextSize( board.textSize * 2 );
-        probe.setColor( Color.CYAN );
-        probe.setFlags( Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
-                Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG );
+        probe.setColor(Color.CYAN);
+        probe.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
+                Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
 
-
+        probeBackground.setStyle(Paint.Style.FILL_AND_STROKE);
+        probeBackground.setColor( Color.BLUE );
 
         // calculateScreen data has calculated height of the area
-        setMeasuredDimension( widthSize, board.areaHeightInPixels );
+        setMeasuredDimension(widthSize, board.areaHeightInPixels);
         }
 
 
@@ -765,9 +766,9 @@ public class BoardView extends View
                 Scribe.debug( Debug.TOUCH, "Previous button is released: " + mainTouchBow.buttonMainTouch.getString() );
 
                 if (bowAction == TOUCH_UP)
-                    mainTouchBow.buttonMainTouch.mainTouchEnd( true );
+                    mainTouchBow.buttonMainTouch.mainTouchEnd(true);
                 else
-                    mainTouchBow.buttonMainTouch.mainTouchEnd( false );
+                    mainTouchBow.buttonMainTouch.mainTouchEnd(false);
 
                 // meta check could be here, after finishing the next main-stream button
                 // but in this case we should finish here
@@ -801,9 +802,9 @@ public class BoardView extends View
                     mainTouchBow = new MainTouchBow( newBowTouchCode, (ButtonMainTouch)newBowButton );
 
                     if (bowAction == TOUCH_DOWN)
-                        mainTouchBow.buttonMainTouch.mainTouchStart( true );
+                        mainTouchBow.buttonMainTouch.mainTouchStart(true);
                     else
-                        mainTouchBow.buttonMainTouch.mainTouchStart( false );
+                        mainTouchBow.buttonMainTouch.mainTouchStart(false);
 
                     // meta check could be here, just after the first event
 
@@ -899,10 +900,22 @@ public class BoardView extends View
                 }
             }
 
+        canvas.drawRect(
+                0f,
+                board.areaHeightInPixels - board.halfHexagonHeightInPixels,
+                board.validatedWidthInPixels,
+                board.areaHeightInPixels,
+                probeBackground );
+
         canvas.drawText( board.softBoardData.softBoardListener.getStoredText().toString(),
-                20f, (float)(board.boardHeightInPixels + board.halfHexagonHeightInPixels), probe );
+                board.halfHexagonWidthInPixels,
+                //(float)(board.boardHeightInPixels + board.halfHexagonHeightInPixels),
+                // board.boardHeightInPixels - probe.descent(),
+                // board.boardHeightInPixels - probe.ascent(),
+                board.areaHeightInPixels - probe.descent(),
+                probe );
         }
 
     Paint probe = new Paint();
-
+    Paint probeBackground = new Paint();
     }

@@ -457,6 +457,9 @@ public class SoftBoardService extends InputMethodService implements
                 candidatesStart, candidatesEnd);
         // Scribe.locus( Debug.SERVICE );
 
+        Scribe.debug( Debug.TEXT, "Cursor is updated. SelStart position: " + newSelStart +
+                ", relative: " + (newSelStart-oldSelStart));
+
         // Text is NOT selected...
         if ( newSelStart == newSelEnd )
             {
@@ -569,6 +572,21 @@ public class SoftBoardService extends InputMethodService implements
         }
 
 
+    /**
+     * String can be sent only through this method
+     * @param inputConnection input connection - CANNOT BE NULL!
+     * @param string string to send - CANNOT BE NULL!
+     */
+    private void sendString( InputConnection inputConnection, String string )
+        {
+        Scribe.debug( Debug.TEXT, "String to send: [" + string + "], length: " + string.length());
+
+        inputConnection.commitText( string, 1 );
+        storedText.preTextType( string );
+        calculatedPosition += string.length();
+        }
+
+
     @Override
     public void sendString( String string, int autoSpace )
         {
@@ -603,9 +621,7 @@ public class SoftBoardService extends InputMethodService implements
 
             String sendString = sendBuilder.toString();
 
-            ic.commitText( sendString, 1 );
-            storedText.preTextType( sendString );
-            calculatedPosition += sendString.length();
+            sendString( ic, sendString );
             }
         }
 
@@ -704,18 +720,14 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
         {
-        //Scribe.locus( Debug.SERVICE );
-        //Scribe.note( Debug.SERVICE, " - keyCode: " + keyCode);
-        // TODO Auto-generated method stub
+        Scribe.note( Debug.SERVICE, "External hard key is DOWN: " + keyCode);
         return super.onKeyDown(keyCode, event);
         }
 
     @Override
     public boolean onKeyUp(int keyCode, KeyEvent event)
         {
-        //Scribe.locus( Debug.SERVICE );
-        //Scribe.note( Debug.SERVICE, " - keyCode: " + keyCode);
-        // TODO Auto-generated method stub
+        Scribe.note( Debug.SERVICE, "External hard key is UP: " + keyCode);
         return super.onKeyUp(keyCode, event);
         }
 

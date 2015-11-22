@@ -41,7 +41,7 @@ public class StoredText
 
 
     /** Last element is cleared above this limit */
-    public final static int LENGTH_LIMIT = 100;
+    public final static int LENGTH_LIMIT = 20;
 
     /** Connection to synchronize text directly from editor */
     private Connection connection;

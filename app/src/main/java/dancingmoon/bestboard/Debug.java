@@ -24,18 +24,18 @@ public class Debug
 
     // Settings of debug levels - only EVEN numbers!
     public static final int PREF = 10;
-    public static final int BOARD = 520;
-    public static final int TOUCH = 524;
+    public static final int BOARD = 20;
+    public static final int TOUCH = 24;
     public static final int TOUCH_VERBOSE = 24;
-    public static final int DRAW = 526;
+    public static final int DRAW =26;
     public static final int DRAW_VERBOSE = 26;
-    public static final int VIEW = 530;
+    public static final int VIEW = 30;
     public static final int COMMANDS = 40;
     public static final int IGNITION = 50;
     public static final int DATA = 60;
     public static final int PARSER = 70;
-    public static final int SERVICE = 80;
-    public static final int TEXT = 90;
+    public static final int SERVICE = 580;
+    public static final int TEXT = 590;
 
     public static final int BOARDSTATE = 100;
     public static final int CAPSSTATE = 100;
