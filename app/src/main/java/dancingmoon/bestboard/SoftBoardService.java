@@ -72,8 +72,15 @@ public class SoftBoardService extends InputMethodService implements
      * cursor position calculated by our IMS. If this not corresponds with real position,
      * then somebody else changed it (and text around cursor is changed, too)!
      * In the case of selection the start of the selection is stored.
+     * -1 - text is selected
      */
     private int calculatedPosition = 0;
+
+    /**
+     * true, if there weren't any cursor changes since the last command,
+     * so last command can be undone.
+     */
+    private boolean undoEnabled = false;
 
     /** Temporary variable to store string to be send */
     private StringBuilder sendBuilder = new StringBuilder();
@@ -159,7 +166,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public View noKeyboardView()
         {
-        Scribe.locus(Debug.SERVICE);
+        Scribe.locus( Debug.SERVICE );
 
         View noKeyboardView = getLayoutInflater().inflate(R.layout.service_nokeyboard, null);
         noKeyboardView.setOnClickListener( new View.OnClickListener()
@@ -204,7 +211,7 @@ public class SoftBoardService extends InputMethodService implements
         super.onCreate();
 
         // Connect to preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener( this );
 
         // Start the first parsing
         startSoftBoardParser();
@@ -217,13 +224,13 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onDestroy()
         {
-        Scribe.locus(Debug.SERVICE);
+        Scribe.locus( Debug.SERVICE );
         Scribe.title("SOFT-BOARD-SERVICE HAS FINISHED");
 
         super.onDestroy();
 
         // Release preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener( this );
 
         // Stop any ongoing parsing
         if ( softBoardParser != null)   softBoardParser.cancel(false);
@@ -236,7 +243,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public void startSoftBoardParser()
         {
-        Scribe.note(Debug.SERVICE, "Parsing has started.");
+        Scribe.note( Debug.SERVICE, "Parsing has started." );
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -340,7 +347,7 @@ public class SoftBoardService extends InputMethodService implements
                 warning = "Critical error!";
             }
         // Generating a new view with the warning
-        Scribe.debug(Debug.SERVICE, warning);
+        Scribe.debug( Debug.SERVICE, warning );
         setInputView(noKeyboardView());
         // Warning should be shown! Keyboard can be hidden
         Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
@@ -453,42 +460,60 @@ public class SoftBoardService extends InputMethodService implements
                                   int newSelStart, int newSelEnd, int candidatesStart,
                                   int candidatesEnd)
         {
-        super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
-                candidatesStart, candidatesEnd);
-        // Scribe.locus( Debug.SERVICE );
+        super.onUpdateSelection( oldSelStart, oldSelEnd, newSelStart, newSelEnd,
+                candidatesStart, candidatesEnd );
+        Scribe.locus( Debug.TEXT );
 
-        Scribe.debug( Debug.TEXT, "Cursor is updated. SelStart position: " + newSelStart +
-                ", relative: " + (newSelStart-oldSelStart));
+        // undo is only enabled, if confirmPositionChange() validates it
+        undoEnabled = false;
 
         // Text is NOT selected...
         if ( newSelStart == newSelEnd )
             {
-            // ...and cursor position is correct
-            if ( newSelEnd == calculatedPosition )
-                {
-                // if text was previously selected then last character is not known
-                //if ( lastCharacter == TEXT_SELECTED )
-                //    lastCharacter = UNKNOWN;
+            int positionChange = newSelStart-oldSelStart;
 
-                // UNKNOWN or valid character values are CORRECT;
-                }
-            // ...and cursor position is incorrect
-            else // if ( newSelStart != calculatedPosition )
+            // ...and cursor position is on the calculated position
+            if ( newSelStart == calculatedPosition )
                 {
-                // Text was modified without our knowledge
-                // Correct inner variables!
-                // Scribe.debug( Debug.SERVICE, " - Cursor position was changed, last character is not known!");
-                storedText.invalidate(); //lastCharacter = UNKNOWN;
+                Scribe.debug( Debug.TEXT, "Calculated position is correct. Cursor position: " + newSelStart +
+                        ", relative: " + positionChange );
+
+                if ( storedText.confirmPositionChange( positionChange ) )
+                    {
+                    undoEnabled = true;
+                    }
+                // else - it was an external cursor movement!
+                }
+            else
+                {
                 calculatedPosition = newSelStart;
+
+                // ...and cursor position is incorrect:
+                // it was an external movement
+                if ( positionChange < 0 )
+                    {
+                    Scribe.debug( Debug.TEXT,
+                            "Cursor is moving backwards. PreText is deleted, postText is invalidated. Cursor position: " + newSelStart +
+                                    ", relative: " + positionChange );
+                    storedText.preTextDelete( -positionChange );
+                    storedText.postTextInvalidate();
+                    }
+                else
+                    {
+                    Scribe.debug( Debug.TEXT,
+                            "Cursor is moving forwards. StoredText is invalidated. Cursor position: " + newSelStart +
+                                    ", relative: " + positionChange );
+                    storedText.invalidate();
+                    }
                 }
             }
 
         // Text is selected
         else // newSelStart != newSelEnd
             {
-            // Scribe.debug( Debug.SERVICE, " - Text selected, last character N/A!");
+            Scribe.debug( Debug.TEXT, "Text is selected, calculated position is invalidated!");
             storedText.invalidate(); //lastCharacter = TEXT_SELECTED;
-            calculatedPosition = newSelStart;
+            calculatedPosition = -1;
             }
         }
 
@@ -577,9 +602,9 @@ public class SoftBoardService extends InputMethodService implements
      * @param inputConnection input connection - CANNOT BE NULL!
      * @param string string to send - CANNOT BE NULL!
      */
-    private void sendString( InputConnection inputConnection, String string )
+    private void sendPreText( InputConnection inputConnection, String string )
         {
-        Scribe.debug( Debug.TEXT, "String to send: [" + string + "], length: " + string.length());
+        Scribe.debug( Debug.TEXT, "String to send: [" + string + "], length: " + string.length() );
 
         inputConnection.commitText( string, 1 );
         storedText.preTextType( string );
@@ -621,7 +646,7 @@ public class SoftBoardService extends InputMethodService implements
 
             String sendString = sendBuilder.toString();
 
-            sendString( ic, sendString );
+            sendPreText( ic, sendString );
             }
         }
 

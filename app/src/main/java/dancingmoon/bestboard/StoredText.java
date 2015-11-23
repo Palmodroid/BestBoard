@@ -62,6 +62,14 @@ public class StoredText
     /** Character counter for PreTextReader */
     private int preCharCounter = -1;
 
+    /** Typed string is booked, but it should be confirmed with position change */
+    private String preTextString = null;
+
+    /** Time of typing - IF 0L, THEN NO STRING IS BOOKED (preTextString is null) */
+    private long preTextTime = 0L;
+
+    /** Time threshold */
+    private static final long TIME_THRESHOLD = 500L*1000000L;
 
     /** Stored string - text after the cursor. It can be empty, but cannot be null! */
     private String postText = "";
@@ -107,37 +115,71 @@ public class StoredText
         preTextLength = 0;
         preTextReady = false;
 
+        preTextTime = 0L;
+
         preTextReaderReset();
 
-        Scribe.debug( Debug.TEXT, "PreText and preTextReader are invalidated!");
+        Scribe.debug( Debug.TEXT, "PreText and preTextReader are invalidated!" );
         }
 
 
     /**
-     * Add typed string at the end of preText.
-     * If preText (without last element) exceeds LIMIT_LENGTH, last element will be deleted.
+     * Booked string to be added to preText
+     * positionChange should confirm it
      * @param string Typed string CANNOT BE NULL!
      */
     public void preTextType(String string)
         {
-        preText.add( new PartialString( string ) );
-        preTextLength += string.length();
+        preTextTime = System.nanoTime();
+        preTextString = string;
 
-        // while length without the last element is bigger than limit,
-        // then last element could be deleted
-        while ( preTextLength - preText.get(0).length > LENGTH_LIMIT )
+        Scribe.debug( Debug.TEXT, "PRETEXT: String is booked: [" + preTextString + "] at " + preTextTime );
+        }
+
+
+    /**
+     * Add previously booked string at the end of preText.
+     * If preText (without last element) exceeds LIMIT_LENGTH, last element will be deleted.
+     * @param positionChange
+     * @return true, if change was confirmed; false if change was abandoned, and it was an external cursor movement
+     */
+    public boolean confirmPositionChange( int positionChange )
+        {
+        long currentTime = System.nanoTime();
+
+        if ( preTextTime + TIME_THRESHOLD > currentTime )
             {
-            preTextLength -= preText.get(0).length;
-            preText.remove( 0 );
+            preTextTime = 0L;
+
+            // String is written - if preTextTime is 0L, then string is invalid (may be null)
+            preText.add( new PartialString( preTextString ) );
+            preTextLength += preTextString.length();
+
+            // while length without the last element is bigger than limit,
+            // then last element could be deleted
+            while ( preTextLength - preText.get( 0 ).length > LENGTH_LIMIT )
+                {
+                preTextLength -= preText.get( 0 ).length;
+                preText.remove( 0 );
+                }
+
+            Scribe.debug( Debug.TEXT, "PRETEXT: Booked string is added to pretext at " + currentTime );
+            return true;
             }
 
-        Scribe.debug( Debug.TEXT, "PreText typed: " + toString());
+        else
+            {
+            // Cursor moved after time
+            invalidate();
+            Scribe.debug( Debug.TEXT, "PRETEXT: Stored texts are invalidated because of cursor was moved after time threshold." );
+            return false;
+            }
         }
 
 
     /**
      * Synchronize text before the cursor.
-     * preText stucture changes:
+     * preText structure changes:
      * there will be only one string with LENGTH_LIMIT length.
      * (Only text right before the cursor could be read.)
      * Its length will be shorter, if there are not enough characters.
