@@ -478,11 +478,7 @@ public class SoftBoardService extends InputMethodService implements
                 Scribe.debug( Debug.TEXT, "Calculated position is correct. Cursor position: " + newSelStart +
                         ", relative: " + positionChange );
 
-                if ( storedText.confirmPositionChange( positionChange ) )
-                    {
-                    undoEnabled = true;
-                    }
-                // else - it was an external cursor movement!
+                undoEnabled = storedText.confirmPositionChange( positionChange );
                 }
             else
                 {
@@ -609,6 +605,7 @@ public class SoftBoardService extends InputMethodService implements
         inputConnection.commitText( string, 1 );
         storedText.preTextType( string );
         calculatedPosition += string.length();
+        undoEnabled = false;
         }
 
 
