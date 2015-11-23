@@ -166,18 +166,18 @@ public class SoftBoardService extends InputMethodService implements
      */
     public View noKeyboardView()
         {
-        Scribe.locus( Debug.SERVICE );
+        Scribe.locus(Debug.SERVICE);
 
         View noKeyboardView = getLayoutInflater().inflate(R.layout.service_nokeyboard, null);
-        noKeyboardView.setOnClickListener( new View.OnClickListener()
+        noKeyboardView.setOnClickListener(new View.OnClickListener()
         {
         @Override
-        public void onClick( View view )
+        public void onClick(View view)
             {
-            InputMethodManager imm = (InputMethodManager) getSystemService( Context.INPUT_METHOD_SERVICE );
+            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.showInputMethodPicker();
             }
-        } );
+        });
 
         // Warning comes from the onCreate method
         if ( warning != null )
@@ -205,13 +205,13 @@ public class SoftBoardService extends InputMethodService implements
         // This should be called at every starting point
         Ignition.start(this);
 
-        Scribe.title( "SOFT-BOARD-SERVICE HAS STARTED" );
-        Scribe.locus( Debug.SERVICE );
+        Scribe.title("SOFT-BOARD-SERVICE HAS STARTED");
+        Scribe.locus(Debug.SERVICE);
 
         super.onCreate();
 
         // Connect to preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener( this );
+        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener(this);
 
         // Start the first parsing
         startSoftBoardParser();
@@ -224,13 +224,13 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onDestroy()
         {
-        Scribe.locus( Debug.SERVICE );
+        Scribe.locus(Debug.SERVICE);
         Scribe.title("SOFT-BOARD-SERVICE HAS FINISHED");
 
         super.onDestroy();
 
         // Release preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener( this );
+        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener(this);
 
         // Stop any ongoing parsing
         if ( softBoardParser != null)   softBoardParser.cancel(false);
@@ -243,7 +243,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public void startSoftBoardParser()
         {
-        Scribe.note( Debug.SERVICE, "Parsing has started." );
+        Scribe.note(Debug.SERVICE, "Parsing has started.");
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -280,7 +280,7 @@ public class SoftBoardService extends InputMethodService implements
 
         if (softBoardData == null)
             {
-            Scribe.note( Debug.SERVICE, "Soft-board is not ready yet, no-keyboard-view will be displayed.");
+            Scribe.note(Debug.SERVICE, "Soft-board is not ready yet, no-keyboard-view will be displayed.");
             return noKeyboardView();
             }
         else
@@ -297,7 +297,7 @@ public class SoftBoardService extends InputMethodService implements
                 parent.removeView( getBoardView() );
                 }
 
-            getBoardView().setBoard( softBoardData.linkState.getActiveBoard() );
+            getBoardView().setBoard(softBoardData.linkState.getActiveBoard());
 
             return getBoardView();
             }
@@ -347,7 +347,7 @@ public class SoftBoardService extends InputMethodService implements
                 warning = "Critical error!";
             }
         // Generating a new view with the warning
-        Scribe.debug( Debug.SERVICE, warning );
+        Scribe.debug(Debug.SERVICE, warning);
         setInputView(noKeyboardView());
         // Warning should be shown! Keyboard can be hidden
         Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
@@ -365,7 +365,7 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void softBoardParserFinished(SoftBoardData softBoardData, int errorCount)
         {
-        Scribe.locus( Debug.SERVICE );
+        Scribe.locus(Debug.SERVICE);
 
         // non-critical errors
         if ( errorCount != 0 )
@@ -395,7 +395,7 @@ public class SoftBoardService extends InputMethodService implements
         softBoardData.linkState.setOrientation();
 
         boardView = new BoardView( this );        
-        boardView.setBoard( softBoardData.linkState.getActiveBoard() );
+        boardView.setBoard(softBoardData.linkState.getActiveBoard());
         
         setInputView( boardView );
 
@@ -426,7 +426,7 @@ public class SoftBoardService extends InputMethodService implements
             softBoardData.boardStates.resetSimulatedMetaButtons();
 
             // enter's title is set
-            softBoardData.setAction( editorInfo.imeOptions );
+            softBoardData.setAction(editorInfo.imeOptions);
 
             if ( calculatedPosition == 0 && editorInfo.initialCapsMode != 0 )
                 {
@@ -444,7 +444,7 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onStartInput(EditorInfo attribute, boolean restarting)
         {
-        super.onStartInput( attribute, restarting );
+        super.onStartInput(attribute, restarting);
         Scribe.locus( Debug.SERVICE );
 
         initInput();
@@ -454,15 +454,18 @@ public class SoftBoardService extends InputMethodService implements
     /**
      * This is the most important part:
      * Here we can control whether cursor/selection was changed without our knowledge.
+     * Implemented send... methods should set calculatedPosition.
+     * Stored text is verified only (string will be added) if new position matches calculatedPosition
+     * If text is selected, then all stored-text functions are disabled
      */
     @Override
     public void onUpdateSelection(int oldSelStart, int oldSelEnd,
                                   int newSelStart, int newSelEnd, int candidatesStart,
                                   int candidatesEnd)
         {
-        super.onUpdateSelection( oldSelStart, oldSelEnd, newSelStart, newSelEnd,
-                candidatesStart, candidatesEnd );
-        Scribe.locus( Debug.TEXT );
+        super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
+                candidatesStart, candidatesEnd);
+        Scribe.locus(Debug.TEXT);
 
         // undo is only enabled, if confirmPositionChange() validates it
         undoEnabled = false;
@@ -515,6 +518,49 @@ public class SoftBoardService extends InputMethodService implements
 
 
     /**
+     * Text (string) can be sent ONLY through this method
+     * String is sent to the editor (commitText)
+     * String is booked in stored-text
+     * (string will be added by onUpdateSelection after verifying position changes)
+     * CalculatedPosition is calculated
+     * UndoEnabled is set to false,
+     * (it will be enabled after verifying position changes)
+     * @param inputConnection input connection - CANNOT BE NULL!
+     * @param string string to send - CANNOT BE NULL!
+     */
+    private void sendPreText( InputConnection inputConnection, String string )
+        {
+        Scribe.debug(Debug.TEXT, "String to send: [" + string + "], length: " + string.length());
+
+        inputConnection.commitText(string, 1);
+        storedText.preTextType(string);
+        calculatedPosition += string.length();
+        undoEnabled = false;
+        }
+
+
+    /**
+     * Text can be deleted before cursor ONLY through this method
+     * Delete is sent to the editor
+     * Delete is booked in stored-text
+     * (stored text will be deleted by onUpdateSelection after verifying position changes)
+     * CalculatedPosition is calculated
+     * UndoEnabled is set to false - no undo is possible after delete
+     * @param inputConnection input connection - CANNOT BE NULL!
+     * @param length number of java characters to delete before cursor
+     */
+    private void deletePreText( InputConnection inputConnection, int length )
+        {
+        Scribe.debug(Debug.TEXT, "Chars to delete before cursor: " + length );
+
+        inputConnection.deleteSurroundingText( length, 0 );
+        storedText.preTextDelete( length );
+        calculatedPosition -= length;
+        undoEnabled = false;
+        }
+
+
+    /**
      * Simulates key-event
      * @param downTime time, when key was pressed
      * @param eventTime time, when key was released
@@ -528,7 +574,7 @@ public class SoftBoardService extends InputMethodService implements
         InputConnection ic = getCurrentInputConnection();
         if (ic == null)
             {
-            Scribe.error( "Cannot get input connection!" );
+            Scribe.error("Cannot get input connection!");
             return false;
             }
 
@@ -556,7 +602,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public boolean sendKeyDown( long downTime, int keyEventCode )
         {
-        Scribe.debug( Debug.SERVICE,  keyEventCode + " hard button is down!" );
+        Scribe.debug(Debug.SERVICE, keyEventCode + " hard button is down!");
 
         return sendKeyEvent(downTime, downTime, KeyEvent.ACTION_DOWN, keyEventCode);
         }
@@ -571,7 +617,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public boolean sendKeyUp( long downTime, long eventTime, int keyEventCode )
         {
-        Scribe.debug( Debug.SERVICE,  keyEventCode + " hard button is up!" );
+        Scribe.debug(Debug.SERVICE, keyEventCode + " hard button is up!");
 
         return sendKeyEvent( downTime, eventTime, KeyEvent.ACTION_UP, keyEventCode );
         }
@@ -590,22 +636,6 @@ public class SoftBoardService extends InputMethodService implements
         if (sendKeyDown( downTime, keyEventCode ))
             sendKeyUp( downTime, SystemClock.uptimeMillis(), keyEventCode );
         // ACTION_UP will be sent only, if ACTION_DOWN was successfully sent
-        }
-
-
-    /**
-     * String can be sent only through this method
-     * @param inputConnection input connection - CANNOT BE NULL!
-     * @param string string to send - CANNOT BE NULL!
-     */
-    private void sendPreText( InputConnection inputConnection, String string )
-        {
-        Scribe.debug( Debug.TEXT, "String to send: [" + string + "], length: " + string.length() );
-
-        inputConnection.commitText( string, 1 );
-        storedText.preTextType( string );
-        calculatedPosition += string.length();
-        undoEnabled = false;
         }
 
 
@@ -643,7 +673,7 @@ public class SoftBoardService extends InputMethodService implements
 
             String sendString = sendBuilder.toString();
 
-            sendPreText( ic, sendString );
+            sendPreText(ic, sendString);
             }
         }
 
@@ -671,7 +701,7 @@ public class SoftBoardService extends InputMethodService implements
         storedText.preTextReaderReset();
         for ( space = 0; storedText.preTextRead() == ' '; space++ ) ;
 
-        deleteTextBeforeCursor( space );
+        deleteTextBeforeCursor(space);
 
         Scribe.debug( Debug.SERVICE, "Spaces deleted before cursor: " + space);
         return space;
@@ -684,7 +714,7 @@ public class SoftBoardService extends InputMethodService implements
         storedText.postTextReaderReset();
         for ( space = 0; storedText.postTextRead() == ' '; space++ ) ;
 
-        deleteTextAfterCursor( space );
+        deleteTextAfterCursor(space);
 
         Scribe.debug( Debug.SERVICE,  "Spaces deleted after cursor: " + space );
         return space;
@@ -695,10 +725,7 @@ public class SoftBoardService extends InputMethodService implements
         InputConnection ic = getCurrentInputConnection();
         if (ic != null)
             {
-            storedText.preTextDelete( n );
-            ic.deleteSurroundingText( n, 0 );
-
-            calculatedPosition -= n;
+            deletePreText( ic, n );
             }
         }
 
@@ -707,21 +734,49 @@ public class SoftBoardService extends InputMethodService implements
         InputConnection ic = getCurrentInputConnection();
         if (ic != null)
             {
-            storedText.postTextDelete( n );
-            ic.deleteSurroundingText( 0, n );
+            storedText.postTextDelete(n);
+            ic.deleteSurroundingText(0, n);
             }
         }
 
+
+    /**
+     * Gets text before cursor - needed only by StoredText
+     * Text can be retrieved only, if text is NOT selected
+     * @param n number of java chars to get
+     * @return text or null, if no text is available (or text is selected)
+     */
     public CharSequence getTextBeforeCursor( int n )
         {
-        InputConnection ic = getCurrentInputConnection();
-        return ic != null ? ic.getTextBeforeCursor( n, 0 ) : null;
+        if ( calculatedPosition >= 0 )
+            {
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                return ic.getTextBeforeCursor(n, 0);
+                }
+            }
+        return null;
         }
 
+
+    /**
+     * Gets text after cursor - needed only by StoredText
+     * Text can be retrieved only, if text is NOT selected
+     * @param n number of java chars to get
+     * @return text or null, if no text is available (or text is selected)
+     */
     public CharSequence getTextAfterCursor( int n )
         {
-        InputConnection ic = getCurrentInputConnection();
-        return ic != null ? ic.getTextAfterCursor( n, 0 ) : null;
+        if ( calculatedPosition >= 0 )
+            {
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                return ic.getTextAfterCursor(n, 0);
+                }
+            }
+        return null;
         }
 
     public boolean isWhiteSpace( int ch )

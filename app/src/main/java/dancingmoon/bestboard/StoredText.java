@@ -62,15 +62,6 @@ public class StoredText
     /** Character counter for PreTextReader */
     private int preCharCounter = -1;
 
-    /** Typed string is booked, but it should be confirmed with position change */
-    private String preTextString = null;
-
-    /** Time of typing - IF 0L, THEN NO STRING IS BOOKED (preTextString is null) */
-    private long preTextTime = 0L;
-
-    /** Time threshold */
-    private static final long TIME_THRESHOLD = 500L*1000000L;
-
     /** Stored string - text after the cursor. It can be empty, but cannot be null! */
     private String postText = "";
 
@@ -84,6 +75,29 @@ public class StoredText
     private int postCharCounter = -1;
 
 
+    private final static int NO_ACTION_BOOKED = 0;
+    private final static int PRE_TEXT_STRING_BOOKED = 1;
+    private final static int PRE_TEXT_DELETE_BOOKED = 2;
+    private final static int POST_TEXT_DELETE_BOOKED = 3;
+
+    private final static long MILLION = 1000000L;
+
+    /** Time to wait for cursor changes */
+    private static final long TIME_THRESHOLD = 300L * MILLION;
+
+    /** Type of the booked action */
+    private int bookedActionType = NO_ACTION_BOOKED;
+
+    /** Time of the booked action */
+    private long bookedActionTime = 0L;
+
+    /** Booked string if bookedActionType is PRE_TEXT_STRING_BOOKED */
+    private String bookedActionString = null;
+
+    /** Length of booked delete if bookedActionType is ...DELETE_BOOKED */
+    private int bookedActionDeleteLength = 0;
+
+
     /**
      * Constructor stores connection
      * @param connection connection to synchronize text with editor
@@ -91,6 +105,98 @@ public class StoredText
     public StoredText(Connection connection)
         {
         this.connection = connection;
+        }
+
+
+    /**
+     * Add previously booked string at the end of preText.
+     * If preText (without last element) exceeds LIMIT_LENGTH, last element will be deleted.
+     * @param positionChange
+     * @return true, if change was confirmed; false if change was abandoned, and it was an external cursor movement
+     */
+    public boolean confirmPositionChange( int positionChange )
+        {
+        long currentTime = System.nanoTime();
+        boolean undoEnabled = false;
+        
+        // Action is enabled if it happens within time threshold
+        if ( bookedActionTime + TIME_THRESHOLD > currentTime )
+            {
+            switch ( bookedActionType )
+                {
+                case PRE_TEXT_STRING_BOOKED:
+
+                    long debugNow = currentTime / MILLION;
+                    long debugDiff = (currentTime - bookedActionTime) / MILLION;
+
+                    Scribe.debug( Debug.TEXT,
+                            "PRETEXT: Booked string is added to pretext at " + debugNow +
+                            ", during " + debugDiff );
+
+                    preText.add( new PartialString(bookedActionString) );
+                    preTextLength += bookedActionString.length();
+
+                    // while length without the last element is bigger than limit,
+                    // then last element could be deleted
+                    while ( preTextLength - preText.get( 0 ).length > LENGTH_LIMIT )
+                        {
+                        preTextLength -= preText.get( 0 ).length;
+                        preText.remove( 0 );
+                        }
+
+                    undoEnabled = true;
+                    break;
+
+                case PRE_TEXT_DELETE_BOOKED:
+
+                    Scribe.debug( Debug.TEXT, "PRETEXT: Booked delete is performed. Length: " + bookedActionDeleteLength );
+
+                    // only delete can shrink stored text
+                    // if stored text is already shorter than limit, then it remains valid after delete
+                    // if cache is full but become shorter than limit after delete,
+                    // then there could be more characters in the valid text than in the cache.
+                    if ( preTextLength >= LENGTH_LIMIT && preTextLength - bookedActionDeleteLength < LENGTH_LIMIT )
+                        preTextReady = false;
+
+                    int counter = preText.size();
+
+                    while (counter > 0) // actually this cannot be false
+                        {
+                        counter--;
+
+                        if (preText.get(counter).length > bookedActionDeleteLength)
+                            {
+                            preText.get(counter).length -= bookedActionDeleteLength;
+                            preTextLength -= bookedActionDeleteLength;
+                            break;
+                            }
+
+                        bookedActionDeleteLength -= preText.get(counter).length;
+                        preTextLength -= preText.get(counter).length;
+                        preText.remove(counter);
+                        }
+
+                    break;
+
+                case POST_TEXT_DELETE_BOOKED:
+                    break;
+
+                case NO_ACTION_BOOKED:
+                default:
+                    Scribe.error( "STORED TEXT: confirmPositionChange is called without booked action!" );
+                }
+            }
+            
+        // Cursor moved after time threshold - action is abandoned, stored text is invalidated
+        else
+            {
+            Scribe.debug( Debug.TEXT, "PRETEXT: Stored texts are invalidated because of cursor was moved after time threshold." );
+            invalidate();
+            }
+
+        // action is finished or abandoned
+        bookedActionType = NO_ACTION_BOOKED;
+        return undoEnabled;
         }
 
 
@@ -115,11 +221,11 @@ public class StoredText
         preTextLength = 0;
         preTextReady = false;
 
-        preTextTime = 0L;
+        bookedActionType = NO_ACTION_BOOKED;
 
         preTextReaderReset();
 
-        Scribe.debug( Debug.TEXT, "PreText and preTextReader are invalidated!" );
+        Scribe.debug(Debug.TEXT, "PreText and preTextReader are invalidated!");
         }
 
 
@@ -130,50 +236,13 @@ public class StoredText
      */
     public void preTextType(String string)
         {
-        preTextTime = System.nanoTime();
-        preTextString = string;
+        bookedActionType = PRE_TEXT_STRING_BOOKED;
+        bookedActionTime = System.nanoTime();
+        bookedActionString = string;
 
-        Scribe.debug( Debug.TEXT, "PRETEXT: String is booked: [" + preTextString + "] at " + preTextTime );
-        }
-
-
-    /**
-     * Add previously booked string at the end of preText.
-     * If preText (without last element) exceeds LIMIT_LENGTH, last element will be deleted.
-     * @param positionChange
-     * @return true, if change was confirmed; false if change was abandoned, and it was an external cursor movement
-     */
-    public boolean confirmPositionChange( int positionChange )
-        {
-        long currentTime = System.nanoTime();
-
-        if ( preTextTime + TIME_THRESHOLD > currentTime )
-            {
-            preTextTime = 0L;
-
-            // String is written - if preTextTime is 0L, then string is invalid (may be null)
-            preText.add( new PartialString( preTextString ) );
-            preTextLength += preTextString.length();
-
-            // while length without the last element is bigger than limit,
-            // then last element could be deleted
-            while ( preTextLength - preText.get( 0 ).length > LENGTH_LIMIT )
-                {
-                preTextLength -= preText.get( 0 ).length;
-                preText.remove( 0 );
-                }
-
-            Scribe.debug( Debug.TEXT, "PRETEXT: Booked string is added to pretext at " + currentTime );
-            return true;
-            }
-
-        else
-            {
-            // Cursor moved after time
-            invalidate();
-            Scribe.debug( Debug.TEXT, "PRETEXT: Stored texts are invalidated because of cursor was moved after time threshold." );
-            return false;
-            }
+        long debugNow = bookedActionTime / MILLION;
+        Scribe.debug( Debug.TEXT, "PRETEXT: String is booked: [" + bookedActionString +
+                "] at " + debugNow );
         }
 
 
@@ -283,39 +352,17 @@ public class StoredText
     /**
      * Delete length characters from the end of the stored text.
      * (If length is longer then the stored text's length,
-     * then the wzole text will be deleted.)
+     * then the whole text will be deleted.)
      * @param length number of characters to delete from the end
      */
     public void preTextDelete(int length)
         {
-        // only delete can shrink stored text
-        // if stored text is already shorter than limit, then it remains valid after delete
-        // if cache is full but become shorter than limit after delete,
-        // then there could be more characters in the valid text than in the cache.
-        if ( preTextLength >= LENGTH_LIMIT && preTextLength - length < LENGTH_LIMIT )
-            preTextReady = false;
+        bookedActionType = PRE_TEXT_DELETE_BOOKED;
+        bookedActionTime = System.nanoTime();
+        bookedActionDeleteLength = length;
 
-        int counter = preText.size();
-
-        while (counter > 0) // actually this cannot be false
-            {
-            counter--;
-
-            if (preText.get(counter).length > length)
-                {
-                preText.get(counter).length -= length;
-                preTextLength -= length;
-                break;
-                }
-
-            length -= preText.get(counter).length;
-            preTextLength -= preText.get(counter).length;
-            preText.remove(counter);
-            }
-
-        Scribe.debug( Debug.TEXT, "preText deleted: " + toString());
+        Scribe.debug(Debug.TEXT, "PRETEXT: PreText delete is booked. Length: " +length );
         }
-
 
 
     /**
