@@ -166,7 +166,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public View noKeyboardView()
         {
-        Scribe.locus(Debug.SERVICE);
+        Scribe.locus( Debug.SERVICE );
 
         View noKeyboardView = getLayoutInflater().inflate(R.layout.service_nokeyboard, null);
         noKeyboardView.setOnClickListener(new View.OnClickListener()
@@ -211,7 +211,7 @@ public class SoftBoardService extends InputMethodService implements
         super.onCreate();
 
         // Connect to preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener( this );
 
         // Start the first parsing
         startSoftBoardParser();
@@ -224,13 +224,13 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onDestroy()
         {
-        Scribe.locus(Debug.SERVICE);
-        Scribe.title("SOFT-BOARD-SERVICE HAS FINISHED");
+        Scribe.locus( Debug.SERVICE );
+        Scribe.title( "SOFT-BOARD-SERVICE HAS FINISHED" );
 
         super.onDestroy();
 
         // Release preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener( this );
 
         // Stop any ongoing parsing
         if ( softBoardParser != null)   softBoardParser.cancel(false);
@@ -243,7 +243,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public void startSoftBoardParser()
         {
-        Scribe.note(Debug.SERVICE, "Parsing has started.");
+        Scribe.note( Debug.SERVICE, "Parsing has started." );
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -276,7 +276,7 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public View onCreateInputView()
         {
-        Scribe.locus(Debug.SERVICE);
+        Scribe.locus( Debug.SERVICE );
 
         if (softBoardData == null)
             {
@@ -395,7 +395,7 @@ public class SoftBoardService extends InputMethodService implements
         softBoardData.linkState.setOrientation();
 
         boardView = new BoardView( this );        
-        boardView.setBoard(softBoardData.linkState.getActiveBoard());
+        boardView.setBoard( softBoardData.linkState.getActiveBoard() );
         
         setInputView( boardView );
 
@@ -463,8 +463,8 @@ public class SoftBoardService extends InputMethodService implements
                                   int newSelStart, int newSelEnd, int candidatesStart,
                                   int candidatesEnd)
         {
-        super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
-                candidatesStart, candidatesEnd);
+        super.onUpdateSelection( oldSelStart, oldSelEnd, newSelStart, newSelEnd,
+                candidatesStart, candidatesEnd );
         Scribe.locus(Debug.TEXT);
 
         // undo is only enabled, if confirmPositionChange() validates it
@@ -530,10 +530,10 @@ public class SoftBoardService extends InputMethodService implements
      */
     private void sendPreText( InputConnection inputConnection, String string )
         {
-        Scribe.debug(Debug.TEXT, "String to send: [" + string + "], length: " + string.length());
+        Scribe.debug( Debug.TEXT, "String to send: [" + string + "], length: " + string.length() );
 
-        inputConnection.commitText(string, 1);
-        storedText.preTextType(string);
+        inputConnection.commitText( string, 1 );
+        storedText.bookPreTextString( string );
         calculatedPosition += string.length();
         undoEnabled = false;
         }
@@ -554,7 +554,7 @@ public class SoftBoardService extends InputMethodService implements
         Scribe.debug(Debug.TEXT, "Chars to delete before cursor: " + length );
 
         inputConnection.deleteSurroundingText( length, 0 );
-        storedText.preTextDelete( length );
+        storedText.bookPreTextDelete( length );
         calculatedPosition -= length;
         undoEnabled = false;
         }
@@ -578,7 +578,7 @@ public class SoftBoardService extends InputMethodService implements
             return false;
             }
 
-        return ic.sendKeyEvent(new KeyEvent(
+        return ic.sendKeyEvent( new KeyEvent(
                 downTime,               // this key originally went down
                 eventTime,              // this event happened (downTime in ACTION_DOWN)
                 keyEventAction,         // ACTION_DOWN or ACTION_UP
@@ -590,7 +590,7 @@ public class SoftBoardService extends InputMethodService implements
                 // device id FIX
                 keyEventCode,           // android keyCode as scan-code
                 KeyEvent.FLAG_SOFT_KEYBOARD | KeyEvent.FLAG_KEEP_TOUCH_MODE,
-                InputDevice.SOURCE_TOUCHSCREEN));
+                InputDevice.SOURCE_TOUCHSCREEN ) );
         }
 
 
@@ -642,6 +642,8 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void sendString( String string, int autoSpace )
         {
+        Scribe.locus( Debug.SERVICE );
+
         InputConnection ic = getCurrentInputConnection();
         if (ic != null)
             {
@@ -680,13 +682,15 @@ public class SoftBoardService extends InputMethodService implements
 
     public void changeStringBeforeCursor( String string )
         {
+        Scribe.locus( Debug.SERVICE );
+
         InputConnection ic = getCurrentInputConnection();
         if (ic != null)
             {
             ic.beginBatchEdit();
             ic.deleteSurroundingText( string.length(), 0 );
-            storedText.preTextDelete( string.length() );
-            storedText.preTextType( string );
+            storedText.bookPreTextDelete( string.length() );
+            storedText.bookPreTextString( string );
             ic.commitText( string, 1 );
             ic.endBatchEdit();
             }
@@ -722,6 +726,8 @@ public class SoftBoardService extends InputMethodService implements
 
     public void deleteTextBeforeCursor( int n )
         {
+        Scribe.locus( Debug.SERVICE );
+
         InputConnection ic = getCurrentInputConnection();
         if (ic != null)
             {

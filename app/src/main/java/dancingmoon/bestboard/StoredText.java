@@ -109,6 +109,16 @@ public class StoredText
 
 
     /**
+     * Invalidate whole stored text
+     */
+    public void invalidate()
+        {
+        preTextInvalidate();
+        postTextInvalidate();
+        }
+
+
+    /**
      * Add previously booked string at the end of preText.
      * If preText (without last element) exceeds LIMIT_LENGTH, last element will be deleted.
      * @param positionChange
@@ -126,12 +136,8 @@ public class StoredText
                 {
                 case PRE_TEXT_STRING_BOOKED:
 
-                    long debugNow = currentTime / MILLION;
-                    long debugDiff = (currentTime - bookedActionTime) / MILLION;
-
                     Scribe.debug( Debug.TEXT,
-                            "PRETEXT: Booked string is added to pretext at " + debugNow +
-                            ", during " + debugDiff );
+                            "PRETEXT: Booked string to add: " + bookedActionString );
 
                     preText.add( new PartialString(bookedActionString) );
                     preTextLength += bookedActionString.length();
@@ -145,37 +151,19 @@ public class StoredText
                         }
 
                     undoEnabled = true;
+                    Scribe.debug( Debug.TEXT, "PRETEXT: Stored text after string added: " + toString() );
+
+                    Scribe.debug( Debug.TEXT,
+                            "PRETEXT: Booked string is added at " + currentTime / MILLION +
+                                    ", during " + (currentTime - bookedActionTime) / MILLION );
                     break;
 
                 case PRE_TEXT_DELETE_BOOKED:
 
-                    Scribe.debug( Debug.TEXT, "PRETEXT: Booked delete is performed. Length: " + bookedActionDeleteLength );
-
-                    // only delete can shrink stored text
-                    // if stored text is already shorter than limit, then it remains valid after delete
-                    // if cache is full but become shorter than limit after delete,
-                    // then there could be more characters in the valid text than in the cache.
-                    if ( preTextLength >= LENGTH_LIMIT && preTextLength - bookedActionDeleteLength < LENGTH_LIMIT )
-                        preTextReady = false;
-
-                    int counter = preText.size();
-
-                    while (counter > 0) // actually this cannot be false
-                        {
-                        counter--;
-
-                        if (preText.get(counter).length > bookedActionDeleteLength)
-                            {
-                            preText.get(counter).length -= bookedActionDeleteLength;
-                            preTextLength -= bookedActionDeleteLength;
-                            break;
-                            }
-
-                        bookedActionDeleteLength -= preText.get(counter).length;
-                        preTextLength -= preText.get(counter).length;
-                        preText.remove(counter);
-                        }
-
+                    preTextDelete( bookedActionDeleteLength );
+                    Scribe.debug( Debug.TEXT,
+                            "PRETEXT: Booked delete is performed at " + currentTime / MILLION +
+                                    ", during " + ( currentTime - bookedActionTime ) / MILLION );
                     break;
 
                 case POST_TEXT_DELETE_BOOKED:
@@ -201,12 +189,67 @@ public class StoredText
 
 
     /**
-     * Invalidate whole stored text
+     * Booked string to be added to preText
+     * positionChange should confirm it
+     * @param string Typed string CANNOT BE NULL!
      */
-    public void invalidate()
+    public void bookPreTextString( String string )
         {
-        preTextInvalidate();
-        postTextInvalidate();
+        bookedActionType = PRE_TEXT_STRING_BOOKED;
+        bookedActionTime = System.nanoTime();
+        bookedActionString = string;
+
+        Scribe.debug( Debug.TEXT, "PRETEXT: String is booked: [" + bookedActionString +
+                "] at " + bookedActionTime / MILLION );
+        }
+
+
+    /**
+     * Delete length characters from the end of the stored text.
+     * (If length is longer then the stored text's length,
+     * then the whole text will be deleted.)
+     * @param length number of characters to delete from the end
+     */
+    public void bookPreTextDelete( int length )
+        {
+        bookedActionType = PRE_TEXT_DELETE_BOOKED;
+        bookedActionTime = System.nanoTime();
+        bookedActionDeleteLength = length;
+
+        Scribe.debug( Debug.TEXT, "PRETEXT: PreText delete is booked. Length: " + length );
+        }
+
+
+    public void preTextDelete( int length )
+        {
+        Scribe.debug( Debug.TEXT, "PRETEXT: Delete is performed. Length: " + length );
+
+        // only delete can shrink stored text
+        // if stored text is already shorter than limit, then it remains valid after delete
+        // if cache is full but become shorter than limit after delete,
+        // then there could be more characters in the valid text than in the cache.
+        if ( preTextLength >= LENGTH_LIMIT && preTextLength - length < LENGTH_LIMIT )
+            preTextReady = false;
+
+        int counter = preText.size();
+
+        while (counter > 0) // actually this cannot be false
+            {
+            counter--;
+
+            if (preText.get(counter).length > length)
+                {
+                preText.get(counter).length -= length;
+                preTextLength -= length;
+                break;
+                }
+
+            length -= preText.get(counter).length;
+            preTextLength -= preText.get(counter).length;
+            preText.remove(counter);
+            }
+
+        Scribe.debug( Debug.TEXT, "PRETEXT: Stored text after delete: " + toString() );
         }
 
 
@@ -225,24 +268,7 @@ public class StoredText
 
         preTextReaderReset();
 
-        Scribe.debug(Debug.TEXT, "PreText and preTextReader are invalidated!");
-        }
-
-
-    /**
-     * Booked string to be added to preText
-     * positionChange should confirm it
-     * @param string Typed string CANNOT BE NULL!
-     */
-    public void preTextType(String string)
-        {
-        bookedActionType = PRE_TEXT_STRING_BOOKED;
-        bookedActionTime = System.nanoTime();
-        bookedActionString = string;
-
-        long debugNow = bookedActionTime / MILLION;
-        Scribe.debug( Debug.TEXT, "PRETEXT: String is booked: [" + bookedActionString +
-                "] at " + debugNow );
+        Scribe.debug( Debug.TEXT, "PreText and preTextReader are invalidated!" );
         }
 
 
@@ -278,7 +304,7 @@ public class StoredText
      * Before using this reader preTextReaderReset() should be called.
      * After that each character will be read by preTextRead(), starting with the last character.
      * If there are no more characters available, -1 is returned.
-     * preTextType() and preTextSynchronize() will not change the position,
+     * bookPreTextString() and preTextSynchronize() will not change the position,
      * but puffer could become empty.
      * preTextReader gives indeterminate results after preTextDelete().
      */
@@ -346,22 +372,6 @@ public class StoredText
             }
 
         return preText.get( preItemCounter ).string.charAt( preCharCounter );
-        }
-
-
-    /**
-     * Delete length characters from the end of the stored text.
-     * (If length is longer then the stored text's length,
-     * then the whole text will be deleted.)
-     * @param length number of characters to delete from the end
-     */
-    public void preTextDelete(int length)
-        {
-        bookedActionType = PRE_TEXT_DELETE_BOOKED;
-        bookedActionTime = System.nanoTime();
-        bookedActionDeleteLength = length;
-
-        Scribe.debug(Debug.TEXT, "PRETEXT: PreText delete is booked. Length: " +length );
         }
 
 
