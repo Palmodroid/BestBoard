@@ -419,6 +419,7 @@ public class SoftBoardData
 
         int deleteSpacesBeforeCursor();
         void changeStringBeforeCursor( String string );
+        void changeStringBeforeCursor( int length, String string );
 
         boolean sendDefaultEditorAction(boolean fromEnterKey);
 

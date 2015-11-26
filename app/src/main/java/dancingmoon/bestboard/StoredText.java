@@ -78,7 +78,7 @@ public class StoredText
     private final static int NO_ACTION_BOOKED = 0;
     private final static int PRE_TEXT_STRING_BOOKED = 1;
     private final static int PRE_TEXT_DELETE_BOOKED = 2;
-    private final static int POST_TEXT_DELETE_BOOKED = 3;
+    private final static int PRE_TEXT_DELETE_THAN_STRING_BOOKED = 3;
 
     private final static long MILLION = 1000000L;
 
@@ -136,43 +136,29 @@ public class StoredText
                 {
                 case PRE_TEXT_STRING_BOOKED:
 
-                    Scribe.debug( Debug.TEXT,
-                            "PRETEXT: Booked string to add: " + bookedActionString );
-
-                    preText.add( new PartialString(bookedActionString) );
-                    preTextLength += bookedActionString.length();
-
-                    // while length without the last element is bigger than limit,
-                    // then last element could be deleted
-                    while ( preTextLength - preText.get( 0 ).length > LENGTH_LIMIT )
-                        {
-                        preTextLength -= preText.get( 0 ).length;
-                        preText.remove( 0 );
-                        }
-
+                    preTextString( bookedActionString );
                     undoEnabled = true;
-                    Scribe.debug( Debug.TEXT, "PRETEXT: Stored text after string added: " + toString() );
-
-                    Scribe.debug( Debug.TEXT,
-                            "PRETEXT: Booked string is added at " + currentTime / MILLION +
-                                    ", during " + (currentTime - bookedActionTime) / MILLION );
                     break;
 
                 case PRE_TEXT_DELETE_BOOKED:
 
-                    preTextDelete( bookedActionDeleteLength );
-                    Scribe.debug( Debug.TEXT,
-                            "PRETEXT: Booked delete is performed at " + currentTime / MILLION +
-                                    ", during " + ( currentTime - bookedActionTime ) / MILLION );
+                    preTextDelete(bookedActionDeleteLength);
                     break;
 
-                case POST_TEXT_DELETE_BOOKED:
+                case PRE_TEXT_DELETE_THAN_STRING_BOOKED:
+
+                    preTextDelete( bookedActionDeleteLength );
+                    preTextString( bookedActionString );
+                    undoEnabled = true;
                     break;
 
                 case NO_ACTION_BOOKED:
                 default:
                     Scribe.error( "STORED TEXT: confirmPositionChange is called without booked action!" );
                 }
+            Scribe.debug( Debug.TEXT,
+                    "PRETEXT: Booked action is performed at " + currentTime / MILLION +
+                            ", during " + (currentTime - bookedActionTime) / MILLION );
             }
             
         // Cursor moved after time threshold - action is abandoned, stored text is invalidated
@@ -199,8 +185,8 @@ public class StoredText
         bookedActionTime = System.nanoTime();
         bookedActionString = string;
 
-        Scribe.debug( Debug.TEXT, "PRETEXT: String is booked: [" + bookedActionString +
-                "] at " + bookedActionTime / MILLION );
+        Scribe.debug(Debug.TEXT, "PRETEXT: String [" + bookedActionString +
+                "] is booked at " + bookedActionTime / MILLION);
         }
 
 
@@ -216,13 +202,47 @@ public class StoredText
         bookedActionTime = System.nanoTime();
         bookedActionDeleteLength = length;
 
-        Scribe.debug( Debug.TEXT, "PRETEXT: PreText delete is booked. Length: " + length );
+        Scribe.debug( Debug.TEXT, "PRETEXT: Delete length: " + length +
+                " is booked at " + bookedActionTime / MILLION);
+        }
+
+
+    public void bookPreTextDeleteThanString( int length, String string )
+        {
+        bookedActionType = PRE_TEXT_DELETE_THAN_STRING_BOOKED;
+        bookedActionTime = System.nanoTime();
+
+        bookedActionDeleteLength = length;
+        bookedActionString = string;
+
+        Scribe.debug(Debug.TEXT, "PRETEXT: Delete length: " + length + " and String: " + string +
+                " are booked at " + bookedActionTime / MILLION);
+        }
+
+
+    public void preTextString( String string )
+        {
+        Scribe.debug( Debug.TEXT,
+                "PRETEXT: String to add: " + string );
+
+        preText.add( new PartialString(string) );
+        preTextLength += string.length();
+
+        // while length without the last element is bigger than limit,
+        // then last element could be deleted
+        while ( preTextLength - preText.get( 0 ).length > LENGTH_LIMIT )
+            {
+            preTextLength -= preText.get( 0 ).length;
+            preText.remove( 0 );
+            }
+
+        Scribe.debug( Debug.TEXT, "PRETEXT: Stored text after string added: " + toString() );
         }
 
 
     public void preTextDelete( int length )
         {
-        Scribe.debug( Debug.TEXT, "PRETEXT: Delete is performed. Length: " + length );
+        Scribe.debug( Debug.TEXT, "PRETEXT: Length to delete: " + length );
 
         // only delete can shrink stored text
         // if stored text is already shorter than limit, then it remains valid after delete
@@ -477,7 +497,6 @@ public class StoredText
 
         Scribe.debug( Debug.TEXT, "postText deleted: " + toString());
         }
-
 
 
     /**

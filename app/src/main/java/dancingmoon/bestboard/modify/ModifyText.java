@@ -127,8 +127,7 @@ public class ModifyText extends Modify
                         this.rollCounter = rollCounter;
                         this.stringCounter = stringCounter;
 
-                        softBoardListener.deleteTextBeforeCursor( inspected.length() );
-                        softBoardListener.sendString( rolls.get( rollCounter ).get( stringCounter ), 0 );
+                        softBoardListener.changeStringBeforeCursor(inspected.length(), rolls.get(rollCounter).get(stringCounter));
 
                         if ( spaces >0 )
                             {
@@ -188,8 +187,8 @@ public class ModifyText extends Modify
                     this.rollCounter = rollCounter;
                     this.stringCounter = stringCounter;
 
-                    softBoardListener.deleteTextBeforeCursor( inspected.length() );
-                    softBoardListener.sendString( rolls.get( rollCounter ).get( stringCounter ), 0 );
+                    softBoardListener.changeStringBeforeCursor( inspected.length(),
+                            rolls.get( rollCounter ).get( stringCounter ) );
 
                     if ( spaces >0 )
                         {
