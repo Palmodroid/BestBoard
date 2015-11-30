@@ -74,7 +74,7 @@ public class ModifyText extends Modify
     private boolean comparePreText( String string )
         {
         // preTextReader should start at the cursor
-        softBoardListener.getStoredText().preTextReaderReset();
+        softBoardListener.getTextBeforeCursor().reset();
 
         // String should start at the end
         // String cannot be null and cannot be shorter than 1
@@ -85,7 +85,7 @@ public class ModifyText extends Modify
             {
             counter--;
 
-            if ( string.charAt( counter ) != softBoardListener.getStoredText().preTextRead() )
+            if ( string.charAt( counter ) != softBoardListener.getTextBeforeCursor().read() )
                 return false;
             }
 

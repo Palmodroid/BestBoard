@@ -36,11 +36,18 @@ public class ButtonPacket extends ButtonMainTouch implements Cloneable
 
     @Override
     public void mainTouchEnd( boolean isTouchUp )
-        { }
+        {
+        packet.release();
+        }
 
     @Override
     public void mainTouchOnCircle( boolean isHardPress )
-        { }
+        {
+        if ( !repeat )
+        	{
+        	packet.sendSecondary();
+        	}
+        }
 
     @Override
     public boolean mainTouchOnStay()

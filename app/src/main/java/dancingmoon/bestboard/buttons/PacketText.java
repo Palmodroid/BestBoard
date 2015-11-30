@@ -1,8 +1,8 @@
 package dancingmoon.bestboard.buttons;
 
+import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.CapsState;
-import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.utils.HardKey;
 import dancingmoon.bestboard.utils.StringUtils;
 
@@ -34,6 +34,15 @@ public class PacketText extends Packet
      * AutoSpace function, flags stored on the first 4 bits
      */
     private int autoSpace = 0;
+
+    /**
+     * Temporary variable to store uppercase status durin one cycle
+     * It can be static, because only one needed at a time
+     * 0 - no caps
+     * 1 - first caps (only if stringcaps == false)
+     * 2 - all caps
+     */
+    private static int capsState = 0;
 
 
     // String cannot be null from coat.descriptor (only from direct definition)
@@ -82,6 +91,28 @@ public class PacketText extends Packet
         return string;
         }
 
+    private void sendString()
+    	{
+        switch ( capsState )
+        	{
+            case 0:
+         		softBoardData.softBoardListener.sendString(
+            		string, autoSpace );
+                break;
+
+            case 1:
+                softBoardData.softBoardListener.sendString(
+                        StringUtils.toUpperFirst( string, softBoardData.locale ), autoSpace );
+                break;
+                
+            default: // case 2:
+                // http://stackoverflow.com/questions/4052840/most-efficient-way-to-make-the-first-character-of-a-string-lower-case
+                // http://stackoverflow.com/questions/26515060/why-java-character-touppercase-tolowercase-has-no-locale-parameter-like-string-t
+                softBoardData.softBoardListener.sendString(
+                        string.toUpperCase( softBoardData.locale ), autoSpace );
+            }
+		}
+    
     @Override
     public void send()
         {
@@ -99,25 +130,47 @@ public class PacketText extends Packet
             int state = softBoardData.boardStates.metaStates[BoardStates.META_CAPS].getState();
             if ( state == CapsState.META_OFF )
                 {
-                softBoardData.softBoardListener.sendString(
-                        string, autoSpace );
+                capsState = 0;
+
                 }
             else if ( state == CapsState.META_LOCK || stringCaps )
                 {
-                // http://stackoverflow.com/questions/4052840/most-efficient-way-to-make-the-first-character-of-a-string-lower-case
-                // http://stackoverflow.com/questions/26515060/why-java-character-touppercase-tolowercase-has-no-locale-parameter-like-string-t
-                softBoardData.softBoardListener.sendString(
-                        string.toUpperCase( softBoardData.locale ), autoSpace );
+                capsState = 1;
+
                 }
             else // state == IN_TOUCH || META_ON || AUTOCAPS_ON
                 {
-                softBoardData.softBoardListener.sendString(
-                        StringUtils.toUpperFirst( string, softBoardData.locale ), autoSpace );
-                }
+                capsState = 2;
 
-            // If needed, this could be a standalone method, called when touch releases the button
-            ( (CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS] ).setAutoCapsState( autoCaps );
+                }
+            sendString();
             }
+        }
+
+    @Override
+    public void sendSecondary()
+    	{
+        if ( softBoardData.softBoardListener.undoLastString() )
+        	{
+            capsState++;
+
+            if ( capsState == 1 && stringCaps )
+            	{
+            	capsState = 2;
+				}
+            else if ( capsState > 2 )
+            	{
+                capsState = 0;
+                }
+            sendString();
+            }
+        }
+    
+    @Override    
+    public void release()
+    	{
+        // If needed, this could be a standalone method, called when touch releases the button
+        ( (CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS] ).setAutoCapsState( autoCaps );
         }
     }
 

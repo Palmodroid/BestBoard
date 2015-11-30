@@ -70,7 +70,7 @@ public class BoardView extends View
      * First set is NOT checked!
      * It can be changed later
      * If size is changed, then requestLayout is called
-     * If size is the same, then only preTextInvalidate() is needed
+     * If size is the same, then only invalidate() is needed
      */
     public void setBoard(Board board)
         {
@@ -907,7 +907,7 @@ public class BoardView extends View
                 board.areaHeightInPixels,
                 probeBackground );
 
-        canvas.drawText( board.softBoardData.softBoardListener.getStoredText().toString(),
+        canvas.drawText( board.softBoardData.softBoardListener.getTextBeforeCursor().toString(),
                 board.halfHexagonWidthInPixels,
                 //(float)(board.boardHeightInPixels + board.halfHexagonHeightInPixels),
                 // board.boardHeightInPixels - probe.descent(),

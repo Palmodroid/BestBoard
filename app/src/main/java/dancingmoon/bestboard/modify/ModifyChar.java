@@ -70,8 +70,8 @@ public class ModifyChar extends Modify
             spaces = softBoardListener.deleteSpacesBeforeCursor();
             }
 
-        softBoardListener.getStoredText().preTextReaderReset();
-        int last = softBoardListener.getStoredText().preTextRead();
+        softBoardListener.getTextBeforeCursor().reset();
+        int last = softBoardListener.getTextBeforeCursor().read();
 
         int rollCounter = this.rollCounter;
         do	{
@@ -133,8 +133,8 @@ public class ModifyChar extends Modify
             spaces = softBoardListener.deleteSpacesBeforeCursor();
             }
 
-        softBoardListener.getStoredText().preTextReaderReset();
-        int last = softBoardListener.getStoredText().preTextRead();
+        softBoardListener.getTextBeforeCursor().reset();
+        int last = softBoardListener.getTextBeforeCursor().read();
 
         int stringCounter = this.rollCounter;
         do  {

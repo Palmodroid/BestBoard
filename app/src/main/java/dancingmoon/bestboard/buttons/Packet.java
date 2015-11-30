@@ -26,4 +26,22 @@ public abstract class Packet
      * Send data to the editor field
      */
     public abstract void send();
+    
+    /**
+     * Send secondary data - if undo is possible
+     * !! This method is not obligatory
+     */
+    public void sendSecondary()
+    	{ 
+        }
+
+        
+    /**
+     * Finish duties, when button is left
+     * !! This method is not obligatory
+     */
+    public void release()
+    	{
+        }
+    
     }

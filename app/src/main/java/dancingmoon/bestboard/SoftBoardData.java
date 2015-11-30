@@ -34,6 +34,7 @@ import dancingmoon.bestboard.modify.Modify;
 import dancingmoon.bestboard.modify.ModifyChar;
 import dancingmoon.bestboard.modify.ModifyText;
 import dancingmoon.bestboard.scribe.Scribe;
+import dancingmoon.bestboard.server.TextBeforeCursor;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.states.LinkState;
@@ -410,9 +411,11 @@ public class SoftBoardData
         void sendKeyDownUp( int keyEventCode );
         void sendString( String string, int autoSpace );
         // UseState needs this to change board
+        public boolean undoLastString();
+
         BoardView getBoardView();
 
-        StoredText getStoredText();
+        TextBeforeCursor getTextBeforeCursor();
 
         void deleteTextBeforeCursor( int n );
         void deleteTextAfterCursor( int n );
@@ -445,6 +448,10 @@ public class SoftBoardData
         this.softBoardListener = softBoardListener;
         this.tokenizer = tokenizer;
 
+        // static variables should be deleted!!
+        TitleDescriptor.setTypeface( null );
+
+        
         boardStates = new BoardStates( softBoardListener );
 
         linkState = new LinkState( softBoardListener );
