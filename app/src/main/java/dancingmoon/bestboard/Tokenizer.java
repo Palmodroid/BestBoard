@@ -311,6 +311,9 @@ public class Tokenizer
 	/** String (double) quote mark character */
 	public static final int MARK_CHARACTER = '\'';
 
+    /** Unicode mark (dollar) character */
+    public static final int MARK_UNICODE = '$';
+
 	/** Minus sign character */
 	public static final int MARK_MINUS = '-';
 
@@ -672,7 +675,7 @@ public class Tokenizer
             }
         sb.append( " (line: " ).append( getLineNumber()).append(") ");
 
-        Scribe.error_secondary(sb.toString());
+        Scribe.error_secondary( sb.toString() );
         }
 
     /**
@@ -793,6 +796,73 @@ public class Tokenizer
 
 		return value;
 		}
+
+
+	/**
+	 * Converts unicode (numeric-sequences) into two-characters strings.
+	 * Sequences are read from reader stream, after the unicode-mark sign ('$').
+	 * First non-hexadecimal character terminates the sequence.
+     * Sequence will be terminated after 6 characters
+	 * @return converted two-characters long string
+	 * @throws java.io.IOException if reading fails.
+	 */
+	private String convertUnicodeSequence() throws IOException
+		{
+		int ch;
+
+		long value = 0;
+        int len = 0;
+
+        while ( len < 6 )
+            {
+            ch = read();
+
+            if ( !isValidHexadecimalDigit( ch ) )
+                {
+                pushBackLastRead();
+                break;
+                }
+
+			value*=0x10;
+			value+= valueOf(ch);
+			len++;
+			}
+
+        if ( value < 0x10000 )
+            {
+            // Scribe.debug( "Unicode: " + Long.toHexString( value ));
+            return String.valueOf( (char) value );
+            }
+
+        if ( value > 0x10FFFF )
+            {
+            // Scribe.debug( "Unicode: value do not exist! " + Long.toHexString( value ) );
+            return "";
+            }
+
+        value -= 0x10000;
+        char[] units = new char[2];
+        units[0] = (char)(0xD800 | ( value >> 10 ));
+        units[1] = (char)(0xDC00 | ( value & 0x3FF ));
+
+        // Scribe.debug( "Unicode: " + Integer.toHexString(units[0]) + " - " + Integer.toHexString(units[1]) );
+
+        return String.valueOf( units );
+
+        /*
+        // http://unicodebook.readthedocs.org/en/latest/unicode_encodings.html
+        void
+        encode_utf16_pair(uint32_t character, uint16_t *units)
+            {
+            unsigned int code;
+            assert(0x10000 <= character && character <= 0x10FFF);
+            code = (character - 0x10000);
+            units[0] = 0xD800 | (code >> 10);
+            units[1] = 0xDC00 | (code & 0x3FF);
+            }
+        */
+		}
+
 
 	/** nextToken() will not read a new token, but will give back the last one if true */
 	private boolean rewindLastToken = false;
@@ -1236,6 +1306,13 @@ public class Tokenizer
 						pushBackLastRead();
 						return tokenType;
 						}
+                    else if ( ch == MARK_UNICODE )
+                        {
+                        String unicode = convertUnicodeSequence();
+                        tokenStringBuilder.append( unicode );
+                        tokenLength += unicode.length();
+                        break;
+                        }
 					else if ( ch == '\\' )
 						{
 						ch = convertEscapeSequence();

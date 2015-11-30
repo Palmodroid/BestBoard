@@ -5,7 +5,7 @@
 	
 	<string name="error_escape_unknown">"Unknown escape sequence. Character is used as normal."</string>
 	<string name="error_escape_malformed">"Malformed escape sequence."</string>
-	
+
 	<string name="error_character_invalid">"Invalid character in token. Token is skipped.</string>
 	
 	<string name="error_integer_exceeds">"Integer exceeds the maximal number of digits. Numeric result is unpredictable!"</string>
