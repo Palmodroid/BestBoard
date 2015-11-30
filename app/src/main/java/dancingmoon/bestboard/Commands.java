@@ -106,6 +106,7 @@ public class Commands
     public static final long TOKEN_BUTTON = 0x30e81c12L;
 
     public static final long TOKEN_SEND = 0x15f26aL;
+    public static final long TOKEN_SECOND = 0x7555168eL;
 
     public static final long TOKEN_TEXT = 0x16b9c9L;
     public static final long TOKEN_KEY = 0x6d1cL;
@@ -415,6 +416,7 @@ public class Commands
 
                 TOKEN_OVERWRITE,
 
+                TOKEN_SECOND,
                 TOKEN_SEND },
                 // SEND remains only because label's purposes,
                 // parameters could be given directly to BUTTON
@@ -447,6 +449,19 @@ public class Commands
 
                 TOKEN_ENTER },
                 "createButtonFunction"));
+
+        result.put(TOKEN_SECOND, new Data(new long[]{
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACES,
+                TOKEN_AUTOSPACE,
+
+                TOKEN_KEY,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+
+                TOKEN_DO },
+                "packet"));
 
         result.put(TOKEN_TEXT, new Data(new long[]{PARAMETER_TEXT}, null ));
         result.put(TOKEN_KEY, new Data(new long[]{PARAMETER_INT}, null ));

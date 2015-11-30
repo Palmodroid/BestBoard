@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.Set;
 
 import dancingmoon.bestboard.buttons.Button;
+import dancingmoon.bestboard.buttons.ButtonDouble;
 import dancingmoon.bestboard.buttons.ButtonEnter;
 import dancingmoon.bestboard.buttons.ButtonLink;
 import dancingmoon.bestboard.buttons.ButtonMeta;
@@ -1019,9 +1020,19 @@ public class SoftBoardData
         Packet packet = packet( parameters );
         if (packet != null )
             {
+            Packet secondaryPacket = (Packet)parameters.get( Commands.TOKEN_SECOND );
+
+            if ( secondaryPacket != null )
+                {
+                buttonFunction = new ButtonDouble(packet, secondaryPacket);
+                Scribe.debug(Debug.DATA, "Double Packet is defined");
+                }
+            else
+                {
+                buttonFunction = new ButtonPacket(packet, parameters.containsKey(Commands.TOKEN_REPEAT));
+                Scribe.debug(Debug.DATA, "Simple Packet is defined");
+                }
             counter++;
-            buttonFunction = new ButtonPacket( packet, parameters.containsKey( Commands.TOKEN_REPEAT) );
-            Scribe.debug( Debug.DATA, "Simple Packet is defined");
             }
 
         temp = parameters.get( Commands.TOKEN_LINK );

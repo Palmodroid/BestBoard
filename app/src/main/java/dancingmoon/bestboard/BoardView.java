@@ -900,20 +900,23 @@ public class BoardView extends View
                 }
             }
 
-        canvas.drawRect(
-                0f,
-                board.areaHeightInPixels - board.halfHexagonHeightInPixels,
-                board.validatedWidthInPixels,
-                board.areaHeightInPixels,
-                probeBackground );
+        if ( board.softBoardData.monitorRow )
+            {
+            canvas.drawRect(
+                    0f,
+                    board.areaHeightInPixels - board.halfHexagonHeightInPixels,
+                    board.validatedWidthInPixels,
+                    board.areaHeightInPixels,
+                    probeBackground);
 
-        canvas.drawText( board.softBoardData.softBoardListener.getTextBeforeCursor().toString(),
-                board.halfHexagonWidthInPixels,
-                //(float)(board.boardHeightInPixels + board.halfHexagonHeightInPixels),
-                // board.boardHeightInPixels - probe.descent(),
-                // board.boardHeightInPixels - probe.ascent(),
-                board.areaHeightInPixels - probe.descent(),
-                probe );
+            canvas.drawText(board.softBoardData.softBoardListener.getTextBeforeCursor().toString(),
+                    board.halfHexagonWidthInPixels,
+                    //(float)(board.boardHeightInPixels + board.halfHexagonHeightInPixels),
+                    // board.boardHeightInPixels - probe.descent(),
+                    // board.boardHeightInPixels - probe.ascent(),
+                    board.areaHeightInPixels - probe.descent(),
+                    probe);
+            }
         }
 
     Paint probe = new Paint();
