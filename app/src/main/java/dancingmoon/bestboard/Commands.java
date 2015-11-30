@@ -114,8 +114,9 @@ public class Commands
     public static final long TOKEN_DELETE = 0x375c443dL;
     public static final long TOKEN_BACKSPACE = 0x240879d19872L;
 
-    // JUST A DRAFT !! DO NOT USE IT !!
     public static final long TOKEN_DRAFT = 0x188da4eL;
+
+    public static final long TOKEN_SETTINGS = 0x273bad4bccdL;
 
     public static final long TOKEN_META = 0x115017L;
 

@@ -772,6 +772,16 @@ public class PrefsFragment extends PreferenceFragment
                     {
                     // getActivity() cannot be null, when button is displayed
                     Ignition.copyAssets( getActivity() );
+
+                    EditTextPreference descriptorDirectoryPreference =
+                            (EditTextPreference)findPreference( getString(R.string.descriptor_directory_key) );
+                    descriptorDirectoryPreference.setText( getString( R.string.descriptor_directory_default ) );
+
+                    EditTextPreference descriptorFilePreference =
+                            (EditTextPreference)findPreference( getString(R.string.descriptor_file_key) );
+                    descriptorFilePreference.setText( getString( R.string.descriptor_file_default ) );
+
+                    Scribe.debug( Debug.PREF, "Directory and descriptor file are reset to their default values. ");
                     return true;
                     }
                 });
