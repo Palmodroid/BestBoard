@@ -23,6 +23,8 @@ public class Debug
     public static final String LOG_TAG_TOKEN = "TOKEN";
 
     // Settings of debug levels - only EVEN numbers!
+    private static final int LIMIT = 600;
+
     public static final int PREF = 10;
     public static final int BOARD = 20;
     public static final int TOUCH = 24;
@@ -36,6 +38,8 @@ public class Debug
     public static final int PARSER = 70;
     public static final int SERVICE = 580;
     public static final int TEXT = 590;
+    public static final int CURSOR = 690;
+
 
     public static final int BOARDSTATE = 100;
     public static final int CAPSSTATE = 100;
@@ -71,7 +75,7 @@ public class Debug
                 .enable( enabled )
                 .setDirectoryName( directoryName )      // Primary directory name
                 .enableSysLog( LOG_TAG )                // Primary log-tag : BEST
-                .setLimit( 500 )
+                .setLimit( LIMIT )
                 .init( context );                       // Primary file name : package name
 
 		// !! Service will be started only once, so this should go into a more frequent position

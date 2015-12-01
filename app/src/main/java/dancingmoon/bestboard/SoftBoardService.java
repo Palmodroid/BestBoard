@@ -184,18 +184,18 @@ public class SoftBoardService extends InputMethodService implements
      */
     public View noKeyboardView()
         {
-        Scribe.locus(Debug.SERVICE);
+        Scribe.locus( Debug.SERVICE );
 
         View noKeyboardView = getLayoutInflater().inflate(R.layout.service_nokeyboard, null);
-        noKeyboardView.setOnClickListener(new View.OnClickListener()
+        noKeyboardView.setOnClickListener( new View.OnClickListener()
         {
         @Override
-        public void onClick(View view)
+        public void onClick( View view )
             {
-            InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+            InputMethodManager imm = (InputMethodManager) getSystemService( Context.INPUT_METHOD_SERVICE );
             imm.showInputMethodPicker();
             }
-        });
+        } );
 
         // Warning comes from the onCreate method
         if ( warning != null )
@@ -223,13 +223,13 @@ public class SoftBoardService extends InputMethodService implements
         // This should be called at every starting point
         Ignition.start(this);
 
-        Scribe.title("SOFT-BOARD-SERVICE HAS STARTED");
-        Scribe.locus(Debug.SERVICE);
+        Scribe.title( "SOFT-BOARD-SERVICE HAS STARTED" );
+        Scribe.locus( Debug.SERVICE );
 
         super.onCreate();
 
         // Connect to preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener( this );
 
         // Start the first parsing
         startSoftBoardParser();
@@ -242,13 +242,13 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onDestroy()
         {
-        Scribe.locus(Debug.SERVICE);
+        Scribe.locus( Debug.SERVICE );
         Scribe.title("SOFT-BOARD-SERVICE HAS FINISHED");
 
         super.onDestroy();
 
         // Release preferences
-        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener(this);
+        PreferenceManager.getDefaultSharedPreferences( this ).unregisterOnSharedPreferenceChangeListener( this );
 
         // Stop any ongoing parsing
         if ( softBoardParser != null)   softBoardParser.cancel(false);
@@ -261,7 +261,7 @@ public class SoftBoardService extends InputMethodService implements
      */
     public void startSoftBoardParser()
         {
-        Scribe.note(Debug.SERVICE, "Parsing has started.");
+        Scribe.note( Debug.SERVICE, "Parsing has started." );
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
 
@@ -365,7 +365,7 @@ public class SoftBoardService extends InputMethodService implements
                 warning = "Critical error!";
             }
         // Generating a new view with the warning
-        Scribe.debug(Debug.SERVICE, warning);
+        Scribe.debug( Debug.SERVICE, warning );
         setInputView(noKeyboardView());
         // Warning should be shown! Keyboard can be hidden
         Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
@@ -464,7 +464,7 @@ public class SoftBoardService extends InputMethodService implements
     @Override
     public void onStartInput(EditorInfo attribute, boolean restarting)
         {
-        super.onStartInput(attribute, restarting);
+        super.onStartInput( attribute, restarting );
         Scribe.locus( Debug.SERVICE );
 
         initInput();
@@ -497,13 +497,13 @@ public class SoftBoardService extends InputMethodService implements
             // Calculated position matches cursor position
             if ( position != null && newSelStart == position )
                 {
-                Scribe.debug( Debug.TEXT, "Calculated position is correct. Cursor position: " + newSelStart +
+                Scribe.debug( Debug.CURSOR, "Calculated position is correct. Cursor position: " + newSelStart +
                         ", relative: " + positionChange );
                 }
             // Calculated position does not match cursor position - external typing detected
             else
                 {
-                Scribe.debug( Debug.TEXT, "Calculated position is incorrect. Stored text is invalidated. Cursor position: " + newSelStart +
+                Scribe.debug( Debug.CURSOR, "Calculated position is incorrect. Stored text is invalidated. Cursor position: " + newSelStart +
                              ", relative: " + positionChange );
                     
                 textBeforeCursor.invalidate();
@@ -517,7 +517,7 @@ public class SoftBoardService extends InputMethodService implements
         // Text is selected
         else // newSelStart != newSelEnd
             {
-            Scribe.debug( Debug.TEXT, "Text is selected, calculated position is invalidated!");
+            Scribe.debug( Debug.CURSOR, "Text is selected, calculated position is invalidated!");
 
             textBeforeCursor.invalidate(); //lastCharacter = TEXT_SELECTED;
             textAfterCursor.invalidate();
@@ -541,13 +541,16 @@ public class SoftBoardService extends InputMethodService implements
         Scribe.debug(Debug.TEXT, "String to send: [" + string + "], length: " + string.length());
 
         undoStringLength = string.length();
-        calculatedCursorPosition += undoStringLength;
-        savedCursorPositions.offer( calculatedCursorPosition );
-        textBeforeCursor.sendString( string );
-        textAfterCursor.invalidate();
-        inputConnection.commitText(string, 1);
+        if ( undoStringLength > 0 )
+            {
+            calculatedCursorPosition += undoStringLength;
+            savedCursorPositions.offer( calculatedCursorPosition );
+            textBeforeCursor.sendString( string );
+            textAfterCursor.invalidate();
+            inputConnection.commitText( string, 1 );
+            }
         
-        Scribe.debug(Debug.TEXT, "Calculated cursor position: " + calculatedCursorPosition);
+        Scribe.debug(Debug.CURSOR, "String. Calculated cursor position: " + calculatedCursorPosition);
         }
 
 
@@ -563,13 +566,16 @@ public class SoftBoardService extends InputMethodService implements
         {
         Scribe.debug(Debug.TEXT, "Chars to delete before cursor: " + length );
 
-        undoStringLength = -1;
-        calculatedCursorPosition -= length;
-        savedCursorPositions.offer( calculatedCursorPosition );
-        textBeforeCursor.sendDelete( length );
-        inputConnection.deleteSurroundingText(length, 0);
+        if ( length > 0 )
+            {
+            undoStringLength = -1;
+            calculatedCursorPosition -= length;
+            savedCursorPositions.offer( calculatedCursorPosition );
+            textBeforeCursor.sendDelete( length );
+            inputConnection.deleteSurroundingText( length, 0 );
+            }
 
-        Scribe.debug(Debug.TEXT, "Calculated cursor position: " + calculatedCursorPosition);
+        Scribe.debug(Debug.CURSOR, "Delete. Calculated cursor position: " + calculatedCursorPosition);
         }
 
     
@@ -770,7 +776,7 @@ public class SoftBoardService extends InputMethodService implements
         InputConnection ic = getCurrentInputConnection();
         if (ic != null)
             {
-            textBeforeCursor.sendDelete( n );
+            textAfterCursor.delete( n );
             ic.deleteSurroundingText(0, n);
             }
         }
