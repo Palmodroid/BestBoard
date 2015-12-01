@@ -64,42 +64,6 @@ public class SoftBoardService extends InputMethodService implements
         return boardView;
         }
 
-    /** Text before the cursor is stored in textBeforeCursor. Text is provided by IMS */
-    private TextBeforeCursor textBeforeCursor = new TextBeforeCursor( this );
-
-    public TextBeforeCursor getTextBeforeCursor()
-        {
-        return textBeforeCursor;
-        }
-
-    /** Text after the cursor is stored in textBeforeCursor. Text is provided by IMS */
-    private TextAfterCursor textAfterCursor = new TextAfterCursor( this );
-
-    public TextAfterCursor getTextAfterCursor()
-        {
-        return textAfterCursor;
-        }
-
-
-    /**
-     * cursor position calculated by our IMS. If this not corresponds with real position,
-     * then somebody else changed it (and text around cursor is changed, too)!
-     * -1 - text is selected
-     */
-    //private int calculatedPosition = 0;
-
-    private int calculatedCursorPosition = 0;
-    private LinkedBlockingQueue<Integer> savedCursorPositions = new LinkedBlockingQueue<>();
-
-    private boolean textSelected = false;
-
-    /**
-     * length of the lastly sent string
-     * -1 if no undo is possible
-     */
-    private int undoStringLength = -1;
-
-    
     /** Temporary variable to store string to be send */
     private StringBuilder sendBuilder = new StringBuilder();
 
@@ -428,6 +392,64 @@ public class SoftBoardService extends InputMethodService implements
      **/
 
 
+    /**
+     * FALSE: stored text and calculated position are used; cursor position is checked after time-limit
+     * TRUE: text around cursor is always re-read, stored text/cursor position are not used
+     */
+    private boolean checkHeavily = false;
+
+    /** Cursor position presented by the editor; -1 if text is selected */
+    private int realCursorPosition;
+
+    /** Cursor position calculated by the softkeyboard */
+    private int calculatedCursorPosition = 0;
+
+    /** Before this time cursor position cannot be checked */
+    private long checkTimeLimit;
+
+    /** Lastly sent string. Null if undo is not possible */
+    private String undoString;
+
+/*
+? checkHeavily
+realCursorPosition= ; // -1 text selected
+calculatedCursorPosition= ;
+checkTimeLimit= ; // 0L - always allowed (no limit)  Long.MAX_VALUE - never allowed
+undoString= ;
+textBeforeCursor. ;
+textAfterCursor. ;
+ */
+
+    /** Text before the cursor is stored in textBeforeCursor. Text is provided by IMS */
+    private TextBeforeCursor textBeforeCursor = new TextBeforeCursor( this );
+
+    public TextBeforeCursor getTextBeforeCursor()
+        {
+        return textBeforeCursor;
+        }
+
+    /** Text after the cursor is stored in textBeforeCursor. Text is provided by IMS */
+    private TextAfterCursor textAfterCursor = new TextAfterCursor( this );
+
+    public TextAfterCursor getTextAfterCursor()
+        {
+        return textAfterCursor;
+        }
+
+
+    /**
+     * lastCharacter and calculatedPositions are set based on EditorInfo data.
+     */
+    @Override
+    public void onStartInput(EditorInfo attribute, boolean restarting)
+        {
+        super.onStartInput( attribute, restarting );
+        Scribe.locus( Debug.SERVICE );
+
+        initInput();
+        }
+
+
     public void initInput()
         {
         if ( softBoardData != null )
@@ -459,23 +481,10 @@ public class SoftBoardService extends InputMethodService implements
 
 
     /**
-     * lastCharacter and calculatedPositions are set based on EditorInfo data.
-     */
-    @Override
-    public void onStartInput(EditorInfo attribute, boolean restarting)
-        {
-        super.onStartInput( attribute, restarting );
-        Scribe.locus( Debug.SERVICE );
-
-        initInput();
-        }
-
-
-    /**
      * This is the most important part:
      * Here we can control whether cursor/selection was changed without our knowledge.
      * Implemented send... methods should set calculatedPosition.
-     * Stored text is invalidated if new position mdoes not match calculatedPosition
+     * Stored text is invalidated if new position does not match calculatedPosition
      * If text is selected, then all stored-text functions are disabled
      */
     @Override
