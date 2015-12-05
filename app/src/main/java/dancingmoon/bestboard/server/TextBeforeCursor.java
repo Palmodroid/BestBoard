@@ -232,6 +232,25 @@ public class TextBeforeCursor
         return text.get( textItemCounter ).string.charAt( textCharCounter );
         }
 
+    /**
+     * Compares the end of the stored text with string.
+     * @param string to compare
+     * @return true, if stored string ends with string
+     */
+    public boolean compare( String string )
+        {
+        reset();
+
+        int n = string.length();
+
+        while ( n > 0 )
+            {
+            if ( string.charAt(--n) != read() )
+                return false;
+            }
+
+        return true;
+        }
 
     /**
      * Inner data in text for debugging.

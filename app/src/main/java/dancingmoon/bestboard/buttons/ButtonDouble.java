@@ -36,6 +36,8 @@ public class ButtonDouble extends ButtonMainTouch implements Cloneable
     @Override
     public void mainTouchStart( boolean isTouchDown )
         {
+        board.softBoardData.softBoardListener.beginCheckSuspension();
+
         packetFirst.send();
         counter = 1;
         }
@@ -47,6 +49,8 @@ public class ButtonDouble extends ButtonMainTouch implements Cloneable
             packetFirst.release();
         else // counter == 2;
             packetSecond.release();
+
+        board.softBoardData.softBoardListener.finishCheckSuspension();
         }
 
     @Override

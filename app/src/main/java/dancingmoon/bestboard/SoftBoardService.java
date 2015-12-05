@@ -18,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
-import java.util.concurrent.LinkedBlockingQueue;
 
 import dancingmoon.bestboard.SoftBoardData.SoftBoardListener;
 import dancingmoon.bestboard.SoftBoardParser.SoftBoardParserListener;
@@ -72,7 +71,6 @@ public class SoftBoardService extends InputMethodService implements
         {
         return this;
         }
-
 
     /**
      * Service is notified if it needs to react preference changes.
@@ -443,7 +441,7 @@ textAfterCursor. ;
     @Override
     public void onStartInput(EditorInfo attribute, boolean restarting)
         {
-        super.onStartInput( attribute, restarting );
+        super.onStartInput(attribute, restarting);
         Scribe.locus( Debug.SERVICE );
 
         initInput();
@@ -457,8 +455,23 @@ textAfterCursor. ;
             EditorInfo editorInfo = getCurrentInputEditorInfo();
 
             // position of the cursor
-            calculatedCursorPosition = editorInfo.initialSelStart;
-            savedCursorPositions.clear();
+            if ( editorInfo.initialSelStart != editorInfo.initialSelEnd )
+                {
+                // text is selected
+                realCursorPosition = -1;
+                }
+            else
+                {
+                // text is not selected
+                realCursorPosition = editorInfo.initialSelStart;
+                calculatedCursorPosition = realCursorPosition;
+                }
+
+            // no time limit at start
+            checkTimeLimit = 0L;
+
+            // no undo at start
+            undoString = null;
 
             // surrounding text is changed
             textBeforeCursor.invalidate();
@@ -470,12 +483,18 @@ textAfterCursor. ;
             // enter's title is set
             softBoardData.setAction(editorInfo.imeOptions);
 
+            // set autocapsstate depending on field behavior and cursor position
             if ( calculatedCursorPosition == 0 && editorInfo.initialCapsMode != 0 )
                 {
                 ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
-                        .setAutoCapsState( CapsState.AUTOCAPS_ON );
-                getBoardView().invalidate();
+                        .setAutoCapsState(CapsState.AUTOCAPS_ON);
                 }
+            else
+                {
+                ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
+                        .setAutoCapsState(CapsState.AUTOCAPS_OFF);
+                }
+            getBoardView().invalidate();
             }
         }
 
@@ -492,35 +511,29 @@ textAfterCursor. ;
                                   int newSelStart, int newSelEnd, int candidatesStart,
                                   int candidatesEnd)
         {
-        super.onUpdateSelection( oldSelStart, oldSelEnd, newSelStart, newSelEnd,
-                candidatesStart, candidatesEnd );
+        super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
+                candidatesStart, candidatesEnd);
         Scribe.locus(Debug.TEXT);
 
         // Text is NOT selected...
         if ( newSelStart == newSelEnd )
             {
-            int positionChange = newSelStart-oldSelStart;
+            realCursorPosition = newSelStart;
 
-            Integer position = savedCursorPositions.poll();
+            if ( realCursorPosition != calculatedCursorPosition )
+                {
+                calculatedCursorPosition = realCursorPosition;
 
-            // Calculated position matches cursor position
-            if ( position != null && newSelStart == position )
-                {
-                Scribe.debug( Debug.CURSOR, "Calculated position is correct. Cursor position: " + newSelStart +
-                        ", relative: " + positionChange );
+                if (!checkHeavily && System.nanoTime() > checkTimeLimit)
+                    {
+                    Scribe.debug(Debug.CURSOR, "Cursor does not match within time limit!");
+
+                    undoString = null;
+                    textBeforeCursor.invalidate();
+                    textAfterCursor.invalidate();
+                    }
                 }
-            // Calculated position does not match cursor position - external typing detected
-            else
-                {
-                Scribe.debug( Debug.CURSOR, "Calculated position is incorrect. Stored text is invalidated. Cursor position: " + newSelStart +
-                             ", relative: " + positionChange );
-                    
-                textBeforeCursor.invalidate();
-                textAfterCursor.invalidate();
-                savedCursorPositions.clear();
-                calculatedCursorPosition = newSelStart;
-                undoStringLength = -1;
-                }
+
             }
 
         // Text is selected
@@ -528,14 +541,24 @@ textAfterCursor. ;
             {
             Scribe.debug( Debug.CURSOR, "Text is selected, calculated position is invalidated!");
 
-            textBeforeCursor.invalidate(); //lastCharacter = TEXT_SELECTED;
+            realCursorPosition = -1;
+            checkTimeLimit = 0L;
+            undoString = null;
+            textBeforeCursor.invalidate();
             textAfterCursor.invalidate();
-            calculatedCursorPosition = -1;
-            savedCursorPositions.clear();
-            undoStringLength = -1;
             }
         }
 
+
+    public void beginCheckSuspension()
+        {
+        checkTimeLimit = Long.MAX_VALUE;
+        }
+
+    public void finishCheckSuspension()
+        {
+        checkTimeLimit = System.nanoTime() + 500L * 1000000L;
+        }
 
     /**
      * Text (string) can be sent ONLY through this method
@@ -549,16 +572,22 @@ textAfterCursor. ;
         {
         Scribe.debug(Debug.TEXT, "String to send: [" + string + "], length: " + string.length());
 
-        undoStringLength = string.length();
-        if ( undoStringLength > 0 )
+
+        undoString = string;
+        calculatedCursorPosition += string.length();
+        if ( checkHeavily )
             {
-            calculatedCursorPosition += undoStringLength;
-            savedCursorPositions.offer( calculatedCursorPosition );
-            textBeforeCursor.sendString( string );
-            textAfterCursor.invalidate();
-            inputConnection.commitText( string, 1 );
+            Scribe.debug(Debug.TEXT, "Text before cursor is invalidated because heavy checking!");
+            textBeforeCursor.invalidate();
             }
-        
+        else
+            {
+            Scribe.debug(Debug.TEXT, "Text before cursor is updated, because time checking!");
+            textBeforeCursor.sendString(string);
+            }
+        textAfterCursor.invalidate();
+        inputConnection.commitText(string, 1);
+
         Scribe.debug(Debug.CURSOR, "String. Calculated cursor position: " + calculatedCursorPosition);
         }
 
@@ -573,21 +602,180 @@ textAfterCursor. ;
      */
     private void sendDeleteBeforeCursor(InputConnection inputConnection, int length)
         {
-        Scribe.debug(Debug.TEXT, "Chars to delete before cursor: " + length );
+        Scribe.debug(Debug.TEXT, "Chars to delete before cursor: " + length);
 
         if ( length > 0 )
             {
-            undoStringLength = -1;
+            undoString = null;
             calculatedCursorPosition -= length;
-            savedCursorPositions.offer( calculatedCursorPosition );
-            textBeforeCursor.sendDelete( length );
-            inputConnection.deleteSurroundingText( length, 0 );
+            if ( checkHeavily )
+                {
+                Scribe.debug(Debug.TEXT, "Text before cursor is invalidated because heavy checking!");
+                textBeforeCursor.invalidate();
+                }
+            else
+                {
+                Scribe.debug(Debug.TEXT, "Text before cursor is updated (deleted), because time checking!");
+                textBeforeCursor.sendDelete(length);
+                }
+            inputConnection.deleteSurroundingText(length, 0);
             }
 
-        Scribe.debug(Debug.CURSOR, "Delete. Calculated cursor position: " + calculatedCursorPosition);
+        Scribe.debug(Debug.CURSOR, "Deleted. Calculated cursor position: " + calculatedCursorPosition);
         }
 
-    
+
+    public boolean undoLastString()
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = getCurrentInputConnection();
+        if ( ic != null && undoString != null )
+            {
+            if ( checkHeavily )
+                {
+                if (textBeforeCursor.compare(undoString))
+                    {
+                    Scribe.debug(Debug.TEXT, "Text undo: string matches during heavy checking!");
+                    sendDeleteBeforeCursor(ic, undoString.length());
+                    undoString = null;
+                    return true;
+                    }
+                else
+                    {
+                    Scribe.debug(Debug.TEXT, "Text undo: string does NOT match during heavy checking!");
+                    }
+                }
+            else
+                {
+                if ( System.nanoTime() > checkTimeLimit )
+                    {
+                    if ( calculatedCursorPosition != realCursorPosition )
+                        {
+                        Scribe.debug(Debug.TEXT, "Text undo: cursor positions does NOT match during time checking!");
+                        undoString = null;
+                        return false;
+                        }
+                    sendDeleteBeforeCursor(ic, undoString.length());
+                    }
+                }
+            }
+        return false;
+        }
+
+
+    @Override
+    public void sendString( String string, int autoSpace )
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null)
+            {
+            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 )
+                {
+                deleteSpacesBeforeCursor();
+                }
+            if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 )
+                {
+                deleteSpacesAfterCursor();
+                }
+
+            sendBuilder.setLength(0);
+            if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 )
+                {
+                textBeforeCursor.reset();
+                if ( !isWhiteSpace( textBeforeCursor.read()) )
+                    sendBuilder.append(' ');
+                }
+
+            sendBuilder.append(string);
+
+            if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 )
+                {
+                textBeforeCursor.reset();
+                if ( !isSpace( textBeforeCursor.read()) )
+                    sendBuilder.append(' ');
+                }
+
+            String sendString = sendBuilder.toString();
+
+            sendString(ic, sendString);
+            }
+        }
+
+
+    public void changeStringBeforeCursor( String string )
+        {
+        changeStringBeforeCursor(string.length(), string);
+        }
+
+
+    public void changeStringBeforeCursor( int length, String string )
+        {
+        Scribe.locus( Debug.SERVICE );
+
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null)
+            {
+            sendDeleteBeforeCursor(ic, length);
+            sendString(ic, string);
+            }
+        }
+
+
+    public int deleteSpacesBeforeCursor()
+        {
+        int space;
+
+
+        textBeforeCursor.reset();
+        for ( space = 0; textBeforeCursor.read() == ' '; space++ ) ;
+
+        deleteTextBeforeCursor(space);
+
+        Scribe.debug( Debug.SERVICE, "Spaces deleted before cursor: " + space);
+        return space;
+        }
+
+
+    public int deleteSpacesAfterCursor()
+        {
+        int space;
+
+        textBeforeCursor.reset();
+        for ( space = 0; textBeforeCursor.read() == ' '; space++ ) ;
+
+        deleteTextAfterCursor(space);
+
+        Scribe.debug(Debug.SERVICE, "Spaces deleted after cursor: " + space);
+        return space;
+        }
+
+
+    public void deleteTextBeforeCursor( int n )
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null)
+            {
+            sendDeleteBeforeCursor( ic, n );
+            }
+        }
+
+
+    public void deleteTextAfterCursor( int n )
+        {
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null)
+            {
+            textAfterCursor.delete(n);
+            ic.deleteSurroundingText(0, n);
+            }
+        }
+
+
     /**
      * Simulates key-event
      * @param downTime time, when key was pressed
@@ -664,130 +852,6 @@ textAfterCursor. ;
         if (sendKeyDown( downTime, keyEventCode ))
             sendKeyUp( downTime, SystemClock.uptimeMillis(), keyEventCode );
         // ACTION_UP will be sent only, if ACTION_DOWN was successfully sent
-        }
-
-
-    @Override
-    public void sendString( String string, int autoSpace )
-        {
-        Scribe.locus( Debug.SERVICE );
-
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
-            {
-            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 )
-                {
-                deleteSpacesBeforeCursor();
-                }
-            if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 )
-                {
-                deleteSpacesAfterCursor();
-                }
-
-            sendBuilder.setLength(0);
-            if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 )
-                {
-                textBeforeCursor.reset();
-                if ( !isWhiteSpace( textBeforeCursor.read()) )
-                    sendBuilder.append(' ');
-                }
-
-            sendBuilder.append(string);
-
-            if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 )
-                {
-                textBeforeCursor.reset();
-                if ( !isSpace( textBeforeCursor.read()) )
-                    sendBuilder.append(' ');
-                }
-
-            String sendString = sendBuilder.toString();
-
-            sendString(ic, sendString);
-            }
-        }
-
-
-    public void changeStringBeforeCursor( String string )
-        {
-        changeStringBeforeCursor( string.length(), string );
-        }
-
-
-    public void changeStringBeforeCursor( int length, String string )
-        {
-        Scribe.locus( Debug.SERVICE );
-
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
-            {
-            ic.beginBatchEdit();
-            sendDeleteBeforeCursor(ic, length);
-            sendString(ic, string);
-            ic.endBatchEdit();
-            }
-        }
-
-
-    public boolean undoLastString()
-        {
-        Scribe.locus( Debug.SERVICE );
-
-        InputConnection ic = getCurrentInputConnection();
-        if ( ic != null && undoStringLength >= 0 )
-            {
-            sendDeleteBeforeCursor( ic, undoStringLength );
-            return true;
-            }
-        return false;
-        }
-        
-        
-    public int deleteSpacesBeforeCursor()
-        {
-        int space;
-
-        textBeforeCursor.reset();
-        for ( space = 0; textBeforeCursor.read() == ' '; space++ ) ;
-
-        deleteTextBeforeCursor(space);
-
-        Scribe.debug( Debug.SERVICE, "Spaces deleted before cursor: " + space);
-        return space;
-        }
-
-    public int deleteSpacesAfterCursor()
-        {
-        int space;
-
-        textBeforeCursor.reset();
-        for ( space = 0; textBeforeCursor.read() == ' '; space++ ) ;
-
-        deleteTextAfterCursor(space);
-
-        Scribe.debug( Debug.SERVICE,  "Spaces deleted after cursor: " + space );
-        return space;
-        }
-
-    public void deleteTextBeforeCursor( int n )
-        {
-        Scribe.locus( Debug.SERVICE );
-
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
-            {
-            sendDeleteBeforeCursor( ic, n );
-            }
-        }
-
-    public void deleteTextAfterCursor( int n )
-        {
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
-            {
-            textAfterCursor.delete( n );
-            ic.deleteSurroundingText(0, n);
-            }
         }
 
 
