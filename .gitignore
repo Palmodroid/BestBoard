@@ -1,3 +1,4 @@
+/gradle.properties.proxy
 /gradle.properties.noproxy
 /gradle.properties
 *.iml
