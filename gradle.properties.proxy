@@ -13,3 +13,7 @@
 # http://www.gradle.org/docs/current/userguide/multi_project_builds.html#sec:decoupled_projects
 # org.gradle.parallel=true
 #Sat Dec 05 16:19:52 CET 2015
+systemProp.https.proxyPort=3128
+systemProp.http.proxyHost=10.7.0.21
+systemProp.https.proxyHost=10.7.0.21
+systemProp.http.proxyPort=3128

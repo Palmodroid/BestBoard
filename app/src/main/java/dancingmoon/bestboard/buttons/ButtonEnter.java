@@ -76,6 +76,7 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
                 if ( !packetKey.sendIfNoMeta() )    // if any meta is turned on - send HARD-KEY
                     {
                     packetText.send();              // if all meta is turned off - send TEXT
+                    packetText.release();           // autocaps should be set
                     }
                 }
             // simulated hard-key

@@ -693,8 +693,8 @@ textAfterCursor. ;
 
             if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 )
                 {
-                textBeforeCursor.reset();
-                if ( !isSpace( textBeforeCursor.read()) )
+                textAfterCursor.reset();
+                if ( !isSpace( textAfterCursor.read()) )
                     sendBuilder.append(' ');
                 }
 
@@ -743,8 +743,8 @@ textAfterCursor. ;
         {
         int space;
 
-        textBeforeCursor.reset();
-        for ( space = 0; textBeforeCursor.read() == ' '; space++ ) ;
+        textAfterCursor.reset();
+        for ( space = 0; textAfterCursor.read() == ' '; space++ ) ;
 
         deleteTextAfterCursor(space);
 
