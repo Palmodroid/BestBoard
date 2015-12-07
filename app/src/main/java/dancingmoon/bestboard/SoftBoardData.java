@@ -422,8 +422,8 @@ public class SoftBoardData
 
         TextBeforeCursor getTextBeforeCursor();
 
-        void deleteTextBeforeCursor( int n );
-        void deleteTextAfterCursor( int n );
+        void deleteCharBeforeCursor(int n);
+        void deleteCharAfterCursor(int n);
 
         int deleteSpacesBeforeCursor();
         void changeStringBeforeCursor( String string );

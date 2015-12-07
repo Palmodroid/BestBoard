@@ -50,7 +50,7 @@ public class TextAfterCursor
         textReady = false;
         reset();
 
-        Scribe.debug( Debug.TEXT, "PostText and PostTextReader are invalidated!");
+        Scribe.debug( Debug.TEXT, "TEXT: Stored text after cursor is invalidated!");
         }
 
 
@@ -72,7 +72,7 @@ public class TextAfterCursor
         textStart = 0;
         textReady = true;
 
-        Scribe.debug( Debug.TEXT, "PostText synchronized: " + toString());
+        Scribe.debug( Debug.TEXT, "TEXT: Stored text after cursor synchronized: " + toString());
         }
 
 
@@ -132,13 +132,15 @@ public class TextAfterCursor
      * Whole string could be deleted and invalidated.
      * @param length number of characters to delete from the beginning
      */
-    public void delete( int length )
+    public void sendDelete(int length)
         {
+        Scribe.debug( Debug.TEXT, "TEXT: Length to delete after cursor: " + length );
+
         textStart += length;
         if ( text.length() >= LENGTH_LIMIT )
             textReady = false;
 
-        Scribe.debug( Debug.TEXT, "text deleted: " + toString());
+        Scribe.debug( Debug.TEXT, "TEXT: Stored text after delete: " + toString() );
         }
 
 

@@ -78,12 +78,12 @@ public class PacketFunction extends Packet
         {
         if ( functionCode == Commands.TOKEN_DELETE )
             {
-            softBoardData.softBoardListener.deleteTextAfterCursor( 1 );
+            softBoardData.softBoardListener.deleteCharAfterCursor(1);
             }
 
         else if ( functionCode == Commands.TOKEN_BACKSPACE )
             {
-            softBoardData.softBoardListener.deleteTextBeforeCursor( 1 );
+            softBoardData.softBoardListener.deleteCharBeforeCursor(1);
             }
 
         else if ( functionCode == Commands.TOKEN_DRAFT )

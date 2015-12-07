@@ -23,7 +23,7 @@ public class Debug
     public static final String LOG_TAG_TOKEN = "TOKEN";
 
     // Settings of debug levels - only EVEN numbers!
-    private static final int LIMIT = 600;
+    private static final int LIMIT = 500;
 
     public static final int PREF = 10;
     public static final int BOARD = 20;
@@ -34,7 +34,7 @@ public class Debug
     public static final int VIEW = 30;
     public static final int COMMANDS = 40;
     public static final int IGNITION = 50;
-    public static final int DATA = 560;
+    public static final int DATA = 60;
     public static final int PARSER = 70;
     public static final int SERVICE = 580;
     public static final int TEXT = 590;

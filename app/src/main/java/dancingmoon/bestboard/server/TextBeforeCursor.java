@@ -82,7 +82,7 @@ public class TextBeforeCursor
 
     public void sendDelete( int length )
         {
-        Scribe.debug( Debug.TEXT, "TEXT: Length to delete: " + length );
+        Scribe.debug( Debug.TEXT, "TEXT: Length to delete before cursor: " + length );
 
         // only delete can shrink stored text
         // if stored text is already shorter than limit, then it remains valid after delete
@@ -126,7 +126,7 @@ public class TextBeforeCursor
 
         reset();
 
-        Scribe.debug( Debug.TEXT, "PreText and preTextReader are invalidated!" );
+        Scribe.debug( Debug.TEXT, "TEXT: Stored text before cursor is invalidated!" );
         }
 
 
@@ -153,7 +153,7 @@ public class TextBeforeCursor
             }
         textReady = true;
 
-        Scribe.debug( Debug.TEXT, "PreText synchronized: " + toString());
+        Scribe.debug( Debug.TEXT, "TEXT: Stored text before cursor synchronized: " + toString());
         }
 
 
