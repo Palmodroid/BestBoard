@@ -453,6 +453,7 @@ textAfterCursor. ;
         if ( softBoardData != null )
             {
             EditorInfo editorInfo = getCurrentInputEditorInfo();
+            Scribe.debug( Debug.TEXT, "Start: " + editorInfo.initialSelStart + ", end: " + editorInfo.initialSelEnd);
 
             // position of the cursor
             if ( editorInfo.initialSelStart != editorInfo.initialSelEnd )
@@ -466,6 +467,8 @@ textAfterCursor. ;
                 {
                 // text is not selected
                 realCursorPosition = editorInfo.initialSelStart;
+                if (realCursorPosition < 0)
+                    realCursorPosition = 0; // itt csak heavy checking kell !!
                 calculatedCursorPosition = realCursorPosition;
                 Scribe.debug( Debug.CURSOR, "Editor initialized: cursor position: " + realCursorPosition );
                 }
@@ -652,7 +655,7 @@ textAfterCursor. ;
             if ( checkHeavily )
                 {
                 Scribe.debug(Debug.TEXT, "HEAVY CHECK: Text after cursor is invalidated!");
-                textBeforeCursor.invalidate();
+                textAfterCursor.invalidate();
                 }
             else
                 {
@@ -786,11 +789,14 @@ textAfterCursor. ;
         {
         Scribe.locus(Debug.SERVICE);
 
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
+        if ( realCursorPosition >= 0 )
             {
-            sendDeleteBeforeCursor(ic, length);
-            sendString(ic, string);
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                sendDeleteBeforeCursor(ic, length);
+                sendString(ic, string);
+                }
             }
         }
 
@@ -815,29 +821,49 @@ textAfterCursor. ;
         {
         Scribe.locus(Debug.SERVICE);
 
-        textBeforeCursor.reset();
-        int data = textBeforeCursor.read();
-        int l = 1;
-
-        if ( data < 0 )
+        // text is selected
+        if ( realCursorPosition < 0 )
             {
-            Scribe.debug( Debug.TEXT, "No more text to delete!");
-            return;
-            }
-        if ( data >= 0xDC00 && data <= 0xDFFF )
-            {
-            Scribe.debug( Debug.TEXT, "Unicode delete!");
-            l++;
-            }
-        else if ( data>= 0xD800 && data <= 0xDBFF )
-            {
-            Scribe.error( Debug.TEXT, "Deleting unicode lower part!");
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                sendString(ic, "");
+                }
             }
 
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
+        // text is not selected
+        else
             {
-            sendDeleteBeforeCursor( ic, l );
+            textBeforeCursor.reset();
+            int data = textBeforeCursor.read();
+            int l = 1;
+
+            Scribe.debug( Debug.TEXT, "Character before cursor: " + Integer.toHexString(data));
+            if (data < 0)
+                {
+                Scribe.debug(Debug.TEXT, "No more text to delete, hard DEL is sent!");
+
+                softBoardData.boardStates.forceBinaryHardState( 0x15 );
+                sendKeyDownUp( KeyEvent.KEYCODE_DEL );
+                softBoardData.boardStates.clearBinaryHardState();
+
+                return;
+                }
+            else if ((data & 0xFC00) == 0xDC00 )
+                {
+                Scribe.debug(Debug.TEXT, "Unicode (2 bytes) delete!");
+                l++;
+                }
+            else if ((data & 0xFC00) == 0xD800 )
+                {
+                Scribe.error(Debug.TEXT, "Deleting unicode lower part!");
+                }
+
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                sendDeleteBeforeCursor(ic, l);
+                }
             }
         }
 
@@ -845,11 +871,51 @@ textAfterCursor. ;
     // DO DELETE
     public void deleteCharAfterCursor(int n)
         {
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
+        Scribe.locus(Debug.SERVICE);
+
+        // text is selected
+        if ( realCursorPosition < 0 )
             {
-            textAfterCursor.sendDelete(n);
-            ic.deleteSurroundingText(0, n);
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                sendString(ic, "");
+                }
+            }
+
+        // text is not selected
+        else
+            {
+            textAfterCursor.reset();
+            int data = textAfterCursor.read();
+            int l = 1;
+
+            Scribe.debug( Debug.TEXT, "Character after cursor: " + Integer.toHexString(data));
+            if (data < 0)
+                {
+                Scribe.debug(Debug.TEXT, "No more text to delete, hard FORWARD_DEL is sent!");
+
+                softBoardData.boardStates.forceBinaryHardState( 0x15 );
+                sendKeyDownUp( KeyEvent.KEYCODE_FORWARD_DEL );
+                softBoardData.boardStates.clearBinaryHardState();
+
+                return;
+                }
+            else if ((data & 0xFC00) == 0xD800 )
+                {
+                Scribe.debug(Debug.TEXT, "Unicode (2 bytes) delete!");
+                l++;
+                }
+            else if ((data & 0xFC00) == 0xDC00 )
+                {
+                Scribe.error(Debug.TEXT, "Deleting unicode lower part!");
+                }
+
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                sendDeleteAfterCursor(ic, l);
+                }
             }
         }
 
@@ -941,13 +1007,10 @@ textAfterCursor. ;
      */
     public CharSequence getTextBeforeCursor( int n )
         {
-        if ( calculatedCursorPosition >= 0 )
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null)
             {
-            InputConnection ic = getCurrentInputConnection();
-            if (ic != null)
-                {
-                return ic.getTextBeforeCursor(n, 0);
-                }
+            return ic.getTextBeforeCursor(n, 0);
             }
         return null;
         }
@@ -961,13 +1024,10 @@ textAfterCursor. ;
      */
     public CharSequence getTextAfterCursor( int n )
         {
-        if ( calculatedCursorPosition >= 0 )
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null)
             {
-            InputConnection ic = getCurrentInputConnection();
-            if (ic != null)
-                {
-                return ic.getTextAfterCursor(n, 0);
-                }
+            return ic.getTextAfterCursor(n, 0);
             }
         return null;
         }

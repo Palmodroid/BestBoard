@@ -253,7 +253,7 @@ public class BoardStates
 
 
     /**
-     * Helper method for PacketKey to clear forced hard-sates.
+     * Helper method for PacketKey to clear forced hard-states.
      * (Called by SoftBoardService.sendKeyUpDown() after sending keycode.)
      */
     public void clearBinaryHardState()
