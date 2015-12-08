@@ -396,7 +396,13 @@ public class SoftBoardService extends InputMethodService implements
      */
     private boolean checkHeavily = true;
 
-    /** Cursor position presented by the editor; -1 if text is selected */
+    /** realCursorPosition value if text is selected */
+    private int TEXT_SELECTED = Integer.MIN_VALUE;
+
+    /** realCursorPosition value if editor hasn't got information about text */
+    private int TEXT_INVALID = -1;
+
+    /** Cursor position presented by the editor */
     private int realCursorPosition;
 
     /** Cursor position calculated by the softkeyboard */
@@ -456,21 +462,26 @@ textAfterCursor. ;
             Scribe.debug( Debug.TEXT, "Start: " + editorInfo.initialSelStart + ", end: " + editorInfo.initialSelEnd);
 
             // position of the cursor
+            calculatedCursorPosition = editorInfo.initialSelStart;
             if ( editorInfo.initialSelStart != editorInfo.initialSelEnd )
                 {
                 // text is selected
-                realCursorPosition = -1;
-                calculatedCursorPosition = -1;
+                realCursorPosition = TEXT_SELECTED;
                 Scribe.debug( Debug.CURSOR, "Editor initialized: cursor position invalid, text is selected");
                 }
             else
                 {
                 // text is not selected
                 realCursorPosition = editorInfo.initialSelStart;
-                if (realCursorPosition < 0)
-                    realCursorPosition = 0; // itt csak heavy checking kell !!
-                calculatedCursorPosition = realCursorPosition;
-                Scribe.debug( Debug.CURSOR, "Editor initialized: cursor position: " + realCursorPosition );
+                if ( realCursorPosition < 0 )
+                    {
+                    realCursorPosition = TEXT_INVALID;
+                    Scribe.debug(Debug.CURSOR, "Editor initialized: no info about text, cursor is invalid");
+                    }
+                else
+                    {
+                    Scribe.debug(Debug.CURSOR, "Editor initialized: cursor position: " + realCursorPosition);
+                    }
                 }
 
             // no time limit at start
@@ -559,8 +570,8 @@ textAfterCursor. ;
             {
             Scribe.debug( Debug.CURSOR, "Cursor position: Text is selected, cursor position is invalidated!");
 
-            realCursorPosition = -1;
-            calculatedCursorPosition = -1;
+            realCursorPosition = TEXT_SELECTED;
+            calculatedCursorPosition = newSelStart;
             checkTimeLimit = 0L;
             undoString = null;
             textBeforeCursor.invalidate();
@@ -569,14 +580,32 @@ textAfterCursor. ;
         }
 
 
-    public void beginCheckSuspension()
+    public void beginTextOperation()
         {
-        checkTimeLimit = Long.MAX_VALUE;
+        if ( checkHeavily )
+            {
+            Scribe.debug( Debug.CURSOR, "HEAVY CHECK: Text process begins.");
+
+            textBeforeCursor.invalidate();
+            textAfterCursor.invalidate();
+            }
+        else
+            {
+            checkTimeLimit = Long.MAX_VALUE;
+            }
         }
 
-    public void finishCheckSuspension()
+
+    public void endTextOperation()
         {
-        checkTimeLimit = System.nanoTime() + 500L * 1000000L;
+        if ( checkHeavily )
+            {
+            Scribe.debug( Debug.CURSOR, "HEAVY CHECK: Text process ends.");
+            }
+        else
+            {
+            checkTimeLimit = System.nanoTime() + 500L * 1000000L;
+            }
         }
 
     /**
@@ -822,7 +851,7 @@ textAfterCursor. ;
         Scribe.locus(Debug.SERVICE);
 
         // text is selected
-        if ( realCursorPosition < 0 )
+        if ( realCursorPosition == TEXT_SELECTED )
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)
@@ -874,7 +903,7 @@ textAfterCursor. ;
         Scribe.locus(Debug.SERVICE);
 
         // text is selected
-        if ( realCursorPosition < 0 )
+        if ( realCursorPosition == TEXT_SELECTED )
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)
@@ -938,7 +967,7 @@ textAfterCursor. ;
             return false;
             }
 
-        return ic.sendKeyEvent( new KeyEvent(
+        return ic.sendKeyEvent(new KeyEvent(
                 downTime,               // this key originally went down
                 eventTime,              // this event happened (downTime in ACTION_DOWN)
                 keyEventAction,         // ACTION_DOWN or ACTION_UP
@@ -950,7 +979,7 @@ textAfterCursor. ;
                 // device id FIX
                 keyEventCode,           // android keyCode as scan-code
                 KeyEvent.FLAG_SOFT_KEYBOARD | KeyEvent.FLAG_KEEP_TOUCH_MODE,
-                InputDevice.SOURCE_TOUCHSCREEN ) );
+                InputDevice.SOURCE_TOUCHSCREEN));
         }
 
 
@@ -1007,10 +1036,13 @@ textAfterCursor. ;
      */
     public CharSequence getTextBeforeCursor( int n )
         {
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
+        if ( realCursorPosition != TEXT_INVALID )
             {
-            return ic.getTextBeforeCursor(n, 0);
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                return ic.getTextBeforeCursor(n, 0);
+                }
             }
         return null;
         }
@@ -1024,10 +1056,13 @@ textAfterCursor. ;
      */
     public CharSequence getTextAfterCursor( int n )
         {
-        InputConnection ic = getCurrentInputConnection();
-        if (ic != null)
+        if ( realCursorPosition != TEXT_INVALID )
             {
-            return ic.getTextAfterCursor(n, 0);
+            InputConnection ic = getCurrentInputConnection();
+            if (ic != null)
+                {
+                return ic.getTextAfterCursor(n, 0);
+                }
             }
         return null;
         }

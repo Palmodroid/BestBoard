@@ -93,6 +93,7 @@ public class PacketText extends Packet
 
     private void sendString()
     	{
+        softBoardData.softBoardListener.beginTextOperation();
         switch ( capsState )
         	{
             case 0:
@@ -143,6 +144,7 @@ public class PacketText extends Packet
                 capsState = 2;
 
                 }
+
             sendString();
             }
         }
@@ -171,6 +173,8 @@ public class PacketText extends Packet
     	{
         // If needed, this could be a standalone method, called when touch releases the button
         ( (CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS] ).setAutoCapsState( autoCaps );
+
+        softBoardData.softBoardListener.endTextOperation();
         }
     }
 

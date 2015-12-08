@@ -411,8 +411,8 @@ public class SoftBoardData
         boolean sendKeyUp( long downTime, long eventTime, int keyEventCode );
         void sendKeyDownUp( int keyEventCode );
 
-        public void beginCheckSuspension();
-        public void finishCheckSuspension();
+        public void beginTextOperation();
+        public void endTextOperation();
 
         void sendString( String string, int autoSpace );
         // UseState needs this to change board
