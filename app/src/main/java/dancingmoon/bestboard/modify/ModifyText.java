@@ -74,7 +74,7 @@ public class ModifyText extends Modify
     private boolean comparePreText( String string )
         {
         // preTextReader should start at the cursor
-        softBoardListener.getTextBeforeCursor().reset();
+        softBoardListener.getTextBeforeCursor().rewind();
 
         // String should start at the end
         // String cannot be null and cannot be shorter than 1
@@ -110,6 +110,8 @@ public class ModifyText extends Modify
             {
             spaces = softBoardListener.deleteSpacesBeforeCursor();
             }
+
+        softBoardListener.getTextBeforeCursor().reset();
 
         int rollCounter = this.rollCounter;
             do	{
@@ -169,6 +171,8 @@ public class ModifyText extends Modify
             {
             spaces = softBoardListener.deleteSpacesBeforeCursor();
             }
+
+        softBoardListener.getTextBeforeCursor().reset();
 
         int rollCounter = this.rollCounter;
         do	{
