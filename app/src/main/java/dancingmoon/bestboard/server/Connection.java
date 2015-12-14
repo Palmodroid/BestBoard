@@ -10,4 +10,5 @@ public interface Connection
     // CharSequence getSelectedText();
     CharSequence getTextAfterCursor(int n);
     CharSequence getTextBeforeCursor(int n);
+    boolean isHeavyCheckEnabled();
     }

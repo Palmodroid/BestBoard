@@ -124,7 +124,7 @@ public class TextBeforeCursor
         textLength = 0;
         textReady = false;
 
-        reset();
+        rewind();
 
         Scribe.debug( Debug.TEXT, "TEXT: Stored text before cursor is invalidated!" );
         }
@@ -158,15 +158,31 @@ public class TextBeforeCursor
 
 
     /**
+     * Same as rewind, but if haevy checking is enabled, text will be invalidated
+     */
+    public void reset()
+        {
+        if ( connection.isHeavyCheckEnabled() )
+            {
+            invalidate();
+            }
+        else
+            {
+            rewind();
+            }
+        }
+
+
+    /**
      * Stored text could be read like a reader.
-     * Before using this reader reset() should be called.
+     * Before using this reader rewind() should be called.
      * After that each character will be read by read(), starting with the last character.
      * If there are no more characters available, -1 is returned.
      * bookPreTextString() and synchronize() will not change the position,
      * but puffer could become empty.
      * preTextReader gives indeterminate results after preTextDelete().
      */
-    public void reset()
+    public void rewind()
         {
         // Counter is set AFTER the last character
         textItemCounter = text.size();

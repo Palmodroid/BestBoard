@@ -48,7 +48,8 @@ public class TextAfterCursor
         text = "";
         textStart = 0;
         textReady = false;
-        reset();
+
+        textCounter = -1; // reset();
 
         Scribe.debug( Debug.TEXT, "TEXT: Stored text after cursor is invalidated!");
         }
@@ -86,7 +87,14 @@ public class TextAfterCursor
      */
     public void reset()
         {
-        textCounter = -1;
+        if ( connection.isHeavyCheckEnabled() )
+            {
+            invalidate();
+            }
+        else
+            {
+            textCounter = -1;
+            }
         }
 
 

@@ -264,6 +264,12 @@ public class BoardView extends View
             {
             this.touchCode = touchCode;
             this.buttonMainTouch = buttonMainTouch;
+
+            if ( buttonMainTouch != null )
+                {
+                // in light-check cursor position should be checked before a new bow
+                board.softBoardData.softBoardListener.checkCursorPosition();
+                }
             }
 
         // touchCode of the current bow

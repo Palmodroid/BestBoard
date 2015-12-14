@@ -391,10 +391,21 @@ public class SoftBoardService extends InputMethodService implements
 
 
     /**
+     * FALSE: getText... methods are disabled - no communication is enabled
+     */
+    private boolean getTextEnabled = true;
+
+    /**
      * FALSE: stored text and calculated position are used; cursor position is checked after time-limit
      * TRUE: text around cursor is always re-read, stored text/cursor position are not used
      */
-    private boolean checkHeavily = true;
+    private boolean heavyCheckEnabled = false;
+
+    /** public access is needed by Connection */
+    public boolean isHeavyCheckEnabled()
+        {
+        return heavyCheckEnabled;
+        }
 
     /** realCursorPosition value if text is selected */
     private int TEXT_SELECTED = Integer.MIN_VALUE;
@@ -415,7 +426,7 @@ public class SoftBoardService extends InputMethodService implements
     private String undoString;
 
 /*
-? checkHeavily
+? heavyCheckEnabled
 realCursorPosition= ; // -1 text selected
 calculatedCursorPosition= ;
 checkTimeLimit= ; // 0L - always allowed (no limit)  Long.MAX_VALUE - never allowed
@@ -475,8 +486,8 @@ textAfterCursor. ;
                 realCursorPosition = editorInfo.initialSelStart;
                 if ( realCursorPosition < 0 )
                     {
-                    realCursorPosition = TEXT_INVALID;
-                    Scribe.debug(Debug.CURSOR, "Editor initialized: no info about text, cursor is invalid");
+                    getTextEnabled = false;
+                    Scribe.debug(Debug.CURSOR, "Editor initialized: no info about text, get-text is disabled");
                     }
                 else
                     {
@@ -536,33 +547,6 @@ textAfterCursor. ;
         if ( newSelStart == newSelEnd )
             {
             realCursorPosition = newSelStart;
-
-            if ( realCursorPosition != calculatedCursorPosition )
-                {
-                calculatedCursorPosition = realCursorPosition;
-
-                if ( checkHeavily )
-                    {
-                    Scribe.debug( Debug.CURSOR, "HEAVY CHECK: Cursor position changed, text invalidated. Position: " + realCursorPosition);
-
-                    textBeforeCursor.invalidate();
-                    textAfterCursor.invalidate();
-                    }
-
-                if (!checkHeavily && System.nanoTime() > checkTimeLimit)
-                    {
-                    Scribe.debug(Debug.CURSOR, "Cursor does not match within time limit!");
-
-                    undoString = null;
-                    textBeforeCursor.invalidate();
-                    textAfterCursor.invalidate();
-                    }
-                }
-            else
-                {
-                Scribe.debug(Debug.CURSOR, "Cursor position: calculated position matches real position: " + realCursorPosition );
-                }
-
             }
 
         // Text is selected
@@ -579,32 +563,22 @@ textAfterCursor. ;
             }
         }
 
-
-    public void beginTextOperation()
+    /**
+     * This method is called by BoardView.MainTouchBow constructor
+     * Only if light check is active:
+     * if real and calculated positions are different, then stored text is invalidated
+     */
+    public void checkCursorPosition()
         {
-        if ( checkHeavily )
+        Scribe.locus( Debug.CURSOR );
+
+        if ( !heavyCheckEnabled && realCursorPosition != calculatedCursorPosition )
             {
-            Scribe.debug( Debug.CURSOR, "HEAVY CHECK: Text process begins.");
+            Scribe.debug( Debug.CURSOR, "LIGHT CHECK: Cursor positions doesn't match at the start of the bow! Position: " + realCursorPosition );
 
             textBeforeCursor.invalidate();
             textAfterCursor.invalidate();
-            }
-        else
-            {
-            checkTimeLimit = Long.MAX_VALUE;
-            }
-        }
-
-
-    public void endTextOperation()
-        {
-        if ( checkHeavily )
-            {
-            Scribe.debug( Debug.CURSOR, "HEAVY CHECK: Text process ends.");
-            }
-        else
-            {
-            checkTimeLimit = System.nanoTime() + 500L * 1000000L;
+            calculatedCursorPosition = realCursorPosition;
             }
         }
 
@@ -623,17 +597,12 @@ textAfterCursor. ;
 
         undoString = string;
         calculatedCursorPosition += string.length();
-        if ( checkHeavily )
-            {
-            Scribe.debug(Debug.TEXT, "HEAVY CHECK: Stored text is invalidated!");
-            textBeforeCursor.invalidate();
-            }
-        else
+        if ( !heavyCheckEnabled )
             {
             Scribe.debug(Debug.TEXT, "Text before cursor is updated, because time checking!");
             textBeforeCursor.sendString(string);
+            textAfterCursor.invalidate();
             }
-        textAfterCursor.invalidate();
         inputConnection.commitText(string, 1);
 
         Scribe.debug(Debug.CURSOR, "String. Calculated cursor position: " + calculatedCursorPosition);
@@ -656,12 +625,7 @@ textAfterCursor. ;
             {
             undoString = null;
             calculatedCursorPosition -= length;
-            if ( checkHeavily )
-                {
-                Scribe.debug(Debug.TEXT, "HEAVY CHECK: Text before cursor is invalidated!");
-                textBeforeCursor.invalidate();
-                }
-            else
+            if ( !heavyCheckEnabled)
                 {
                 Scribe.debug(Debug.TEXT, "Text before cursor is updated (deleted), because time checking!");
                 textBeforeCursor.sendDelete(length);
@@ -681,12 +645,7 @@ textAfterCursor. ;
             {
             undoString = null;
             // calculatedCursorPosition does not change
-            if ( checkHeavily )
-                {
-                Scribe.debug(Debug.TEXT, "HEAVY CHECK: Text after cursor is invalidated!");
-                textAfterCursor.invalidate();
-                }
-            else
+            if ( !heavyCheckEnabled )
                 {
                 Scribe.debug(Debug.TEXT, "Text after cursor is updated (deleted), because time checking!");
                 textAfterCursor.sendDelete(length);
@@ -733,7 +692,7 @@ textAfterCursor. ;
         InputConnection ic = getCurrentInputConnection();
         if ( ic != null && undoString != null )
             {
-            if ( checkHeavily )
+            if (heavyCheckEnabled)
                 {
                 if (textBeforeCursor.compare(undoString))
                     {
@@ -749,16 +708,9 @@ textAfterCursor. ;
                 }
             else
                 {
-                if ( System.nanoTime() > checkTimeLimit )
-                    {
-                    if ( calculatedCursorPosition != realCursorPosition )
-                        {
-                        Scribe.debug(Debug.TEXT, "Text undo: cursor positions does NOT match during time checking!");
-                        undoString = null;
-                        return false;
-                        }
-                    sendDeleteBeforeCursor(ic, undoString.length());
-                    }
+                sendDeleteBeforeCursor(ic, undoString.length());
+                undoString = null;
+                return true;
                 }
             }
         return false;
@@ -1036,7 +988,7 @@ textAfterCursor. ;
      */
     public CharSequence getTextBeforeCursor( int n )
         {
-        if ( realCursorPosition != TEXT_INVALID )
+        if ( getTextEnabled )
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)
@@ -1056,7 +1008,7 @@ textAfterCursor. ;
      */
     public CharSequence getTextAfterCursor( int n )
         {
-        if ( realCursorPosition != TEXT_INVALID )
+        if ( getTextEnabled )
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)
