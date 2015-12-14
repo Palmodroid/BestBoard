@@ -410,17 +410,11 @@ public class SoftBoardService extends InputMethodService implements
     /** realCursorPosition value if text is selected */
     private int TEXT_SELECTED = Integer.MIN_VALUE;
 
-    /** realCursorPosition value if editor hasn't got information about text */
-    private int TEXT_INVALID = -1;
-
     /** Cursor position presented by the editor */
     private int realCursorPosition;
 
     /** Cursor position calculated by the softkeyboard */
     private int calculatedCursorPosition = 0;
-
-    /** Before this time cursor position cannot be checked */
-    private long checkTimeLimit;
 
     /** Lastly sent string. Null if undo is not possible */
     private String undoString;
@@ -495,9 +489,6 @@ textAfterCursor. ;
                     }
                 }
 
-            // no time limit at start
-            checkTimeLimit = 0L;
-
             // no undo at start
             undoString = null;
 
@@ -546,7 +537,14 @@ textAfterCursor. ;
         // Text is NOT selected...
         if ( newSelStart == newSelEnd )
             {
+            Scribe.debug( Debug.CURSOR, "Real cursor position: " + newSelStart );
+
             realCursorPosition = newSelStart;
+
+            if ( calculatedCursorPosition != realCursorPosition )
+                {
+                Scribe.error( Debug.CURSOR, "Calculated position does not match: " + calculatedCursorPosition );
+                }
             }
 
         // Text is selected
@@ -556,7 +554,6 @@ textAfterCursor. ;
 
             realCursorPosition = TEXT_SELECTED;
             calculatedCursorPosition = newSelStart;
-            checkTimeLimit = 0L;
             undoString = null;
             textBeforeCursor.invalidate();
             textAfterCursor.invalidate();
@@ -572,13 +569,25 @@ textAfterCursor. ;
         {
         Scribe.locus( Debug.CURSOR );
 
-        if ( !heavyCheckEnabled && realCursorPosition != calculatedCursorPosition )
+        if ( !heavyCheckEnabled )
             {
-            Scribe.debug( Debug.CURSOR, "LIGHT CHECK: Cursor positions doesn't match at the start of the bow! Position: " + realCursorPosition );
+            if (realCursorPosition != calculatedCursorPosition)
+                {
+                Scribe.debug(Debug.CURSOR, "LIGHT CHECK: Cursor positions doesn't match at the start of the bow!" +
+                        " Calculated: " + calculatedCursorPosition +
+                        " Real: " + realCursorPosition);
 
-            textBeforeCursor.invalidate();
-            textAfterCursor.invalidate();
-            calculatedCursorPosition = realCursorPosition;
+                textBeforeCursor.invalidate();
+                textAfterCursor.invalidate();
+                calculatedCursorPosition = realCursorPosition;
+                } else
+                {
+                Scribe.debug(Debug.CURSOR, "LIGHT CHECK: Cursor positions match. Position: " + realCursorPosition);
+                }
+            }
+        else
+            {
+            Scribe.debug( Debug.CURSOR, "HEAVY CHECK: Cursor position check is not needed.");
             }
         }
 

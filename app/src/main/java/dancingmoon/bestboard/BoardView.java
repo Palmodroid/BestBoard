@@ -815,6 +815,9 @@ public class BoardView extends View
                     // meta check could be here, just after the first event
 
                     // new MAIN bow created, evaluation is finished
+
+Scribe.debug( Debug.TEXT, "Main touch - first send is finished.");
+
                     return;
                     }
 
@@ -853,8 +856,11 @@ public class BoardView extends View
             if ( mainTouchBow.isLong() && mainTouchBow.buttonMainTouch != null)
                 {
                 Scribe.debug( Debug.TOUCH, "LONG touch is detected." );
-                mainTouchBow.buttonMainTouch.mainTouchOnCircle( false );
+                mainTouchBow.buttonMainTouch.mainTouchOnCircle(false);
                 mainTouchBow.resetMoveAndPressureCounter();
+
+Scribe.debug(Debug.TEXT, "Main touch - long send is finished.");
+
                 }
 
             // check bow's press
