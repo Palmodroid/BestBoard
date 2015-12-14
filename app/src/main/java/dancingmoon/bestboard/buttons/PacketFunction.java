@@ -5,6 +5,8 @@ import android.content.Intent;
 import dancingmoon.bestboard.Commands;
 import dancingmoon.bestboard.PrefsActivity;
 import dancingmoon.bestboard.SoftBoardData;
+import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.utils.ExternalDataException;
 
 /**
@@ -108,4 +110,15 @@ public class PacketFunction extends Packet
             softBoardData.softBoardListener.getApplicationContext().startActivity( intent );
             }
         }
+
+    @Override
+    public void release()
+        {
+        if ( functionCode == Commands.TOKEN_BACKSPACE )
+            {
+            // If needed, this could be a standalone method, called when touch releases the button
+            ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS]).setAutoCapsState( CapsState.AUTOCAPS_OFF );
+            }
+        }
+
     }

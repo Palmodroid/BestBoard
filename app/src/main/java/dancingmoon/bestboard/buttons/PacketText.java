@@ -1,6 +1,8 @@
 package dancingmoon.bestboard.buttons;
 
+import dancingmoon.bestboard.Debug;
 import dancingmoon.bestboard.SoftBoardData;
+import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.utils.HardKey;
@@ -172,6 +174,7 @@ public class PacketText extends Packet
     	{
         // If needed, this could be a standalone method, called when touch releases the button
         ( (CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS] ).setAutoCapsState( autoCaps );
+        Scribe.debug(Debug.TEXT, "PacketText released, autocaps state is set.");
         }
     }
 
