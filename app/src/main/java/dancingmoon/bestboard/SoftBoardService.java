@@ -419,6 +419,13 @@ public class SoftBoardService extends InputMethodService implements
     /** Lastly sent string. Null if undo is not possible */
     private String undoString;
 
+    private static final long NEVER = Long.MAX_VALUE;
+
+    private static final long ALWAYS = 0L;
+
+    // -> CHAT
+    private long checkEnabledAfter = ALWAYS;
+
 /*
 ? heavyCheckEnabled
 realCursorPosition= ; // -1 text selected
@@ -543,7 +550,22 @@ textAfterCursor. ;
 
             if ( calculatedCursorPosition != realCursorPosition )
                 {
-                Scribe.error( Debug.CURSOR, "Calculated position does not match: " + calculatedCursorPosition );
+                if ( System.nanoTime() > checkEnabledAfter )
+                    {
+                    Scribe.error( Debug.CURSOR, "Position check is enabled. Calculated position does not match: " + calculatedCursorPosition );
+
+                    calculatedCursorPosition = realCursorPosition;
+
+                    if ( softBoardData != null )
+                        {
+                        ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS]).setAutoCapsState(CapsState.AUTOCAPS_OFF);
+                        boardView.invalidate();
+                        }
+                    }
+                else
+                    {
+                    Scribe.error( Debug.CURSOR, "Position check is disabled. Calculated position does not match: " + calculatedCursorPosition );
+                    }
                 }
             }
 
@@ -565,9 +587,11 @@ textAfterCursor. ;
      * Only if light check is active:
      * if real and calculated positions are different, then stored text is invalidated
      */
-    public void checkCursorPosition()
+    public void checkAtBowStart()
         {
-        Scribe.locus( Debug.CURSOR );
+        Scribe.locus(Debug.CURSOR);
+
+        checkEnabledAfter = ALWAYS;
 
         if ( !heavyCheckEnabled )
             {
@@ -587,7 +611,17 @@ textAfterCursor. ;
             }
         else
             {
-            Scribe.debug( Debug.CURSOR, "HEAVY CHECK: Cursor position check is not needed.");
+            Scribe.debug(Debug.CURSOR, "HEAVY CHECK: Cursor position check is not needed.");
+            }
+        }
+
+    public void checkAtStrokeEnd()
+        {
+        Scribe.locus( Debug.CURSOR );
+
+        if ( checkEnabledAfter == NEVER )
+            {
+            checkEnabledAfter = System.nanoTime() + 100L * 1000000L;
             }
         }
 
@@ -606,6 +640,7 @@ textAfterCursor. ;
 
         undoString = string;
         calculatedCursorPosition += string.length();
+        checkEnabledAfter = NEVER;
         if ( !heavyCheckEnabled )
             {
             Scribe.debug(Debug.TEXT, "Text before cursor is updated, because time checking!");
@@ -634,6 +669,7 @@ textAfterCursor. ;
             {
             undoString = null;
             calculatedCursorPosition -= length;
+            checkEnabledAfter = NEVER;
             if ( !heavyCheckEnabled)
                 {
                 Scribe.debug(Debug.TEXT, "Text before cursor is updated (deleted), because time checking!");
@@ -654,6 +690,7 @@ textAfterCursor. ;
             {
             undoString = null;
             // calculatedCursorPosition does not change
+            checkEnabledAfter = NEVER;
             if ( !heavyCheckEnabled )
                 {
                 Scribe.debug(Debug.TEXT, "Text after cursor is updated (deleted), because time checking!");

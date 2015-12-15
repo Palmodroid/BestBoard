@@ -419,7 +419,8 @@ public class SoftBoardData
 
         TextBeforeCursor getTextBeforeCursor();
 
-        public void checkCursorPosition();
+        void checkAtBowStart();
+        void checkAtStrokeEnd();
 
         void deleteCharBeforeCursor(int n);
         void deleteCharAfterCursor(int n);

@@ -256,8 +256,7 @@ public class BoardView extends View
         // Elevated (empty) main touch
         MainTouchBow()
             {
-            this.touchCode = Board.EMPTY_TOUCH_CODE;
-            this.buttonMainTouch = null;
+            this( Board.EMPTY_TOUCH_CODE, null );
             }
 
         MainTouchBow(int touchCode, ButtonMainTouch buttonMainTouch)
@@ -268,7 +267,11 @@ public class BoardView extends View
             if ( buttonMainTouch != null )
                 {
                 // in light-check cursor position should be checked before a new bow
-                board.softBoardData.softBoardListener.checkCursorPosition();
+                board.softBoardData.softBoardListener.checkAtBowStart();
+                }
+            else
+                {
+                board.softBoardData.softBoardListener.checkAtStrokeEnd();
                 }
             }
 
@@ -384,7 +387,7 @@ public class BoardView extends View
         int index;
         int id;
 
-        Scribe.locus( Debug.TEXT ); // Debug.TOUCH_VERBOSE );
+        Scribe.locus( Debug.TOUCH_VERBOSE );
         // Scribe.debug( Debug.VIEW, this.toString() + " touchEvent " + event.getActionMasked());
 
         pointerChangeFlag = NO_CHANGE;
