@@ -384,7 +384,7 @@ public class BoardView extends View
         int index;
         int id;
 
-        Scribe.locus( Debug.TOUCH_VERBOSE );
+        Scribe.locus( Debug.TEXT ); // Debug.TOUCH_VERBOSE );
         // Scribe.debug( Debug.VIEW, this.toString() + " touchEvent " + event.getActionMasked());
 
         pointerChangeFlag = NO_CHANGE;
