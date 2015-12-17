@@ -45,8 +45,12 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
         if ( isTouchUp && !done )
             {
             packet.send();
-            packet.release();   // autocaps should be set
+            done = true;
             }
+
+        if (done)
+            packet.release();   // autocaps should be set
+
         // done = false; // this is not needed, because bow will always start first
         }
 

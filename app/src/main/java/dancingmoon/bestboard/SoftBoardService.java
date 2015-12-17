@@ -6,6 +6,7 @@ import android.inputmethodservice.InputMethodService;
 import android.os.Environment;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.text.InputType;
 import android.view.InputDevice;
 import android.view.KeyCharacterMap;
 import android.view.KeyEvent;
@@ -393,18 +394,19 @@ public class SoftBoardService extends InputMethodService implements
     /**
      * FALSE: getText... methods are disabled - no communication is enabled
      */
-    private boolean getTextEnabled = true;
+    private boolean retrieveTextEnabled = true;
 
     /**
      * FALSE: stored text and calculated position are used; cursor position is checked after time-limit
      * TRUE: text around cursor is always re-read, stored text/cursor position are not used
      */
-    private boolean heavyCheckEnabled = false;
+    // private boolean heavyCheckEnabled = false;
+    private boolean storeTextEnabled = true;
 
     /** public access is needed by Connection */
-    public boolean isHeavyCheckEnabled()
+    public boolean isStoreTextEnabled()
         {
-        return heavyCheckEnabled;
+        return storeTextEnabled;
         }
 
     /** realCursorPosition value if text is selected */
@@ -425,6 +427,8 @@ public class SoftBoardService extends InputMethodService implements
 
     // -> CHAT
     private long checkEnabledAfter = ALWAYS;
+
+    private int elongationPeriod;
 
 /*
 ? heavyCheckEnabled
@@ -466,42 +470,106 @@ textAfterCursor. ;
         }
 
 
-    public void initInput()
+    /**
+     * Initializes a new text session.
+     * This happens at each EditText start, and at each uncontrolled cursor movements
+     */
+    private void initTextSession()
         {
+        // no undo at start
+        undoString = null;
+
+        // surrounding text is changed
+        textBeforeCursor.invalidate();
+        textAfterCursor.invalidate();
+
         if ( softBoardData != null )
             {
+            boardView.type();
+            ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
+                    .setAutoCapsState(CapsState.AUTOCAPS_OFF);
+            boardView.invalidate();
+            }
+
+        }
+
+
+    public void initInput()
+        {
+        if (softBoardData != null)
+            {
+            Scribe.title( "Editor session started" );
+
             EditorInfo editorInfo = getCurrentInputEditorInfo();
             Scribe.debug( Debug.TEXT, "Start: " + editorInfo.initialSelStart + ", end: " + editorInfo.initialSelEnd);
 
             // position of the cursor
             calculatedCursorPosition = editorInfo.initialSelStart;
+
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
+            String retrieveTextPreference = sharedPrefs.getString(getString(R.string.editing_retrieve_text_key),
+                    getString(R.string.editing_retrieve_text_default));
+
+            if ( retrieveTextPreference.startsWith("E") )
+                {
+                retrieveTextEnabled = true;
+                Scribe.debug(Debug.CURSOR, "Editing (retrieve text) is enabled (forced)");
+                }
+            else if ( retrieveTextPreference.startsWith("D") )
+                {
+                retrieveTextEnabled = false;
+                Scribe.debug(Debug.CURSOR, "Editing (retrieve text) is disabled (forced)");
+                }
+            else
+                {
+                retrieveTextEnabled = (calculatedCursorPosition >= 0);
+                Scribe.debug(Debug.CURSOR, "Editing is set automatically. Retrieve text: " + retrieveTextEnabled);
+                }
+
+            String storeTextPreference = sharedPrefs.getString(getString(R.string.editing_store_text_key),
+                    getString(R.string.editing_store_text_default));
+
+            if ( storeTextPreference.startsWith("E") )
+                {
+                storeTextEnabled = true;
+                Scribe.debug(Debug.CURSOR, "Editing (store text) is enabled (forced), LIGHT check.");
+                }
+            else if ( storeTextPreference.startsWith("D") )
+                {
+                storeTextEnabled = false;
+                Scribe.debug(Debug.CURSOR, "Editing (store text) is disabled (forced), HEAVY check.");
+                }
+            else
+                {
+                int inputType = editorInfo.inputType & InputType.TYPE_MASK_CLASS;
+
+                if ( inputType == InputType.TYPE_CLASS_TEXT || inputType == 0 )
+                    {
+                    storeTextEnabled = true;
+                    Scribe.debug(Debug.CURSOR, "Editing (store text) is enabled automatically. LIGHT CHECK" );
+                    }
+                else
+                    {
+                    storeTextEnabled = false;
+                    Scribe.debug(Debug.CURSOR, "Editing (store text) is disabled automatically. HEAVY CHECK" );
+                    }
+                }
+
+            elongationPeriod = sharedPrefs.getInt( PrefsFragment.EDITING_ELONGATION_PERIOD_INT_KEY, 0 );
+            Scribe.debug( Debug.CURSOR, "Elongation period: " + elongationPeriod );
+
             if ( editorInfo.initialSelStart != editorInfo.initialSelEnd )
                 {
                 // text is selected
                 realCursorPosition = TEXT_SELECTED;
-                Scribe.debug( Debug.CURSOR, "Editor initialized: cursor position invalid, text is selected");
+                Scribe.debug( Debug.CURSOR, "Text is selected");
                 }
             else
                 {
                 // text is not selected
                 realCursorPosition = editorInfo.initialSelStart;
-                if ( realCursorPosition < 0 )
-                    {
-                    getTextEnabled = false;
-                    Scribe.debug(Debug.CURSOR, "Editor initialized: no info about text, get-text is disabled");
-                    }
-                else
-                    {
-                    Scribe.debug(Debug.CURSOR, "Editor initialized: cursor position: " + realCursorPosition);
-                    }
+                Scribe.debug(Debug.CURSOR, "Cursor position: " + realCursorPosition);
                 }
-
-            // no undo at start
-            undoString = null;
-
-            // surrounding text is changed
-            textBeforeCursor.invalidate();
-            textAfterCursor.invalidate();
 
             // pressed hard-keys are released
             softBoardData.boardStates.resetSimulatedMetaButtons();
@@ -509,18 +577,14 @@ textAfterCursor. ;
             // enter's title is set
             softBoardData.setAction(editorInfo.imeOptions);
 
-            // set autocapsstate depending on field behavior and cursor position
+            initTextSession();
+
+            // set autocaps state depending on field behavior and cursor position
             if ( calculatedCursorPosition == 0 && editorInfo.initialCapsMode != 0 )
                 {
                 ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
                         .setAutoCapsState(CapsState.AUTOCAPS_ON);
                 }
-            else
-                {
-                ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
-                        .setAutoCapsState(CapsState.AUTOCAPS_OFF);
-                }
-            getBoardView().invalidate();
             }
         }
 
@@ -541,46 +605,42 @@ textAfterCursor. ;
                 candidatesStart, candidatesEnd);
         Scribe.locus(Debug.TEXT);
 
+        // Cursor movement checking is independent from selection.
+        // Cursor position is the start of the selection.
+        if ( calculatedCursorPosition != newSelStart )
+            {
+            if ( System.nanoTime() > checkEnabledAfter )
+                {
+                Scribe.debug( Debug.CURSOR, "Cursor is moving. Calculated position does not match: " + calculatedCursorPosition );
+
+                calculatedCursorPosition = newSelStart;
+
+                initTextSession();
+                }
+            else
+                {
+                Scribe.debug( Debug.CURSOR, "Text processing is not yet finished. Calculated position does not match: " + calculatedCursorPosition );
+                }
+            }
+
         // Text is NOT selected...
         if ( newSelStart == newSelEnd )
             {
             Scribe.debug( Debug.CURSOR, "Real cursor position: " + newSelStart );
-
             realCursorPosition = newSelStart;
-
-            if ( calculatedCursorPosition != realCursorPosition )
-                {
-                if ( System.nanoTime() > checkEnabledAfter )
-                    {
-                    Scribe.error( Debug.CURSOR, "Position check is enabled. Calculated position does not match: " + calculatedCursorPosition );
-
-                    calculatedCursorPosition = realCursorPosition;
-
-                    if ( softBoardData != null )
-                        {
-                        ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS]).setAutoCapsState(CapsState.AUTOCAPS_OFF);
-                        boardView.invalidate();
-                        }
-                    }
-                else
-                    {
-                    Scribe.error( Debug.CURSOR, "Position check is disabled. Calculated position does not match: " + calculatedCursorPosition );
-                    }
-                }
             }
 
         // Text is selected
         else // newSelStart != newSelEnd
             {
             Scribe.debug( Debug.CURSOR, "Cursor position: Text is selected, cursor position is invalidated!");
-
             realCursorPosition = TEXT_SELECTED;
             calculatedCursorPosition = newSelStart;
-            undoString = null;
-            textBeforeCursor.invalidate();
-            textAfterCursor.invalidate();
+
+            initTextSession();
             }
         }
+
 
     /**
      * This method is called by BoardView.MainTouchBow constructor
@@ -593,7 +653,7 @@ textAfterCursor. ;
 
         checkEnabledAfter = ALWAYS;
 
-        if ( !heavyCheckEnabled )
+        if ( storeTextEnabled )
             {
             if (realCursorPosition != calculatedCursorPosition)
                 {
@@ -604,7 +664,8 @@ textAfterCursor. ;
                 textBeforeCursor.invalidate();
                 textAfterCursor.invalidate();
                 calculatedCursorPosition = realCursorPosition;
-                } else
+                }
+            else
                 {
                 Scribe.debug(Debug.CURSOR, "LIGHT CHECK: Cursor positions match. Position: " + realCursorPosition);
                 }
@@ -621,7 +682,8 @@ textAfterCursor. ;
 
         if ( checkEnabledAfter == NEVER )
             {
-            checkEnabledAfter = System.nanoTime() + 100L * 1000000L;
+            checkEnabledAfter = System.nanoTime() + (long)elongationPeriod * 1000000L;
+            Scribe.debug( Debug.CURSOR, "Check is enabled after: " + checkEnabledAfter );
             }
         }
 
@@ -641,9 +703,9 @@ textAfterCursor. ;
         undoString = string;
         calculatedCursorPosition += string.length();
         checkEnabledAfter = NEVER;
-        if ( !heavyCheckEnabled )
+        if ( storeTextEnabled )
             {
-            Scribe.debug(Debug.TEXT, "Text before cursor is updated, because time checking!");
+            Scribe.debug(Debug.TEXT, "LIGHT CHECK: Text before cursor is updated.");
             textBeforeCursor.sendString(string);
             textAfterCursor.invalidate();
             }
@@ -670,9 +732,9 @@ textAfterCursor. ;
             undoString = null;
             calculatedCursorPosition -= length;
             checkEnabledAfter = NEVER;
-            if ( !heavyCheckEnabled)
+            if ( storeTextEnabled )
                 {
-                Scribe.debug(Debug.TEXT, "Text before cursor is updated (deleted), because time checking!");
+                Scribe.debug(Debug.TEXT, "LIGHT CHECK: Text before cursor is updated (deleted).");
                 textBeforeCursor.sendDelete(length);
                 }
             inputConnection.deleteSurroundingText(length, 0);
@@ -691,9 +753,9 @@ textAfterCursor. ;
             undoString = null;
             // calculatedCursorPosition does not change
             checkEnabledAfter = NEVER;
-            if ( !heavyCheckEnabled )
+            if ( storeTextEnabled )
                 {
-                Scribe.debug(Debug.TEXT, "Text after cursor is updated (deleted), because time checking!");
+                Scribe.debug(Debug.TEXT, "LIGHT CHECK: Text after cursor is updated (deleted).");
                 textAfterCursor.sendDelete(length);
                 }
             inputConnection.deleteSurroundingText( 0, length );
@@ -738,7 +800,13 @@ textAfterCursor. ;
         InputConnection ic = getCurrentInputConnection();
         if ( ic != null && undoString != null )
             {
-            if (heavyCheckEnabled)
+            if ( storeTextEnabled )
+                {
+                sendDeleteBeforeCursor(ic, undoString.length());
+                undoString = null;
+                return true;
+                }
+            else
                 {
                 if (textBeforeCursor.compare(undoString))
                     {
@@ -751,12 +819,6 @@ textAfterCursor. ;
                     {
                     Scribe.debug(Debug.TEXT, "HEAVY CHECK: Text undo: string does NOT match!");
                     }
-                }
-            else
-                {
-                sendDeleteBeforeCursor(ic, undoString.length());
-                undoString = null;
-                return true;
                 }
             }
         return false;
@@ -1034,7 +1096,7 @@ textAfterCursor. ;
      */
     public CharSequence getTextBeforeCursor( int n )
         {
-        if ( getTextEnabled )
+        if (retrieveTextEnabled)
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)
@@ -1054,7 +1116,7 @@ textAfterCursor. ;
      */
     public CharSequence getTextAfterCursor( int n )
         {
-        if ( getTextEnabled )
+        if (retrieveTextEnabled)
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)

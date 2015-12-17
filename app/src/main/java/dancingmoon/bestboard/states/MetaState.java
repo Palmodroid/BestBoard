@@ -19,7 +19,7 @@ public abstract class MetaState
     /** ACTIVE state - only for the next non-meta button */
     public final static int META_ON = 1;
     /** ACTIVE state - locked */
-    public final static int META_LOCK = 2;
+    public final static int META_LOCK = 3;
 
 
     /**

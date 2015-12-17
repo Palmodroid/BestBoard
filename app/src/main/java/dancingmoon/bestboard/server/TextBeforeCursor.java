@@ -158,17 +158,17 @@ public class TextBeforeCursor
 
 
     /**
-     * Same as rewind, but if haevy checking is enabled, text will be invalidated
+     * Same as rewind, but if heavy checking is enabled, text will be invalidated
      */
     public void reset()
         {
-        if ( connection.isHeavyCheckEnabled() )
+        if ( connection.isStoreTextEnabled() )
             {
-            invalidate();
+            rewind();
             }
         else
             {
-            rewind();
+            invalidate();
             }
         }
 

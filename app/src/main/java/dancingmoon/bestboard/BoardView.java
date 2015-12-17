@@ -19,6 +19,8 @@ import dancingmoon.bestboard.buttons.Button;
 import dancingmoon.bestboard.buttons.ButtonMainTouch;
 import dancingmoon.bestboard.buttons.ButtonMultiTouch;
 import dancingmoon.bestboard.scribe.Scribe;
+import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.states.MetaState;
 
 public class BoardView extends View
@@ -689,6 +691,21 @@ public class BoardView extends View
 
 
     /**
+     * "type" will turn off meta/link ON states
+     */
+    public void type()
+        {
+        // if not meta -> call meta-states, maybe they should finish
+        for (MetaState metaState : board.softBoardData.boardStates.metaStates)
+            {
+            metaState.type();
+            }
+
+        board.softBoardData.linkState.type();
+        }
+
+
+    /**
      * Each main touch arrives here.
      * Bows should start and finish here, but moving and pressing will increase bow values in onTouchEvents.
      * - bowAction: TOUCH_DOWN, TOUCH_HOLD, TOUCH_MOVE, TOUCH_UP
@@ -774,21 +791,17 @@ public class BoardView extends View
                 {
                 Scribe.debug( Debug.TOUCH, "Previous button is released: " + mainTouchBow.buttonMainTouch.getString() );
 
+                // meta check could be here, after finishing the next main-stream button
+                // but in this case we should finish here
+
+                // Clears meta ON states
+                type();
+
+                // PacketTest sets autoCaps state
                 if (bowAction == TOUCH_UP)
                     mainTouchBow.buttonMainTouch.mainTouchEnd(true);
                 else
                     mainTouchBow.buttonMainTouch.mainTouchEnd(false);
-
-                // meta check could be here, after finishing the next main-stream button
-                // but in this case we should finish here
-
-                // if not meta -> call meta-states, maybe they should finish
-                for (MetaState metaState : board.softBoardData.boardStates.metaStates)
-                    {
-                    metaState.type();
-                    }
-
-                board.softBoardData.linkState.type();
 
                 // if board was changed during type, no further buttons could be evaluated!
                 if ( pointerChangeFlag == BOARD_CHANGE )
@@ -818,8 +831,6 @@ public class BoardView extends View
                     // meta check could be here, just after the first event
 
                     // new MAIN bow created, evaluation is finished
-
-Scribe.debug( Debug.TEXT, "Main touch - first send is finished.");
 
                     return;
                     }
@@ -852,8 +863,7 @@ Scribe.debug( Debug.TEXT, "Main touch - first send is finished.");
             // "outside" areas ends here
             Scribe.debug( Debug.TOUCH, "MAIN pointer has no attached button.");
             mainTouchBow = new MainTouchBow(newBowTouchCode, null);
-            }
-        else // same bow
+            } else // same bow
             {
             // check bow's long
             if ( mainTouchBow.isLong() && mainTouchBow.buttonMainTouch != null)
@@ -861,9 +871,6 @@ Scribe.debug( Debug.TEXT, "Main touch - first send is finished.");
                 Scribe.debug( Debug.TOUCH, "LONG touch is detected." );
                 mainTouchBow.buttonMainTouch.mainTouchOnCircle(false);
                 mainTouchBow.resetMoveAndPressureCounter();
-
-Scribe.debug(Debug.TEXT, "Main touch - long send is finished.");
-
                 }
 
             // check bow's press

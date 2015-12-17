@@ -166,7 +166,37 @@
 			android:dialogMessage="@string/cursor_stroke_color_dialog_message"
 			android:defaultValue="@string/cursor_stroke_color_default" /-->
 
-	</PreferenceCategory>
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:title="@string/prefs_editing">
+
+        <ListPreference
+			android:key="@string/editing_retrieve_text_key"
+			android:title="@string/editing_retrieve_text_title"
+			android:summary="@string/editing_retrieve_text_summary"
+			android:entries="@array/trileanlistentries"
+			android:entryValues="@array/trileanlistvalues"
+            android:defaultValue="@string/editing_retrieve_text_default"/>
+
+        <ListPreference
+            android:key="@string/editing_store_text_key"
+            android:title="@string/editing_store_text_title"
+            android:summary="@string/editing_store_text_summary"
+            android:entries="@array/trileanlistentries"
+            android:entryValues="@array/trileanlistvalues"
+            android:defaultValue="@string/editing_store_text_default"/>
+
+        <EditTextPreference
+            android:key="@string/editing_elongation_period_key"
+            android:inputType="number"
+            android:title="@string/editing_elongation_period_title"
+            android:summary="@string/editing_elongation_period_summary"
+            android:dialogTitle="@string/editing_elongation_period_dialog_title"
+            android:dialogMessage="@string/editing_elongation_period_dialog_message"
+            android:defaultValue="@string/editing_elongation_period_default" />
+        
+    </PreferenceCategory>
 
 	<PreferenceCategory
 		android:title="@string/prefs_debug">

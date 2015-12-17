@@ -111,13 +111,14 @@ public class PacketFunction extends Packet
             }
         }
 
+
     @Override
     public void release()
         {
         if ( functionCode == Commands.TOKEN_BACKSPACE )
             {
-            // If needed, this could be a standalone method, called when touch releases the button
-            ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS]).setAutoCapsState( CapsState.AUTOCAPS_OFF );
+            ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
+                    .setAutoCapsState(CapsState.AUTOCAPS_OFF);
             }
         }
 

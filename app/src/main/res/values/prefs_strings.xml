@@ -122,12 +122,45 @@
     <string name="cursor_stroke_color_default">100</string>
 
 
+    <string name="prefs_editing">Editing control</string>
+
+    <string name="editing_retrieve_text_key">retrievetext</string>
+    <string name="editing_retrieve_text_title">Enable keyboard-editor communication</string>
+    <string name="editing_retrieve_text_summary">Retrieve text property is not set properly.</string>
+    <string name="editing_retrieve_text_automatic">Text retrieval is disabled only if editor-info contains invalid values.</string>
+    <string name="editing_retrieve_text_enabled">Text retrieval is enabled. (Disable, if editor behaves abnormally!)</string>
+    <string name="editing_retrieve_text_disabled">Text retrieval is disabled. Editing functions are limited.</string>
+
+    <string name="editing_store_text_key">storetext</string>
+    <string name="editing_store_text_title">Enable to store text during text-session</string>
+    <string name="editing_store_text_summary">Store text property is not set properly.</string>
+    <string name="editing_store_text_automatic">Text is stored only in simple text (non restricted) fields.</string>
+    <string name="editing_store_text_enabled">Text is always stored during a session. (Disable, if editor behaves abnormally!)</string>
+    <string name="editing_store_text_disabled">Text is never stored. (More accurate, but needs more resources.)</string>
+
+    <string-array name="trileanlistentries">
+        <item>Automatic</item>
+        <item>Enabled</item>
+        <item>Disabled</item>
+    </string-array>
+
+    <string-array name="trileanlistvalues">
+        <item>A</item>
+        <item>E</item>
+        <item>D</item>
+    </string-array>
+
+    <string name="editing_elongation_period_key">elongationperiod</string>
+    <string name="editing_elongation_period_title">Elongation period </string>
+    <string name="editing_elongation_period_summary">No cursor movements detected during the elongation period. Period length after button release: </string>
+    <string name="editing_elongation_period_dialog_title">Elongation period </string>
+    <string name="editing_elongation_period_dialog_message">Enter time of elongation after button release (in ms)! Cursor movements are not checked during this period.</string>
+
     <string name="prefs_debug">Log files</string>
 
     <string name="debug_key">debug</string>
     <string name="debug_title">Enable developer log</string>
     <string name="debug_summary">Detailed developer log can be enabled for debugging</string>
-
 
 
 

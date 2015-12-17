@@ -1,6 +1,8 @@
 package dancingmoon.bestboard.buttons;
 
 import dancingmoon.bestboard.SoftBoardData;
+import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.CapsState;
 
 /**
  * Packet represents the data sent by the keyboard.
@@ -38,7 +40,8 @@ public abstract class Packet
         
     /**
      * Finish duties, when button is left
-     * !! This method is not obligatory
+     * Packets are clearing AUTOCAPS state
+     * If need, this method can be overridden (PacketText)
      */
     public void release()
     	{

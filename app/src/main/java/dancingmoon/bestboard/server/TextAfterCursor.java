@@ -87,13 +87,13 @@ public class TextAfterCursor
      */
     public void reset()
         {
-        if ( connection.isHeavyCheckEnabled() )
+        if ( connection.isStoreTextEnabled() )
             {
-            invalidate();
+            textCounter = -1;
             }
         else
             {
-            textCounter = -1;
+            invalidate();
             }
         }
 

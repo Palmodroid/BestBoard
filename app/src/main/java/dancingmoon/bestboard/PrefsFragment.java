@@ -82,6 +82,10 @@ public class PrefsFragment extends PreferenceFragment
     /** Time of repeat */
     public static String TOUCH_REPEAT_TIME_INT_KEY = "intrepeattime";
 
+    /** Elongation period */
+    public static String EDITING_ELONGATION_PERIOD_INT_KEY = "intelongationperiod";
+
+
     // -- NEW INTEGER PREFERENCE KEYS SHOULD COME HERE -- //
 
 
@@ -132,14 +136,16 @@ public class PrefsFragment extends PreferenceFragment
             // Integer preferences should be set, too
             // !! This will happen at every start, checking an int pref could avoid repeat !!
             checkAndStoreHeightRatioPref(context);
-            checkAndStoreLandscapeOffsetPref( context );
-            checkAndStoreOuterRimPref( context );
+            checkAndStoreLandscapeOffsetPref(context);
+            checkAndStoreOuterRimPref(context);
 
-            checkAndStoreLongCountPref( context );
-            checkAndStorePressCountPref( context );
-            checkAndStorePressThresholdPref( context );
-            checkAndStoreStayTimePref( context );
-            checkAndStoreRepeatTimePref( context );
+            checkAndStoreLongCountPref(context);
+            checkAndStorePressCountPref(context);
+            checkAndStorePressThresholdPref(context);
+            checkAndStoreStayTimePref(context);
+            checkAndStoreRepeatTimePref(context);
+
+            checkAndStoreElongationPeriod(context);
 
             // -- NEW INTEGER PREFERENCE CALLS SHOULD COME HERE -- //
 
@@ -274,8 +280,23 @@ public class PrefsFragment extends PreferenceFragment
                 R.integer.touch_repeat_time_max );
         }
 
+    /**
+     * Checks and sets elongation period integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStoreElongationPeriod( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.editing_elongation_period_key,
+                EDITING_ELONGATION_PERIOD_INT_KEY,
+                R.string.editing_elongation_period_default,
+                R.integer.editing_elongation_period_min,
+                R.integer.editing_elongation_period_max );
+        }
 
     // -- NEW INTEGER PREFERENCE METHODS SHOULD COME HERE -- //
+
 
     /**
      * Helper method to check, correct and store an integer preference.
@@ -389,6 +410,11 @@ public class PrefsFragment extends PreferenceFragment
                 R.integer.touch_repeat_time_min,
                 R.integer.touch_repeat_time_max );
 
+        _prepareDialogMessage( R.string.editing_elongation_period_key,
+                R.string.editing_elongation_period_dialog_message,
+                R.integer.editing_elongation_period_min,
+                R.integer.editing_elongation_period_max );
+
         // -- NEW INTEGER PREFERENCE DIALOG MESSAGE PREPS SHOULD COME HERE -- //
         }
 
@@ -492,10 +518,10 @@ public class PrefsFragment extends PreferenceFragment
         // Drawing / Screen height ratio
         if ( key.equals( getString( R.string.drawing_height_ratio_key )) || allKeys )
             {
-            int heightRatio = checkAndStoreHeightRatioPref( getActivity() );
+            int heightRatio = checkAndStoreHeightRatioPref(getActivity());
 
             // Cannot be null, if prefs.xml is valid
-            Preference preference = findPreference( getString( R.string.drawing_height_ratio_key ) );
+            Preference preference = findPreference(getString(R.string.drawing_height_ratio_key));
             preference.setSummary(getString(R.string.drawing_height_ratio_summary) + " " +
                     Integer.toString(heightRatio));
             Scribe.note( Debug.PREF, "PREFERENCES: Screen height ratio has changed: " + heightRatio);
@@ -505,7 +531,7 @@ public class PrefsFragment extends PreferenceFragment
         // Drawing / Landscape offset for non-wide boards
         if ( key.equals( getString( R.string.drawing_landscape_offset_key )) || allKeys )
             {
-            int landscapeOffset = checkAndStoreLandscapeOffsetPref( getActivity() );
+            int landscapeOffset = checkAndStoreLandscapeOffsetPref(getActivity());
             // Cannot be null, if prefs.xml is valid
             Preference preference = findPreference( getString( R.string.drawing_landscape_offset_key ) );
             preference.setSummary(getString(R.string.drawing_landscape_offset_summary) + " " +
@@ -517,7 +543,7 @@ public class PrefsFragment extends PreferenceFragment
         // Drawing / Outer rim ratio
         if ( key.equals( getString( R.string.drawing_outer_rim_key )) || allKeys )
             {
-            int outerRim = checkAndStoreOuterRimPref( getActivity() );
+            int outerRim = checkAndStoreOuterRimPref(getActivity());
             // Cannot be null, if prefs.xml is valid
             Preference preference = findPreference( getString( R.string.drawing_outer_rim_key ) );
             preference.setSummary(getString(R.string.drawing_outer_rim_summary) + " " +
@@ -531,8 +557,8 @@ public class PrefsFragment extends PreferenceFragment
             {
             // Cannot be null, if prefs.xml is valid
             Preference preference = findPreference( getString( R.string.drawing_monitor_row_key ) );
-            boolean value = sharedPrefs.getBoolean( getString( R.string.drawing_monitor_row_key ),
-                    getResources().getBoolean( R.bool.drawing_monitor_row_default ) );
+            boolean value = sharedPrefs.getBoolean(getString(R.string.drawing_monitor_row_key),
+                    getResources().getBoolean(R.bool.drawing_monitor_row_default));
             preference.setSummary( getString( value ?
                     R.string.drawing_monitor_row_on : R.string.drawing_monitor_row_off ));
 
@@ -543,9 +569,9 @@ public class PrefsFragment extends PreferenceFragment
         // Touch / Long count
         if ( key.equals( getString( R.string.touch_long_count_key )) || allKeys )
             {
-            int longCount = checkAndStoreLongCountPref( getActivity() );
+            int longCount = checkAndStoreLongCountPref(getActivity());
             // Cannot be null, if prefs.xml is valid
-            Preference preference = findPreference( getString( R.string.touch_long_count_key ) );
+            Preference preference = findPreference(getString(R.string.touch_long_count_key));
             preference.setSummary(getString(R.string.touch_long_count_summary) + " " +
                     Integer.toString(longCount));
             Scribe.note( Debug.PREF, "PREFERENCES: Long counter has changed!" + longCount);
@@ -555,7 +581,7 @@ public class PrefsFragment extends PreferenceFragment
         // Touch / Press counter
         if ( key.equals( getString( R.string.touch_press_count_key )) || allKeys )
             {
-            int pressCount = checkAndStorePressCountPref( getActivity() );
+            int pressCount = checkAndStorePressCountPref(getActivity());
             // Cannot be null, if prefs.xml is valid
             Preference preference = findPreference( getString( R.string.touch_press_count_key ) );
             preference.setSummary(getString(R.string.touch_press_count_summary) + " " +
@@ -567,7 +593,7 @@ public class PrefsFragment extends PreferenceFragment
         // Touch / Press threshold
         if ( key.equals( getString( R.string.touch_press_threshold_key )) || allKeys )
             {
-            int pressThreshold = checkAndStorePressThresholdPref( getActivity() );
+            int pressThreshold = checkAndStorePressThresholdPref(getActivity());
             // Cannot be null, if prefs.xml is valid
             Preference preference = findPreference( getString( R.string.touch_press_threshold_key ) );
             preference.setSummary(getString(R.string.touch_press_threshold_summary) + " " +
@@ -579,7 +605,7 @@ public class PrefsFragment extends PreferenceFragment
         // Touch / Stay time
         if ( key.equals( getString( R.string.touch_stay_time_key )) || allKeys )
             {
-            int stayTime = checkAndStoreStayTimePref( getActivity() );
+            int stayTime = checkAndStoreStayTimePref(getActivity());
             // Cannot be null, if prefs.xml is valid
             Preference preference = findPreference( getString( R.string.touch_stay_time_key ) );
             preference.setSummary(getString(R.string.touch_stay_time_summary) + " " +
@@ -591,7 +617,7 @@ public class PrefsFragment extends PreferenceFragment
         // Touch / Repeat time
         if ( key.equals( getString( R.string.touch_repeat_time_key )) || allKeys )
             {
-            int repeatTime = checkAndStoreRepeatTimePref( getActivity() );
+            int repeatTime = checkAndStoreRepeatTimePref(getActivity());
             // Cannot be null, if prefs.xml is valid
             Preference preference = findPreference( getString( R.string.touch_repeat_time_key ) );
             preference.setSummary(getString(R.string.touch_repeat_time_summary) + " " +
@@ -614,6 +640,55 @@ public class PrefsFragment extends PreferenceFragment
             Scribe.note( Debug.PREF,  "PREFERENCES: Cursor stroke indicator has changed!" );
 
             if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
+        // Editing preferences do not need any refresh, because initInput reads them
+
+        // Editing / Retrieve text
+        if ( key.equals( getString( R.string.editing_retrieve_text_key)) || allKeys )
+            {
+            Preference preference = findPreference( getString( R.string.editing_retrieve_text_key) );
+            String value = sharedPrefs.getString(getString(R.string.editing_retrieve_text_key),
+                    getString(R.string.editing_retrieve_text_default));
+            if ( value.startsWith("A") )
+                preference.setSummary( getString(R.string.editing_retrieve_text_automatic));
+            else if ( value.startsWith("E") )
+                preference.setSummary(getString(R.string.editing_retrieve_text_enabled));
+            else if ( value.startsWith("D") )
+                preference.setSummary(getString(R.string.editing_retrieve_text_disabled));
+            else
+                preference.setSummary(getString(R.string.editing_retrieve_text_summary));
+
+            Scribe.note( Debug.PREF, "PREFERENCES: Editing (retrieve text) has changed!" + value);
+            }
+
+        // Editing / Store text
+        if ( key.equals( getString( R.string.editing_store_text_key)) || allKeys )
+            {
+            Preference preference = findPreference( getString( R.string.editing_store_text_key) );
+            String value = sharedPrefs.getString(getString(R.string.editing_store_text_key),
+                    getString(R.string.editing_store_text_default));
+            if ( value.startsWith("A") )
+                preference.setSummary( getString(R.string.editing_store_text_automatic));
+            else if ( value.startsWith("E") )
+                preference.setSummary(getString(R.string.editing_store_text_enabled));
+            else if ( value.startsWith("D") )
+                preference.setSummary(getString(R.string.editing_store_text_disabled));
+            else
+                preference.setSummary(getString(R.string.editing_store_text_summary));
+
+            Scribe.note( Debug.PREF, "PREFERENCES: Editing (store text) has changed!" + value);
+            }
+
+        // Editing / elongation period
+        if ( key.equals( getString( R.string.editing_elongation_period_key )) || allKeys )
+            {
+            int elongationPeriod = checkAndStoreElongationPeriod(getActivity());
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference(getString(R.string.editing_elongation_period_key));
+            preference.setSummary(getString(R.string.editing_elongation_period_summary) + " " +
+                    Integer.toString(elongationPeriod));
+            Scribe.note( Debug.PREF, "PREFERENCES: Elongation period has changed!" + elongationPeriod);
             }
 
         // Debug
