@@ -25,6 +25,32 @@ public abstract class Modify
         this.ignoreSpace = ignoreSpace;
         }
 
+    /**
+     * This method just helps to change the text before the spaces standing before the cursor
+     * @param reverse Direction of the change
+     */
+    public void change( boolean reverse )
+        {
+        int spaces=0;
+
+        if ( ignoreSpace )
+            {
+            spaces = softBoardListener.deleteSpacesBeforeCursor();
+            }
+
+        if ( reverse )
+            changeBack();
+        else
+            change();
+
+        if ( spaces >0 )
+            {
+            // http://stackoverflow.com/a/2807731
+            softBoardListener.sendString(new String(new char[spaces]).replace('\0', ' '), 0 );
+            }
+        }
+
+
     public abstract void change();
     public abstract void changeBack();
     }

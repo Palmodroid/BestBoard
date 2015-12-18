@@ -33,10 +33,7 @@ public class ButtonModify extends ButtonMainTouch implements Cloneable
         Modify modify = board.softBoardData.modify.get( modifyId );
         if ( modify != null )
             {
-            if ( reverse )
-                modify.changeBack();
-            else
-                modify.change();
+            modify.change( reverse );
             }
         else
             {

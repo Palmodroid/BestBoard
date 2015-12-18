@@ -63,13 +63,6 @@ public class ModifyChar extends Modify
      */
     public void change( )
         {
-        int spaces=0;
-
-        if ( ignoreSpace )
-            {
-            spaces = softBoardListener.deleteSpacesBeforeCursor();
-            }
-
         softBoardListener.getTextBeforeCursor().reset();
         int last = softBoardListener.getTextBeforeCursor().read();
 
@@ -91,12 +84,6 @@ public class ModifyChar extends Modify
 
                     softBoardListener.changeStringBeforeCursor(
                             String.valueOf( rolls.get( rollCounter ).charAt( charCounter ) ));
-
-                    if ( spaces >0 )
-                        {
-                        // http://stackoverflow.com/a/2807731
-                        softBoardListener.sendString(new String(new char[spaces]).replace('\0', ' '), 0 );
-                        }
 
                     return;
                     }
@@ -126,13 +113,6 @@ public class ModifyChar extends Modify
      */
     public void changeBack( )
         {
-        int spaces=0;
-
-        if ( ignoreSpace )
-            {
-            spaces = softBoardListener.deleteSpacesBeforeCursor();
-            }
-
         softBoardListener.getTextBeforeCursor().reset();
         int last = softBoardListener.getTextBeforeCursor().read();
 
@@ -155,12 +135,6 @@ public class ModifyChar extends Modify
 
                     softBoardListener.changeStringBeforeCursor(
                         String.valueOf( rolls.get( stringCounter ).charAt( charCounter ) ));
-
-                    if ( spaces >0 )
-                        {
-                        // http://stackoverflow.com/a/2807731
-                        softBoardListener.sendString(new String(new char[spaces]).replace('\0', ' '), 0 );
-                        }
 
                     return;
                     }
