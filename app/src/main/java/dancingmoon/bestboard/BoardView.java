@@ -691,16 +691,32 @@ public class BoardView extends View
 
 
     /**
+     * !! THIS SHOULD GO TO BOARD STATES !!
      * "type" will turn off meta/link ON states
      */
     public void type()
+        {
+        typeMetaState();
+        typeLinkState();
+        }
+
+    /**
+     * evaluateMain should call meta and link separately
+     */
+    private void typeMetaState()
         {
         // if not meta -> call meta-states, maybe they should finish
         for (MetaState metaState : board.softBoardData.boardStates.metaStates)
             {
             metaState.type();
             }
+        }
 
+    /**
+     * evaluateMain should call meta and link separately
+     */
+    private void typeLinkState()
+        {
         board.softBoardData.linkState.type();
         }
 
@@ -795,13 +811,16 @@ public class BoardView extends View
                 // but in this case we should finish here
 
                 // Clears meta ON states
-                type();
+                typeMetaState();
 
                 // PacketTest sets autoCaps state
                 if (bowAction == TOUCH_UP)
                     mainTouchBow.buttonMainTouch.mainTouchEnd(true);
                 else
                     mainTouchBow.buttonMainTouch.mainTouchEnd(false);
+
+                // Clears link ON states - this could clear mainTouchBow, too
+                typeLinkState();
 
                 // if board was changed during type, no further buttons could be evaluated!
                 if ( pointerChangeFlag == BOARD_CHANGE )

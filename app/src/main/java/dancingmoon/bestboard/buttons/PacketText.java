@@ -38,7 +38,7 @@ public class PacketText extends Packet
     private int autoSpace = 0;
 
     /**
-     * Temporary variable to store uppercase status durin one cycle
+     * Temporary variable to store uppercase status during one cycle
      * It can be static, because only one needed at a time
      * 0 - no caps
      * 1 - first caps (only if stringcaps == false)
@@ -70,7 +70,7 @@ public class PacketText extends Packet
 
     /**
      * Creator of textual button data - Character type
-     * Currently PARAMTER_TEXT accepts String, Character and Integer data
+     * Currently PARAMETER_TEXT accepts String, Character and Integer data
      * Character and Integer are treated and are sent as char.
      * This behavior can be changed in SoftBoardParser.ParseOneParameter()
      * @param softBoardData general keyboard data class
@@ -137,12 +137,12 @@ public class PacketText extends Packet
                 }
             else if ( state == CapsState.META_LOCK || stringCaps )
                 {
-                capsState = 1;
+                capsState = 2;
 
                 }
             else // state == IN_TOUCH || META_ON || AUTOCAPS_ON
                 {
-                capsState = 2;
+                capsState = 1;
 
                 }
 

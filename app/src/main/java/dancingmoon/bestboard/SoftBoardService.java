@@ -615,7 +615,8 @@ textAfterCursor. ;
 
                 calculatedCursorPosition = newSelStart;
 
-                initTextSession();
+// JUST FOR TESTING !!
+//                initTextSession();
                 }
             else
                 {
