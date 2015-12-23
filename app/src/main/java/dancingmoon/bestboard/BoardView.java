@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Handler;
 import android.view.InflateException;
 import android.view.MotionEvent;
 import android.view.View;
@@ -266,13 +267,21 @@ public class BoardView extends View
             this.touchCode = touchCode;
             this.buttonMainTouch = buttonMainTouch;
 
+            // clear previous repeats
+            repeatHandler.removeCallbacks( repeatRunnable );
+
             if ( buttonMainTouch != null )
                 {
+                Scribe.debug( Debug.TOUCH, "MainTouchBow created.");
                 // in light-check cursor position should be checked before a new bow
                 board.softBoardData.softBoardListener.checkAtBowStart();
+
+                // start timing of repeats
+                repeatHandler.postDelayed( repeatRunnable, board.softBoardData.stayBowTime );
                 }
             else
                 {
+                Scribe.debug( Debug.TOUCH, "MainTouchBow with no button created.");
                 board.softBoardData.softBoardListener.checkAtStrokeEnd();
                 }
             }
@@ -287,8 +296,6 @@ public class BoardView extends View
         int moveCounter = 0;
         // strong presses applied to this bow
         int pressureCounter = 0;
-        // time, when touch should repeat
-        long nextRepeatTime = System.nanoTime() +  board.softBoardData.stayBowTime;
 
         void increaseMoveCounter()
             {
@@ -315,18 +322,6 @@ public class BoardView extends View
             {
             return pressureCounter == board.softBoardData.pressBowCount;
             }
-
-        void setNextRepeat( boolean isRepeating )
-            {
-            nextRepeatTime = System.nanoTime() +
-                    ( isRepeating ? board.softBoardData.repeatTime : board.softBoardData.stayBowTime );
-            }
-
-        boolean isNextRepeat()
-            {
-            return nextRepeatTime < System.nanoTime();
-            }
-
         }
 
     /**
@@ -336,6 +331,21 @@ public class BoardView extends View
      * (because empty buttons have got the same MainTouchBow; elevated is a special empty button)
      */
     private MainTouchBow mainTouchBow;
+
+
+    private Handler repeatHandler = new Handler();
+
+    private Runnable repeatRunnable = new Runnable()
+        {
+        @Override
+        public void run()
+            {
+            Scribe.debug( Debug.TOUCH, "REPEAT touch is detected." );
+            repeatHandler.postDelayed( repeatRunnable,
+                    mainTouchBow.buttonMainTouch.mainTouchOnStay() ?
+                    board.softBoardData.repeatTime : board.softBoardData.stayBowTime );
+            }
+        };
 
 
     // MULTI TOUCH - ButtonMultiTouch subclasses can work with multiple touches
@@ -391,6 +401,7 @@ public class BoardView extends View
 
         Scribe.locus( Debug.TOUCH_VERBOSE );
         // Scribe.debug( Debug.VIEW, this.toString() + " touchEvent " + event.getActionMasked());
+Scribe.error("touch");
 
         pointerChangeFlag = NO_CHANGE;
 
@@ -667,12 +678,14 @@ public class BoardView extends View
         		strokePoints.get(strokePoints.size() - 1).canvasX == strokePoint.canvasX &&
                 strokePoints.get(strokePoints.size() - 1).canvasY == strokePoint.canvasY)
             {
+Scribe.error("HOLD");
             // There were no point movements - TOUCH_HOLD
             // Points are not stored, but evaluation should be called,
-            evaluateMain(TOUCH_HOLD, strokePoint);
+            // Repeat touches are checked by repeat-handler - instead of evaluateMain(TOUCH_HOLD, strokePoint);
             }
         else // point was moved
             {
+Scribe.error("MOVE");
             // mainTouchBow.increaseMoveCounter(); -> evaluateMain - TOUCH_MOVE part
             // It is increased only if touch touches it's own button. On the surrounding buttons move counter is skipped.
             evaluateMain(TOUCH_MOVE, strokePoint);
@@ -740,16 +753,15 @@ public class BoardView extends View
         // - stroke is not hold
         if (bowAction != TOUCH_UP) // == (strokePoint != null)
             {
-            if (bowAction != TOUCH_HOLD)
-                {
-                strokePoints.add(strokePoint);
-                if (board.softBoardData.displayStroke) this.invalidate();
-                }
+            // if (bowAction != TOUCH_HOLD) - but HOLD never calls evaluate main
+            strokePoints.add(strokePoint);
+            if (board.softBoardData.displayStroke) this.invalidate();
             }
         // if bowAction == TOUCH_UP - strokePoints will be cleared later
 
         // FIRST: find out the touchCode for this new touch
-        int newBowTouchCode;
+        int newBowTouchCode = mainTouchBow.touchCode;
+
 
         if (bowAction == TOUCH_DOWN)
             {
@@ -785,12 +797,7 @@ public class BoardView extends View
             // Because this.invalidate will be called in the next section, this is not needed:
             // if (board.softBoardData.displayStroke) this.invalidate();
             }
-        else
-            {
-            // TOUCH_HOLD will not change the touchCode
-            newBowTouchCode = mainTouchBow.touchCode;
-            }
-
+        // else TOUCH_HOLD - but HOLD never calls evaluateMain - will not change the touchCode
 
         if (mainTouchBow.touchCode != newBowTouchCode)
             {
@@ -882,7 +889,8 @@ public class BoardView extends View
             // "outside" areas ends here
             Scribe.debug( Debug.TOUCH, "MAIN pointer has no attached button.");
             mainTouchBow = new MainTouchBow(newBowTouchCode, null);
-            } else // same bow
+            }
+        else // same bow
             {
             // check bow's long
             if ( mainTouchBow.isLong() && mainTouchBow.buttonMainTouch != null)
@@ -896,16 +904,11 @@ public class BoardView extends View
             if ( mainTouchBow.isPressed() && mainTouchBow.buttonMainTouch != null)
                 {
                 Scribe.debug( Debug.TOUCH, "PRESS touch is detected." );
-                mainTouchBow.buttonMainTouch.mainTouchOnCircle( true );
+                mainTouchBow.buttonMainTouch.mainTouchOnCircle(true);
                 mainTouchBow.resetMoveAndPressureCounter();
                 }
 
-            // check bow's repeat
-            if ( mainTouchBow.isNextRepeat() && mainTouchBow.buttonMainTouch != null)
-                {
-                Scribe.debug( Debug.TOUCH, "REPEAT touch is detected." );
-                mainTouchBow.setNextRepeat( mainTouchBow.buttonMainTouch.mainTouchOnStay() );
-                }
+            // bow's repeat - is checked by the repeat-handler
             }
         }
 

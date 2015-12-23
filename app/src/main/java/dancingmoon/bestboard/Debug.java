@@ -27,8 +27,8 @@ public class Debug
 
     public static final int PREF = 10;
     public static final int BOARD = 20;
-    public static final int TOUCH = 724;
-    public static final int TOUCH_VERBOSE = 724;
+    public static final int TOUCH = 24;
+    public static final int TOUCH_VERBOSE = 24;
     public static final int DRAW =26;
     public static final int DRAW_VERBOSE = 26;
     public static final int VIEW = 30;

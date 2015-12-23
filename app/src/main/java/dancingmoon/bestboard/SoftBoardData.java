@@ -255,9 +255,9 @@ public class SoftBoardData
 
         pressBowThreshold = (float)sharedPrefs.getInt( PrefsFragment.TOUCH_PRESS_THRESHOLD_INT_KEY, 0 ) / 1000f;
 
-        stayBowTime = sharedPrefs.getInt( PrefsFragment.TOUCH_STAY_TIME_INT_KEY, 0 ) * 1000000;
+        stayBowTime = sharedPrefs.getInt( PrefsFragment.TOUCH_STAY_TIME_INT_KEY, 0 ); // * 1000000;
 
-        repeatTime = sharedPrefs.getInt( PrefsFragment.TOUCH_REPEAT_TIME_INT_KEY, 0 ) * 1000000;
+        repeatTime = sharedPrefs.getInt( PrefsFragment.TOUCH_REPEAT_TIME_INT_KEY, 0 ); //  * 1000000;
 
 
 
@@ -325,12 +325,12 @@ public class SoftBoardData
     public float pressBowThreshold;
 
     /**
-     * Time of STAY to start secondary function - nanosec
+     * Time of STAY to start secondary function - millisec
      */
     public int stayBowTime;
 
     /**
-     * Time to repeat (repeat rate) - nanosec
+     * Time to repeat (repeat rate) - millisec
      */
     public int repeatTime;
 

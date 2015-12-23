@@ -615,8 +615,7 @@ textAfterCursor. ;
 
                 calculatedCursorPosition = newSelStart;
 
-// JUST FOR TESTING !!
-//                initTextSession();
+                initTextSession();
                 }
             else
                 {
@@ -662,9 +661,8 @@ textAfterCursor. ;
                         " Calculated: " + calculatedCursorPosition +
                         " Real: " + realCursorPosition);
 
-                textBeforeCursor.invalidate();
-                textAfterCursor.invalidate();
                 calculatedCursorPosition = realCursorPosition;
+                initTextSession();
                 }
             else
                 {
