@@ -612,9 +612,7 @@ textAfterCursor. ;
             if ( System.nanoTime() > checkEnabledAfter )
                 {
                 Scribe.debug( Debug.CURSOR, "Cursor is moving. Calculated position does not match: " + calculatedCursorPosition );
-
                 calculatedCursorPosition = newSelStart;
-
                 initTextSession();
                 }
             else
