@@ -20,8 +20,6 @@ import dancingmoon.bestboard.buttons.Button;
 import dancingmoon.bestboard.buttons.ButtonMainTouch;
 import dancingmoon.bestboard.buttons.ButtonMultiTouch;
 import dancingmoon.bestboard.scribe.Scribe;
-import dancingmoon.bestboard.states.BoardStates;
-import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.states.MetaState;
 
 public class BoardView extends View
@@ -401,7 +399,6 @@ public class BoardView extends View
 
         Scribe.locus( Debug.TOUCH_VERBOSE );
         // Scribe.debug( Debug.VIEW, this.toString() + " touchEvent " + event.getActionMasked());
-Scribe.error("touch");
 
         pointerChangeFlag = NO_CHANGE;
 
@@ -678,14 +675,12 @@ Scribe.error("touch");
         		strokePoints.get(strokePoints.size() - 1).canvasX == strokePoint.canvasX &&
                 strokePoints.get(strokePoints.size() - 1).canvasY == strokePoint.canvasY)
             {
-Scribe.error("HOLD");
             // There were no point movements - TOUCH_HOLD
             // Points are not stored, but evaluation should be called,
             // Repeat touches are checked by repeat-handler - instead of evaluateMain(TOUCH_HOLD, strokePoint);
             }
         else // point was moved
             {
-Scribe.error("MOVE");
             // mainTouchBow.increaseMoveCounter(); -> evaluateMain - TOUCH_MOVE part
             // It is increased only if touch touches it's own button. On the surrounding buttons move counter is skipped.
             evaluateMain(TOUCH_MOVE, strokePoint);

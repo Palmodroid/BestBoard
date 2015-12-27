@@ -9,7 +9,7 @@ import dancingmoon.bestboard.scribe.Scribe;
 public class TextAfterCursor
     {
     /** Last element is cleared above this limit */
-    public final static int LENGTH_LIMIT = 20;
+    public final static int LENGTH_LIMIT = 4;
 
     /** Connection to synchronize text directly from editor */
     private Connection connection;
@@ -116,7 +116,6 @@ public class TextAfterCursor
             // If string is not completely synchronized
             if ( !textReady )
                 {
-                textCounter -= textStart;
                 synchronize();
                 // Character is still non available
                 if ( textCounter >= text.length() ) // start == 0
