@@ -51,6 +51,8 @@
     <integer name="editing_elongation_period_min">0</integer>
     <integer name="editing_elongation_period_max">1000</integer>
 
+    <bool name="editing_text_session_default">true</bool>
+
     <bool name="debug_default">true</bool>
 
 </resources>

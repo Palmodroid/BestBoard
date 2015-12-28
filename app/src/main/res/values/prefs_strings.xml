@@ -156,6 +156,11 @@
     <string name="editing_elongation_period_dialog_title">Elongation period </string>
     <string name="editing_elongation_period_dialog_message">Enter time of elongation after button release (in ms)! Cursor movements are not checked during this period.</string>
 
+    <string name="editing_text_session_key">textsession</string>
+    <string name="editing_text_session_title">New text session and meta keys</string>
+    <string name="editing_text_session_on">New text session acts like a key-press on meta-states</string>
+    <string name="editing_text_session_off">New text session do not set meta-states</string>
+
     <string name="prefs_debug">Log files</string>
 
     <string name="debug_key">debug</string>

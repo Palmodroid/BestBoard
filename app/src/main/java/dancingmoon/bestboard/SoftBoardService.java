@@ -483,7 +483,7 @@ textAfterCursor. ;
         textBeforeCursor.invalidate();
         textAfterCursor.invalidate();
 
-        if ( softBoardData != null )
+        if ( softBoardData != null && softBoardData.textSessionSetsMetastates )
             {
             boardView.type();
             ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])

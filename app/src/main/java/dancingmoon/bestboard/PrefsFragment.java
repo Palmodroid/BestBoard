@@ -642,7 +642,8 @@ public class PrefsFragment extends PreferenceFragment
             if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
             }
 
-        // Editing preferences do not need any refresh, because initInput reads them
+        // Most editing preferences do not need any refresh, because initInput reads them
+        // Editing / Text sesion is read out by softboarddata
 
         // Editing / Retrieve text
         if ( key.equals( getString( R.string.editing_retrieve_text_key)) || allKeys )
@@ -689,6 +690,20 @@ public class PrefsFragment extends PreferenceFragment
             preference.setSummary(getString(R.string.editing_elongation_period_summary) + " " +
                     Integer.toString(elongationPeriod));
             Scribe.note( Debug.PREF, "PREFERENCES: Elongation period has changed!" + elongationPeriod);
+            }
+
+        // Editing / New text session
+        if ( key.equals( getString( R.string.editing_text_session_key )) || allKeys )
+            {
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.editing_text_session_key ) );
+            boolean value = sharedPrefs.getBoolean(getString(R.string.editing_text_session_key),
+                    getResources().getBoolean(R.bool.editing_text_session_default));
+            preference.setSummary( getString( value ?
+                    R.string.editing_text_session_on : R.string.editing_text_session_off ));
+
+            Scribe.note( Debug.PREF, "PREFERENCES: New text session is set to: " + value );
+            if ( !allKeys )     performAction( PREFS_ACTION_REFRESH );
             }
 
         // Debug

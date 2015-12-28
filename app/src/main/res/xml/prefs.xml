@@ -195,8 +195,13 @@
             android:dialogTitle="@string/editing_elongation_period_dialog_title"
             android:dialogMessage="@string/editing_elongation_period_dialog_message"
             android:defaultValue="@string/editing_elongation_period_default" />
-        
-    </PreferenceCategory>
+
+		<CheckBoxPreference
+			android:key="@string/editing_text_session_key"
+			android:title="@string/editing_text_session_title"
+			android:defaultValue="@bool/editing_text_session_default" />
+
+	</PreferenceCategory>
 
 	<PreferenceCategory
 		android:title="@string/prefs_debug">

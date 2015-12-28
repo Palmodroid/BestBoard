@@ -246,10 +246,10 @@ public class SoftBoardData
         outerRimPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0 );
 
         monitorRow = sharedPrefs.getBoolean(
-                softBoardListener.getApplicationContext().getString( R.string.drawing_monitor_row_key ),
-                false );
+                softBoardListener.getApplicationContext().getString(R.string.drawing_monitor_row_key),
+                false);
 
-        longBowCount = sharedPrefs.getInt( PrefsFragment.TOUCH_LONG_COUNT_INT_KEY, 0 );
+        longBowCount = sharedPrefs.getInt(PrefsFragment.TOUCH_LONG_COUNT_INT_KEY, 0);
 
         pressBowCount = sharedPrefs.getInt( PrefsFragment.TOUCH_PRESS_COUNT_INT_KEY, 0 );
 
@@ -259,14 +259,16 @@ public class SoftBoardData
 
         repeatTime = sharedPrefs.getInt( PrefsFragment.TOUCH_REPEAT_TIME_INT_KEY, 0 ); //  * 1000000;
 
-
-
         displayTouch = sharedPrefs.getBoolean(
-                softBoardListener.getApplicationContext().getString( R.string.cursor_touch_allow_key ),
+                softBoardListener.getApplicationContext().getString(R.string.cursor_touch_allow_key),
                 true);
 
         displayStroke = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString( R.string.cursor_stroke_allow_key ),
+                true);
+
+        textSessionSetsMetastates = sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString( R.string.editing_text_session_key ),
                 true);
         }
 
@@ -343,6 +345,11 @@ public class SoftBoardData
      * Stroke is displayed or not
      */
     public boolean displayStroke = true;
+
+    /**
+     * New text session behaves as a key stroke, and sets meta states accordingly (or not)
+     */
+    public boolean textSessionSetsMetastates = true;
 
 
     /**
