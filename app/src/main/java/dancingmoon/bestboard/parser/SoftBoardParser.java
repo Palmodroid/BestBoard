@@ -1,4 +1,4 @@
-package dancingmoon.bestboard;
+package dancingmoon.bestboard.parser;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,6 +17,9 @@ import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
 
+import dancingmoon.bestboard.debug.Debug;
+import dancingmoon.bestboard.R;
+import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.SoftBoardData.SoftBoardListener;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.ExtendedMap;
@@ -541,16 +544,16 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                     // Parameter-command has COMPLEX parameters - forwardParameters
                     if ( commandData.getParameterType() >= 0L )
-                        result = commandData.getMethod().invoke(softBoardData, forwardParameters );
+                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands, forwardParameters );
                     // Parameter-command has ONE parameter - result
                     else if ( commandData.getParameterType() >= Commands.PARAMETER_KEYWORD )
-                        result = commandData.getMethod().invoke(softBoardData, result );
+                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands, result );
                     // Parameter-command has LIST parameter - result
                     else if ( commandData.getParameterType() >= Commands.PARAMETER_KEYWORD_LIST )
-                        result = commandData.getMethod().invoke(softBoardData, (List)result );
+                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands, (List)result );
                     // Parameter-command has NO or FLAG parameters - no parameters
                     else
-                        result = commandData.getMethod().invoke(softBoardData );
+                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands );
                     // Label-parameters cannot arrive here
 
                     // if ( result != null )

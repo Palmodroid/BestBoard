@@ -9,6 +9,8 @@ import java.util.ArrayList;
 import dancingmoon.bestboard.buttons.Button;
 import dancingmoon.bestboard.buttons.ButtonForMaps;
 import dancingmoon.bestboard.buttons.TitleDescriptor;
+import dancingmoon.bestboard.debug.Debug;
+import dancingmoon.bestboard.parser.Tokenizer;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.MetaState;
@@ -701,7 +703,7 @@ public class Board
     public String toString()
         {
         StringBuilder result = new StringBuilder();
-        result.append("Board ").append( Tokenizer.regenerateKeyword( boardId ));
+        result.append("Board ").append( Tokenizer.regenerateKeyword(boardId));
         result.append(" - C:").append(boardWidthInHexagons);
         result.append("/R:").append(boardHeightInHexagons);
         return result.toString();

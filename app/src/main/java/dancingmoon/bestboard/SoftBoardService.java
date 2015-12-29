@@ -21,8 +21,11 @@ import android.widget.Toast;
 import java.io.File;
 
 import dancingmoon.bestboard.SoftBoardData.SoftBoardListener;
-import dancingmoon.bestboard.SoftBoardParser.SoftBoardParserListener;
+import dancingmoon.bestboard.debug.Debug;
+import dancingmoon.bestboard.parser.SoftBoardParser;
+import dancingmoon.bestboard.parser.SoftBoardParser.SoftBoardParserListener;
 import dancingmoon.bestboard.buttons.PacketText;
+import dancingmoon.bestboard.prefs.PrefsFragment;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.server.Connection;
 import dancingmoon.bestboard.server.TextAfterCursor;

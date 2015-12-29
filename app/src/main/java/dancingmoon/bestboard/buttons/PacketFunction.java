@@ -2,8 +2,8 @@ package dancingmoon.bestboard.buttons;
 
 import android.content.Intent;
 
-import dancingmoon.bestboard.Commands;
-import dancingmoon.bestboard.PrefsActivity;
+import dancingmoon.bestboard.parser.Commands;
+import dancingmoon.bestboard.prefs.PrefsActivity;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.CapsState;

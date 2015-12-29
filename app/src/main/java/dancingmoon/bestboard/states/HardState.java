@@ -1,6 +1,6 @@
 package dancingmoon.bestboard.states;
 
-import dancingmoon.bestboard.Debug;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 
 /**

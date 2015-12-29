@@ -1,10 +1,11 @@
-package dancingmoon.bestboard;
+package dancingmoon.bestboard.parser;
 
 import android.content.Context;
 
 import java.io.IOException;
 import java.io.Reader;
 
+import dancingmoon.bestboard.R;
 import dancingmoon.bestboard.scribe.Scribe;
 
 

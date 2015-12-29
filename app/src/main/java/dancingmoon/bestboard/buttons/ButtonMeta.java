@@ -2,7 +2,7 @@ package dancingmoon.bestboard.buttons;
 
 import android.graphics.Canvas;
 
-import dancingmoon.bestboard.Debug;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.CapsState;

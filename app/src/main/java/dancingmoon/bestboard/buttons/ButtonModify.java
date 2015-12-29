@@ -1,7 +1,7 @@
 package dancingmoon.bestboard.buttons;
 
 import dancingmoon.bestboard.R;
-import dancingmoon.bestboard.Tokenizer;
+import dancingmoon.bestboard.parser.Tokenizer;
 import dancingmoon.bestboard.modify.Modify;
 import dancingmoon.bestboard.scribe.Scribe;
 

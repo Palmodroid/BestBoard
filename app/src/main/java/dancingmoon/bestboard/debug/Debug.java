@@ -1,9 +1,10 @@
-package dancingmoon.bestboard;
+package dancingmoon.bestboard.debug;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import dancingmoon.bestboard.R;
 import dancingmoon.bestboard.scribe.Scribe;
 
 /**

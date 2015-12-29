@@ -3,7 +3,7 @@ package dancingmoon.bestboard.states;
 import android.content.res.Configuration;
 
 import dancingmoon.bestboard.Board;
-import dancingmoon.bestboard.Debug;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.ExternalDataException;

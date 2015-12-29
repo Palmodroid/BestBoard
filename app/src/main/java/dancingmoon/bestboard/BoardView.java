@@ -19,6 +19,7 @@ import java.util.Map;
 import dancingmoon.bestboard.buttons.Button;
 import dancingmoon.bestboard.buttons.ButtonMainTouch;
 import dancingmoon.bestboard.buttons.ButtonMultiTouch;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.MetaState;
 

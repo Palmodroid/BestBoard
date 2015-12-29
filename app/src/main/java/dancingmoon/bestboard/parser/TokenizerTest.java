@@ -1,4 +1,4 @@
-package dancingmoon.bestboard;
+package dancingmoon.bestboard.parser;
 
 import android.app.Activity;
 import android.os.Bundle;
@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.StringReader;
 import java.util.Locale;
 
+import dancingmoon.bestboard.debug.Debug;
+import dancingmoon.bestboard.R;
 import dancingmoon.bestboard.scribe.Scribe;
 
 public class TokenizerTest extends Activity
@@ -23,7 +25,7 @@ public class TokenizerTest extends Activity
 		super.onCreate(savedInstanceState);
 		
 		// primary scribe is started as normal
-		Debug.initScribe( this );
+		Debug.initScribe(this);
 		// Ignition.start( this ); need not be called,
 		// because TokenizerTest do not use any preferences.
 

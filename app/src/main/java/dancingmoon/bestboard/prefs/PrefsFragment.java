@@ -1,4 +1,4 @@
-package dancingmoon.bestboard;
+package dancingmoon.bestboard.prefs;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -11,6 +11,9 @@ import android.preference.PreferenceManager;
 
 import java.io.File;
 
+import dancingmoon.bestboard.debug.Debug;
+import dancingmoon.bestboard.Ignition;
+import dancingmoon.bestboard.R;
 import dancingmoon.bestboard.scribe.Scribe;
 
 
@@ -861,7 +864,7 @@ public class PrefsFragment extends PreferenceFragment
                 public boolean onPreferenceClick(Preference preference)
                     {
                     // getActivity() cannot be null, when button is displayed
-                    Ignition.copyAssets( getActivity() );
+                    Ignition.copyAssets(getActivity());
 
                     EditTextPreference descriptorDirectoryPreference =
                             (EditTextPreference)findPreference( getString(R.string.descriptor_directory_key) );

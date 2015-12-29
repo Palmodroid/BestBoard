@@ -3,7 +3,7 @@ package dancingmoon.bestboard.server;
 import java.util.ArrayList;
 import java.util.List;
 
-import dancingmoon.bestboard.Debug;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 
 /**

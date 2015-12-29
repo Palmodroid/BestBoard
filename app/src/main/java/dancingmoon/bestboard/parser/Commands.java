@@ -1,4 +1,4 @@
-package dancingmoon.bestboard;
+package dancingmoon.bestboard.parser;
 
 import java.lang.reflect.Method;
 import java.security.InvalidKeyException;
@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.ExtendedMap;
 
@@ -1121,24 +1122,24 @@ public class Commands
                 {
                 // Parameter-command has COMPLEX parameters - forwardParamers
                 if (getParameterType() >= 0L)
-                    method = SoftBoardData.class.getDeclaredMethod(methodName, ExtendedMap.class);
+                    method = MethodsForCommands.class.getDeclaredMethod(methodName, ExtendedMap.class);
                 // Parameter-command has ONE parameter - result
                 else if (getParameterType() >= Commands.PARAMETER_KEYWORD)
-                    method = SoftBoardData.class.getDeclaredMethod(methodName, Object.class);
+                    method = MethodsForCommands.class.getDeclaredMethod(methodName, Object.class);
                 // Parameter-command has LIST parameter - result
                 else if (getParameterType() >= Commands.PARAMETER_KEYWORD_LIST)
-                    method = SoftBoardData.class.getDeclaredMethod(methodName, List.class);
+                    method = MethodsForCommands.class.getDeclaredMethod(methodName, List.class);
                 // Parameter-command has LABEL parameter
                 else if (getParameterType() == Commands.PARAMETER_LABEL)
                 // Parameter-command has NO parameters - no parameters
                     method = null;
                 else // FLAG or NO parameters
-                    method = SoftBoardData.class.getDeclaredMethod(methodName);
+                    method = MethodsForCommands.class.getDeclaredMethod(methodName);
                 }
             catch (NoSuchMethodException e)
                 {
                 method = null;
-                Scribe.error("Method " + methodName + " is missing in SoftBoardData!");
+                Scribe.error("Method " + methodName + " is missing in MethodsForCommands!");
                 }
             }
 

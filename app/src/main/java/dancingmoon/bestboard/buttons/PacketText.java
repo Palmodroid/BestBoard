@@ -1,6 +1,6 @@
 package dancingmoon.bestboard.buttons;
 
-import dancingmoon.bestboard.Debug;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.BoardStates;

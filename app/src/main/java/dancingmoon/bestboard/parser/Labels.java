@@ -1,4 +1,4 @@
-package dancingmoon.bestboard;
+package dancingmoon.bestboard.parser;
 
 import java.security.InvalidKeyException;
 import java.util.HashMap;

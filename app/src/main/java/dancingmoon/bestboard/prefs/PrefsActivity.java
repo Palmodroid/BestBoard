@@ -1,8 +1,10 @@
-package dancingmoon.bestboard;
+package dancingmoon.bestboard.prefs;
 
 import android.app.Activity;
 import android.os.Bundle;
 
+import dancingmoon.bestboard.debug.Debug;
+import dancingmoon.bestboard.Ignition;
 import dancingmoon.bestboard.scribe.Scribe;
 
 /**
@@ -22,7 +24,7 @@ import dancingmoon.bestboard.scribe.Scribe;
  *	</intent-filter>
  * Or can be started from general settings. method.xml should contain:
  * 	<input-method xmlns:android="http://schemas.android.com/apk/res/android"
- * 		android:settingsActivity="dancingmoon.bestboard.PrefsActivity"/>
+ * 		android:settingsActivity="dancingmoon.bestboard.prefs.PrefsActivity"/>
  * PreferenceFragment without any error-checking is very simple:
  *		addPreferencesFromResource(R.xml.prefs); (onCreate method)
  *

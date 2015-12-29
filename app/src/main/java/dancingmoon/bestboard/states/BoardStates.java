@@ -5,8 +5,8 @@ import android.view.KeyEvent;
 
 import java.util.Arrays;
 
-import dancingmoon.bestboard.Commands;
-import dancingmoon.bestboard.Debug;
+import dancingmoon.bestboard.parser.Commands;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.ExtendedMap;

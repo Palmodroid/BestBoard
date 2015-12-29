@@ -16,6 +16,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+import dancingmoon.bestboard.debug.Debug;
+import dancingmoon.bestboard.prefs.PrefsFragment;
 import dancingmoon.bestboard.scribe.Scribe;
 
 /**
@@ -32,7 +34,7 @@ public class Ignition
         // initScribe should be started before any use of Scribe
         // This could come BEFORE PrefsFragment.initDefaultPrefs(context),
         // because initScribe uses default values from xml
-        Debug.initScribe( context );
+        Debug.initScribe(context);
 
         // Default and integer preferences should be initialized first
         // Check whether this is the very first start
