@@ -196,19 +196,9 @@ public class Commands
 
     // List parameter types - NEGATIVE VALUES, ORDER SAME AS ONE PARAMETER, but bit 5 is 0!!
     // Parameters are returned as ArrayList<Object>
-    public final static long PARAMETER_BOOLEAN_LIST = -1L & -17L;   // Returned as Boolean (false==0, true==anything else)
-    public final static long PARAMETER_CHAR_LIST = -2L & -17L;      // Returned as Character (unsigned 16 bit)
-    public final static long PARAMETER_COLOR_LIST = -3L & -17L;     // Returned as Integer (unsigned 32 bit)
-    public final static long PARAMETER_INT_LIST = -4L & -17L;       // Returned as Integer (signed 32 bit)
-    public final static long PARAMETER_LONG_LIST = -5L & -17L;      // Returned as Long (signed 64 bit)
+    // Should be given as PARAMETER_... & PARAMETER_MODE_LIST
 
-    public final static long PARAMETER_FILE_LIST = -6L & -17L;      // Returned as String
-    public final static long PARAMETER_STRING_LIST = -7L & -17L;    // Returned as String
-
-    public final static long PARAMETER_TEXT_LIST = -8L & -17L;      // Returned as String OR Character
-    // Further type-checking is needed after return!!
-
-    public final static long PARAMETER_KEYWORD_LIST = -9L & -17L;   // Returned as Long (signed 64 bit)
+    public final static long PARAMETER_MODE_LIST = -17L;
 
     // Label parameter - NEGATIVE VALUES, BELOW LIST AND ABOVE NO-PARAMETER TYPES !!
     public final static long PARAMETER_LABEL = -40L;
@@ -301,7 +291,7 @@ public class Commands
         result.put(TOKEN_NAME, new Data(new long[]{PARAMETER_STRING}, "setName" ));
         result.put(TOKEN_VERSION, new Data(new long[]{PARAMETER_INT}, "setVersion" ));
         result.put(TOKEN_AUTHOR, new Data(new long[]{PARAMETER_STRING}, "setAuthor" ));
-        result.put(TOKEN_ADDTAGS, new Data(new long[]{PARAMETER_STRING_LIST}, "addTags" ));
+        result.put(TOKEN_ADDTAGS, new Data(new long[]{(PARAMETER_STRING & PARAMETER_MODE_LIST)}, "addTags" ));
         result.put(TOKEN_DESCRIPTION, new Data(new long[]{PARAMETER_STRING}, "setDescription" ));
         result.put(TOKEN_DOCFILE, new Data(new long[]{PARAMETER_FILE}, "setDocFile" ));
         result.put(TOKEN_DOCURI, new Data(new long[]{PARAMETER_STRING}, "setDocUri" ));
@@ -517,8 +507,8 @@ public class Commands
         // TOKEN_ID is already defined
         // !! addRollHelper functionality should be avoided !!
         // "Multiple" type parameters are needed
-        result.put(TOKEN_ADDROLL, new Data(new long[]{PARAMETER_STRING_LIST}, "addRollHelper" ));
-        result.put(TOKEN_ROLLS, new Data(new long[]{PARAMETER_STRING_LIST}, null ));
+        result.put(TOKEN_ADDROLL, new Data(new long[]{ (PARAMETER_STRING & PARAMETER_MODE_LIST) }, "addRollHelper" ));
+        result.put(TOKEN_ROLLS, new Data(new long[]{ (PARAMETER_STRING & PARAMETER_MODE_LIST) }, null ));
         result.put(TOKEN_IGNORESPACE, new Data(new long[]{PARAMETER_FLAG}, null ));
 
         result.put(TOKEN_STOP, new Data(new long[]{MESSAGE_STOP}, null ));
@@ -1127,7 +1117,7 @@ public class Commands
                 else if (getParameterType() >= Commands.PARAMETER_KEYWORD)
                     method = MethodsForCommands.class.getDeclaredMethod(methodName, Object.class);
                 // Parameter-command has LIST parameter - result
-                else if (getParameterType() >= Commands.PARAMETER_KEYWORD_LIST)
+                else if (getParameterType() >= (Commands.PARAMETER_KEYWORD & Commands.PARAMETER_MODE_LIST))
                     method = MethodsForCommands.class.getDeclaredMethod(methodName, List.class);
                 // Parameter-command has LABEL parameter
                 else if (getParameterType() == Commands.PARAMETER_LABEL)

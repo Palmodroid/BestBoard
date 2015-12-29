@@ -491,7 +491,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 }
 
             // Parameter-command has LIST parameter
-            else if ( commandData.getParameterType() >= Commands.PARAMETER_KEYWORD_LIST )
+            else if ( commandData.getParameterType() >= (Commands.PARAMETER_KEYWORD & Commands.PARAMETER_MODE_LIST) )
                 {
                 result = parseListParameter( commandData.getParameterType() );
                 // tokenizer.note( commandString, R.string.parser_list_finished, result.toString() );
@@ -549,7 +549,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     else if ( commandData.getParameterType() >= Commands.PARAMETER_KEYWORD )
                         result = commandData.getMethod().invoke(softBoardData.methodsForCommands, result );
                     // Parameter-command has LIST parameter - result
-                    else if ( commandData.getParameterType() >= Commands.PARAMETER_KEYWORD_LIST )
+                    else if ( commandData.getParameterType() >= ( Commands.PARAMETER_KEYWORD & Commands.PARAMETER_MODE_LIST) )
                         result = commandData.getMethod().invoke(softBoardData.methodsForCommands, (List)result );
                     // Parameter-command has NO or FLAG parameters - no parameters
                     else
