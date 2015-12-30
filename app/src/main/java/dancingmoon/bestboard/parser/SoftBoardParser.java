@@ -229,7 +229,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         // Descriptor file check
         if ( descriptorFile==null || !descriptorFile.exists() || !descriptorFile.isFile())
             {
-            Scribe.error_secondary( caller.getApplicationContext().getString( R.string.parser_no_coat_file ) );
+            Scribe.error_secondary(caller.getApplicationContext().getString(R.string.parser_no_coat_file));
             throw new FileNotFoundException();
             }
 
@@ -448,8 +448,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             // Or the result of the method (if any), or should be null
             result = null;
 
-            // Parameter-command has COMPLEX parameters
-            if ( commandData.getParameterType() >= 0L )
+            // Parameter-command has COMPLEX (SINGLE) parameters
+            if ( commandData.getParameterType() >= Tokenizer.TOKEN_CODE_SHIFT )
                 {
                 // surrounding parentheses are checked here
                 if (tokenizer.nextToken() != Tokenizer.TYPE_START)
@@ -476,8 +476,14 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 // parameters for method are in forwardParameters, result is cleared
                 }
 
+            // Parameter-command has COMPLEX (MULTIPLE) parameters
+            else if ( commandData.getParameterType() < 0x0L )
+                {
+                /**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
+                }
+
             // Parameter-command has ONE parameter
-            else if ( commandData.getParameterType() >= Commands.PARAMETER_KEYWORD )
+            else if ( commandData.getParameterType() <= Commands.PARAMETER_KEYWORD )
                 {
                 result = parseOneParameter( commandData.getParameterType());
                 // tokenizer.note( commandString, R.string.parser_one_finished, result.toString() );
@@ -491,7 +497,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 }
 
             // Parameter-command has LIST parameter
-            else if ( commandData.getParameterType() >= (Commands.PARAMETER_KEYWORD & Commands.PARAMETER_MODE_LIST) )
+            else if ( commandData.getParameterType() <= (Commands.PARAMETER_KEYWORD | Commands.PARAMETER_MOD_LIST) )
                 {
                 result = parseListParameter( commandData.getParameterType() );
                 // tokenizer.note( commandString, R.string.parser_list_finished, result.toString() );
@@ -543,13 +549,13 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     // Different types of methods should be called - according to parameter type
 
                     // Parameter-command has COMPLEX parameters - forwardParameters
-                    if ( commandData.getParameterType() >= 0L )
+                    if ( commandData.getParameterType() >= Tokenizer.TOKEN_CODE_SHIFT || commandData.getParameterType() < 0L )
                         result = commandData.getMethod().invoke(softBoardData.methodsForCommands, forwardParameters );
                     // Parameter-command has ONE parameter - result
-                    else if ( commandData.getParameterType() >= Commands.PARAMETER_KEYWORD )
+                    else if ( commandData.getParameterType() <= Commands.PARAMETER_KEYWORD )
                         result = commandData.getMethod().invoke(softBoardData.methodsForCommands, result );
                     // Parameter-command has LIST parameter - result
-                    else if ( commandData.getParameterType() >= ( Commands.PARAMETER_KEYWORD & Commands.PARAMETER_MODE_LIST) )
+                    else if ( commandData.getParameterType() <= ( Commands.PARAMETER_KEYWORD | Commands.PARAMETER_MOD_LIST) )
                         result = commandData.getMethod().invoke(softBoardData.methodsForCommands, (List)result );
                     // Parameter-command has NO or FLAG parameters - no parameters
                     else
@@ -561,15 +567,20 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     // else
                         // tokenizer.note( commandString, R.string.parser_method_no_result );
                     }
-                catch (IllegalAccessException e)
+                catch (IllegalAccessException iae)
                     {
                     tokenizer.error( commandString, R.string.parser_cannot_access_method );
                     // if result was ready (one-parameter) it will be still part of the returnedParameters
                     // but this is NOT the result of the method!
                     }
-                catch (InvocationTargetException e)
+                catch (InvocationTargetException ite)
                     {
-                    tokenizer.error( commandString, R.string.parser_method_exception );
+                    // http://stackoverflow.com/a/20525219 getTargetException and getCause
+                    Throwable cause = ite.getCause();
+                    if ( cause == null )
+                        tokenizer.error( commandString, R.string.parser_method_exception_missing );
+                    else
+                        tokenizer.error( commandString, R.string.parser_method_exception, ite.getCause().toString() );
                     // if result was ready (one-parameter) it will be still part of the returnedParameters
                     // but this is NOT the result of the method!
                     }
@@ -668,8 +679,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             return null;
             }
 
-        // 5. bit of parameter type should be turned 1
-        parameterType |= -16L;
+        // 5. bit of parameter type should be turned 0
+        parameterType &= (~Commands.PARAMETER_MOD_LIST);
 
         // Next tokens: one-parameter type tokens, terminated by TYPE_END
         while ( true )
@@ -927,7 +938,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             if ( tokenType == Tokenizer.TYPE_INTEGER )
                 {
                 // BOOLEAN CHAR COLOR INT LONG
-                if ( parameterType >= Commands.PARAMETER_LONG )
+                if ( parameterType <= Commands.PARAMETER_LONG )
                     {
                     // Parameter: NUMERIC, Token: NUMERIC, Return: LONG
                     result = tokenizer.getIntegerToken();
@@ -946,7 +957,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             else if ( tokenType == Tokenizer.TYPE_CHARACTER )
                 {
                 // BOOLEAN CHAR COLOR INT LONG
-                if ( parameterType >= Commands.PARAMETER_LONG )
+                if ( parameterType <= Commands.PARAMETER_LONG )
                     {
                     // Parameter: NUMERIC, Token: CHARACTER, Return: LONG
                     result = tokenizer.getIntegerToken();
@@ -965,7 +976,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             else if ( tokenType == Tokenizer.TYPE_STRING )
                 {
                 // STRING FILE
-                if ( parameterType < Commands.PARAMETER_LONG && parameterType >= Commands.PARAMETER_STRING )
+                if ( parameterType > Commands.PARAMETER_LONG && parameterType <= Commands.PARAMETER_STRING )
                     {
                     // Parameter: STRING, Token: STRING, Return: STRING
                     result = tokenizer.getStringToken();
@@ -995,13 +1006,13 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 else
                     {
                     // CHAR COLOR INT LONG
-                    if ( parameterType >= Commands.PARAMETER_LONG )
+                    if ( parameterType <= Commands.PARAMETER_LONG )
                         {
                         // RETURN VALID LONG INTEGER (LABEL)
                         result = labels.getLongValue( key );
                         }
                     // FILE STRING
-                    else if ( parameterType >= Commands.PARAMETER_STRING )
+                    else if ( parameterType <= Commands.PARAMETER_STRING )
                         {
                         // RETURN VALID STRING (LABEL)
                         result = labels.getStringValue(key);

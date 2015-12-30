@@ -86,13 +86,13 @@ public class TokenizerTest extends Activity
 						else if (type == Tokenizer.TYPE_KEYWORD )
 							{
 							text.setText(text.getText() +
-									"Keyword: " + tokenizer.getStringToken() + " = 0x" + Long.toHexString(tokenizer.getIntegerToken()) + "L; ");
+									"Keyword: " + tokenizer.getStringToken() + " [" + Tokenizer.regenerateKeyword(tokenizer.getIntegerToken()) + "] = 0x" + Long.toHexString(tokenizer.getIntegerToken()) + "L; ");
 //							Scribe.note_secondary("Keyword: " + tokenizer.getStringToken() + " = 0x" + Long.toHexString(tokenizer.getIntegerToken()) + "L");
 
 							// To use directly in Commands.java - TimeStamp is disabled, too
 							Scribe.note_secondary("    public static final long TOKEN_" +
 									tokenizer.getStringToken().toUpperCase(Locale.US) +
-									" = 0x" + Long.toHexString( tokenizer.getIntegerToken() ) + "L;");
+									" = 0x" + Long.toHexString(tokenizer.getIntegerToken()) + "L;");
 
                             Tokenizer.regenerateKeyword( tokenizer.getIntegerToken() );
 							}

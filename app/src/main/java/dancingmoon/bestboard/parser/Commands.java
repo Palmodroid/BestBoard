@@ -21,197 +21,203 @@ public class Commands
     {
     // Coat version is checked independently at SoftBoardParser.parseSoftBoard()
     public final static long COAT_VERSION = 2L;
-    public static final long TOKEN_COAT = 0x9c843L;
+    public static final long TOKEN_COAT = 0xac842L;
 
     // Special code for first level commands
-    public final static long ADDSOFTBOARD = 0L;
+    public final static long ADDSOFTBOARD = 0x10000L;
 
     // Token codes for complex parameter-commands - POSITIVE VALUES !!
-    public static final long TOKEN_NAME = 0x11ff91L;
-    public static final long TOKEN_VERSION = 0x12c1c5d965L;
-    public static final long TOKEN_AUTHOR = 0x2cc5c115L;
-    public static final long TOKEN_ADDTAGS = 0x630908ad7L;
-    public static final long TOKEN_DESCRIPTION = 0xe4e74ed039e9f3L;
-    public static final long TOKEN_DOCFILE = 0x828aa14c5L;
-    public static final long TOKEN_DOCURI = 0x38739e2cL;
+    public static final long TOKEN_NAME = 0x12ff90L;
+    public static final long TOKEN_VERSION = 0x12c1c6d964L;
+    public static final long TOKEN_AUTHOR = 0x2cc6c114L;
+    public static final long TOKEN_ADDTAGS = 0x630918ad6L;
+    public static final long TOKEN_DESCRIPTION = 0xe4e74ed03ae9f2L;
+    public static final long TOKEN_DOCFILE = 0x828ab14c4L;
+    public static final long TOKEN_DOCURI = 0x38749e2bL;
 
-    public static final long TOKEN_LET = 0x7270L;
+    public static final long TOKEN_LET = 0x1726fL;
 
-    public static final long TOKEN_LOCALE = 0x598408feL;
-    public static final long TOKEN_LANGUAGE = 0x1d6843b69dcL;
-    public static final long TOKEN_COUNTRY = 0x791c55f9bL;
-    public static final long TOKEN_VARIANT = 0x12b1358888L;
+    public static final long TOKEN_LOCALE = 0x598508fdL;
+    public static final long TOKEN_LANGUAGE = 0x1d6843c69dbL;
+    public static final long TOKEN_COUNTRY = 0x791c65f9aL;
+    public static final long TOKEN_VARIANT = 0x12b1368887L;
 
-    public static final long TOKEN_DEFAULT = 0x7ffa73630L;
-    public static final long TOKEN_BOARDCOLOR = 0x561cab6e3e939L;
-    public static final long TOKEN_BUTTONCOLOR = 0xca246447c75adeL;
-    public static final long TOKEN_SLOT = 0x16180eL;
+    public static final long TOKEN_DEFAULT = 0x7ffa8362fL;
+    public static final long TOKEN_BOARDCOLOR = 0x561cab6e4e938L;
+    public static final long TOKEN_BUTTONCOLOR = 0xca246447c85addL;
+    public static final long TOKEN_SLOT = 0x17180dL;
 
-    public static final long TOKEN_METACOLOR = 0x478ed1022507L;
-    public static final long TOKEN_LOCKCOLOR = 0x45300a4313a1L;
-    public static final long TOKEN_AUTOCOLOR = 0x229aefe28af1L;
-    public static final long TOKEN_TOUCHCOLOR = 0xdb3133d210b24L;
-    public static final long TOKEN_STROKECOLOR = 0x1ec12db0914dd7eL;
-    public static final long TOKEN_TITLEFONT = 0x5e4418d3118eL;
+    public static final long TOKEN_METACOLOR = 0x478ed1032506L;
+    public static final long TOKEN_LOCKCOLOR = 0x45300a4413a0L;
+    public static final long TOKEN_AUTOCOLOR = 0x229aefe38af0L;
+    public static final long TOKEN_TOUCHCOLOR = 0xdb3133d220b23L;
+    public static final long TOKEN_STROKECOLOR = 0x1ec12db0915dd7dL;
+    public static final long TOKEN_TITLEFONT = 0x5e4418d4118dL;
 
-    public static final long TOKEN_ENTERTITLE = 0x6c2ce8db50a6eL;
-    public static final long TOKEN_GOTITLE = 0x9f55c6b8bL;
-    public static final long TOKEN_SEARCHTITLE = 0x1e4efcbab841f3fL;
-    public static final long TOKEN_SENDTITLE = 0x5ab62a415135L;
-    public static final long TOKEN_NEXTTITLE = 0x4ac3553a67faL;
-    public static final long TOKEN_DONETITLE = 0x2ba804d8335dL;
-    public static final long TOKEN_PREVTITLE = 0x523afaf86e24L;
-    public static final long TOKEN_NONETITLE = 0x4b9a25bef027L;
-    public static final long TOKEN_UNKNOWNTITLE = 0x4ba5296e5765a85eL;
+    public static final long TOKEN_ENTERTITLE = 0x6c2ce8db60a6dL;
+    public static final long TOKEN_GOTITLE = 0x9f55d6b8aL;
+    public static final long TOKEN_SEARCHTITLE = 0x1e4efcbab851f3eL;
+    public static final long TOKEN_SENDTITLE = 0x5ab62a425134L;
+    public static final long TOKEN_NEXTTITLE = 0x4ac3553b67f9L;
+    public static final long TOKEN_DONETITLE = 0x2ba804d9335cL;
+    public static final long TOKEN_PREVTITLE = 0x523afaf96e23L;
+    public static final long TOKEN_NONETITLE = 0x4b9a25bff026L;
+    public static final long TOKEN_UNKNOWNTITLE = 0x4ba5296e5766a85dL;
 
-    public static final long TOKEN_ADDSLOT = 0x6309000f6L;
-    public static final long TOKEN_ID = 0x2a7L;
-    public static final long TOKEN_XOFFSET = 0x141b95a3d2L;
-    public static final long TOKEN_YOFFSET = 0x14b483849bL;
-    public static final long TOKEN_SIZE = 0x16098bL;
+    public static final long TOKEN_ADDSLOT = 0x6309100f5L;
+    public static final long TOKEN_ID = 0x102a6L;
+    public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
+    public static final long TOKEN_YOFFSET = 0x14b484849aL;
+    public static final long TOKEN_SIZE = 0x17098aL;
 
-    public static final long TOKEN_ADDBOARD = 0xe502ec0209L;
-    public static final long TOKEN_HEXAGONAL = 0x379824b8b630L;
-    public static final long TOKEN_WIDE = 0x191dd1L;
-    public static final long TOKEN_HALFCOLUMNS = 0x1274de67160b457L;
-    public static final long TOKEN_COLUMNS = 0x790c94224L;
-    public static final long TOKEN_ROWS = 0x156363L;
-    public static final long TOKEN_ALIGN = 0x12e9734L;
-    public static final long TOKEN_COLOR = 0x16a2be4L;
+    public static final long TOKEN_ADDBOARD = 0xe502ed0208L;
+    public static final long TOKEN_HEXAGONAL = 0x379824b9b62fL;
+    public static final long TOKEN_WIDE = 0x1a1dd0L;
+    public static final long TOKEN_HALFCOLUMNS = 0x1274de67161b456L;
+    public static final long TOKEN_COLUMNS = 0x790ca4223L;
+    public static final long TOKEN_ROWS = 0x166362L;
+    public static final long TOKEN_ALIGN = 0x12f9733L;
+    public static final long TOKEN_COLOR = 0x16b2be3L;
 
-    public static final long TOKEN_ODDS = 0x12d43aL;
-    public static final long TOKEN_EVENS = 0x1a8a13eL;
+    public static final long TOKEN_ODDS = 0x13d439L;
+    public static final long TOKEN_EVENS = 0x1a9a13dL;
 
-    public static final long TOKEN_FORCECAPS = 0x320dfec7a853L;
-    public static final long TOKEN_FORCESHIFT = 0x73c05d4aa24e7L;
-    public static final long TOKEN_FORCECTRL = 0x320dfec80e31L;
-    public static final long TOKEN_FORCEALT = 0x15a52fe7114L;
+    public static final long TOKEN_FORCECAPS = 0x320dfec8a852L;
+    public static final long TOKEN_FORCESHIFT = 0x73c05d4ab24e6L;
+    public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
+    public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
 
-    public static final long TOKEN_CURSOR = 0x3508a5d8L;
-    public static final long TOKEN_NONE = 0x124a94L;
-    public static final long TOKEN_ALSO = 0x82f13L;
-    public static final long TOKEN_ONLY = 0x130ae2L;
-    public static final long TOKEN_BOARD = 0x14d5881L;
-    public static final long TOKEN_COLUMN = 0x34587768L;
-    public static final long TOKEN_ROW = 0x93fbL;
+    public static final long TOKEN_CURSOR = 0x3509a5d7L;
+    public static final long TOKEN_NONE = 0x134a93L;
+    public static final long TOKEN_ALSO = 0x92f12L;
+    public static final long TOKEN_ONLY = 0x140ae1L;
+    public static final long TOKEN_BOARD = 0x14e5880L;
+    public static final long TOKEN_COLUMN = 0x34597767L;
+    public static final long TOKEN_ROW = 0x193faL;
 
-    public static final long TOKEN_NEXT = 0x12169bL;
-    public static final long TOKEN_NEXTROW = 0xdfb035ecaL;
+    public static final long TOKEN_NEXT = 0x13169aL;
+    public static final long TOKEN_NEXTROW = 0xdfb045ec9L;
 
-    public static final long TOKEN_SKIP = 0x1611d3L;
-    public static final long TOKEN_SKIPROW = 0x110ec55622L;
+    public static final long TOKEN_SKIP = 0x1711d2L;
+    public static final long TOKEN_SKIPROW = 0x110ec65621L;
 
-    public static final long TOKEN_OVERWRITE = 0x4f61843b6a10L;
-    public static final long TOKEN_TRANSFORM = 0x5effb66d5b7dL;
+    public static final long TOKEN_OVERWRITE = 0x4f61843c6a0fL;
+    public static final long TOKEN_TRANSFORM = 0x5effb66e5b7cL;
 
-    public static final long TOKEN_BUTTON = 0x30e81c12L;
+    public static final long TOKEN_BUTTON = 0x30e91c11L;
 
-    public static final long TOKEN_SEND = 0x15f26aL;
-    public static final long TOKEN_SECOND = 0x7555168eL;
+    public static final long TOKEN_SEND = 0x16f269L;
+    public static final long TOKEN_SECOND = 0x7556168dL;
 
-    public static final long TOKEN_TEXT = 0x16b9c9L;
-    public static final long TOKEN_KEY = 0x6d1cL;
-    public static final long TOKEN_DO = 0x1f9L;
+    public static final long TOKEN_TEXT = 0x17b9c8L;
+    public static final long TOKEN_KEY = 0x16d1bL;
+    public static final long TOKEN_DO = 0x101f8L;
 
-    public static final long TOKEN_DELETE = 0x375c443dL;
-    public static final long TOKEN_BACKSPACE = 0x240879d19872L;
+    public static final long TOKEN_DELETE = 0x375d443cL;
+    public static final long TOKEN_BACKSPACE = 0x240879d29871L;
 
-    public static final long TOKEN_DRAFT = 0x188da4eL;
+    public static final long TOKEN_DRAFT = 0x189da4dL;
 
-    public static final long TOKEN_SETTINGS = 0x273bad4bccdL;
+    public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
 
-    public static final long TOKEN_META = 0x115017L;
+    public static final long TOKEN_META = 0x125016L;
 
-    public static final long TOKEN_CAPS = 0x97f8fL;
-    public static final long TOKEN_CTRL = 0x9e56dL;
-    public static final long TOKEN_ALT = 0x38a0L;
-    public static final long TOKEN_SHIFT = 0x32e4093L;
+    public static final long TOKEN_CAPS = 0xa7f8eL;
+    public static final long TOKEN_CTRL = 0xae56cL;
+    public static final long TOKEN_ALT = 0x1389fL;
+    public static final long TOKEN_SHIFT = 0x32f4092L;
 
-    public static final long TOKEN_LINK = 0x109ecaL;
+    public static final long TOKEN_LINK = 0x119ec9L;
 
-    public static final long TOKEN_LOCK = 0x10bd49L;
+    public static final long TOKEN_LOCK = 0x11bd48L;
 
-    public static final long TOKEN_AUTOCAPS = 0xef6e441a58L;
-    public static final long TOKEN_ON = 0x38fL;
-    public static final long TOKEN_OFF = 0x8292L;
-    public static final long TOKEN_WAIT = 0x18f3d1L;
-    public static final long TOKEN_HOLD = 0xda71bL;
+    public static final long TOKEN_AUTOCAPS = 0xef6e451a57L;
+    public static final long TOKEN_ON = 0x1038eL;
+    public static final long TOKEN_OFF = 0x18291L;
+    public static final long TOKEN_WAIT = 0x19f3d0L;
+    public static final long TOKEN_HOLD = 0xea71aL;
 
-    public static final long TOKEN_STRINGCAPS = 0xd4c9a99e3004cL;
+    public static final long TOKEN_STRINGCAPS = 0xd4c9a99e4004bL;
 
-    public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b27badL;
+    public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
 
-    public static final long TOKEN_AUTOSPACE = 0x229af1aca342L;
-    public static final long TOKEN_ERASESPACES = 0xfbc52200a2a61eL;
+    public static final long TOKEN_AUTOSPACE = 0x229af1ada341L;
+    public static final long TOKEN_ERASESPACES = 0xfbc52200a3a61dL;
 
-    public static final long TOKEN_AFTER = 0x12a2e93L;
-    public static final long TOKEN_BEFORE = 0x2f13a095L;
-    public static final long TOKEN_AROUND = 0x2c6c5e43L;
+    public static final long TOKEN_AFTER = 0x12b2e92L;
+    public static final long TOKEN_BEFORE = 0x2f14a094L;
+    public static final long TOKEN_AROUND = 0x2c6d5e42L;
 
-    public static final long TOKEN_REPEAT = 0x713cd0a7L;
+    public static final long TOKEN_REPEAT = 0x713dd0a6L;
 
-    public static final long TOKEN_MODIFY = 0x5da713aeL;
+    public static final long TOKEN_MODIFY = 0x5da813adL;
 
-    public static final long TOKEN_ENTER = 0x1a2c13fL;
+    public static final long TOKEN_ENTER = 0x1a3c13eL;
 
-    public static final long TOKEN_ADDTITLE = 0xe504ea848bL;
-    // public static final long TOKEN_TEXT = 0x16b9c9L;
-    public static final long TOKEN_BOLD = 0x903edL;
-    public static final long TOKEN_ITALICS = 0xb39c56ee8L;
-    // public static final long TOKEN_COLOR = 0x16a2be4L;
-    // public static final long TOKEN_SLOT = 0x16180eL ;
+    public static final long TOKEN_ADDTITLE = 0xe504eb848aL;
+    // public static final long TOKEN_TEXT = 0x17b9c8L;
+    public static final long TOKEN_BOLD = 0xa03ecL;
+    public static final long TOKEN_ITALICS = 0xb39c66ee7L;
+    // public static final long TOKEN_COLOR = 0x16b2be3L;
+    // public static final long TOKEN_SLOT = 0x17180dL;
 
-    public static final long TOKEN_INDEX = 0x214cf79L;
+    public static final long TOKEN_INDEX = 0x215cf78L;
 
-    public static final long TOKEN_ADDLINK = 0x6308a87b2L;
-    // public static final long TOKEN_INDEX = 0x214cf79L;
-    // public static final long TOKEN_BOARD = 0x14d5881L;
-    public static final long TOKEN_LANDSCAPE = 0x44010ff837b4L;
-    public static final long TOKEN_PORTRAIT = 0x2375cbd8761L;
+    public static final long TOKEN_ADDLINK = 0x6308b87b1L;
+    // public static final long TOKEN_INDEX = 0x215cf78L;
+    // public static final long TOKEN_BOARD = 0x14e5880L;
+    public static final long TOKEN_LANDSCAPE = 0x44010ff937b3L;
+    public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
 
-    public static final long TOKEN_ADDMODIFY = 0x211999959456L;
-    //     public static final long TOKEN_ID = 0x2a7L;
-    public static final long TOKEN_ROLLS = 0x3172195L;
-    public static final long TOKEN_ADDROLL = 0x6308f4aadL;
-    public static final long TOKEN_IGNORESPACE = 0x13b2fae0bc1c2cfL;
-    public static final long TOKEN_REVERSE = 0x105e76189bL;
+    public static final long TOKEN_ADDMODIFY = 0x211999969455L;
+    // public static final long TOKEN_ID = 0x102a6L;
+    public static final long TOKEN_ROLLS = 0x3182194L;
+    public static final long TOKEN_ADDROLL = 0x630904aacL;
+    public static final long TOKEN_IGNORESPACE = 0x13b2fae0bc2c2ceL;
+    public static final long TOKEN_REVERSE = 0x105e77189aL;
 
-    public static final long TOKEN_STOP = 0x1642d2L;
+    public static final long TOKEN_STOP = 0x1742d1L;
 
 
-    // One parameter types - NEGATIVE VALUES, ORDER IS IMPORTANT !!
-    public final static long PARAMETER_BOOLEAN = -1L;   // Returned as Boolean (false==0, true==anything else)
-    public final static long PARAMETER_CHAR = -2L;      // Returned as Character (unsigned 16 bit)
-    public final static long PARAMETER_COLOR = -3L;     // Returned as Integer (unsigned 32 bit)
-    public final static long PARAMETER_INT = -4L;       // Returned as Integer (signed 32 bit)
-    public final static long PARAMETER_LONG = -5L;      // Returned as Long (signed 64 bit)
+    // Complex parameter types - ABOVE POSITIVE 0xFFFF (Tokenizer.TOKEN_CODE_SHIFT)
+    // Complex parameter - Multiple modifier - BELOW NEGATIVE 0xFFFF
+    // Should be given as PARAMETER_... | PARAMETER_MOD_MULTIPLE
 
-    public final static long PARAMETER_FILE = -6L;      // Returned as String
-    public final static long PARAMETER_STRING = -7L;    // Returned as String
+    public final static long PARAMETER_MOD_MULTIPLE = 0x8000000000000000L;
 
-    public final static long PARAMETER_TEXT = -8L;      // Returned as String OR Character
-                                                        // Further type-checking is needed after return!!
+    // One parameter types - POSITIVE VALUES, ORDER IS IMPORTANT !! (4 bit reserved)
+    public final static long PARAMETER_BOOLEAN = 1L;   // Returned as Boolean (false==0, true==anything else)
+    public final static long PARAMETER_CHAR = 2L;      // Returned as Character (unsigned 16 bit)
+    public final static long PARAMETER_COLOR = 3L;     // Returned as Integer (unsigned 32 bit)
+    public final static long PARAMETER_INT = 4L;       // Returned as Integer (signed 32 bit)
+    public final static long PARAMETER_LONG = 5L;      // Returned as Long (signed 64 bit)
 
-    public final static long PARAMETER_KEYWORD = -9L;   // Returned as Long (signed 64 bit)
+    public final static long PARAMETER_FILE = 6L;      // Returned as String
+    public final static long PARAMETER_STRING = 7L;    // Returned as String
 
-    // List parameter types - NEGATIVE VALUES, ORDER SAME AS ONE PARAMETER, but bit 5 is 0!!
+    public final static long PARAMETER_TEXT = 8L;      // Returned as String OR Character
+                                                       // Further type-checking is needed after return!!
+
+    public final static long PARAMETER_KEYWORD = 9L;   // Returned as Long (signed 64 bit)
+
+    // One parameter - List modifier (same as one parameter, but bit 5 is 1) RESERVED TILL 0x1F!
     // Parameters are returned as ArrayList<Object>
-    // Should be given as PARAMETER_... & PARAMETER_MODE_LIST
+    // Should be given as PARAMETER_... | PARAMETER_MOD_LIST
 
-    public final static long PARAMETER_MODE_LIST = -17L;
+    public final static long PARAMETER_MOD_LIST = 0x10L;
 
-    // Label parameter - NEGATIVE VALUES, BELOW LIST AND ABOVE NO-PARAMETER TYPES !!
-    public final static long PARAMETER_LABEL = -40L;
+    // Flag parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
+    public final static long PARAMETER_FLAG = 0x20L;
 
-    // Flag parameter - NEGATIVE VALUES, BELOW LIST AND ABOVE NO-PARAMETER TYPES !!
-    public final static long PARAMETER_FLAG = -42L;
+    // Label parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
+    public final static long PARAMETER_LABEL = 0x40L;
 
     // Special "messages" are not real parameters, but messages to the parser
-    // Messages - NEGATIVE VALUES, BELOW ONE AND ABOVE NO-PARAMETER TYPES !!
-    public final static long MESSAGE_STOP = -0xF000L;
+    // Messages - POSITIVE VALUES, ABOVE ONE AND BELOW NO-PARAMETER TYPES !!
+    public final static long MESSAGE_STOP = 0x80L;
 
-    // No parameters - MOST NEGATIVE!!
-    public final static long NO_PARAMETERS = -0xFFFFL;
+    // No parameters - MOST POSITIVE!!
+    public final static long NO_PARAMETERS = 0xFFL;
 
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] ALLOWED_LABELS = new long[]{
@@ -291,7 +297,7 @@ public class Commands
         result.put(TOKEN_NAME, new Data(new long[]{PARAMETER_STRING}, "setName" ));
         result.put(TOKEN_VERSION, new Data(new long[]{PARAMETER_INT}, "setVersion" ));
         result.put(TOKEN_AUTHOR, new Data(new long[]{PARAMETER_STRING}, "setAuthor" ));
-        result.put(TOKEN_ADDTAGS, new Data(new long[]{(PARAMETER_STRING & PARAMETER_MODE_LIST)}, "addTags" ));
+        result.put(TOKEN_ADDTAGS, new Data(new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)}, "addTags" ));
         result.put(TOKEN_DESCRIPTION, new Data(new long[]{PARAMETER_STRING}, "setDescription" ));
         result.put(TOKEN_DOCFILE, new Data(new long[]{PARAMETER_FILE}, "setDocFile" ));
         result.put(TOKEN_DOCURI, new Data(new long[]{PARAMETER_STRING}, "setDocUri" ));
@@ -507,8 +513,8 @@ public class Commands
         // TOKEN_ID is already defined
         // !! addRollHelper functionality should be avoided !!
         // "Multiple" type parameters are needed
-        result.put(TOKEN_ADDROLL, new Data(new long[]{ (PARAMETER_STRING & PARAMETER_MODE_LIST) }, "addRollHelper" ));
-        result.put(TOKEN_ROLLS, new Data(new long[]{ (PARAMETER_STRING & PARAMETER_MODE_LIST) }, null ));
+        result.put(TOKEN_ADDROLL, new Data(new long[]{ (PARAMETER_STRING | PARAMETER_MOD_LIST) }, "addRollHelper" ));
+        result.put(TOKEN_ROLLS, new Data(new long[]{ (PARAMETER_STRING | PARAMETER_MOD_LIST) }, null ));
         result.put(TOKEN_IGNORESPACE, new Data(new long[]{PARAMETER_FLAG}, null ));
 
         result.put(TOKEN_STOP, new Data(new long[]{MESSAGE_STOP}, null ));
@@ -532,270 +538,270 @@ public class Commands
 
     // public static final long TOKEN_ON = 0x38fL;
     // public static final long TOKEN_OFF = 0x8292L;
-    public static final long TOKEN_TRUE = 0x16fed0L;
-    public static final long TOKEN_FALSE = 0x1b52528L;
+    public static final long TOKEN_TRUE = 0x17fecfL;
+    public static final long TOKEN_FALSE = 0x1b62527L;
 
     // Hard-key mnemonics
-    public static final long TOKEN_KEYUNKNOWN = 0x96bb8b22735dbL;
-    public static final long TOKEN_KEYSOFTLEFT = 0x15c91860fd40befL;
-    public static final long TOKEN_KEYSOFTRIGHT = 0x326108604a546a5fL;
-    public static final long TOKEN_KEYHOME = 0xc304cfe9dL;
-    public static final long TOKEN_KEYBACK = 0xc30480f25L;
-    public static final long TOKEN_KEYCALL = 0xc3048d650L;
-    public static final long TOKEN_KEYENDCALL = 0x96baf22782dbeL;
-    public static final long TOKEN_KEY0 = 0xfc50cL;
-    public static final long TOKEN_KEY1 = 0xfc50dL;
-    public static final long TOKEN_KEY2 = 0xfc50eL;
-    public static final long TOKEN_KEY3 = 0xfc50fL;
-    public static final long TOKEN_KEY4 = 0xfc510L;
-    public static final long TOKEN_KEY5 = 0xfc511L;
-    public static final long TOKEN_KEY6 = 0xfc512L;
-    public static final long TOKEN_KEY7 = 0xfc513L;
-    public static final long TOKEN_KEY8 = 0xfc514L;
-    public static final long TOKEN_KEY9 = 0xfc515L;
-    public static final long TOKEN_KEYSTAR = 0xc3055982aL;
-    public static final long TOKEN_KEYNUMBER = 0x412e6535be4fL; // !!!! SHOULD BE KEYPOUND !!!!
-    public static final long TOKEN_KEYDPADUP = 0x412e3b487becL;
-    public static final long TOKEN_KEYDPADDOWN = 0x15c903b06918cbdL;
-    public static final long TOKEN_KEYDPADLEFT = 0x15c903b069783bcL;
-    public static final long TOKEN_KEYDPADRIGHT = 0x3260d887f494bb00L;
-    public static final long TOKEN_KEYDPADCENTR = 0x3260d887f2e4d496L;
-    public static final long TOKEN_KEYVOLUP = 0x1c2fcb126efL;
-    public static final long TOKEN_KEYVOLDOWN = 0x96bb94f4c0fc8L;
-    public static final long TOKEN_KEYPOWER = 0x1c2fc05c9ceL;
-    public static final long TOKEN_KEYCAMERA = 0x412e3582b62fL;
-    public static final long TOKEN_KEYCLEAR = 0x1c2fa8f5324L;
-    public static final long TOKEN_KEYA = 0xfc516L;
-    public static final long TOKEN_KEYB = 0xfc517L;
-    public static final long TOKEN_KEYC = 0xfc518L;
-    public static final long TOKEN_KEYD = 0xfc519L;
-    public static final long TOKEN_KEYE = 0xfc51aL;
-    public static final long TOKEN_KEYF = 0xfc51bL;
-    public static final long TOKEN_KEYG = 0xfc51cL;
-    public static final long TOKEN_KEYH = 0xfc51dL;
-    public static final long TOKEN_KEYI = 0xfc51eL;
-    public static final long TOKEN_KEYJ = 0xfc51fL;
-    public static final long TOKEN_KEYK = 0xfc520L;
-    public static final long TOKEN_KEYL = 0xfc521L;
-    public static final long TOKEN_KEYM = 0xfc522L;
-    public static final long TOKEN_KEYN = 0xfc523L;
-    public static final long TOKEN_KEYO = 0xfc524L;
-    public static final long TOKEN_KEYP = 0xfc525L;
-    public static final long TOKEN_KEYQ = 0xfc526L;
-    public static final long TOKEN_KEYR = 0xfc527L;
-    public static final long TOKEN_KEYS = 0xfc528L;
-    public static final long TOKEN_KEYT = 0xfc529L;
-    public static final long TOKEN_KEYU = 0xfc52aL;
-    public static final long TOKEN_KEYV = 0xfc52bL;
-    public static final long TOKEN_KEYW = 0xfc52cL;
-    public static final long TOKEN_KEYX = 0xfc52dL;
-    public static final long TOKEN_KEYY = 0xfc52eL;
-    public static final long TOKEN_KEYZ = 0xfc52fL;
-    public static final long TOKEN_KEYCOMMA = 0x1c2fa91d12eL;
-    public static final long TOKEN_KEYPERIOD = 0x412e6bb4690dL;
-    public static final long TOKEN_KEYALTLEFT = 0x96bacb84d0d53L;
-    public static final long TOKEN_KEYALTRIGHT = 0x15c8ff6a3d19dd3L;
-    public static final long TOKEN_KEYSHLEFT = 0x412e786bca90L;
-    public static final long TOKEN_KEYSHRIGHT = 0x96bb76842f7a4L;
-    public static final long TOKEN_KEYTAB = 0x545559beL;
-    public static final long TOKEN_KEYSPACE = 0x1c2fc5be481L;
-    public static final long TOKEN_KEYSYM = 0x545557e8L;
-    public static final long TOKEN_KEYEXPLORER = 0x15c9056274ef809L;
-    public static final long TOKEN_KEYENVELOPE = 0x15c90504606427eL;
-    public static final long TOKEN_KEYENTER = 0x1c2faca618bL;
-    public static final long TOKEN_KEYDEL = 0x545504ccL;
-    public static final long TOKEN_KEYGRAVE = 0x1c2fb0647aeL;
-    public static final long TOKEN_KEYMINUS = 0x1c2fbab2dfdL;
-    public static final long TOKEN_KEYEQUAL = 0x1c2faccb7e1L;
-    public static final long TOKEN_KEYLBRACKET = 0x15c90e3c28849a4L;
-    public static final long TOKEN_KEYRBRACKET = 0x15c916860d137f2L;
-    public static final long TOKEN_KEYBACKSLASH = 0x3260d0da17998addL;
-    public static final long TOKEN_KEYSEMICOLON = 0x3261078741e74efeL;
-    public static final long TOKEN_KEYAPOSTROPH = 0x3260cefb1f91b261L;
-    public static final long TOKEN_KEYSLASH = 0x1c2fc58cf60L;
-    public static final long TOKEN_KEYAT = 0x2477c4bL;
-    public static final long TOKEN_KEYNUM = 0x54553c97L;
-    public static final long TOKEN_KEYHOOK = 0xc304cfeedL;
-    public static final long TOKEN_KEYFOCUS = 0x1c2fae767c1L;
-    public static final long TOKEN_KEYPLUS = 0xc30531eb0L;
-    public static final long TOKEN_KEYMENU = 0xc3050a6a9L;
-    public static final long TOKEN_KEYNOTIFY = 0x412e648fb74fL;
-    public static final long TOKEN_KEYSEARCH = 0x412e780dc448L;
-    public static final long TOKEN_KEYPLAYPAUSE = 0x3260fe85a2b0c86dL;
-    public static final long TOKEN_KEYSTOP = 0xc30559a2eL;
-    public static final long TOKEN_KEYNEXT = 0xc30516df7L;
-    public static final long TOKEN_KEYPREV = 0xc30533c79L;
-    public static final long TOKEN_KEYREWIND = 0x412e73fc7be3L;
-    public static final long TOKEN_KEYFFORWARD = 0x15c90617d85f797L;
-    public static final long TOKEN_KEYMUTE = 0xc3050fd07L;
-    public static final long TOKEN_KEYPAGEUP = 0x412e6b397050L;
-    public static final long TOKEN_KEYPAGEDOWN = 0x15c913b661c7781L;
-    public static final long TOKEN_KEYPICTSYM = 0x96bb59ff73d18L;
-    public static final long TOKEN_KEYCHARSET = 0x96badd785f795L;
-    public static final long TOKEN_KEYBUTTONA = 0x96bad76744510L;
-    public static final long TOKEN_KEYBUTTONB = 0x96bad76744511L;
-    public static final long TOKEN_KEYBUTTONC = 0x96bad76744512L;
-    public static final long TOKEN_KEYBUTTONX = 0x96bad76744527L;
-    public static final long TOKEN_KEYBUTTONY = 0x96bad76744528L;
-    public static final long TOKEN_KEYBUTTONZ = 0x96bad76744529L;
-    public static final long TOKEN_KEYBUTTONL1 = 0x15c90121ecdfce8L;
-    public static final long TOKEN_KEYBUTTONR1 = 0x15c90121ecdfdc6L;
-    public static final long TOKEN_KEYBUTTONL2 = 0x15c90121ecdfce9L;
-    public static final long TOKEN_KEYBUTTONR2 = 0x15c90121ecdfdc7L;
-    public static final long TOKEN_KEYBUTTHUMBL = 0x3260d29e7302cedcL;
-    public static final long TOKEN_KEYBUTTHUMBR = 0x3260d29e7302cee2L;
-    public static final long TOKEN_KEYBUTSTART = 0x15c90121eb4fcbdL;
-    public static final long TOKEN_KEYBUTSELECT = 0x3260d29e6e83c9d4L;
-    public static final long TOKEN_KEYBUTMODE = 0x96bad766eda97L;
-    public static final long TOKEN_KEYESC = 0x54550c22L;
-    public static final long TOKEN_KEYFWDEL = 0x1c2faed99abL;
-    public static final long TOKEN_KEYCTRLLEFT = 0x15c902797161980L;
-    public static final long TOKEN_KEYCTRLRIGHT = 0x3260d5b8d6e06054L;
-    public static final long TOKEN_KEYCAPSLOCK = 0x15c901c35f29884L;
-    public static final long TOKEN_KEYSCROLLOCK = 0x3261075e239576fdL;
-    public static final long TOKEN_KEYMETALEFT = 0x15c90fbaffe738aL;
-    public static final long TOKEN_KEYMETARIGHT = 0x3260f460707563c6L;
-    public static final long TOKEN_KEYFUNCTION = 0x15c906a6da4eb36L;
-    public static final long TOKEN_KEYSYSRQ = 0x1c2fc633bbfL;
-    public static final long TOKEN_KEYBREAK = 0x1c2fa775d5aL;
-    public static final long TOKEN_KEYMOVEHOME = 0x15c9101b1fcf3ccL;
-    public static final long TOKEN_KEYMOVEEND = 0x96bb3f00db12dL;
-    public static final long TOKEN_KEYINS = 0x545520ddL;
-    public static final long TOKEN_KEYFORWARD = 0x96bafc127fca4L;
-    public static final long TOKEN_KEYPLAY = 0xc30531bd2L;
-    public static final long TOKEN_KEYPAUSE = 0x1c2fbfaeeffL;
-    public static final long TOKEN_KEYCLOSE = 0x1c2fa8f8b2bL;
-    public static final long TOKEN_KEYEJECT = 0x1c2fac6f998L;
-    public static final long TOKEN_KEYREC = 0x54554fa1L;
-    public static final long TOKEN_KEYF1 = 0x2477ce8L;
-    public static final long TOKEN_KEYF2 = 0x2477ce9L;
-    public static final long TOKEN_KEYF3 = 0x2477ceaL;
-    public static final long TOKEN_KEYF4 = 0x2477cebL;
-    public static final long TOKEN_KEYF5 = 0x2477cecL;
-    public static final long TOKEN_KEYF6 = 0x2477cedL;
-    public static final long TOKEN_KEYF7 = 0x2477ceeL;
-    public static final long TOKEN_KEYF8 = 0x2477cefL;
-    public static final long TOKEN_KEYF9 = 0x2477cf0L;
-    public static final long TOKEN_KEYF10 = 0x54550d88L;
-    public static final long TOKEN_KEYF11 = 0x54550d89L;
-    public static final long TOKEN_KEYF12 = 0x54550d8aL;
-    public static final long TOKEN_KEYNUMLOCK = 0x96bb4a0cc6f70L;
-    public static final long TOKEN_KEYNUM0 = 0xc3051c1d3L;
-    public static final long TOKEN_KEYNUM1 = 0xc3051c1d4L;
-    public static final long TOKEN_KEYNUM2 = 0xc3051c1d5L;
-    public static final long TOKEN_KEYNUM3 = 0xc3051c1d6L;
-    public static final long TOKEN_KEYNUM4 = 0xc3051c1d7L;
-    public static final long TOKEN_KEYNUM5 = 0xc3051c1d8L;
-    public static final long TOKEN_KEYNUM6 = 0xc3051c1d9L;
-    public static final long TOKEN_KEYNUM7 = 0xc3051c1daL;
-    public static final long TOKEN_KEYNUM8 = 0xc3051c1dbL;
-    public static final long TOKEN_KEYNUM9 = 0xc3051c1dcL;
-    public static final long TOKEN_KEYNUMDIV = 0x412e6535c999L;
-    public static final long TOKEN_KEYNUMSTAR = 0x96bb4a0d1f2f5L;
-    public static final long TOKEN_KEYNUMMINUS = 0x15c911b3da44d54L;
-    public static final long TOKEN_KEYNUMPLUS = 0x96bb4a0cf797bL;
-    public static final long TOKEN_KEYNUMPERIOD = 0x3260f8eff4b5f0a0L;
-    public static final long TOKEN_KEYNUMCOMMA = 0x15c911b3c8af085L;
-    public static final long TOKEN_KEYNUMENTER = 0x15c911b3cc380e2L;
-    public static final long TOKEN_KEYNUMEQUAL = 0x15c911b3cc5d738L;
-    public static final long TOKEN_KEYNUMLPAR = 0x96bb4a0cc7486L;
-    public static final long TOKEN_KEYNUMRPAR = 0x96bb4a0d117b4L;
-    public static final long TOKEN_KEYVOLMUTE = 0x96bb94f53242bL;
-    public static final long TOKEN_KEYINFO = 0xc304dbe28L;
-    public static final long TOKEN_KEYCHUP = 0xc3048fd10L;
-    public static final long TOKEN_KEYCHDOWN = 0x412e36442641L;
-    public static final long TOKEN_KEYZOOMIN = 0x412e962531c2L;
-    public static final long TOKEN_KEYZOOMOUT = 0x96bbbb3605240L;
-    public static final long TOKEN_KEYTV = 0x2477f0cL;
-    public static final long TOKEN_KEYWIN = 0x54556afdL;
-    public static final long TOKEN_KEYGUIDE = 0x1c2fb08c173L;
-    public static final long TOKEN_KEYDVR = 0x54550747L;
-    public static final long TOKEN_KEYBOOKMARK = 0x15c900e738d0142L;
-    public static final long TOKEN_KEYCAPTIONS = 0x15c901c360ce17dL;
-    public static final long TOKEN_KEYSETTINGS = 0x15c918050649a69L;
-    public static final long TOKEN_KEYTVPOWER = 0x96bb83ada167eL;
-    public static final long TOKEN_KEYTVINPUT = 0x96bb83a10feedL;
-    public static final long TOKEN_KEYSTBPOWER = 0x15c9188fb815276L;
-    public static final long TOKEN_KEYSTBINPUT = 0x15c9188fab83ae5L;
-    public static final long TOKEN_KEYAVRPOWER = 0x15c8ffc94a3f66eL;
-    public static final long TOKEN_KEYAVRINPUT = 0x15c8ffc93dadeddL;
-    public static final long TOKEN_KEYPRGRED = 0x412e6d1fdb7aL;
-    public static final long TOKEN_KEYPRGGREEN = 0x15c91458e2c30beL;
-    public static final long TOKEN_KEYPRGYELLOW = 0x3260ff0dd55ab8f2L;
-    public static final long TOKEN_KEYPRGBLUE = 0x96bb5c58e82c4L;
-    public static final long TOKEN_KEYAPPSWITCH = 0x3260cefbb8ce8214L;
-    public static final long TOKEN_KEYBUTTON1 = 0x96bad76744507L;
-    public static final long TOKEN_KEYBUTTON2 = 0x96bad76744508L;
-    public static final long TOKEN_KEYBUTTON3 = 0x96bad76744509L;
-    public static final long TOKEN_KEYBUTTON4 = 0x96bad7674450aL;
-    public static final long TOKEN_KEYBUTTON5 = 0x96bad7674450bL;
-    public static final long TOKEN_KEYBUTTON6 = 0x96bad7674450cL;
-    public static final long TOKEN_KEYBUTTON7 = 0x96bad7674450dL;
-    public static final long TOKEN_KEYBUTTON8 = 0x96bad7674450eL;
-    public static final long TOKEN_KEYBUTTON9 = 0x96bad7674450fL;
-    public static final long TOKEN_KEYBUTTON10 = 0x15c90121ecdfa03L;
-    public static final long TOKEN_KEYBUTTON11 = 0x15c90121ecdfa04L;
-    public static final long TOKEN_KEYBUTTON12 = 0x15c90121ecdfa05L;
-    public static final long TOKEN_KEYBUTTON13 = 0x15c90121ecdfa06L;
-    public static final long TOKEN_KEYBUTTON14 = 0x15c90121ecdfa07L;
-    public static final long TOKEN_KEYBUTTON15 = 0x15c90121ecdfa08L;
-    public static final long TOKEN_KEYBUTTON16 = 0x15c90121ecdfa09L;
-    public static final long TOKEN_KEYLANGUAGE = 0x15c90e319cb4778L;
-    public static final long TOKEN_KEYMANNER = 0x412e5ed8b6afL;
-    public static final long TOKEN_KEY3D = 0x2477b38L;
-    public static final long TOKEN_KEYCONTACTS = 0x15c90248ac4889bL;
-    public static final long TOKEN_KEYCALENDAR = 0x15c901c23db20a6L;
-    public static final long TOKEN_KEYMUSIC = 0x1c2fbb48d4aL;
-    public static final long TOKEN_KEYCALC = 0xc3048d647L;
-    public static final long TOKEN_KEYKAKU = 0xc304f051cL;
-    public static final long TOKEN_KEYEISU = 0xc304a8ddeL;
-    public static final long TOKEN_KEYMUHENKAN = 0x15c91050db74cf3L;
-    public static final long TOKEN_KEYHENKAN = 0x412e4aa083a7L;
-    public static final long TOKEN_KEYSWKANA = 0x412e7a17e683L;
-    public static final long TOKEN_KEYYEN = 0x5455751bL;
-    public static final long TOKEN_KEYRO = 0x2477ebbL;
-    public static final long TOKEN_KEYKANA = 0xc304f0577L;
-    public static final long TOKEN_KEYASSIST = 0x412e2f45fa41L;
-    public static final long TOKEN_KEYBRGDOWN = 0x96bad688dd3deL;
-    public static final long TOKEN_KEYBRGUP = 0x1c2fa776af5L;
-    public static final long TOKEN_KEYMATRACE = 0x96bb3b600fce4L;
-    public static final long TOKEN_KEYSLEEP = 0x1c2fc58e2c6L;
-    public static final long TOKEN_KEYWAKE = 0xc30584b68L;
-    public static final long TOKEN_KEYPAIR = 0xc3052e220L;
-    public static final long TOKEN_KEYMEDIATOP = 0x15c90fb6eb95ec3L;
-    public static final long TOKEN_KEY11 = 0x2477ae2L;
-    public static final long TOKEN_KEY12 = 0x2477ae3L;
-    public static final long TOKEN_KEYCHLAST = 0x412e364a09bdL;
-    public static final long TOKEN_KEYTVDATA = 0x412e7e18003aL;
-    public static final long TOKEN_KEYVOICEASST = 0x326111f73da5cbd6L;
-    public static final long TOKEN_KEYTVRADIO = 0x96bb83b081140L;
-    public static final long TOKEN_KEYTVTEXT = 0x412e7e247415L;
-    public static final long TOKEN_KEYTVNUMENT = 0x15c91a079e4e519L;
-    public static final long TOKEN_KEYTVTERRANA = 0x32610c34f21f7698L;
-    public static final long TOKEN_KEYTVTERRDIA = 0x32610c34f21f85eaL;
-    public static final long TOKEN_KEYTVSAT = 0x1c2fc7d80a7L;
-    public static final long TOKEN_KEYTVSATBS = 0x96bb83b24fec2L;
-    public static final long TOKEN_KEYTVSATCS = 0x96bb83b24fee7L;
-    public static final long TOKEN_KEYTVSATSERV = 0x32610c3448e33847L;
-    public static final long TOKEN_KEYTVNETWORK = 0x32610c315cc98c91L;
-    public static final long TOKEN_KEYTVANTCABL = 0x32610c29bdd85168L;
-    public static final long TOKEN_KEYTVHDMI1 = 0x96bb839ec9977L;
-    public static final long TOKEN_KEYTVHDMI2 = 0x96bb839ec9978L;
-    public static final long TOKEN_KEYTVHDMI3 = 0x96bb839ec9979L;
-    public static final long TOKEN_KEYTVHDMI4 = 0x96bb839ec997aL;
-    public static final long TOKEN_KEYTVCMPSIT1 = 0x32610c2aeb2c1f7fL;
-    public static final long TOKEN_KEYTVCMPSIT2 = 0x32610c2aeb2c1f80L;
-    public static final long TOKEN_KEYTVCOMP1 = 0x96bb839661e44L;
-    public static final long TOKEN_KEYTVCOMP2 = 0x96bb839661e45L;
-    public static final long TOKEN_KEYTVVGA1 = 0x412e7e260712L;
-    public static final long TOKEN_KEYTVAUMIX = 0x96bb839318eadL;
-    public static final long TOKEN_KEYTVAUMIXUP = 0x32610c29da03ff94L;
-    public static final long TOKEN_KEYTVAUMIXDN = 0x32610c29da03fd1dL;
-    public static final long TOKEN_KEYTVZOOMMOD = 0x32610c38b0ae5fd0L;
-    public static final long TOKEN_KEYTVCONTMNU = 0x32610c2af337fdc7L;
-    public static final long TOKEN_KEYTVMEDCNTX = 0x32610c30c202a272L;
-    public static final long TOKEN_KEYTVTIMER = 0x96bb83b47a19aL;
-    public static final long TOKEN_KEYHELP = 0xc304cc909L;
+    public static final long TOKEN_KEYUNKNOWN = 0x96bb8b22835daL;
+    public static final long TOKEN_KEYSOFTLEFT = 0x15c91860fd50beeL;
+    public static final long TOKEN_KEYSOFTRIGHT = 0x326108604a556a5eL;
+    public static final long TOKEN_KEYHOME = 0xc304dfe9cL;
+    public static final long TOKEN_KEYBACK = 0xc30490f24L;
+    public static final long TOKEN_KEYCALL = 0xc3049d64fL;
+    public static final long TOKEN_KEYENDCALL = 0x96baf22792dbdL;
+    public static final long TOKEN_KEY0 = 0x10c50bL;
+    public static final long TOKEN_KEY1 = 0x10c50cL;
+    public static final long TOKEN_KEY2 = 0x10c50dL;
+    public static final long TOKEN_KEY3 = 0x10c50eL;
+    public static final long TOKEN_KEY4 = 0x10c50fL;
+    public static final long TOKEN_KEY5 = 0x10c510L;
+    public static final long TOKEN_KEY6 = 0x10c511L;
+    public static final long TOKEN_KEY7 = 0x10c512L;
+    public static final long TOKEN_KEY8 = 0x10c513L;
+    public static final long TOKEN_KEY9 = 0x10c514L;
+    public static final long TOKEN_KEYSTAR = 0xc30569829L;
+    public static final long TOKEN_KEYNUMBER = 0x412e6536be4eL;
+    public static final long TOKEN_KEYDPADUP = 0x412e3b497bebL;
+    public static final long TOKEN_KEYDPADDOWN = 0x15c903b06928cbcL;
+    public static final long TOKEN_KEYDPADLEFT = 0x15c903b069883bbL;
+    public static final long TOKEN_KEYDPADRIGHT = 0x3260d887f495baffL;
+    public static final long TOKEN_KEYDPADCENTR = 0x3260d887f2e5d495L;
+    public static final long TOKEN_KEYVOLUP = 0x1c2fcb226eeL;
+    public static final long TOKEN_KEYVOLDOWN = 0x96bb94f4d0fc7L;
+    public static final long TOKEN_KEYPOWER = 0x1c2fc06c9cdL;
+    public static final long TOKEN_KEYCAMERA = 0x412e3583b62eL;
+    public static final long TOKEN_KEYCLEAR = 0x1c2fa905323L;
+    public static final long TOKEN_KEYA = 0x10c515L;
+    public static final long TOKEN_KEYB = 0x10c516L;
+    public static final long TOKEN_KEYC = 0x10c517L;
+    public static final long TOKEN_KEYD = 0x10c518L;
+    public static final long TOKEN_KEYE = 0x10c519L;
+    public static final long TOKEN_KEYF = 0x10c51aL;
+    public static final long TOKEN_KEYG = 0x10c51bL;
+    public static final long TOKEN_KEYH = 0x10c51cL;
+    public static final long TOKEN_KEYI = 0x10c51dL;
+    public static final long TOKEN_KEYJ = 0x10c51eL;
+    public static final long TOKEN_KEYK = 0x10c51fL;
+    public static final long TOKEN_KEYL = 0x10c520L;
+    public static final long TOKEN_KEYM = 0x10c521L;
+    public static final long TOKEN_KEYN = 0x10c522L;
+    public static final long TOKEN_KEYO = 0x10c523L;
+    public static final long TOKEN_KEYP = 0x10c524L;
+    public static final long TOKEN_KEYQ = 0x10c525L;
+    public static final long TOKEN_KEYR = 0x10c526L;
+    public static final long TOKEN_KEYS = 0x10c527L;
+    public static final long TOKEN_KEYT = 0x10c528L;
+    public static final long TOKEN_KEYU = 0x10c529L;
+    public static final long TOKEN_KEYV = 0x10c52aL;
+    public static final long TOKEN_KEYW = 0x10c52bL;
+    public static final long TOKEN_KEYX = 0x10c52cL;
+    public static final long TOKEN_KEYY = 0x10c52dL;
+    public static final long TOKEN_KEYZ = 0x10c52eL;
+    public static final long TOKEN_KEYCOMMA = 0x1c2fa92d12dL;
+    public static final long TOKEN_KEYPERIOD = 0x412e6bb5690cL;
+    public static final long TOKEN_KEYALTLEFT = 0x96bacb84e0d52L;
+    public static final long TOKEN_KEYALTRIGHT = 0x15c8ff6a3d29dd2L;
+    public static final long TOKEN_KEYSHLEFT = 0x412e786cca8fL;
+    public static final long TOKEN_KEYSHRIGHT = 0x96bb76843f7a3L;
+    public static final long TOKEN_KEYTAB = 0x545659bdL;
+    public static final long TOKEN_KEYSPACE = 0x1c2fc5ce480L;
+    public static final long TOKEN_KEYSYM = 0x545657e7L;
+    public static final long TOKEN_KEYEXPLORER = 0x15c9056274ff808L;
+    public static final long TOKEN_KEYENVELOPE = 0x15c90504607427dL;
+    public static final long TOKEN_KEYENTER = 0x1c2facb618aL;
+    public static final long TOKEN_KEYDEL = 0x545604cbL;
+    public static final long TOKEN_KEYGRAVE = 0x1c2fb0747adL;
+    public static final long TOKEN_KEYMINUS = 0x1c2fbac2dfcL;
+    public static final long TOKEN_KEYEQUAL = 0x1c2facdb7e0L;
+    public static final long TOKEN_KEYLBRACKET = 0x15c90e3c28949a3L;
+    public static final long TOKEN_KEYRBRACKET = 0x15c916860d237f1L;
+    public static final long TOKEN_KEYBACKSLASH = 0x3260d0da179a8adcL;
+    public static final long TOKEN_KEYSEMICOLON = 0x3261078741e84efdL;
+    public static final long TOKEN_KEYAPOSTROPH = 0x3260cefb1f92b260L;
+    public static final long TOKEN_KEYSLASH = 0x1c2fc59cf5fL;
+    public static final long TOKEN_KEYAT = 0x2487c4aL;
+    public static final long TOKEN_KEYNUM = 0x54563c96L;
+    public static final long TOKEN_KEYHOOK = 0xc304dfeecL;
+    public static final long TOKEN_KEYFOCUS = 0x1c2fae867c0L;
+    public static final long TOKEN_KEYPLUS = 0xc30541eafL;
+    public static final long TOKEN_KEYMENU = 0xc3051a6a8L;
+    public static final long TOKEN_KEYNOTIFY = 0x412e6490b74eL;
+    public static final long TOKEN_KEYSEARCH = 0x412e780ec447L;
+    public static final long TOKEN_KEYPLAYPAUSE = 0x3260fe85a2b1c86cL;
+    public static final long TOKEN_KEYSTOP = 0xc30569a2dL;
+    public static final long TOKEN_KEYNEXT = 0xc30526df6L;
+    public static final long TOKEN_KEYPREV = 0xc30543c78L;
+    public static final long TOKEN_KEYREWIND = 0x412e73fd7be2L;
+    public static final long TOKEN_KEYFFORWARD = 0x15c90617d86f796L;
+    public static final long TOKEN_KEYMUTE = 0xc3051fd06L;
+    public static final long TOKEN_KEYPAGEUP = 0x412e6b3a704fL;
+    public static final long TOKEN_KEYPAGEDOWN = 0x15c913b661d7780L;
+    public static final long TOKEN_KEYPICTSYM = 0x96bb59ff83d17L;
+    public static final long TOKEN_KEYCHARSET = 0x96badd786f794L;
+    public static final long TOKEN_KEYBUTTONA = 0x96bad7675450fL;
+    public static final long TOKEN_KEYBUTTONB = 0x96bad76754510L;
+    public static final long TOKEN_KEYBUTTONC = 0x96bad76754511L;
+    public static final long TOKEN_KEYBUTTONX = 0x96bad76754526L;
+    public static final long TOKEN_KEYBUTTONY = 0x96bad76754527L;
+    public static final long TOKEN_KEYBUTTONZ = 0x96bad76754528L;
+    public static final long TOKEN_KEYBUTTONL1 = 0x15c90121ecefce7L;
+    public static final long TOKEN_KEYBUTTONR1 = 0x15c90121ecefdc5L;
+    public static final long TOKEN_KEYBUTTONL2 = 0x15c90121ecefce8L;
+    public static final long TOKEN_KEYBUTTONR2 = 0x15c90121ecefdc6L;
+    public static final long TOKEN_KEYBUTTHUMBL = 0x3260d29e7303cedbL;
+    public static final long TOKEN_KEYBUTTHUMBR = 0x3260d29e7303cee1L;
+    public static final long TOKEN_KEYBUTSTART = 0x15c90121eb5fcbcL;
+    public static final long TOKEN_KEYBUTSELECT = 0x3260d29e6e84c9d3L;
+    public static final long TOKEN_KEYBUTMODE = 0x96bad766fda96L;
+    public static final long TOKEN_KEYESC = 0x54560c21L;
+    public static final long TOKEN_KEYFWDEL = 0x1c2faee99aaL;
+    public static final long TOKEN_KEYCTRLLEFT = 0x15c90279717197fL;
+    public static final long TOKEN_KEYCTRLRIGHT = 0x3260d5b8d6e16053L;
+    public static final long TOKEN_KEYCAPSLOCK = 0x15c901c35f39883L;
+    public static final long TOKEN_KEYSCROLLOCK = 0x3261075e239676fcL;
+    public static final long TOKEN_KEYMETALEFT = 0x15c90fbafff7389L;
+    public static final long TOKEN_KEYMETARIGHT = 0x3260f460707663c5L;
+    public static final long TOKEN_KEYFUNCTION = 0x15c906a6da5eb35L;
+    public static final long TOKEN_KEYSYSRQ = 0x1c2fc643bbeL;
+    public static final long TOKEN_KEYBREAK = 0x1c2fa785d59L;
+    public static final long TOKEN_KEYMOVEHOME = 0x15c9101b1fdf3cbL;
+    public static final long TOKEN_KEYMOVEEND = 0x96bb3f00eb12cL;
+    public static final long TOKEN_KEYINS = 0x545620dcL;
+    public static final long TOKEN_KEYFORWARD = 0x96bafc128fca3L;
+    public static final long TOKEN_KEYPLAY = 0xc30541bd1L;
+    public static final long TOKEN_KEYPAUSE = 0x1c2fbfbeefeL;
+    public static final long TOKEN_KEYCLOSE = 0x1c2fa908b2aL;
+    public static final long TOKEN_KEYEJECT = 0x1c2fac7f997L;
+    public static final long TOKEN_KEYREC = 0x54564fa0L;
+    public static final long TOKEN_KEYF1 = 0x2487ce7L;
+    public static final long TOKEN_KEYF2 = 0x2487ce8L;
+    public static final long TOKEN_KEYF3 = 0x2487ce9L;
+    public static final long TOKEN_KEYF4 = 0x2487ceaL;
+    public static final long TOKEN_KEYF5 = 0x2487cebL;
+    public static final long TOKEN_KEYF6 = 0x2487cecL;
+    public static final long TOKEN_KEYF7 = 0x2487cedL;
+    public static final long TOKEN_KEYF8 = 0x2487ceeL;
+    public static final long TOKEN_KEYF9 = 0x2487cefL;
+    public static final long TOKEN_KEYF10 = 0x54560d87L;
+    public static final long TOKEN_KEYF11 = 0x54560d88L;
+    public static final long TOKEN_KEYF12 = 0x54560d89L;
+    public static final long TOKEN_KEYNUMLOCK = 0x96bb4a0cd6f6fL;
+    public static final long TOKEN_KEYNUM0 = 0xc3052c1d2L;
+    public static final long TOKEN_KEYNUM1 = 0xc3052c1d3L;
+    public static final long TOKEN_KEYNUM2 = 0xc3052c1d4L;
+    public static final long TOKEN_KEYNUM3 = 0xc3052c1d5L;
+    public static final long TOKEN_KEYNUM4 = 0xc3052c1d6L;
+    public static final long TOKEN_KEYNUM5 = 0xc3052c1d7L;
+    public static final long TOKEN_KEYNUM6 = 0xc3052c1d8L;
+    public static final long TOKEN_KEYNUM7 = 0xc3052c1d9L;
+    public static final long TOKEN_KEYNUM8 = 0xc3052c1daL;
+    public static final long TOKEN_KEYNUM9 = 0xc3052c1dbL;
+    public static final long TOKEN_KEYNUMDIV = 0x412e6536c998L;
+    public static final long TOKEN_KEYNUMSTAR = 0x96bb4a0d2f2f4L;
+    public static final long TOKEN_KEYNUMMINUS = 0x15c911b3da54d53L;
+    public static final long TOKEN_KEYNUMPLUS = 0x96bb4a0d0797aL;
+    public static final long TOKEN_KEYNUMPERIOD = 0x3260f8eff4b6f09fL;
+    public static final long TOKEN_KEYNUMCOMMA = 0x15c911b3c8bf084L;
+    public static final long TOKEN_KEYNUMENTER = 0x15c911b3cc480e1L;
+    public static final long TOKEN_KEYNUMEQUAL = 0x15c911b3cc6d737L;
+    public static final long TOKEN_KEYNUMLPAR = 0x96bb4a0cd7485L;
+    public static final long TOKEN_KEYNUMRPAR = 0x96bb4a0d217b3L;
+    public static final long TOKEN_KEYVOLMUTE = 0x96bb94f54242aL;
+    public static final long TOKEN_KEYINFO = 0xc304ebe27L;
+    public static final long TOKEN_KEYCHUP = 0xc3049fd0fL;
+    public static final long TOKEN_KEYCHDOWN = 0x412e36452640L;
+    public static final long TOKEN_KEYZOOMIN = 0x412e962631c1L;
+    public static final long TOKEN_KEYZOOMOUT = 0x96bbbb361523fL;
+    public static final long TOKEN_KEYTV = 0x2487f0bL;
+    public static final long TOKEN_KEYWIN = 0x54566afcL;
+    public static final long TOKEN_KEYGUIDE = 0x1c2fb09c172L;
+    public static final long TOKEN_KEYDVR = 0x54560746L;
+    public static final long TOKEN_KEYBOOKMARK = 0x15c900e738e0141L;
+    public static final long TOKEN_KEYCAPTIONS = 0x15c901c360de17cL;
+    public static final long TOKEN_KEYSETTINGS = 0x15c918050659a68L;
+    public static final long TOKEN_KEYTVPOWER = 0x96bb83adb167dL;
+    public static final long TOKEN_KEYTVINPUT = 0x96bb83a11feecL;
+    public static final long TOKEN_KEYSTBPOWER = 0x15c9188fb825275L;
+    public static final long TOKEN_KEYSTBINPUT = 0x15c9188fab93ae4L;
+    public static final long TOKEN_KEYAVRPOWER = 0x15c8ffc94a4f66dL;
+    public static final long TOKEN_KEYAVRINPUT = 0x15c8ffc93dbdedcL;
+    public static final long TOKEN_KEYPRGRED = 0x412e6d20db79L;
+    public static final long TOKEN_KEYPRGGREEN = 0x15c91458e2d30bdL;
+    public static final long TOKEN_KEYPRGYELLOW = 0x3260ff0dd55bb8f1L;
+    public static final long TOKEN_KEYPRGBLUE = 0x96bb5c58f82c3L;
+    public static final long TOKEN_KEYAPPSWITCH = 0x3260cefbb8cf8213L;
+    public static final long TOKEN_KEYBUTTON1 = 0x96bad76754506L;
+    public static final long TOKEN_KEYBUTTON2 = 0x96bad76754507L;
+    public static final long TOKEN_KEYBUTTON3 = 0x96bad76754508L;
+    public static final long TOKEN_KEYBUTTON4 = 0x96bad76754509L;
+    public static final long TOKEN_KEYBUTTON5 = 0x96bad7675450aL;
+    public static final long TOKEN_KEYBUTTON6 = 0x96bad7675450bL;
+    public static final long TOKEN_KEYBUTTON7 = 0x96bad7675450cL;
+    public static final long TOKEN_KEYBUTTON8 = 0x96bad7675450dL;
+    public static final long TOKEN_KEYBUTTON9 = 0x96bad7675450eL;
+    public static final long TOKEN_KEYBUTTON10 = 0x15c90121ecefa02L;
+    public static final long TOKEN_KEYBUTTON11 = 0x15c90121ecefa03L;
+    public static final long TOKEN_KEYBUTTON12 = 0x15c90121ecefa04L;
+    public static final long TOKEN_KEYBUTTON13 = 0x15c90121ecefa05L;
+    public static final long TOKEN_KEYBUTTON14 = 0x15c90121ecefa06L;
+    public static final long TOKEN_KEYBUTTON15 = 0x15c90121ecefa07L;
+    public static final long TOKEN_KEYBUTTON16 = 0x15c90121ecefa08L;
+    public static final long TOKEN_KEYLANGUAGE = 0x15c90e319cc4777L;
+    public static final long TOKEN_KEYMANNER = 0x412e5ed9b6aeL;
+    public static final long TOKEN_KEY3D = 0x2487b37L;
+    public static final long TOKEN_KEYCONTACTS = 0x15c90248ac5889aL;
+    public static final long TOKEN_KEYCALENDAR = 0x15c901c23dc20a5L;
+    public static final long TOKEN_KEYMUSIC = 0x1c2fbb58d49L;
+    public static final long TOKEN_KEYCALC = 0xc3049d646L;
+    public static final long TOKEN_KEYKAKU = 0xc3050051bL;
+    public static final long TOKEN_KEYEISU = 0xc304b8dddL;
+    public static final long TOKEN_KEYMUHENKAN = 0x15c91050db84cf2L;
+    public static final long TOKEN_KEYHENKAN = 0x412e4aa183a6L;
+    public static final long TOKEN_KEYSWKANA = 0x412e7a18e682L;
+    public static final long TOKEN_KEYYEN = 0x5456751aL;
+    public static final long TOKEN_KEYRO = 0x2487ebaL;
+    public static final long TOKEN_KEYKANA = 0xc30500576L;
+    public static final long TOKEN_KEYASSIST = 0x412e2f46fa40L;
+    public static final long TOKEN_KEYBRGDOWN = 0x96bad688ed3ddL;
+    public static final long TOKEN_KEYBRGUP = 0x1c2fa786af4L;
+    public static final long TOKEN_KEYMATRACE = 0x96bb3b601fce3L;
+    public static final long TOKEN_KEYSLEEP = 0x1c2fc59e2c5L;
+    public static final long TOKEN_KEYWAKE = 0xc30594b67L;
+    public static final long TOKEN_KEYPAIR = 0xc3053e21fL;
+    public static final long TOKEN_KEYMEDIATOP = 0x15c90fb6eba5ec2L;
+    public static final long TOKEN_KEY11 = 0x2487ae1L;
+    public static final long TOKEN_KEY12 = 0x2487ae2L;
+    public static final long TOKEN_KEYCHLAST = 0x412e364b09bcL;
+    public static final long TOKEN_KEYTVDATA = 0x412e7e190039L;
+    public static final long TOKEN_KEYVOICEASST = 0x326111f73da6cbd5L;
+    public static final long TOKEN_KEYTVRADIO = 0x96bb83b09113fL;
+    public static final long TOKEN_KEYTVTEXT = 0x412e7e257414L;
+    public static final long TOKEN_KEYTVNUMENT = 0x15c91a079e5e518L;
+    public static final long TOKEN_KEYTVTERRANA = 0x32610c34f2207697L;
+    public static final long TOKEN_KEYTVTERRDIA = 0x32610c34f22085e9L;
+    public static final long TOKEN_KEYTVSAT = 0x1c2fc7e80a6L;
+    public static final long TOKEN_KEYTVSATBS = 0x96bb83b25fec1L;
+    public static final long TOKEN_KEYTVSATCS = 0x96bb83b25fee6L;
+    public static final long TOKEN_KEYTVSATSERV = 0x32610c3448e43846L;
+    public static final long TOKEN_KEYTVNETWORK = 0x32610c315cca8c90L;
+    public static final long TOKEN_KEYTVANTCABL = 0x32610c29bdd95167L;
+    public static final long TOKEN_KEYTVHDMI1 = 0x96bb839ed9976L;
+    public static final long TOKEN_KEYTVHDMI2 = 0x96bb839ed9977L;
+    public static final long TOKEN_KEYTVHDMI3 = 0x96bb839ed9978L;
+    public static final long TOKEN_KEYTVHDMI4 = 0x96bb839ed9979L;
+    public static final long TOKEN_KEYTVCMPSIT1 = 0x32610c2aeb2d1f7eL;
+    public static final long TOKEN_KEYTVCMPSIT2 = 0x32610c2aeb2d1f7fL;
+    public static final long TOKEN_KEYTVCOMP1 = 0x96bb839671e43L;
+    public static final long TOKEN_KEYTVCOMP2 = 0x96bb839671e44L;
+    public static final long TOKEN_KEYTVVGA1 = 0x412e7e270711L;
+    public static final long TOKEN_KEYTVAUMIX = 0x96bb839328eacL;
+    public static final long TOKEN_KEYTVAUMIXUP = 0x32610c29da04ff93L;
+    public static final long TOKEN_KEYTVAUMIXDN = 0x32610c29da04fd1cL;
+    public static final long TOKEN_KEYTVZOOMMOD = 0x32610c38b0af5fcfL;
+    public static final long TOKEN_KEYTVCONTMNU = 0x32610c2af338fdc6L;
+    public static final long TOKEN_KEYTVMEDCNTX = 0x32610c30c203a271L;
+    public static final long TOKEN_KEYTVTIMER = 0x96bb83b48a199L;
+    public static final long TOKEN_KEYHELP = 0xc304dc908L;
 
 
     /**
@@ -1093,6 +1099,9 @@ public class Commands
      */
     public static class Data
         {
+        private long params[];
+        private Method method;
+
         private Data(long[] params, String methodName )
             {
             this.params = params;
@@ -1111,13 +1120,13 @@ public class Commands
             try
                 {
                 // Parameter-command has COMPLEX parameters - forwardParamers
-                if (getParameterType() >= 0L)
+                if (getParameterType() >= Tokenizer.TOKEN_CODE_SHIFT || getParameterType() < 0x0L )
                     method = MethodsForCommands.class.getDeclaredMethod(methodName, ExtendedMap.class);
                 // Parameter-command has ONE parameter - result
-                else if (getParameterType() >= Commands.PARAMETER_KEYWORD)
+                else if (getParameterType() <= Commands.PARAMETER_KEYWORD)
                     method = MethodsForCommands.class.getDeclaredMethod(methodName, Object.class);
                 // Parameter-command has LIST parameter - result
-                else if (getParameterType() >= (Commands.PARAMETER_KEYWORD & Commands.PARAMETER_MODE_LIST))
+                else if (getParameterType() <= (Commands.PARAMETER_KEYWORD | Commands.PARAMETER_MOD_LIST))
                     method = MethodsForCommands.class.getDeclaredMethod(methodName, List.class);
                 // Parameter-command has LABEL parameter
                 else if (getParameterType() == Commands.PARAMETER_LABEL)
@@ -1132,9 +1141,6 @@ public class Commands
                 Scribe.error("Method " + methodName + " is missing in MethodsForCommands!");
                 }
             }
-
-        private long params[];
-        private Method method;
 
         /**
          * First allowed parameter determines the type of the parameter list

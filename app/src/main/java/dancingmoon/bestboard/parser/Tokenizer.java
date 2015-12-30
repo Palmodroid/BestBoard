@@ -324,6 +324,9 @@ public class Tokenizer
 	/** Escape sequence comming */
 	public static final int MARK_ESCAPE = '\\';
 
+    /** Keyword token-codes start above this level */
+    public static final long TOKEN_CODE_SHIFT = 0xFFFFL;
+
 
 	/**
 	 * True if character is a decimal digit
@@ -572,6 +575,10 @@ public class Tokenizer
         {
         char val;
         StringBuilder keyword = new StringBuilder();
+
+        // signed keyword-code cannot exist
+        code &= 0x7FFFFFFFFFFFFFFFL;
+        code -= TOKEN_CODE_SHIFT;
 
         while ( code > 0 )
             {
@@ -1268,7 +1275,7 @@ public class Tokenizer
 					
 				case TYPE_KEYWORD:
 					// Cannot start with number, otherwise all keyword chars are accepted
-					// Endig from unknown character will be truncated
+					// Ending from unknown character will be truncated
 					if ( isValidKeyword(ch) )
 						{
 						tokenInteger*=TOKEN_CODE_RADIX;
@@ -1279,17 +1286,30 @@ public class Tokenizer
 							error( getStringToken(), R.string.error_keyword_exceeds );
 						tokenLength++;
 						}
-					else if ( isValidWhiteSpace(ch) )
-						{
-						// Correctly terminated keyword returned - no messages.
-						// Last white-space should be evaluated.
-						pushBackLastRead();
-						return tokenType;
-						}
 					else
 						{
-						error( getStringToken(), R.string.error_keyword_malformed_ending );
-						findNextWhiteSpace();
+                        if ( isValidWhiteSpace(ch) )
+                            {
+                            // Correctly terminated keyword returned - no messages.
+                            // Last white-space should be evaluated.
+                            pushBackLastRead();
+                            }
+                        else
+                            {
+                            error( getStringToken(), R.string.error_keyword_malformed_ending );
+                            findNextWhiteSpace();
+                            }
+                        // keyword's token-integer is shifted
+                        tokenInteger += TOKEN_CODE_SHIFT;
+                        // it cannot be negative or smaller then TOKEN_CODE_SHIFT
+                        if ( tokenInteger <= TOKEN_CODE_SHIFT )
+                            {
+                            // signed bit is cleared
+                            tokenInteger &= 0x7FFFFFFFFFFFFFFFL;
+                            // if the value is till too small, then it is shifted once more
+                            if ( tokenInteger <= TOKEN_CODE_SHIFT )
+                                tokenInteger += TOKEN_CODE_SHIFT;
+                            }
 						return tokenType;
 						}
 					break;

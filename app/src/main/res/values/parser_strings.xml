@@ -25,7 +25,8 @@
     <string name="parser_method_called">"Method is called."</string>
     <string name="parser_method_no_result">"Method returned with no result."</string>
     <string name="parser_cannot_access_method">"Cannot access method! ERROR IN CODE!"</string>
-    <string name="parser_method_exception">"Exception is thrown by method! ERROR IN CODE!"</string>
+    <string name="parser_method_exception">"Exception is thrown by method! ERROR IN CODE! Cause: "</string>
+    <string name="parser_method_exception_missing">"Exception is thrown by method! ERROR IN CODE! Cause cannot be found!"</string>
     <string name="parser_no_method_called">"No method to call."</string>
 
     <string name="parser_invalid_numeric">"Numeric value is invalid!"</string>
