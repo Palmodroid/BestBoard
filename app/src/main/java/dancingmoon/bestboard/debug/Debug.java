@@ -36,10 +36,10 @@ public class Debug
     public static final int COMMANDS = 40;
     public static final int IGNITION = 50;
     public static final int DATA = 60;
-    public static final int PARSER = 70;
-    public static final int SERVICE = 580;
-    public static final int TEXT = 590;
-    public static final int CURSOR = 690;
+    public static final int PARSER = 770;
+    public static final int SERVICE = 80;
+    public static final int TEXT = 90;
+    public static final int CURSOR = 90;
 
 
     public static final int BOARDSTATE = 100;

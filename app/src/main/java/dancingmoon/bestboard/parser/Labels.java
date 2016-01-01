@@ -33,7 +33,7 @@ import java.util.Map;
  * User defined labels can be set by 'LET (label value)' command.
  * <p>
  * ((The difference between Commands and Labels class:
- * Commands - static data for interpretting language.
+ * Commands - static data for interpreting language.
  * Labels - dynamic data, expanding during parse.
  * All SoftBoardParser instance can use the same Commands class,
  * while each instance should have its own Labels class.

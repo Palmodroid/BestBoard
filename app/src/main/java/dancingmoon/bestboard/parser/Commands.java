@@ -240,7 +240,7 @@ public class Commands
      *  it makes creation of map more explicit,
      *  it makes map unmodifiable,
      *  as MY_MAP is constant, I would name it like constant))
-     * @return the initalized map
+     * @return the initialized map
      */
     private static Map<Long, Data> createDataMap()
         {
