@@ -185,6 +185,8 @@ public class Commands
 
     public final static long PARAMETER_MOD_MULTIPLE = 0x8000000000000000L;
 
+    // ONE PARAMETER types cannot be negative, not to mix with MULTIPLE Flag
+
     // One parameter types - POSITIVE VALUES, ORDER IS IMPORTANT !! (4 bit reserved)
     public final static long PARAMETER_BOOLEAN = 1L;   // Returned as Boolean (false==0, true==anything else)
     public final static long PARAMETER_CHAR = 2L;      // Returned as Character (unsigned 16 bit)
@@ -220,7 +222,7 @@ public class Commands
     public final static long NO_PARAMETERS = 0xFFL;
 
     // These tokens (parameter-commands) can be defined as labels
-    public final static long[] ALLOWED_LABELS = new long[]{
+    public final static long[] DEFAULT_LABEL_ALLOWED = new long[]{
             TOKEN_ADDBOARD,
             TOKEN_CURSOR,
             TOKEN_SEND,

@@ -16,6 +16,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.R;
@@ -341,6 +342,10 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         String commandString; // Just for debugging
         Commands.Data commandData;
 
+        // allowedParameterCommands signs, that this parameter is
+        // multiple (-1), single (+1), not allowed (0)
+        int commandMultiple;
+
         // Complex parameter-list forwarded to the method
         ExtendedMap<Long, Object> forwardParameters = null;
 
@@ -350,6 +355,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         // Parameter list (results of the called methods of the parameter-commands) will be returned to the caller
         // Every cycle can give a new item to returnParameters
         ExtendedMap<Long, Object> returnParameters = new ExtendedMap<>();
+
+        // Before the cycles default values populates returnParameters
         try
             {
             // parsedCommandCode with signed bit on (as key) could define the default label
@@ -378,10 +385,10 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 commandString = tokenizer.getStringToken();
                 // tokenizer.note( commandString, R.string.parser_code, Long.toHexString(commandCode) );
 
-                Scribe.debug( Debug.PARSER, " * Parsing of parameter [" + commandString + "] has started.");
+                Scribe.debug( Debug.PARSER, " * Parsing of parameter [" + commandString + "] for [" + Tokenizer.regenerateKeyword( parsedCommandCode ) + "] has started.");
 
                 // Valid keyword, but not allowed parameter-command - this can be a label
-                if ( !contains( allowedParameterCommands, commandCode ) )
+                if ( ( commandMultiple = containsWithoutSignedBit(allowedParameterCommands, commandCode)) == 0 )
                     {
                     try
                         {
@@ -392,9 +399,25 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                         Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as a label. Value: [" + forwardParameters + "]");
 
                         // All elements are copied into returnedParameters
-                        // !! WARNING !! ADDTITLE elements are overwritten instead of adding !!
-                        // !! This will work only after implementing multiple parameters
-                        returnParameters.putAll( forwardParameters );
+                        // each entry should be checked if multiple or not
+                        for (Map.Entry<Long, Object> entry : forwardParameters.entrySet())
+                            {
+                            if ( entry.getKey() > 0L ) // SINGLE
+                                {
+                                returnParameters.put(entry.getKey(), entry.getValue());
+                                }
+                            else
+                                {
+                                ArrayList<Object> list = (ArrayList<Object>) returnParameters.get( entry.getKey() );
+
+                                if (list == null)
+                                    {
+                                    list = new ArrayList<Object>();
+                                    returnParameters.put( entry.getKey(), list) ;
+                                    }
+                                list.add(entry.getValue());
+                                }
+                            }
                         }
                     catch (InvalidKeyException e)
                         {
@@ -467,10 +490,10 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             // Or the result of the method (if any), or should be null
             result = null;
 
-            // Parameter-command has COMPLEX (SINGLE) parameters
+            // Parameter-command has COMPLEX parameters
             if ( commandData.getParameterType() >= Tokenizer.TOKEN_CODE_SHIFT )
                 {
-                Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as a single COMPLEX parameter. " );
+                Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as COMPLEX parameter. " );
                 // surrounding parentheses are checked here
                 if (tokenizer.nextToken() != Tokenizer.TYPE_START)
                     {
@@ -484,6 +507,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                 // forward results of previous parameter-commands with the same code to method
                 // forwarded value can be null
+                // multiple parameters signed bit is ON, so those will not attached
                 forwardParameters.put(commandCode, returnParameters.get(commandCode));
 
                 // END and EOF can be returned, but evaluation can be performed normally
@@ -495,14 +519,6 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                 Scribe.debug( Debug.PARSER, "Result of COMPLEX parameter [" + commandString + "]: " + forwardParameters );
                 // parameters for method are in forwardParameters, result is cleared
-                }
-
-            // Parameter-command has COMPLEX (MULTIPLE) parameters
-            else if ( commandData.getParameterType() < 0x0L )
-                {
-                Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as multiple COMPLEX parameter. NOT IMPLEMENTED !!" );
-
-                /**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
                 }
 
             // Parameter-command has ONE parameter
@@ -543,7 +559,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             // Parameter-command has LABEL parameter
             else if ( commandData.getParameterType() == Commands.PARAMETER_LABEL )
                 {
-                Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as LABEL." );
+                Scribe.debug( Debug.PARSER, "[" + commandString + "] creates label." );
 
                 parseLabelParameter();
                 continue;
@@ -634,8 +650,28 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             // if result is not null, it will part of the returnParameters as commandCode-result pair
             if (result != null)
                 {
-                // if there was a previous result - it is overwritten
-                returnParameters.put(commandCode, result);
+                // commandMultiple cannot be 0 (already checked. -1: multiple, +1: single
+                if ( commandMultiple > 0 )
+                    {
+                    // if there was a previous result - it is overwritten
+                    returnParameters.put(commandCode, result);
+                    Scribe.debug( Debug.PARSER, "[" + commandString + "] (" + commandCode + ") has single result: " + result);
+                    }
+                else // MULTIPLE
+                    {
+                    commandCode = Bit.setSignedBitOn( commandCode );
+                    ArrayList<Object> list;
+
+                    list = (ArrayList<Object>)returnParameters.get(commandCode);
+                    if ( list == null )
+                        {
+                        list = new ArrayList<Object>();
+                        returnParameters.put(commandCode, list);
+                        }
+
+                    list.add( result );
+                    Scribe.debug(Debug.PARSER, "[" + commandString + "] (" + commandCode + ") has multiple result: " + list);
+                    }
                 }
 
             } // end of cycle
@@ -1153,8 +1189,11 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         ExtendedMap<Long, Object> result = null;
         Commands.Data commandData;
 
-        // is command allowed? - if allowed it will be > 0
-        if ( !contains( Commands.ALLOWED_LABELS, commandCode ) )
+        // is command allowed?
+        // '0' - NOT allowed
+        // '-1' - multiple parameters allowed (this is not an option here!)
+        // '1' - single allowed
+        if ( containsWithoutSignedBit(Commands.DEFAULT_LABEL_ALLOWED, commandCode) != 1 )
             {
             tokenizer.error( commandString, R.string.parser_label_complex_not_allowed );
             return null;
@@ -1219,18 +1258,21 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * ((http://stackoverflow.com/questions/2721546/why-dont-java-generics-support-primitive-types ;
      * http://stackoverflow.com/a/12635769 a nice algorithm with generics ;
      * http://stackoverflow.com/questions/2250031/null-check-in-an-enhanced-for-loop))
-     * !! Method could be added to Utils later
+     *
+     * Method was developed to distinguish between on and off signed bit in the array
      * @param array to check (cannot be null!)
      * @param item to look for
-     * @return true if array contains item
+     * @return 0 if item cannot be found in the array, 1 if item can be found in the array,
+     * -1 if item can be found, but array's item signed bit is ON
      */
-    public static boolean contains(final long[] array, final long item)
+    public static int containsWithoutSignedBit(final long[] array, final long item)
         {
         for (final long i : array)
-            if ( i == item )
-                return true;
-
-        return false;
+            {
+            if ( Bit.setSignedBitOff( i ) == item)
+                return i < 0 ? -1 : +1;
+            }
+        return 0;
         }
 
     }
