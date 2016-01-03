@@ -45,15 +45,21 @@
 
     <string name="parser_terminated">"Descriptor file terminated unexpectedly!"</string>
 
-
     <string name="parser_label_key_missing">"LET: parameter-pair is missing!"</string>
     <string name="parser_label_key_invalid">"LET: Key parameter is invalid:"</string>
     <string name="parser_label_value_missing">"LET: Key has no value! (Label is skipped.)"</string>
     <string name="parser_label_value_invalid">"LET: Value is invalid: (Label is skipped.)"</string>
-    <string name="parser_label_complex_not_allowed">"LET: This command is not allowed as complex label!"</string>
+    <string name="parser_label_complex_not_allowed">"This command is not allowed as complex default/label!"</string>
     <string name="parser_label_complex_one_allowed">"LET: Only one parameter is allowed in complex labels!"</string>
     <string name="parser_label_complex_invalid">"LET: Complex has no value! (Label is skipped.) ERROR IN CODE!"</string>
     <string name="parser_label_added">"label added:"</string>
     <string name="parser_label_overwritten">"Warning! Label's previous value was overwritten!"</string>
+
+    <string name="parser_default_type_missing">"DEFAULT: parameter is missing!"</string>
+    <string name="parser_default_value_invalid">"DEFAULT: Complex has no value! (complex is skipped.) ERROR IN CODE!"</string>
+    <string name="parser_default_type_invalid">"DEFAULT: Only complex parameters are allowed!"</string>
+    <string name="parser_default_added">"default complex added."</string>
+
+    <string name="parser_previous_overwritten">"More values are available, the last one is used."</string>
 
 </resources>

@@ -37,9 +37,9 @@ public class ExtendedMap<K, V> extends java.util.HashMap<K, V>
      * @param defaultValue default value to return if key is not found
      * @return value that is associated with key
      */
-    public Object get( Object key, Object defaultValue )
+    public V remove(Object key, V defaultValue)
         {
-        Object value = get(key);
+        V value = remove(key);
         return ( value != null ) ? value : defaultValue;
         }
 

@@ -15,6 +15,7 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -48,6 +49,9 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
     // parseSoftBoard creates labels - temporary
     private Labels labels;
+
+    // parseSoftBoard creates default values for complex parameters - temporary
+    private Map< Long, ExtendedMap< Long, Object>> defaults = new HashMap<>();
 
     // (Static) Commands class is needed, too
 
@@ -351,26 +355,20 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
         // Result from the method - or the value of the one-parameter 
         Object result;
+        Object previousResult;
 
         // Parameter list (results of the called methods of the parameter-commands) will be returned to the caller
         // Every cycle can give a new item to returnParameters
         ExtendedMap<Long, Object> returnParameters = new ExtendedMap<>();
 
         // Before the cycles default values populates returnParameters
-        try
+        ExtendedMap< Long, Object> defaultParameters = defaults.get( parsedCommandCode );
+        if ( defaultParameters != null )
             {
-            // parsedCommandCode with signed bit on (as key) could define the default label
-            returnParameters.putAll( (ExtendedMap<Long, Object>) labels
-                    .get( Bit.setSignedBitOn(parsedCommandCode), parsedCommandCode ));
-
-            Scribe.debug(Debug.PARSER, "Default values (label) for [" + Tokenizer.regenerateKeyword( parsedCommandCode ) +
+            returnParameters.putAll( defaultParameters );
+            Scribe.debug(Debug.PARSER, "Default values (label) for [" + Tokenizer.regenerateKeyword(parsedCommandCode) +
                     "] is found: [" + returnParameters + "]");
             }
-        catch (InvalidKeyException e)
-            {
-            // no default values were defined
-            }
-
 
         // iterate the parameter-commands of the caller
         while (true)
@@ -507,8 +505,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                 // forward results of previous parameter-commands with the same code to method
                 // forwarded value can be null
-                // multiple parameters signed bit is ON, so those will not attached
-                forwardParameters.put(commandCode, returnParameters.get(commandCode));
+                // !! multiple parameters should be used !!
+                // forwardParameters.put(commandCode, returnParameters.get(commandCode));
 
                 // END and EOF can be returned, but evaluation can be performed normally
                 if (tokenizer.nextToken() != Tokenizer.TYPE_END)
@@ -567,6 +565,17 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 // no method to call; no result to return
                 }
 
+            // Parameter-command has DEFAULT parameter
+            else if ( commandData.getParameterType() == Commands.PARAMETER_DEFAULT )
+                {
+                Scribe.debug( Debug.PARSER, "[" + commandString + "] creates default complex parameters." );
+
+                parseDefaultParameter();
+                continue;
+
+                // no method to call; no result to return
+                }
+
             // Parameter-command has FLAG parameter
             else if ( commandData.getParameterType() == Commands.PARAMETER_FLAG )
                 {
@@ -604,7 +613,21 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                     // Parameter-command has COMPLEX parameters - forwardParameters
                     if ( commandData.getParameterType() >= Tokenizer.TOKEN_CODE_SHIFT || commandData.getParameterType() < 0L )
-                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands, forwardParameters );
+                        {
+                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands, forwardParameters);
+                        // As 'get' removes the entries from forwardparameters, it should be empty after the call
+
+                        /**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!**/
+
+                        Scribe.error( Debug.PARSER, "Remaining items in forwarded parameters after method call: " + forwardParameters.size() );
+                        for (Map.Entry<Long, Object> entry : forwardParameters.entrySet())
+                            {
+                            Scribe.error(Debug.PARSER, " - " + Tokenizer.regenerateKeyword(entry.getKey()));
+                            }
+
+                        /**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!**/
+
+                        }
                     // Parameter-command has ONE parameter - result
                     else if ( commandData.getParameterType() <= Commands.PARAMETER_KEYWORD )
                         result = commandData.getMethod().invoke(softBoardData.methodsForCommands, result );
@@ -654,8 +677,18 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 if ( commandMultiple > 0 )
                     {
                     // if there was a previous result - it is overwritten
-                    returnParameters.put(commandCode, result);
-                    Scribe.debug( Debug.PARSER, "[" + commandString + "] (" + commandCode + ") has single result: " + result);
+                    previousResult = returnParameters.put(commandCode, result);
+                    if ( previousResult == null )
+                        {
+                        Scribe.debug( Debug.PARSER, "[" + commandString + "] (" + commandCode +
+                                ") has single result: " + result);
+                        }
+                    else
+                        {
+                        Scribe.debug( Debug.PARSER, "[" + commandString + "] (" + commandCode +
+                                ") overwrites previuos result (" + previousResult + ") with single result: " + result);
+                        tokenizer.note( commandString, R.string.parser_previous_overwritten);
+                        }
                     }
                 else // MULTIPLE
                     {
@@ -1108,7 +1141,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             type = tokenizer.getIntegerToken();
             String typeString = tokenizer.getStringToken();
 
-            value = parseComplexValue( type, typeString );
+            value = parseComplexValue(type, typeString);
             if ( value == null )
                 {
                 // !! Error was already signed !!
@@ -1120,12 +1153,6 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 valueAsString = typeString + ":" + value.toString();
                 }
 
-            if ( key == Commands.TOKEN_DEFAULT )
-                {
-                // Default complex value is specially handled
-                key = Bit.setSignedBitOn( type );
-                keyAsString = typeString;
-                }
             }
         // 3rd token is MISSING, closing-bracket is consumed
         else if ( tokenType == Tokenizer.TYPE_END )
@@ -1171,7 +1198,94 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             {
             tokenizer.error( keyAsString, R.string.parser_label_overwritten );
             }
+        }
 
+
+    /**
+     * Parses parameters after DEFAULT command.
+     * Very similar to LET command, only one parameter allowed, brackets are obligatory.
+     * Parameter is a complex parameter-command, allowed in DEFAULT_LABEL_ALLOWED[]
+     * @throws IOException (coat) file reading fails
+     */
+    private void parseDefaultParameter() throws IOException
+        {
+        // type part
+        long type = 0L;
+        String typeAsString = null;
+
+        // value part
+        ExtendedMap<Long, Object> value = null; // value == null means error
+        String valueAsString = null; // just for logging
+
+        // 1st token is obligatory OPENING-BRACKET
+        int tokenType = tokenizer.nextToken();
+        if ( tokenType != Tokenizer.TYPE_START )
+            {
+            tokenizer.error( R.string.parser_default_type_missing);
+            tokenizer.pushBackLastToken();
+            return;
+            }
+
+        //2rd token is VALUE
+        tokenType = tokenizer.nextToken();
+
+        // Value is complex
+        if ( tokenType == Tokenizer.TYPE_KEYWORD )
+            {
+            // type - token of command, commandCode
+            // value - parameters of command, evaluated by parseComplexParameter
+
+            type = tokenizer.getIntegerToken();
+            typeAsString = tokenizer.getStringToken();
+
+            value = parseComplexValue(type, typeAsString);
+            if ( value == null )
+                {
+                // !! Error was already signed !!
+                tokenizer.error( typeAsString, R.string.parser_default_value_invalid);
+                }
+            else
+                {
+                valueAsString = typeAsString + ":" + value;
+                }
+            }
+        // 2nd token is MISSING, closing-bracket is consumed
+        else if ( tokenType == Tokenizer.TYPE_END )
+            {
+            tokenizer.error( R.string.parser_default_type_missing);
+            return;
+            }
+        else if ( tokenType == Tokenizer.TYPE_EOF )
+            {
+            tokenizer.error( R.string.parser_terminated );
+            return;
+            }
+        // 2nd token is invalid
+        else
+            {
+            tokenizer.error( R.string.parser_default_type_invalid, tokenizer.getStringToken());
+            }
+
+        // 3rd token is obligatory CLOSING BRACKET
+        tokenType = tokenizer.nextToken();
+        if ( tokenType != Tokenizer.TYPE_END )
+            {
+            tokenizer.error( R.string.parser_bracket_missing);
+            tokenizer.pushBackLastToken();
+            // There are several ways to resolve this mistake.
+            // Result (if ready) is returned, invalid token is pushed back for further analysis
+            }
+
+        // error was already logged
+        if ( value == null )
+            return;
+
+        // defaults can be overwritten without notice
+        value = defaults.put( type, value );
+
+        tokenizer.note(typeAsString, R.string.parser_default_added);
+
+        Scribe.debug(Debug.PARSER, "Default is" + (value == null ? " added: " : "changed: ") + valueAsString);
         }
 
 
@@ -1184,7 +1298,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * OR null if complex is not valid
      * @throws IOException
      */
-    private ExtendedMap<Long, Object> parseComplexValue( long commandCode, String commandString ) throws IOException
+    private ExtendedMap<Long, Object> parseComplexValue(long commandCode, String commandString) throws IOException
         {
         ExtendedMap<Long, Object> result = null;
         Commands.Data commandData;
@@ -1265,7 +1379,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * @return 0 if item cannot be found in the array, 1 if item can be found in the array,
      * -1 if item can be found, but array's item signed bit is ON
      */
-    public static int containsWithoutSignedBit(final long[] array, final long item)
+    private int containsWithoutSignedBit(final long[] array, final long item)
         {
         for (final long i : array)
             {

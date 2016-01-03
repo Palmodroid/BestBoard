@@ -36,20 +36,17 @@ import dancingmoon.bestboard.modify.ModifyText;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.CapsState;
+import dancingmoon.bestboard.utils.Bit;
 import dancingmoon.bestboard.utils.ExtendedMap;
 import dancingmoon.bestboard.utils.ExternalDataException;
 import dancingmoon.bestboard.utils.SinglyLinkedList;
 import dancingmoon.bestboard.utils.Trilean;
 
 /**
- * Created by Beothe on 2015.12.29..
+ * Methods to create SoftBoardData from coat descriptor
  */
 public class MethodsForCommands
     {
-    /** if no default key is given for packetKey */
-    public static final int NO_DEFAULT_KEY = -1;
-
-
     /**
      * Tokenizer is needed for messaging during data-load.
      * It should be cleared, after data-load is ready.
@@ -117,6 +114,21 @@ public class MethodsForCommands
             }
         }
 
+
+    /**
+     * Temporary data to create buttons
+     */
+    private class ButtonPlan
+        {
+        private int relativeColumn;
+        private int relativeRow;
+
+        private String buttonName;
+
+        private Button button;
+        }
+
+
     /**
      * Temporary data for title-slots
      * Title-slots describe the position and size of a title on the buttons.
@@ -166,23 +178,27 @@ public class MethodsForCommands
     public void createDefaultSlots()
         {
         Slots.put(
-                defaultSlot,
+                0L,
                 new Slot(0, 250, 1200, false, false, Color.BLACK));
         }
 
     /**
      ** TEMPORARY VARIABLES NEEDED ONLY BY THE PARSING PHASE
-     ** (?? Put them in a separate inner class, which can be freed later ??)
      **/
 
+
+    /** if no default key is given for packetKey */
+    public static final int NO_DEFAULT_KEY = -1;
+
+
     /** Board's default background */
-    public int defaultBoardColor = Color.LTGRAY;
+    public static final int DEFAULT_BOARD_COLOR = Color.LTGRAY;
 
     /** Button's default background */
-    public int defaultButtonColor = Color.LTGRAY;
+    public static final int DEFAULT_BUTTON_COLOR = Color.LTGRAY;
 
     /** Title's default position */
-    public long defaultSlot = 0L;
+    // public long defaultSlot = 0L;
 
     /** Map of temporary boardPlans, identified by code of keywords */
     public Map<Long, BoardPlan> boardPlans = new HashMap<>();
@@ -263,50 +279,12 @@ public class MethodsForCommands
      */
     public void setLocale( ExtendedMap<Long, Object> parameters )
         {
-        String language = (String)parameters.get( Commands.TOKEN_LANGUAGE, "" );
-        String country = (String)parameters.get( Commands.TOKEN_COUNTRY, "" );
-        String variant = (String)parameters.get( Commands.TOKEN_VARIANT, "" );
+        String language = (String)parameters.remove(Commands.TOKEN_LANGUAGE, "");
+        String country = (String)parameters.remove(Commands.TOKEN_COUNTRY, "");
+        String variant = (String)parameters.remove(Commands.TOKEN_VARIANT, "");
 
         softBoardData.locale = new Locale( language, country, variant);
         tokenizer.note(R.string.data_locale, String.valueOf(softBoardData.locale) );
-        }
-
-    /**
-     * Set default values
-     */
-    public void setDefault( ExtendedMap<Long, Object> parameters )
-        {
-        Object temp;
-
-        temp = parameters.get( Commands.TOKEN_BOARDCOLOR );
-        if (temp != null)
-            {
-            defaultBoardColor = (int)temp;
-            tokenizer.note(R.string.data_default_boardcolor,
-                    Integer.toHexString( defaultBoardColor ));
-            }
-
-        temp = parameters.get( Commands.TOKEN_BUTTONCOLOR );
-        if (temp != null)
-            {
-            defaultButtonColor = (int)temp;
-            tokenizer.note(R.string.data_default_buttoncolor,
-                    Integer.toHexString( defaultButtonColor ));
-            }
-
-        temp = parameters.get( Commands.TOKEN_SLOT );
-        if ( temp != null )
-            {
-            if ( Slots.containsKey( temp ))
-                {
-                defaultSlot = (long)temp;
-                tokenizer.note(R.string.data_default_titleslot,
-                        Tokenizer.regenerateKeyword( defaultSlot ));
-                }
-            else
-                tokenizer.error(R.string.data_titleslot_invalid,
-                        Tokenizer.regenerateKeyword((long)temp));
-            }
         }
 
     /** Set color of touched meta keys */
@@ -424,7 +402,7 @@ public class MethodsForCommands
 
     public void addSlot( ExtendedMap<Long, Object> parameters )
         {
-        Long id = (Long)parameters.get( Commands.TOKEN_ID );
+        Long id = (Long)parameters.remove( Commands.TOKEN_ID );
         if (id == null)
             {
             tokenizer.error("ADDSLOT", R.string.data_slot_no_id );
@@ -432,13 +410,13 @@ public class MethodsForCommands
             }
 
         // default TitleSlot cannot be null, it is checked on selection
-        Slot dts = Slots.get( defaultSlot );
-        int xOffset = (int)parameters.get( Commands.TOKEN_XOFFSET, dts.xOffset );
-        int yOffset = (int)parameters.get( Commands.TOKEN_YOFFSET, dts.yOffset );
-        int size = (int)parameters.get( Commands.TOKEN_SIZE, dts.size );
-        boolean bold = (boolean)parameters.get( Commands.TOKEN_BOLD, dts.bold );
-        boolean italics = (boolean)parameters.get( Commands.TOKEN_ITALICS, dts.italics );
-        int color = (int)parameters.get( Commands.TOKEN_COLOR, dts.color );
+        Slot dts = Slots.get( 0L );
+        int xOffset = (int)parameters.remove(Commands.TOKEN_XOFFSET, dts.xOffset);
+        int yOffset = (int)parameters.remove(Commands.TOKEN_YOFFSET, dts.yOffset);
+        int size = (int)parameters.remove(Commands.TOKEN_SIZE, dts.size);
+        boolean bold = (boolean)parameters.remove(Commands.TOKEN_BOLD, dts.bold);
+        boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, dts.italics);
+        int color = (int)parameters.remove(Commands.TOKEN_COLOR, dts.color);
 
         Slot slot = new Slot( xOffset, yOffset, size, bold, italics, color );
         Slots.put( id, slot );
@@ -460,14 +438,14 @@ public class MethodsForCommands
         int color; // default: defaultBoardColor
         Trilean[] metaStates = new Trilean[ BoardStates.META_STATES_SIZE]; // default: IGNORED
 
-        id = (Long)parameters.get( Commands.TOKEN_ID );
+        id = (Long)parameters.remove( Commands.TOKEN_ID );
         if (id == null)
             {
             tokenizer.error( "ADDBOARD", R.string.data_board_no_id );
             return;
             }
 
-        temp = parameters.get( Commands.TOKEN_HALFCOLUMNS );
+        temp = parameters.remove( Commands.TOKEN_HALFCOLUMNS );
         if (temp != null)
             {
             halfColumns = (int) temp;
@@ -476,7 +454,7 @@ public class MethodsForCommands
         else
             {
             // if HALFCOLUMNS is missing, try COLUMNS!
-            temp = parameters.get(Commands.TOKEN_COLUMNS);
+            temp = parameters.remove(Commands.TOKEN_COLUMNS);
             if (temp != null)
                 {
                 // One half column is added as standard
@@ -490,7 +468,7 @@ public class MethodsForCommands
                 }
             }
 
-        temp = parameters.get( Commands.TOKEN_ROWS );
+        temp = parameters.remove( Commands.TOKEN_ROWS );
         if (temp == null)
             {
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
@@ -499,10 +477,10 @@ public class MethodsForCommands
             }
         rows = (int)temp;
 
-        wide = (boolean)parameters.get( Commands.TOKEN_WIDE, false );
+        wide = (boolean)parameters.remove(Commands.TOKEN_WIDE, false);
 
         oddRowsAligned = true; // default: ODDS_ALIGNED
-        long alignFlag = (long)parameters.get( Commands.TOKEN_ALIGN, -1L );
+        long alignFlag = (long)parameters.remove(Commands.TOKEN_ALIGN, -1L);
         if ( alignFlag == Commands.TOKEN_ODDS )
             ; // default remains
         else if ( alignFlag == Commands.TOKEN_EVENS )
@@ -511,17 +489,17 @@ public class MethodsForCommands
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_align_bad_parameter );
 
-        color = (int)parameters.get( Commands.TOKEN_COLOR, defaultBoardColor);
+        color = (int)parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BOARD_COLOR);
 
         // missing token (null) is interpreted as IGNORE
         metaStates[ BoardStates.META_SHIFT ] =
-                Trilean.valueOf((Boolean)parameters.get( Commands.TOKEN_FORCESHIFT ));
+                Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCESHIFT ));
         metaStates[ BoardStates.META_CTRL ] =
-                Trilean.valueOf((Boolean)parameters.get( Commands.TOKEN_FORCECTRL ));
+                Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCECTRL ));
         metaStates[ BoardStates.META_ALT ] =
-                Trilean.valueOf((Boolean)parameters.get( Commands.TOKEN_FORCEALT ));
+                Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCEALT ));
         metaStates[ BoardStates.META_CAPS ] =
-                Trilean.valueOf((Boolean)parameters.get( Commands.TOKEN_FORCECAPS ));
+                Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCECAPS ));
 
         try
             {
@@ -574,17 +552,17 @@ public class MethodsForCommands
             return;
             }
 
-        Long boardId = (Long)parameters.get( Commands.TOKEN_BOARD );
+        Long boardId = (Long)parameters.remove( Commands.TOKEN_BOARD );
         if (boardId == null)
             {
             tokenizer.error( "CURSOR", R.string.data_board_missing );
             return;
             }
 
-        int column = (int)parameters.get( Commands.TOKEN_COLUMN, 0 );
-        int row = (int)parameters.get( Commands.TOKEN_ROW, 0 );
-        boolean also = (boolean)parameters.get( Commands.TOKEN_ALSO, false );
-        boolean transform = (boolean)parameters.get( Commands.TOKEN_TRANSFORM, false );
+        int column = (int)parameters.remove(Commands.TOKEN_COLUMN, 0);
+        int row = (int)parameters.remove(Commands.TOKEN_ROW, 0);
+        boolean also = (boolean)parameters.remove(Commands.TOKEN_ALSO, false);
+        boolean transform = (boolean)parameters.remove(Commands.TOKEN_TRANSFORM, false);
 
         // exclude all boards, if also is not given
         if ( !also )
@@ -655,7 +633,7 @@ public class MethodsForCommands
         Packet packet = packet( parameters );
         if (packet != null )
             {
-            Packet secondaryPacket = (Packet)parameters.get( Commands.TOKEN_SECOND );
+            Packet secondaryPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND );
 
             if ( secondaryPacket != null )
                 {
@@ -670,7 +648,7 @@ public class MethodsForCommands
             counter++;
             }
 
-        temp = parameters.get( Commands.TOKEN_LINK );
+        temp = parameters.remove( Commands.TOKEN_LINK );
         if (temp != null)
             {
             counter++;
@@ -679,7 +657,7 @@ public class MethodsForCommands
             // invalid index - (int)temp - means go back to previous board
             }
 
-        temp = parameters.get( Commands.TOKEN_META );
+        temp = parameters.remove( Commands.TOKEN_META );
         if (temp != null)
             {
             counter++;
@@ -714,7 +692,7 @@ public class MethodsForCommands
             buttonFunction = new ButtonSpaceTravel( packet(parameters, " ") );
             }
 
-        temp = parameters.get( Commands.TOKEN_MODIFY );
+        temp = parameters.remove( Commands.TOKEN_MODIFY );
         if (temp != null)
             {
             counter++;
@@ -761,7 +739,7 @@ public class MethodsForCommands
         PacketKey packet = null;
         int temp;
 
-        temp = (int)parameters.get( Commands.TOKEN_KEY, NO_DEFAULT_KEY );
+        temp = (int)parameters.remove(Commands.TOKEN_KEY, NO_DEFAULT_KEY);
 
         if ( temp == NO_DEFAULT_KEY )             // KEY token is missing
             {
@@ -798,7 +776,7 @@ public class MethodsForCommands
         PacketText packet = null;
         Object temp;
 
-        temp = parameters.get(Commands.TOKEN_TEXT);
+        temp = parameters.remove(Commands.TOKEN_TEXT);
 
         if ( temp == null )             // TEXT token is missing
             {
@@ -816,7 +794,7 @@ public class MethodsForCommands
             int autoCaps = CapsState.AUTOCAPS_OFF;
             int autoSpace = 0;
 
-            autoFlag = (long)parameters.get( Commands.TOKEN_AUTOCAPS, -1L );
+            autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOCAPS, -1L);
             if ( autoFlag == Commands.TOKEN_ON )
                 autoCaps = CapsState.AUTOCAPS_ON;
             else if ( autoFlag == Commands.TOKEN_HOLD )
@@ -828,7 +806,7 @@ public class MethodsForCommands
             else if ( autoFlag != -1L )
                 tokenizer.error("PACKET", R.string.data_autocaps_bad_parameter );
 
-            autoFlag = (long)parameters.get( Commands.TOKEN_AUTOSPACE, -1L );
+            autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOSPACE, -1L);
             if ( autoFlag == Commands.TOKEN_BEFORE )
                 autoSpace = PacketText.AUTO_SPACE_BEFORE;
             else if ( autoFlag == Commands.TOKEN_AFTER )
@@ -838,7 +816,7 @@ public class MethodsForCommands
             else if ( autoFlag != -1L )
                 tokenizer.error("PACKET", R.string.data_autospace_bad_parameter );
 
-            autoFlag = (long)parameters.get( Commands.TOKEN_ERASESPACES, -1L );
+            autoFlag = (long)parameters.remove(Commands.TOKEN_ERASESPACES, -1L);
             if ( autoFlag == Commands.TOKEN_BEFORE )
                 autoSpace |= PacketText.ERASE_SPACES_BEFORE;
             else if ( autoFlag == Commands.TOKEN_AFTER )
@@ -877,7 +855,7 @@ public class MethodsForCommands
         PacketFunction packet = null;
         long temp;
 
-        temp = (long)parameters.get( Commands.TOKEN_DO, -1L );
+        temp = (long)parameters.remove(Commands.TOKEN_DO, -1L);
 
         if ( temp != -1L )
             {
@@ -904,13 +882,13 @@ public class MethodsForCommands
         {
         Packet packet;
 
-        packet = packetText( parameters, null );
+        packet = packetText(parameters, null);
 
         if ( packet == null )
             packet = packetKey( parameters, NO_DEFAULT_KEY );
 
         if ( packet == null )
-            packet = packetFunction( parameters );
+            packet = packetFunction(parameters);
 
         return packet;
         }
@@ -927,10 +905,10 @@ public class MethodsForCommands
         {
         Packet packet;
 
-        packet = packetText( parameters, null );
+        packet = packetText(parameters, null);
 
         if ( packet == null )
-            packet = packetKey( parameters, defaultKey );
+            packet = packetKey(parameters, defaultKey);
 
         return packet;
         }
@@ -947,10 +925,10 @@ public class MethodsForCommands
         {
         Packet packet;
 
-        packet = packetKey( parameters, NO_DEFAULT_KEY );
+        packet = packetKey(parameters, NO_DEFAULT_KEY);
 
         if ( packet == null )
-            packet = packetText( parameters, defaultText );
+            packet = packetText(parameters, defaultText);
 
         return packet;
         }
@@ -964,11 +942,11 @@ public class MethodsForCommands
         // Check the result of previous ADDTITLE parameter-commands
         SinglyLinkedList<TitleDescriptor> titles =
                 (SinglyLinkedList<TitleDescriptor>)
-                        parameters.get( Commands.TOKEN_ADDTITLE, new SinglyLinkedList<TitleDescriptor>() );
+                        parameters.remove(Commands.TOKEN_ADDTITLE, new SinglyLinkedList<TitleDescriptor>());
 
         // text is optional, if it is null, then button's function will be used
         String text = null;
-        Object temp = parameters.get( Commands.TOKEN_TEXT );
+        Object temp = parameters.remove( Commands.TOKEN_TEXT );
         if ( temp != null )
             {
             text = SoftBoardParser.stringFromText( temp );
@@ -976,7 +954,7 @@ public class MethodsForCommands
 
         Slot ts = null;
 
-        Long titleSlotId = (Long)parameters.get( Commands.TOKEN_SLOT );
+        Long titleSlotId = (Long)parameters.remove( Commands.TOKEN_SLOT );
         if (titleSlotId != null) // SLOT is definied
             {
             ts = Slots.get(titleSlotId);
@@ -987,20 +965,145 @@ public class MethodsForCommands
             }
 
         if (ts == null) // default SLOT should be used
-            ts = Slots.get( defaultSlot );
+            ts = Slots.get( 0L );
         // default TitleSlot cannot be null, it is checked on selection
 
-        int xOffset = (int)parameters.get( Commands.TOKEN_XOFFSET, ts.xOffset );
-        int yOffset = (int)parameters.get( Commands.TOKEN_YOFFSET, ts.yOffset );
-        int size = (int)parameters.get( Commands.TOKEN_SIZE, ts.size );
-        boolean bold = (boolean)parameters.get( Commands.TOKEN_BOLD, ts.bold );
-        boolean italics = (boolean)parameters.get( Commands.TOKEN_ITALICS, ts.italics );
-        int color = (int)parameters.get( Commands.TOKEN_COLOR, ts.color );
+        int xOffset = (int)parameters.remove(Commands.TOKEN_XOFFSET, ts.xOffset);
+        int yOffset = (int)parameters.remove(Commands.TOKEN_YOFFSET, ts.yOffset);
+        int size = (int)parameters.remove(Commands.TOKEN_SIZE, ts.size);
+        boolean bold = (boolean)parameters.remove(Commands.TOKEN_BOLD, ts.bold);
+        boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, ts.italics);
+        int color = (int)parameters.remove(Commands.TOKEN_COLOR, ts.color);
 
         titles.add( new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color ) );
 
         return titles;
         }
+
+
+    /**
+     * Inserts button parameters into absolute positions
+     * @param parameters
+     */
+    public void setBlock(ExtendedMap<Long, Object> parameters)
+        {
+        Long boardId = (Long)parameters.remove( Commands.TOKEN_BOARD );
+        if (boardId == null)
+            {
+            tokenizer.error( "CURSOR", R.string.data_board_missing );
+            return;
+            }
+
+        int column = (int)parameters.remove(Commands.TOKEN_COLUMN, 0);
+        int row = (int)parameters.remove(Commands.TOKEN_ROW, 0);
+
+        ArrayList<ButtonPlan> buttonPlans = (ArrayList<ButtonPlan>)parameters.remove(
+                Bit.setSignedBitOn(Commands.TOKEN_BUTTON) );
+
+        if ( buttonPlans == null )
+            {
+            Scribe.error( Debug.PARSER, "BLOCK: is EMPTY!!");
+            return;
+            }
+
+        BoardPlan boardPlan = boardPlans.get( boardId );
+        if ( boardPlan == null )
+            {
+            Scribe.error( Debug.PARSER, "BLOCK: board is missing!!");
+            return;
+            }
+        Board board = boardPlan.board;
+
+        for ( ButtonPlan buttonPlan : buttonPlans )
+            {
+            try
+                {
+                if ( board.addButton(
+                        column,
+                        row,
+                        buttonPlan.button.clone() ))
+                    {
+                    if ( parameters.containsKey( Commands.TOKEN_OVERWRITE ) )
+                        {
+                        tokenizer.note( R.string.data_button_overwritten,
+                                boardPlan.toString() );
+                        }
+                    else
+                        {
+                        tokenizer.error( R.string.data_button_overwritten,
+                                boardPlan.toString() );
+                        }
+                    }
+                tokenizer.note( buttonPlan.buttonName, R.string.data_button_added,
+                        boardPlan.toString() );
+                }
+            catch (ExternalDataException ede)
+                {
+                tokenizer.error( buttonPlan.buttonName, R.string.data_button_error,
+                        boardPlan.toString()  );
+                }
+
+            column += buttonPlan.relativeColumn;
+            row += buttonPlan.relativeRow;
+            }
+        }
+
+
+    /**
+     * Creates temporary button data, which is copied into button position in setBlock
+     * @param parameters
+     * @return
+     */
+    public ButtonPlan setButton2(ExtendedMap<Long, Object> parameters)
+        {
+        ButtonPlan buttonPlan = new ButtonPlan();
+
+        // "SEND" parameters could be found among "BUTTON"-s parameters
+        // For testing reasons SEND remains...
+        Object temp = parameters.remove( Commands.TOKEN_SEND );
+        if ( temp != null )
+            {
+            buttonPlan.button = (Button) temp;
+            }
+        // ...but if SEND is missing, then parameters are submitted directly
+        else
+            {
+            buttonPlan.button = createButtonFunction(parameters);
+            }
+
+        if ( buttonPlan.button == null )
+            {
+            tokenizer.error( "BUTTON", R.string.data_button_function_missing);
+            buttonPlan.button = new Button();
+            }
+
+        buttonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
+
+        // if no titles are added, then addTitle will add one based on default titleSlot
+        // an empty parameter list is needed
+        SinglyLinkedList<TitleDescriptor> titles =
+                (SinglyLinkedList<TitleDescriptor>)parameters.remove(Commands.TOKEN_ADDTITLE,
+                        addTitle(new ExtendedMap<Long, Object>(0)));
+
+        // if title text is null, code should be used
+        // button id can be created from the titles (and from the code)
+        StringBuilder buttonNameBuilder = new StringBuilder();
+        for ( TitleDescriptor title : titles )
+            {
+            title.checkText( buttonPlan.button.getString() );
+            buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
+            }
+        buttonNameBuilder.setCharAt( 0, '\"');
+        buttonPlan.buttonName = buttonNameBuilder.append('\"').toString();
+
+        buttonPlan.button.setTitles( titles );
+
+        buttonPlan.relativeColumn = 1;
+        buttonPlan.relativeRow = 0;
+
+        return buttonPlan;
+        }
+
 
     public void setButton(ExtendedMap<Long, Object> parameters)
         {
@@ -1008,7 +1111,7 @@ public class MethodsForCommands
 
         // "SEND" parameters could be found among "BUTTON"-s parameters
         // For testing reasons SEND remains...
-        Object temp = parameters.get( Commands.TOKEN_SEND );
+        Object temp = parameters.remove( Commands.TOKEN_SEND );
         if ( temp != null )
             {
             button = (Button) temp;
@@ -1025,13 +1128,13 @@ public class MethodsForCommands
             button = new Button();
             }
 
-        button.setColor((int) parameters.get(Commands.TOKEN_COLOR, defaultButtonColor));
+        button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
 
         // if no titles are added, then addTitle will add one based on default titleSlot
         // an empty parameter list is needed
         SinglyLinkedList<TitleDescriptor> titles =
-                (SinglyLinkedList<TitleDescriptor>)parameters.get( Commands.TOKEN_ADDTITLE,
-                        addTitle( new ExtendedMap<Long, Object>(0)) );
+                (SinglyLinkedList<TitleDescriptor>)parameters.remove(Commands.TOKEN_ADDTITLE,
+                        addTitle(new ExtendedMap<Long, Object>(0)));
 
         // if title text is null, code should be used
         // button id can be created from the titles (and from the code)
@@ -1082,7 +1185,7 @@ public class MethodsForCommands
 
     public void addLink( ExtendedMap<Long, Object> parameters )
         {
-        Integer index = (Integer)parameters.get( Commands.TOKEN_INDEX );
+        Integer index = (Integer)parameters.remove( Commands.TOKEN_INDEX );
         if (index == null)
             {
             tokenizer.error("ADDLINK", R.string.data_addlink_no_index );
@@ -1090,7 +1193,7 @@ public class MethodsForCommands
             }
 
         // BOARD is given, no other parameters are checked
-        Long boardId = (Long)parameters.get( Commands.TOKEN_BOARD );
+        Long boardId = (Long)parameters.remove( Commands.TOKEN_BOARD );
         if (boardId != null)
             {
             BoardPlan boardPlan = boardPlans.get( boardId );
@@ -1122,7 +1225,7 @@ public class MethodsForCommands
             {
             BoardPlan boardPlan;
 
-            Long portraitId = (Long)parameters.get( Commands.TOKEN_PORTRAIT );
+            Long portraitId = (Long)parameters.remove( Commands.TOKEN_PORTRAIT );
             Board portrait = null;
 
             if ( portraitId != null )
@@ -1143,7 +1246,7 @@ public class MethodsForCommands
                 tokenizer.error( index.toString(), R.string.data_addlink_portrait_missing );
                 }
 
-            Long landscapeId = (Long)parameters.get( Commands.TOKEN_LANDSCAPE );
+            Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
             Board landscape = null;
 
             if ( landscapeId != null )
@@ -1205,7 +1308,7 @@ public class MethodsForCommands
         {
         Long id;
 
-        id = (Long) parameters.get( Commands.TOKEN_ID );
+        id = (Long) parameters.remove( Commands.TOKEN_ID );
         if ( id == null )
             {
             tokenizer.error("ADDMODIFY", R.string.data_modify_no_id );
@@ -1236,7 +1339,7 @@ public class MethodsForCommands
             }
 
         // ROLLS is used!
-        List<Object> rolls = (List) parameters.get( Commands.TOKEN_ROLLS );
+        List<Object> rolls = (List) parameters.remove( Commands.TOKEN_ROLLS );
         if ( rolls != null )
             {
             empty = true;

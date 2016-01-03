@@ -20,11 +20,14 @@ import dancingmoon.bestboard.utils.ExtendedMap;
 public class Commands
     {
     // Coat version is checked independently at SoftBoardParser.parseSoftBoard()
-    public final static long COAT_VERSION = 2L;
+    public final static long COAT_VERSION = 1000L;
     public static final long TOKEN_COAT = 0xac842L;
 
     // Special code for first level commands
     public final static long ADDSOFTBOARD = 0x10000L;
+
+    public static final long TOKEN_LET = 0x1726fL;
+    public static final long TOKEN_DEFAULT = 0x7ffa8362fL;
 
     // Token codes for complex parameter-commands - POSITIVE VALUES !!
     public static final long TOKEN_NAME = 0x12ff90L;
@@ -35,16 +38,11 @@ public class Commands
     public static final long TOKEN_DOCFILE = 0x828ab14c4L;
     public static final long TOKEN_DOCURI = 0x38749e2bL;
 
-    public static final long TOKEN_LET = 0x1726fL;
-
     public static final long TOKEN_LOCALE = 0x598508fdL;
     public static final long TOKEN_LANGUAGE = 0x1d6843c69dbL;
     public static final long TOKEN_COUNTRY = 0x791c65f9aL;
     public static final long TOKEN_VARIANT = 0x12b1368887L;
 
-    public static final long TOKEN_DEFAULT = 0x7ffa8362fL;
-    public static final long TOKEN_BOARDCOLOR = 0x561cab6e4e938L;
-    public static final long TOKEN_BUTTONCOLOR = 0xca246447c85addL;
     public static final long TOKEN_SLOT = 0x17180dL;
 
     public static final long TOKEN_METACOLOR = 0x478ed1032506L;
@@ -78,6 +76,8 @@ public class Commands
     public static final long TOKEN_ROWS = 0x166362L;
     public static final long TOKEN_ALIGN = 0x12f9733L;
     public static final long TOKEN_COLOR = 0x16b2be3L;
+
+    public static final long TOKEN_BLOCK = 0x14c4fa3L;
 
     public static final long TOKEN_ODDS = 0x13d439L;
     public static final long TOKEN_EVENS = 0x1a9a13dL;
@@ -214,6 +214,9 @@ public class Commands
     // Label parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
     public final static long PARAMETER_LABEL = 0x40L;
 
+    // Default parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
+    public final static long PARAMETER_DEFAULT = 0x41L;
+
     // Special "messages" are not real parameters, but messages to the parser
     // Messages - POSITIVE VALUES, ABOVE ONE AND BELOW NO-PARAMETER TYPES !!
     public final static long MESSAGE_STOP = 0x80L;
@@ -224,6 +227,7 @@ public class Commands
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] DEFAULT_LABEL_ALLOWED = new long[]{
             TOKEN_ADDBOARD,
+            TOKEN_BLOCK,
             TOKEN_CURSOR,
             TOKEN_SEND,
             TOKEN_BUTTON,
@@ -256,6 +260,9 @@ public class Commands
         //      AT LEAST FIRST ITEM IS NEEDED (NO_PARAMETERS if there are no parameters allowed)
         // - method to call in SoftBoardClass (method should have a map parameter)
         result.put(ADDSOFTBOARD, new Data(new long[] {
+                TOKEN_LET,
+                TOKEN_DEFAULT,
+
                 TOKEN_NAME,
                 TOKEN_VERSION,
                 TOKEN_AUTHOR,
@@ -263,9 +270,7 @@ public class Commands
                 TOKEN_DESCRIPTION,
                 TOKEN_DOCFILE,
                 TOKEN_DOCURI,
-                TOKEN_LET,
                 TOKEN_LOCALE,
-                TOKEN_DEFAULT,
                 TOKEN_METACOLOR,
                 TOKEN_LOCKCOLOR,
                 TOKEN_AUTOCOLOR,
@@ -285,6 +290,8 @@ public class Commands
 
                 TOKEN_ADDSLOT,
                 TOKEN_ADDBOARD,
+                TOKEN_BLOCK,
+
                 TOKEN_CURSOR,
                 TOKEN_NEXT,
                 TOKEN_NEXTROW,
@@ -296,6 +303,9 @@ public class Commands
                 TOKEN_STOP
         }, null ));
 
+        result.put(TOKEN_LET, new Data(new long[]{PARAMETER_LABEL}, null ));
+        result.put(TOKEN_DEFAULT, new Data(new long[]{PARAMETER_DEFAULT}, null ));
+
         result.put(TOKEN_NAME, new Data(new long[]{PARAMETER_STRING}, "setName" ));
         result.put(TOKEN_VERSION, new Data(new long[]{PARAMETER_INT}, "setVersion" ));
         result.put(TOKEN_AUTHOR, new Data(new long[]{PARAMETER_STRING}, "setAuthor" ));
@@ -304,19 +314,11 @@ public class Commands
         result.put(TOKEN_DOCFILE, new Data(new long[]{PARAMETER_FILE}, "setDocFile" ));
         result.put(TOKEN_DOCURI, new Data(new long[]{PARAMETER_STRING}, "setDocUri" ));
 
-        result.put(TOKEN_LET, new Data(new long[]{PARAMETER_LABEL}, null ));
-
         result.put(TOKEN_LOCALE, new Data(new long[]{
                 TOKEN_LANGUAGE, TOKEN_COUNTRY, TOKEN_VARIANT }, "setLocale" ));
         result.put(TOKEN_LANGUAGE, new Data(new long[]{PARAMETER_STRING}, null ));
         result.put(TOKEN_COUNTRY, new Data(new long[]{PARAMETER_STRING}, null ));
         result.put(TOKEN_VARIANT, new Data(new long[]{PARAMETER_STRING}, null ));
-
-        result.put(TOKEN_DEFAULT, new Data(new long[]{
-                TOKEN_BOARDCOLOR, TOKEN_BUTTONCOLOR, TOKEN_SLOT}, "setDefault" ));
-        result.put(TOKEN_BOARDCOLOR, new Data(new long[]{PARAMETER_COLOR}, null ));
-        result.put(TOKEN_BUTTONCOLOR, new Data(new long[]{PARAMETER_COLOR}, null ));
-        result.put( TOKEN_SLOT, new Data(new long[]{PARAMETER_KEYWORD}, null ));
 
         result.put(TOKEN_METACOLOR, new Data(new long[]{PARAMETER_COLOR}, "setMetaColor" ));
         result.put(TOKEN_LOCKCOLOR, new Data(new long[]{PARAMETER_COLOR}, "setLockColor" ));
@@ -385,6 +387,15 @@ public class Commands
         result.put( TOKEN_SKIP, new Data(new long[]{PARAMETER_INT}, "skip" ));
         result.put( TOKEN_SKIPROW, new Data(new long[]{PARAMETER_INT}, "skipRow" ));
 
+
+        result.put( TOKEN_BLOCK, new Data(new long[]{
+                TOKEN_BOARD,
+                TOKEN_COLUMN,
+                TOKEN_ROW,
+                TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE },
+                "setBlock" ));
+
+
         result.put(TOKEN_BUTTON, new Data(new long[]{
                 TOKEN_TEXT,
                 TOKEN_AUTOCAPS,
@@ -419,7 +430,7 @@ public class Commands
                 TOKEN_SEND },
                 // SEND remains only because label's purposes,
                 // parameters could be given directly to BUTTON
-                "setButton"));
+                "setButton2"));
 
         result.put(TOKEN_OVERWRITE, new Data(new long[]{PARAMETER_FLAG}, null ));
 
