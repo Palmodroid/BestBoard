@@ -120,8 +120,18 @@ public class MethodsForCommands
      */
     private class ButtonPlan
         {
-        private int relativeColumn;
-        private int relativeRow;
+        private final static int MOVE_AUTO = 0;
+        private final static int MOVE_BUTTON = 1;
+        private final static int MOVE_XHOME = 2;
+        private final static int MOVE_XYHOME = 3;
+
+        // true: automatic right move
+        // false: move by relative coordinates
+        private int moveType = MOVE_AUTO;
+
+        private int moveX = 0;
+        private int moveY = 0;
+        private int moveHalfs = 0;
 
         private String buttonName;
 
@@ -604,14 +614,6 @@ public class MethodsForCommands
             }
         }
 
-    public void skip( Object intParameter )
-        {
-        for (BoardPlan includedBoardPlan : includedBoardPlans)
-            {
-            includedBoardPlan.cursorColumn += (int)intParameter;
-            }
-        }
-
     public void skipRow( Object intParameter )
         {
         for (BoardPlan includedBoardPlan : includedBoardPlans)
@@ -994,8 +996,8 @@ public class MethodsForCommands
             return;
             }
 
-        int arrayColumn = (int)parameters.remove(Commands.TOKEN_COLUMN, 1) -1;
-        int arrayRow = (int)parameters.remove(Commands.TOKEN_ROW, 1) -1;
+        int homeArrayColumn = (int)parameters.remove(Commands.TOKEN_COLUMN, 1) -1;
+        int homeArrayRow = (int)parameters.remove(Commands.TOKEN_ROW, 1) -1;
 
         ArrayList<ButtonPlan> buttonPlans = (ArrayList<ButtonPlan>)parameters.remove(
                 Bit.setSignedBitOn(Commands.TOKEN_BUTTON) );
@@ -1014,40 +1016,61 @@ public class MethodsForCommands
             }
         Board board = boardPlan.board;
 
+
+        int arrayColumn = homeArrayColumn;
+        int arrayRow = homeArrayRow;
+
         for ( ButtonPlan buttonPlan : buttonPlans )
             {
             try
                 {
-                if ( board.addButton(
+                if (board.addButton(
                         arrayColumn,
                         arrayRow,
-                        buttonPlan.button.clone() ))
+                        buttonPlan.button.clone()))
                     {
-                    if ( parameters.containsKey( Commands.TOKEN_OVERWRITE ) )
+                    if (parameters.containsKey(Commands.TOKEN_OVERWRITE))
                         {
-                        tokenizer.note( R.string.data_button_overwritten,
-                                boardPlan.toString() );
-                        }
-                    else
+                        tokenizer.note(R.string.data_button_overwritten,
+                                boardPlan.toString());
+                        } else
                         {
-                        tokenizer.error( R.string.data_button_overwritten,
-                                boardPlan.toString() );
+                        tokenizer.error(R.string.data_button_overwritten,
+                                boardPlan.toString());
                         }
                     }
-                tokenizer.note( buttonPlan.buttonName, R.string.data_button_added,
-                        boardPlan.toString() );
+                tokenizer.note(buttonPlan.buttonName, R.string.data_button_added,
+                        boardPlan.toString());
                 }
             catch (ExternalDataException ede)
                 {
-                tokenizer.error( buttonPlan.buttonName, R.string.data_button_error,
-                        boardPlan.toString()  );
+                tokenizer.error(buttonPlan.buttonName, R.string.data_button_error,
+                        boardPlan.toString());
                 }
 
-            arrayColumn += buttonPlan.relativeColumn;
-            arrayRow += buttonPlan.relativeRow;
+            switch (buttonPlan.moveType)
+                { // !!!!!!!!!!!! moveHALFS felét megcsinálni!!!!!!!
+                case ButtonPlan.MOVE_XYHOME:
+                    arrayColumn = homeArrayColumn + buttonPlan.moveX + buttonPlan.moveHalfs / 2;
+                    arrayRow = homeArrayRow + buttonPlan.moveY;
+                    break;
+                case ButtonPlan.MOVE_XHOME:
+                    arrayColumn = homeArrayColumn + buttonPlan.moveX + buttonPlan.moveHalfs / 2;
+                    arrayRow += buttonPlan.moveY;
+                    break;
+                case ButtonPlan.MOVE_BUTTON:
+                    arrayColumn += (buttonPlan.moveX + buttonPlan.moveHalfs / 2);
+                    arrayRow += buttonPlan.moveY;
+                    break;
+                case ButtonPlan.MOVE_AUTO:
+                default:
+                    arrayColumn++;
+                }
             }
         }
 
+    // last button to add movement information
+    private ButtonPlan lastButtonPlan = new ButtonPlan();
 
     /**
      * Creates temporary button data, which is copied into button position in setBlock
@@ -1056,28 +1079,28 @@ public class MethodsForCommands
      */
     public ButtonPlan setButton2(ExtendedMap<Long, Object> parameters)
         {
-        ButtonPlan buttonPlan = new ButtonPlan();
+        lastButtonPlan = new ButtonPlan();
 
         // "SEND" parameters could be found among "BUTTON"-s parameters
         // For testing reasons SEND remains...
         Object temp = parameters.remove( Commands.TOKEN_SEND );
         if ( temp != null )
             {
-            buttonPlan.button = (Button) temp;
+            lastButtonPlan.button = (Button) temp;
             }
         // ...but if SEND is missing, then parameters are submitted directly
         else
             {
-            buttonPlan.button = createButtonFunction(parameters);
+            lastButtonPlan.button = createButtonFunction(parameters);
             }
 
-        if ( buttonPlan.button == null )
+        if ( lastButtonPlan.button == null )
             {
             tokenizer.error( "BUTTON", R.string.data_button_function_missing);
-            buttonPlan.button = new Button();
+            lastButtonPlan.button = new Button();
             }
 
-        buttonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
+        lastButtonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
 
         // if no titles are added, then addTitle will add one based on default titleSlot
         // an empty parameter list is needed
@@ -1090,18 +1113,61 @@ public class MethodsForCommands
         StringBuilder buttonNameBuilder = new StringBuilder();
         for ( TitleDescriptor title : titles )
             {
-            title.checkText( buttonPlan.button.getString() );
+            title.checkText(lastButtonPlan.button.getString());
             buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
             }
-        buttonNameBuilder.setCharAt( 0, '\"');
-        buttonPlan.buttonName = buttonNameBuilder.append('\"').toString();
+        buttonNameBuilder.setCharAt(0, '\"');
+        lastButtonPlan.buttonName = buttonNameBuilder.append('\"').toString();
 
-        buttonPlan.button.setTitles( titles );
+        lastButtonPlan.button.setTitles(titles);
 
-        buttonPlan.relativeColumn = 1;
-        buttonPlan.relativeRow = 0;
+        return lastButtonPlan;
+        }
 
-        return buttonPlan;
+    public void moveL()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
+        lastButtonPlan.moveX--;
+        }
+
+    public void moveR()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
+        lastButtonPlan.moveX++;
+        }
+
+    public void moveDL()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
+        lastButtonPlan.moveY++;
+        lastButtonPlan.moveHalfs--;
+        }
+
+    public void moveDR()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
+        lastButtonPlan.moveY++;
+        lastButtonPlan.moveHalfs++;
+        }
+
+    public void moveSkip( Object intParameter )
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
+        lastButtonPlan.moveX += (int)intParameter + ( (int)intParameter < 0 ? -1 : 1 );
+        }
+
+    public void moveHome()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_XYHOME )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_XYHOME;
+        lastButtonPlan.moveX = 0;
+        lastButtonPlan.moveY = 0;
+        lastButtonPlan.moveHalfs = 0;
         }
 
 

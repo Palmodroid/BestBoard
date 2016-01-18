@@ -79,6 +79,17 @@ public class Commands
 
     public static final long TOKEN_BLOCK = 0x14c4fa3L;
 
+    public static final long TOKEN_HOME = 0xea740L;
+    public static final long TOKEN_SKIP = 0x1711d2L;
+    public static final long TOKEN_CRL = 0x14427L;
+    public static final long TOKEN_CRR = 0x1442dL;
+    public static final long TOKEN_UL = 0x1046aL;
+    public static final long TOKEN_UR = 0x10470L;
+    public static final long TOKEN_L = 0x10014L;
+    public static final long TOKEN_R = 0x1001aL;
+    public static final long TOKEN_DL = 0x101f5L;
+    public static final long TOKEN_DR = 0x101fbL;
+
     public static final long TOKEN_ODDS = 0x13d439L;
     public static final long TOKEN_EVENS = 0x1a9a13dL;
 
@@ -98,7 +109,7 @@ public class Commands
     public static final long TOKEN_NEXT = 0x13169aL;
     public static final long TOKEN_NEXTROW = 0xdfb045ec9L;
 
-    public static final long TOKEN_SKIP = 0x1711d2L;
+//    public static final long TOKEN_SKIP = 0x1711d2L;
     public static final long TOKEN_SKIPROW = 0x110ec65621L;
 
     public static final long TOKEN_OVERWRITE = 0x4f61843c6a0fL;
@@ -295,7 +306,6 @@ public class Commands
                 TOKEN_CURSOR,
                 TOKEN_NEXT,
                 TOKEN_NEXTROW,
-                TOKEN_SKIP,
                 TOKEN_SKIPROW,
                 TOKEN_BUTTON,
                 TOKEN_ADDLINK,
@@ -384,7 +394,6 @@ public class Commands
         result.put(TOKEN_NEXT, new Data(new long[]{NO_PARAMETERS}, "next" ));
         result.put(TOKEN_NEXTROW, new Data(new long[]{NO_PARAMETERS}, "nextRow" ));
 
-        result.put( TOKEN_SKIP, new Data(new long[]{PARAMETER_INT}, "skip" ));
         result.put( TOKEN_SKIPROW, new Data(new long[]{PARAMETER_INT}, "skipRow" ));
 
 
@@ -392,9 +401,21 @@ public class Commands
                 TOKEN_BOARD,
                 TOKEN_COLUMN,
                 TOKEN_ROW,
-                TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE },
+                TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE,
+                TOKEN_L,
+                TOKEN_R,
+                TOKEN_DL,
+                TOKEN_DR,
+                TOKEN_SKIP,
+                TOKEN_HOME },
                 "setBlock" ));
 
+        result.put(TOKEN_L, new Data(new long[]{NO_PARAMETERS}, "moveL" ));
+        result.put(TOKEN_R, new Data(new long[]{NO_PARAMETERS}, "moveR" ));
+        result.put(TOKEN_DL, new Data(new long[]{NO_PARAMETERS}, "moveDL" ));
+        result.put(TOKEN_DR, new Data(new long[]{NO_PARAMETERS}, "moveDR" ));
+        result.put(TOKEN_SKIP, new Data(new long[]{PARAMETER_INT}, "moveSkip" ));
+        result.put(TOKEN_HOME, new Data(new long[]{NO_PARAMETERS}, "moveHome" ));
 
         result.put(TOKEN_BUTTON, new Data(new long[]{
                 TOKEN_TEXT,
