@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 
 import dancingmoon.bestboard.Board;
+import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.SinglyLinkedList;
 
 /**
@@ -78,14 +79,14 @@ public class Button implements Cloneable
      * Connects the Button instance to its board and position.
      * (Each Button instance refers to only one specific button.)
      * @param board button's board
-     * @param columnInHexagons column (hexagonal)
-     * @param rowInHexagons row (hexagonal)
+     * @param arrayColumn column (hexagonal)
+     * @param arrayRow row (hexagonal)
      */
-    public void setPosition( Board board, int columnInHexagons, int rowInHexagons )
+    public void setPosition( Board board, int arrayColumn, int arrayRow )
         {
         this.board = board;
-        this.columnInGrids = getGridX( columnInHexagons, rowInHexagons );
-        this.rowInGrids = getGridY( rowInHexagons );
+        this.columnInGrids = getGridX( arrayColumn, arrayRow );
+        this.rowInGrids = getGridY( arrayRow );
         }
 
 
@@ -132,25 +133,29 @@ public class Button implements Cloneable
     /**
      * Converts columns (hexagon) into grids
      * This is only needed by the constructor and ButtonForMaps!
-     * @param columnInHexagons hexagonal column
-     * @param rowInHexagons hexagonal row
+     * @param arrayColumn hexagonal column
+     * @param arrayRow hexagonal row
      * @return Y-grid
      */
-    protected int getGridX( int columnInHexagons, int rowInHexagons )
+    protected int getGridX( int arrayColumn, int arrayRow )
         {
-        return columnInHexagons * 2 + ( (rowInHexagons + board.rowsAlignOffset) % 2 ) + 1;
+        int gridX = arrayColumn * 2 + 1 + (( arrayRow + board.rowsAlignOffset ) % 2 );
+        Scribe.error( "ArrayX: " + arrayColumn + ", GridX: " + gridX + ", Align: " + board.rowsAlignOffset );
+        return gridX;
         }
 
 
     /**
      * Converts rows (hexagon) into grids
      * This is only needed by the constructor and ButtonForMaps!
-     * @param rowInHexagons hexagonal row
+     * @param arrayRow hexagonal row
      * @return Y-grid
      */
-    protected int getGridY( int rowInHexagons )
+    protected int getGridY( int arrayRow )
         {
-        return rowInHexagons * 3 + 2;
+        int gridY = arrayRow * 3 + 2;
+        Scribe.error( "ArrayY: " + arrayRow + ", GridY: " + gridY );
+        return arrayRow * 3 + 2;
         }
 
 

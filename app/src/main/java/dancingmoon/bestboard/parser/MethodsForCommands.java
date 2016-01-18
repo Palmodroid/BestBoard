@@ -994,8 +994,8 @@ public class MethodsForCommands
             return;
             }
 
-        int column = (int)parameters.remove(Commands.TOKEN_COLUMN, 0);
-        int row = (int)parameters.remove(Commands.TOKEN_ROW, 0);
+        int arrayColumn = (int)parameters.remove(Commands.TOKEN_COLUMN, 1) -1;
+        int arrayRow = (int)parameters.remove(Commands.TOKEN_ROW, 1) -1;
 
         ArrayList<ButtonPlan> buttonPlans = (ArrayList<ButtonPlan>)parameters.remove(
                 Bit.setSignedBitOn(Commands.TOKEN_BUTTON) );
@@ -1019,8 +1019,8 @@ public class MethodsForCommands
             try
                 {
                 if ( board.addButton(
-                        column,
-                        row,
+                        arrayColumn,
+                        arrayRow,
                         buttonPlan.button.clone() ))
                     {
                     if ( parameters.containsKey( Commands.TOKEN_OVERWRITE ) )
@@ -1043,8 +1043,8 @@ public class MethodsForCommands
                         boardPlan.toString()  );
                 }
 
-            column += buttonPlan.relativeColumn;
-            row += buttonPlan.relativeRow;
+            arrayColumn += buttonPlan.relativeColumn;
+            arrayRow += buttonPlan.relativeRow;
             }
         }
 

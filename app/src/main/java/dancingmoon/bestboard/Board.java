@@ -290,28 +290,28 @@ public class Board
      * Predefined button is added at the defined position.
      * Board and position infos are added previously.
      *
-     * @param column column (in hexagons) of the button
-     * @param row    row (in hexagons) of the button
+     * @param arrayColumn arrayColumn (in hexagons) of the button
+     * @param arrayRow    arrayRow (in hexagons) of the button
      * @param button predefined button instance (board, positions are not needed)
      * @return true if button overwrites an other button
      * @throws ExternalDataException If button position is not valid
      */
-    public boolean addButton(int column, int row, Button button) throws ExternalDataException
+    public boolean addButton(int arrayColumn, int arrayRow, Button button) throws ExternalDataException
         {
         // BUTTONS ARE COMING FROM COAT DESCRIPTOR FILE
         // Scribe.locus();
 
-        if (!isValidPosition(column, row))
+        if (!isValidPosition(arrayColumn, arrayRow))
             {
             throw new ExternalDataException("This button position is not valid! Button cannot be added!");
             }
 
         boolean ret = false;
 
-        button.setPosition(this, column, row);
+        button.setPosition(this, arrayColumn, arrayRow);
 
         // put in its position
-        int index = touchCodeFromPosition(column, row);
+        int index = touchCodeFromPosition(arrayColumn, arrayRow);
 
         // check whether this is empty position !! changedButtons list is not checked if button is overwritten !!
         if (buttons[index] != null)
@@ -706,6 +706,7 @@ public class Board
         result.append("Board ").append( Tokenizer.regenerateKeyword(boardId));
         result.append(" - C:").append(boardWidthInHexagons);
         result.append("/R:").append(boardHeightInHexagons);
+        result.append("/A:").append(rowsAlignOffset);
         return result.toString();
         }
 
