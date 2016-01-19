@@ -1089,6 +1089,8 @@ public class MethodsForCommands
                     break;
 
                 case ButtonPlan.MOVE_BUTTON:
+                    arrayColumn += ((buttonPlan.moveHalfs%2 + ((arrayRow + board.rowsAlignOffset)%2)*2 - 1) / 2);
+                    /*
                     if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
                         {
                         if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
@@ -1103,6 +1105,7 @@ public class MethodsForCommands
                             arrayColumn --;
                             }
                         }
+                    */
                     arrayColumn += (buttonPlan.moveX + buttonPlan.moveHalfs / 2);
                     arrayRow += buttonPlan.moveY;
                     break;
