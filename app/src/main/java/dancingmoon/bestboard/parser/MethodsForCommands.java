@@ -1053,15 +1053,60 @@ public class MethodsForCommands
                 case ButtonPlan.MOVE_XYHOME:
                     arrayColumn = homeArrayColumn + buttonPlan.moveX + buttonPlan.moveHalfs / 2;
                     arrayRow = homeArrayRow + buttonPlan.moveY;
+                    if ( (homeArrayRow + board.rowsAlignOffset) % 2 == 1 )
+                        {
+                        if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
+                            {
+                            arrayColumn ++;
+                            }
+                        }
+                    else
+                        {
+                        if ( buttonPlan.moveHalfs % 2 < 0 ) // +1 is not allowed!!
+                            {
+                            arrayColumn --;
+                            }
+                        }
                     break;
+
                 case ButtonPlan.MOVE_XHOME:
                     arrayColumn = homeArrayColumn + buttonPlan.moveX + buttonPlan.moveHalfs / 2;
+                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                        {
+                        if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
+                            {
+                            arrayColumn ++;
+                            }
+                        }
+                    else
+                        {
+                        if ( buttonPlan.moveHalfs % 2 < 0 ) // +1 is not allowed!!
+                            {
+                            arrayColumn --;
+                            }
+                        }
                     arrayRow += buttonPlan.moveY;
                     break;
+
                 case ButtonPlan.MOVE_BUTTON:
+                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                        {
+                        if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
+                            {
+                            arrayColumn ++;
+                            }
+                        }
+                    else
+                        {
+                        if ( buttonPlan.moveHalfs % 2 < 0 ) // +1 is not allowed!!
+                            {
+                            arrayColumn --;
+                            }
+                        }
                     arrayColumn += (buttonPlan.moveX + buttonPlan.moveHalfs / 2);
                     arrayRow += buttonPlan.moveY;
                     break;
+
                 case ButtonPlan.MOVE_AUTO:
                 default:
                     arrayColumn++;
@@ -1151,6 +1196,22 @@ public class MethodsForCommands
         if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
             lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
         lastButtonPlan.moveY++;
+        lastButtonPlan.moveHalfs++;
+        }
+
+    public void moveUL()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
+        lastButtonPlan.moveY--;
+        lastButtonPlan.moveHalfs--;
+        }
+
+    public void moveUR()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
+        lastButtonPlan.moveY--;
         lastButtonPlan.moveHalfs++;
         }
 

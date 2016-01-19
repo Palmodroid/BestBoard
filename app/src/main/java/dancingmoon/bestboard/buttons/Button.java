@@ -6,6 +6,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 
 import dancingmoon.bestboard.Board;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.SinglyLinkedList;
 
@@ -140,7 +141,7 @@ public class Button implements Cloneable
     protected int getGridX( int arrayColumn, int arrayRow )
         {
         int gridX = arrayColumn * 2 + 1 + (( arrayRow + board.rowsAlignOffset ) % 2 );
-        Scribe.error( "ArrayX: " + arrayColumn + ", GridX: " + gridX + ", Align: " + board.rowsAlignOffset );
+        Scribe.debug(Debug.BUTTON, "ArrayX: " + arrayColumn + ", GridX: " + gridX + ", Align: " + board.rowsAlignOffset);
         return gridX;
         }
 
@@ -154,7 +155,7 @@ public class Button implements Cloneable
     protected int getGridY( int arrayRow )
         {
         int gridY = arrayRow * 3 + 2;
-        Scribe.error( "ArrayY: " + arrayRow + ", GridY: " + gridY );
+        Scribe.debug( Debug.BUTTON, "ArrayY: " + arrayRow + ", GridY: " + gridY );
         return arrayRow * 3 + 2;
         }
 

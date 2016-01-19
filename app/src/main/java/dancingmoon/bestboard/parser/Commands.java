@@ -406,6 +406,8 @@ public class Commands
                 TOKEN_R,
                 TOKEN_DL,
                 TOKEN_DR,
+                TOKEN_UL,
+                TOKEN_UR,
                 TOKEN_SKIP,
                 TOKEN_HOME },
                 "setBlock" ));
@@ -414,6 +416,8 @@ public class Commands
         result.put(TOKEN_R, new Data(new long[]{NO_PARAMETERS}, "moveR" ));
         result.put(TOKEN_DL, new Data(new long[]{NO_PARAMETERS}, "moveDL" ));
         result.put(TOKEN_DR, new Data(new long[]{NO_PARAMETERS}, "moveDR" ));
+        result.put(TOKEN_UL, new Data(new long[]{NO_PARAMETERS}, "moveUL" ));
+        result.put(TOKEN_UR, new Data(new long[]{NO_PARAMETERS}, "moveUR" ));
         result.put(TOKEN_SKIP, new Data(new long[]{PARAMETER_INT}, "moveSkip" ));
         result.put(TOKEN_HOME, new Data(new long[]{NO_PARAMETERS}, "moveHome" ));
 

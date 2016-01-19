@@ -617,16 +617,14 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                         result = commandData.getMethod().invoke(softBoardData.methodsForCommands, forwardParameters);
                         // As 'get' removes the entries from forwardparameters, it should be empty after the call
 
-                        /**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!**/
-
-                        Scribe.error( Debug.PARSER, "Remaining items in forwarded parameters after method call: " + forwardParameters.size() );
-                        for (Map.Entry<Long, Object> entry : forwardParameters.entrySet())
+                        if ( forwardParameters.size() > 0 )
                             {
-                            Scribe.error(Debug.PARSER, " - " + Tokenizer.regenerateKeyword(entry.getKey()));
+                            Scribe.error(Debug.PARSER, "Remaining items in forwarded parameters after method call: " + forwardParameters.size());
+                            for (Map.Entry<Long, Object> entry : forwardParameters.entrySet())
+                                {
+                                Scribe.error(Debug.PARSER, " - " + Tokenizer.regenerateKeyword(entry.getKey()));
+                                }
                             }
-
-                        /**!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!**/
-
                         }
                     // Parameter-command has ONE parameter - result
                     else if ( commandData.getParameterType() <= Commands.PARAMETER_KEYWORD )
