@@ -251,7 +251,28 @@ public class Commands
      * Parameter-commands are stored in an unmodifiable hash-HashMap (LIST)
      * as long token-code key (the command itself) and as Data value (command's data) pairs.
      */
-    private static final Map<Long, Data> LIST = createDataMap();
+    private static Map<Long, Data> LIST = createDataMap();
+
+
+    private static void add( long tokenCode, long groupCode, long[] params, String methodName )
+        {
+        LIST.put( tokenCode, new Data(groupCode, params, methodName ));
+        }
+
+    private static void add( long tokenCode, long[] params, String methodName )
+        {
+        add(tokenCode, tokenCode, params, methodName);
+        }
+
+    private static void add( long tokenCode, long groupCode, long[] params)
+        {
+        add( tokenCode, groupCode, params, null );
+        }
+
+    private static void add( long tokenCode, long[] params )
+        {
+        add( tokenCode, tokenCode, params, null );
+        }
 
     /**
      * Static map initialization is done as suggested by http://stackoverflow.com/a/509016
@@ -260,19 +281,23 @@ public class Commands
      *  it makes map unmodifiable,
      *  as MY_MAP is constant, I would name it like constant))
      * @return the initialized map
+     *
+     * Initialization is changed to a more convenient way:
+     * Several "add" methods populate the LIST map (temporarily),
+     * than an unmodifiable map is returned.
      */
-    private static Map<Long, Data> createDataMap()
+    public static Map<Long, Data> createDataMap()
         {
         Scribe.locus( Debug.COMMANDS );
 
-        Map<Long, Data> result = new HashMap<>();
+        LIST = new HashMap<>();
 
         // KEY: Code (long) of Parameter-command
         // VALUE (new DATA object)
         // - array (long) of allowed parameters for this command
         //      AT LEAST FIRST ITEM IS NEEDED (NO_PARAMETERS if there are no parameters allowed)
         // - method to call in SoftBoardClass (method should have a map parameter)
-        result.put(ADDSOFTBOARD, new Data(new long[] {
+        add(ADDSOFTBOARD, new long[] {
                 TOKEN_LET,
                 TOKEN_DEFAULT,
 
@@ -313,93 +338,93 @@ public class Commands
                 TOKEN_ADDLINK,
                 TOKEN_ADDMODIFY,
                 TOKEN_STOP
-        }, null ));
+        } );
 
-        result.put(TOKEN_LET, new Data(new long[]{PARAMETER_LABEL}, null ));
-        result.put(TOKEN_DEFAULT, new Data(new long[]{PARAMETER_DEFAULT}, null ));
+        add(TOKEN_LET, new long[]{PARAMETER_LABEL} );
+        add(TOKEN_DEFAULT, new long[]{PARAMETER_DEFAULT} );
 
-        result.put(TOKEN_NAME, new Data(new long[]{PARAMETER_STRING}, "setName" ));
-        result.put(TOKEN_VERSION, new Data(new long[]{PARAMETER_INT}, "setVersion" ));
-        result.put(TOKEN_AUTHOR, new Data(new long[]{PARAMETER_STRING}, "setAuthor" ));
-        result.put(TOKEN_ADDTAGS, new Data(new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)}, "addTags" ));
-        result.put(TOKEN_DESCRIPTION, new Data(new long[]{PARAMETER_STRING}, "setDescription" ));
-        result.put(TOKEN_DOCFILE, new Data(new long[]{PARAMETER_FILE}, "setDocFile" ));
-        result.put(TOKEN_DOCURI, new Data(new long[]{PARAMETER_STRING}, "setDocUri" ));
+        add(TOKEN_NAME, new long[]{PARAMETER_STRING}, "setName" );
+        add(TOKEN_VERSION, new long[]{PARAMETER_INT}, "setVersion" );
+        add(TOKEN_AUTHOR, new long[]{PARAMETER_STRING}, "setAuthor" );
+        add(TOKEN_ADDTAGS, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)}, "addTags" );
+        add(TOKEN_DESCRIPTION, new long[]{PARAMETER_STRING}, "setDescription" );
+        add(TOKEN_DOCFILE, new long[]{PARAMETER_FILE}, "setDocFile" );
+        add(TOKEN_DOCURI, new long[]{PARAMETER_STRING}, "setDocUri" );
 
-        result.put(TOKEN_LOCALE, new Data(new long[]{
-                TOKEN_LANGUAGE, TOKEN_COUNTRY, TOKEN_VARIANT }, "setLocale" ));
-        result.put(TOKEN_LANGUAGE, new Data(new long[]{PARAMETER_STRING}, null ));
-        result.put(TOKEN_COUNTRY, new Data(new long[]{PARAMETER_STRING}, null ));
-        result.put(TOKEN_VARIANT, new Data(new long[]{PARAMETER_STRING}, null ));
+        add(TOKEN_LOCALE, new long[]{
+                TOKEN_LANGUAGE, TOKEN_COUNTRY, TOKEN_VARIANT }, "setLocale" );
+        add(TOKEN_LANGUAGE, new long[]{PARAMETER_STRING} );
+        add(TOKEN_COUNTRY, new long[]{PARAMETER_STRING} );
+        add(TOKEN_VARIANT, new long[]{PARAMETER_STRING} );
 
-        result.put(TOKEN_METACOLOR, new Data(new long[]{PARAMETER_COLOR}, "setMetaColor" ));
-        result.put(TOKEN_LOCKCOLOR, new Data(new long[]{PARAMETER_COLOR}, "setLockColor" ));
-        result.put(TOKEN_AUTOCOLOR, new Data(new long[]{PARAMETER_COLOR}, "setAutoColor" ));
-        result.put(TOKEN_TOUCHCOLOR, new Data(new long[]{PARAMETER_COLOR}, "setTouchColor" ));
-        result.put(TOKEN_STROKECOLOR, new Data(new long[]{PARAMETER_COLOR}, "setStrokeColor" ));
-        result.put(TOKEN_TITLEFONT, new Data(new long[]{PARAMETER_FILE}, "setTypeface" ));
+        add(TOKEN_METACOLOR, new long[]{PARAMETER_COLOR}, "setMetaColor" );
+        add(TOKEN_LOCKCOLOR, new long[]{PARAMETER_COLOR}, "setLockColor" );
+        add(TOKEN_AUTOCOLOR, new long[]{PARAMETER_COLOR}, "setAutoColor" );
+        add(TOKEN_TOUCHCOLOR, new long[]{PARAMETER_COLOR}, "setTouchColor" );
+        add(TOKEN_STROKECOLOR, new long[]{PARAMETER_COLOR}, "setStrokeColor" );
+        add(TOKEN_TITLEFONT, new long[]{PARAMETER_FILE}, "setTypeface" );
 
-        result.put(TOKEN_ENTERTITLE, new Data(new long[]{PARAMETER_TEXT}, "setEnterTitle" ));
-        result.put(TOKEN_GOTITLE, new Data(new long[]{PARAMETER_TEXT}, "setGoTitle" ));
-        result.put(TOKEN_SEARCHTITLE, new Data(new long[]{PARAMETER_TEXT}, "setSearchTitle" ));
-        result.put(TOKEN_SENDTITLE, new Data(new long[]{PARAMETER_TEXT}, "setSendTitle" ));
-        result.put(TOKEN_NEXTTITLE, new Data(new long[]{PARAMETER_TEXT}, "setNextTitle" ));
-        result.put(TOKEN_DONETITLE, new Data(new long[]{PARAMETER_TEXT}, "setDoneTitle" ));
-        result.put(TOKEN_PREVTITLE, new Data(new long[]{PARAMETER_TEXT}, "setPrevTitle" ));
-        result.put(TOKEN_NONETITLE, new Data(new long[]{PARAMETER_TEXT}, "setNoneTitle" ));
-        result.put(TOKEN_UNKNOWNTITLE, new Data(new long[]{PARAMETER_TEXT}, "setUnknownTitle" ));
+        add(TOKEN_ENTERTITLE, new long[]{PARAMETER_TEXT}, "setEnterTitle" );
+        add(TOKEN_GOTITLE, new long[]{PARAMETER_TEXT}, "setGoTitle" );
+        add(TOKEN_SEARCHTITLE, new long[]{PARAMETER_TEXT}, "setSearchTitle" );
+        add(TOKEN_SENDTITLE, new long[]{PARAMETER_TEXT}, "setSendTitle" );
+        add(TOKEN_NEXTTITLE, new long[]{PARAMETER_TEXT}, "setNextTitle" );
+        add(TOKEN_DONETITLE, new long[]{PARAMETER_TEXT}, "setDoneTitle" );
+        add(TOKEN_PREVTITLE, new long[]{PARAMETER_TEXT}, "setPrevTitle" );
+        add(TOKEN_NONETITLE, new long[]{PARAMETER_TEXT}, "setNoneTitle" );
+        add(TOKEN_UNKNOWNTITLE, new long[]{PARAMETER_TEXT}, "setUnknownTitle" );
 
-        result.put( TOKEN_ADDSLOT, new Data(new long[]{
+        add( TOKEN_ADDSLOT, new long[]{
                 TOKEN_ID, TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
-                TOKEN_BOLD, TOKEN_ITALICS, TOKEN_COLOR }, "addSlot" ));
-        result.put(TOKEN_ID, new Data(new long[]{PARAMETER_KEYWORD}, null ));
-        result.put(TOKEN_XOFFSET, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_YOFFSET, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_SIZE, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_BOLD, new Data(new long[]{PARAMETER_FLAG}, null ));
-        result.put(TOKEN_ITALICS, new Data(new long[]{PARAMETER_FLAG}, null ));
-        result.put(TOKEN_COLOR, new Data(new long[]{PARAMETER_COLOR}, null ));
+                TOKEN_BOLD, TOKEN_ITALICS, TOKEN_COLOR }, "addSlot" );
+        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_XOFFSET, new long[]{PARAMETER_INT} );
+        add(TOKEN_YOFFSET, new long[]{PARAMETER_INT} );
+        add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
+        add(TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR} );
 
-        result.put(TOKEN_ADDBOARD, new Data(new long[]{
+        add(TOKEN_ADDBOARD, new long[]{
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
                 TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
                 TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT}, "addBoard" ));
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT}, "addBoard" );
         // TOKEN_ID is already defined
         // Useless parametercommand - just for clearer readability
-        result.put(TOKEN_HEXAGONAL, new Data(new long[]{NO_PARAMETERS}, null ));
-        result.put(TOKEN_WIDE, new Data(new long[]{PARAMETER_FLAG}, null ));
-        result.put(TOKEN_COLUMNS, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_HALFCOLUMNS, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_ROWS, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_ALIGN, new Data(new long[]{PARAMETER_KEYWORD}, null ));
-        result.put(TOKEN_COLOR, new Data(new long[]{PARAMETER_COLOR}, null ));
+        add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS} );
+        add(TOKEN_WIDE, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_COLUMNS, new long[]{PARAMETER_INT} );
+        add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT} );
+        add(TOKEN_ROWS, new long[]{PARAMETER_INT} );
+        add(TOKEN_ALIGN, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR} );
 
-        result.put( TOKEN_FORCECAPS, new Data(new long[]{PARAMETER_BOOLEAN}, null ));
-        result.put( TOKEN_FORCESHIFT, new Data(new long[]{PARAMETER_BOOLEAN}, null ));
-        result.put( TOKEN_FORCECTRL, new Data(new long[]{PARAMETER_BOOLEAN}, null ));
-        result.put( TOKEN_FORCEALT, new Data(new long[]{PARAMETER_BOOLEAN}, null ));
+        add( TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN} );
+        add( TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN} );
+        add( TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN} );
+        add( TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN} );
 
-        result.put( TOKEN_CURSOR, new Data(new long[]{
+        add( TOKEN_CURSOR, new long[]{
                 TOKEN_NONE, TOKEN_ALSO, TOKEN_ONLY,
                 TOKEN_BOARD, TOKEN_COLUMN, TOKEN_ROW,
-                TOKEN_TRANSFORM }, "setCursor" ));
-        result.put(TOKEN_NONE, new Data(new long[]{PARAMETER_FLAG}, null ));
-        result.put(TOKEN_ALSO, new Data(new long[]{PARAMETER_FLAG}, null ));
+                TOKEN_TRANSFORM }, "setCursor" );
+        add(TOKEN_NONE, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_ALSO, new long[]{PARAMETER_FLAG} );
         // TOKEN_ONLY is currently NOT checked, If TOKEN_ALSO can be found it is used
-        result.put(TOKEN_ONLY, new Data(new long[]{NO_PARAMETERS}, null ));
-        result.put(TOKEN_BOARD, new Data(new long[]{PARAMETER_KEYWORD}, null ));
-        result.put(TOKEN_COLUMN, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_ROW, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_TRANSFORM, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_ONLY, new long[]{NO_PARAMETERS} );
+        add(TOKEN_BOARD, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_COLUMN, new long[]{PARAMETER_INT} );
+        add(TOKEN_ROW, new long[]{PARAMETER_INT} );
+        add(TOKEN_TRANSFORM, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_NEXT, new Data(new long[]{NO_PARAMETERS}, "next" ));
-        result.put(TOKEN_NEXTROW, new Data(new long[]{NO_PARAMETERS}, "nextRow" ));
+        add(TOKEN_NEXT, new long[]{NO_PARAMETERS}, "next" );
+        add(TOKEN_NEXTROW, new long[]{NO_PARAMETERS}, "nextRow" );
 
-        result.put( TOKEN_SKIPROW, new Data(new long[]{PARAMETER_INT}, "skipRow" ));
+        add( TOKEN_SKIPROW, new long[]{PARAMETER_INT}, "skipRow" );
 
 
-        result.put( TOKEN_BLOCK, new Data(new long[]{
+        add( TOKEN_BLOCK, new long[]{
                 TOKEN_BOARD,
                 TOKEN_COLUMN,
                 TOKEN_ROW,
@@ -414,20 +439,20 @@ public class Commands
                 TOKEN_CRR,
                 TOKEN_SKIP,
                 TOKEN_HOME },
-                "setBlock" ));
+                "setBlock" );
 
-        result.put(TOKEN_L, new Data(new long[]{NO_PARAMETERS}, "moveL" ));
-        result.put(TOKEN_R, new Data(new long[]{NO_PARAMETERS}, "moveR" ));
-        result.put(TOKEN_DL, new Data(new long[]{NO_PARAMETERS}, "moveDL" ));
-        result.put(TOKEN_DR, new Data(new long[]{NO_PARAMETERS}, "moveDR" ));
-        result.put(TOKEN_UL, new Data(new long[]{NO_PARAMETERS}, "moveUL" ));
-        result.put(TOKEN_UR, new Data(new long[]{NO_PARAMETERS}, "moveUR" ));
-        result.put(TOKEN_CRL, new Data(new long[]{NO_PARAMETERS}, "moveCRL" ));
-        result.put(TOKEN_CRR, new Data(new long[]{NO_PARAMETERS}, "moveCRR" ));
-        result.put(TOKEN_SKIP, new Data(new long[]{PARAMETER_INT}, "moveSkip" ));
-        result.put(TOKEN_HOME, new Data(new long[]{NO_PARAMETERS}, "moveHome" ));
+        add(TOKEN_L, new long[]{NO_PARAMETERS}, "moveL" );
+        add(TOKEN_R, new long[]{NO_PARAMETERS}, "moveR" );
+        add(TOKEN_DL, new long[]{NO_PARAMETERS}, "moveDL" );
+        add(TOKEN_DR, new long[]{NO_PARAMETERS}, "moveDR" );
+        add(TOKEN_UL, new long[]{NO_PARAMETERS}, "moveUL" );
+        add(TOKEN_UR, new long[]{NO_PARAMETERS}, "moveUR" );
+        add(TOKEN_CRL, new long[]{NO_PARAMETERS}, "moveCRL" );
+        add(TOKEN_CRR, new long[]{NO_PARAMETERS}, "moveCRR" );
+        add(TOKEN_SKIP, new long[]{PARAMETER_INT}, "moveSkip" );
+        add(TOKEN_HOME, new long[]{NO_PARAMETERS}, "moveHome" );
 
-        result.put(TOKEN_BUTTON, new Data(new long[]{
+        add(TOKEN_BUTTON, new long[]{
                 TOKEN__HOLDER,
 
                 TOKEN_TEXT,
@@ -463,13 +488,13 @@ public class Commands
                 TOKEN_SEND },
                 // SEND remains only because label's purposes,
                 // parameters could be given directly to BUTTON
-                "setButton2"));
+                "setButton2");
 
-        result.put(TOKEN__HOLDER, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN__HOLDER, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_OVERWRITE, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_OVERWRITE, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_SEND, new Data(new long[]{
+        add(TOKEN_SEND, new long[]{
                 TOKEN_TEXT,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
@@ -493,9 +518,9 @@ public class Commands
                 TOKEN_REVERSE,
 
                 TOKEN_ENTER },
-                "createButtonFunction"));
+                "createButtonFunction");
 
-        result.put(TOKEN_SECOND, new Data(new long[]{
+        add(TOKEN_SECOND, new long[]{
                 TOKEN_TEXT,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
@@ -506,40 +531,40 @@ public class Commands
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
                 TOKEN_DO },
-                "packet"));
+                "packet");
 
-        result.put(TOKEN_TEXT, new Data(new long[]{PARAMETER_TEXT}, null ));
-        result.put(TOKEN_KEY, new Data(new long[]{PARAMETER_INT}, null ));
-        result.put(TOKEN_DO, new Data(new long[]{PARAMETER_KEYWORD}, null ));
+        add(TOKEN_TEXT, new long[]{PARAMETER_TEXT} );
+        add(TOKEN_KEY, new long[]{PARAMETER_INT} );
+        add(TOKEN_DO, new long[]{PARAMETER_KEYWORD} );
 
-        result.put(TOKEN_META, new Data(new long[]{PARAMETER_KEYWORD}, null ));
-        result.put(TOKEN_LINK, new Data(new long[]{PARAMETER_INT}, null ));
+        add(TOKEN_META, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_LINK, new long[]{PARAMETER_INT} );
 
-        result.put(TOKEN_LOCK, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_LOCK, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_AUTOCAPS, new Data(new long[]{PARAMETER_KEYWORD}, null ));
-        result.put(TOKEN_STRINGCAPS, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_AUTOCAPS, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_STRINGCAPS, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_REPEAT, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_REPEAT, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_SPACETRAVEL, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_SPACETRAVEL, new long[]{PARAMETER_FLAG} );
 
         // TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT are already defined
 
-        result.put(TOKEN_AUTOSPACE, new Data(new long[]{PARAMETER_KEYWORD}, null ));
-        result.put(TOKEN_ERASESPACES, new Data(new long[]{PARAMETER_KEYWORD}, null ));
+        add(TOKEN_AUTOSPACE, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_ERASESPACES, new long[]{PARAMETER_KEYWORD} );
 
-        result.put(TOKEN_MODIFY, new Data(new long[]{PARAMETER_KEYWORD}, null ));
-        result.put(TOKEN_REVERSE, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_MODIFY, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_REVERSE, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_ENTER, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_ENTER, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_ADDTITLE, new Data(new long[]{
+        add(TOKEN_ADDTITLE, new long[]{
                 TOKEN_TEXT, TOKEN_SLOT,
                 TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
-                TOKEN_BOLD, TOKEN_ITALICS, TOKEN_COLOR }, "addTitle"));
+                TOKEN_BOLD, TOKEN_ITALICS, TOKEN_COLOR }, "addTitle");
         // TOKEN_TEXT is already defined
-        result.put(TOKEN_SLOT, new Data(new long[]{PARAMETER_KEYWORD}, null ));
+        add(TOKEN_SLOT, new long[]{PARAMETER_KEYWORD} );
         // TOKEN_XOFFSET is already defined
         // TOKEN_YOFFSET is already defined
         // TOKEN_SIZE is already defined
@@ -547,28 +572,29 @@ public class Commands
         // TOKEN_ITALICS is already defined
         // TOKEN_COLOR is already defined
 
-        result.put( TOKEN_ADDLINK, new Data(new long[]{
+        add( TOKEN_ADDLINK, new long[]{
                 TOKEN_INDEX, TOKEN_BOARD,
-                TOKEN_PORTRAIT, TOKEN_LANDSCAPE }, "addLink"));
-        result.put(TOKEN_INDEX, new Data(new long[]{PARAMETER_INT}, null ));
+                TOKEN_PORTRAIT, TOKEN_LANDSCAPE }, "addLink");
+        add(TOKEN_INDEX, new long[]{PARAMETER_INT} );
         // TOKEN_BOARD is already defined
-        result.put(TOKEN_PORTRAIT, new Data(new long[]{PARAMETER_KEYWORD}, null ));
-        result.put(TOKEN_LANDSCAPE, new Data(new long[]{PARAMETER_KEYWORD}, null ));
+        add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD} );
 
-        result.put(TOKEN_ADDMODIFY, new Data(new long[]{
+        add(TOKEN_ADDMODIFY, new long[]{
                 TOKEN_ID, TOKEN_ADDROLL, TOKEN_ROLLS,
-                TOKEN_IGNORESPACE }, "addModify" ));
+                TOKEN_IGNORESPACE }, "addModify" );
         // TOKEN_ID is already defined
         // !! addRollHelper functionality should be avoided !!
         // "Multiple" type parameters are needed
-        result.put(TOKEN_ADDROLL, new Data(new long[]{ (PARAMETER_STRING | PARAMETER_MOD_LIST) }, "addRollHelper" ));
-        result.put(TOKEN_ROLLS, new Data(new long[]{ (PARAMETER_STRING | PARAMETER_MOD_LIST) }, null ));
-        result.put(TOKEN_IGNORESPACE, new Data(new long[]{PARAMETER_FLAG}, null ));
+        add(TOKEN_ADDROLL, new long[]{ (PARAMETER_STRING | PARAMETER_MOD_LIST) }, "addRollHelper" );
+        add(TOKEN_ROLLS, new long[]{ (PARAMETER_STRING | PARAMETER_MOD_LIST) } );
+        add(TOKEN_IGNORESPACE, new long[]{PARAMETER_FLAG} );
 
-        result.put(TOKEN_STOP, new Data(new long[]{MESSAGE_STOP}, null ));
+        add(TOKEN_STOP, new long[]{MESSAGE_STOP} );
 
-//        result.put(TOKEN_, new Data(new long[]{ }, "" ));
-        return Collections.unmodifiableMap(result);
+//        add(TOKEN_, new long[]{ }, "" );
+
+        return Collections.unmodifiableMap( LIST );
         }
 
     public static Data get( long commandCode ) throws InvalidKeyException
@@ -1138,6 +1164,9 @@ public class Commands
 
     /**
      * Commands's data consists of:
+     * long groupCode - parameter is stored under groupCode
+     * (Single params: only one parameter is allowed under one groupCode,
+     *  Multiple params: all parameters are listed together under the same groupCode)
      * long parameters[] - allowed parameters (token-codes of allowed parameter-commands) or
      * special parameters as negative values.
      * Array cannot be null or empty; at least one item is needed!
@@ -1147,11 +1176,13 @@ public class Commands
      */
     public static class Data
         {
+        private long groupCode;
         private long params[];
         private Method method;
 
-        private Data(long[] params, String methodName )
+        private Data( long groupCode, long[] params, String methodName )
             {
+            this.groupCode = groupCode;
             this.params = params;
 
             // if no method to call;
