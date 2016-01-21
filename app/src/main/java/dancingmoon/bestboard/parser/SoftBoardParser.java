@@ -413,7 +413,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                                     list = new ArrayList<Object>();
                                     returnParameters.put( entry.getKey(), list) ;
                                     }
-                                list.add(entry.getValue());
+                                list.addAll( (ArrayList<Object>)(entry.getValue()) );
                                 }
                             }
                         }

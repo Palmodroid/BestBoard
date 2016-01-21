@@ -79,6 +79,8 @@ public class Commands
 
     public static final long TOKEN_BLOCK = 0x14c4fa3L;
 
+    public static final long TOKEN__HOLDER = 0x15ca773dc7L;
+
     public static final long TOKEN_HOME = 0xea740L;
     public static final long TOKEN_SKIP = 0x1711d2L;
     public static final long TOKEN_CRL = 0x14427L;
@@ -408,6 +410,8 @@ public class Commands
                 TOKEN_DR,
                 TOKEN_UL,
                 TOKEN_UR,
+                TOKEN_CRL,
+                TOKEN_CRR,
                 TOKEN_SKIP,
                 TOKEN_HOME },
                 "setBlock" ));
@@ -418,10 +422,14 @@ public class Commands
         result.put(TOKEN_DR, new Data(new long[]{NO_PARAMETERS}, "moveDR" ));
         result.put(TOKEN_UL, new Data(new long[]{NO_PARAMETERS}, "moveUL" ));
         result.put(TOKEN_UR, new Data(new long[]{NO_PARAMETERS}, "moveUR" ));
+        result.put(TOKEN_CRL, new Data(new long[]{NO_PARAMETERS}, "moveCRL" ));
+        result.put(TOKEN_CRR, new Data(new long[]{NO_PARAMETERS}, "moveCRR" ));
         result.put(TOKEN_SKIP, new Data(new long[]{PARAMETER_INT}, "moveSkip" ));
         result.put(TOKEN_HOME, new Data(new long[]{NO_PARAMETERS}, "moveHome" ));
 
         result.put(TOKEN_BUTTON, new Data(new long[]{
+                TOKEN__HOLDER,
+
                 TOKEN_TEXT,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
@@ -456,6 +464,8 @@ public class Commands
                 // SEND remains only because label's purposes,
                 // parameters could be given directly to BUTTON
                 "setButton2"));
+
+        result.put(TOKEN__HOLDER, new Data(new long[]{PARAMETER_FLAG}, null ));
 
         result.put(TOKEN_OVERWRITE, new Data(new long[]{PARAMETER_FLAG}, null ));
 

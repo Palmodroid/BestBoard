@@ -1,6 +1,9 @@
 package dancingmoon.bestboard.utils;
 
+import java.util.Iterator;
 import java.util.Map;
+
+import dancingmoon.bestboard.parser.Tokenizer;
 
 /**
  * ExtendedMap with extended get method for HashMap.
@@ -43,4 +46,59 @@ public class ExtendedMap<K, V> extends java.util.HashMap<K, V>
         return ( value != null ) ? value : defaultValue;
         }
 
+    @Override
+    public String toString()
+        {
+        if (isEmpty())
+            {
+            return "{}";
+            }
+
+        StringBuilder buffer = new StringBuilder( size() * 28 );
+        buffer.append('{');
+        Iterator<Entry<K, V>> it = entrySet().iterator();
+        while (it.hasNext())
+            {
+            Map.Entry<K, V> entry = it.next();
+            Object key = entry.getKey();
+            if (key != this)
+                {
+                buffer.append(key);
+                if ( key != null && key instanceof Long )
+                    {
+                    buffer.append('[');
+                    buffer.append(Tokenizer.regenerateKeyword((long) key));
+                    buffer.append(']');
+                    }
+                }
+            else
+                {
+                buffer.append("(this Map)");
+                }
+            buffer.append('=');
+
+            Object value = entry.getValue();
+            if (value != this)
+                {
+                buffer.append(value);
+                if ( value != null && value instanceof Long )
+                    {
+                    buffer.append('[');
+                    buffer.append(Tokenizer.regenerateKeyword((long) value));
+                    buffer.append(']');
+                    }
+                }
+            else
+                {
+                buffer.append("(this Map)");
+                }
+
+            if (it.hasNext())
+                {
+                buffer.append(", ");
+                }
+            }
+        buffer.append('}');
+        return buffer.toString();
+        }
     }

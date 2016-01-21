@@ -120,6 +120,7 @@ public class MethodsForCommands
      */
     private class ButtonPlan
         {
+        private final static int MOVE_NO = -1;
         private final static int MOVE_AUTO = 0;
         private final static int MOVE_BUTTON = 1;
         private final static int MOVE_XHOME = 2;
@@ -996,6 +997,7 @@ public class MethodsForCommands
             return;
             }
 
+        // starting (HOME) positions
         int homeArrayColumn = (int)parameters.remove(Commands.TOKEN_COLUMN, 1) -1;
         int homeArrayRow = (int)parameters.remove(Commands.TOKEN_ROW, 1) -1;
 
@@ -1016,43 +1018,48 @@ public class MethodsForCommands
             }
         Board board = boardPlan.board;
 
-
+        // button positions
         int arrayColumn = homeArrayColumn;
         int arrayRow = homeArrayRow;
 
+        // beginning of the line in the actual row
+        int crArrayColumn = homeArrayColumn;
+
         for ( ButtonPlan buttonPlan : buttonPlans )
             {
-            try
+            if ( buttonPlan.button != null )
                 {
-                if (board.addButton(
-                        arrayColumn,
-                        arrayRow,
-                        buttonPlan.button.clone()))
+                try
                     {
-                    if (parameters.containsKey(Commands.TOKEN_OVERWRITE))
+                    if (board.addButton(
+                            arrayColumn,
+                            arrayRow,
+                            buttonPlan.button.clone()))
                         {
-                        tokenizer.note(R.string.data_button_overwritten,
-                                boardPlan.toString());
-                        } else
-                        {
-                        tokenizer.error(R.string.data_button_overwritten,
-                                boardPlan.toString());
+                        if (parameters.containsKey(Commands.TOKEN_OVERWRITE))
+                            {
+                            tokenizer.note(R.string.data_button_overwritten,
+                                    boardPlan.toString());
+                            } else
+                            {
+                            tokenizer.error(R.string.data_button_overwritten,
+                                    boardPlan.toString());
+                            }
                         }
+                    tokenizer.note(buttonPlan.buttonName, R.string.data_button_added,
+                            boardPlan.toString());
+                    } catch (ExternalDataException ede)
+                    {
+                    tokenizer.error(buttonPlan.buttonName, R.string.data_button_error,
+                            boardPlan.toString());
                     }
-                tokenizer.note(buttonPlan.buttonName, R.string.data_button_added,
-                        boardPlan.toString());
-                }
-            catch (ExternalDataException ede)
-                {
-                tokenizer.error(buttonPlan.buttonName, R.string.data_button_error,
-                        boardPlan.toString());
                 }
 
             switch (buttonPlan.moveType)
-                { // !!!!!!!!!!!! moveHALFS felét megcsinálni!!!!!!!
+                {
+                // MOVE starts from HOME position
                 case ButtonPlan.MOVE_XYHOME:
                     arrayColumn = homeArrayColumn + buttonPlan.moveX + buttonPlan.moveHalfs / 2;
-                    arrayRow = homeArrayRow + buttonPlan.moveY;
                     if ( (homeArrayRow + board.rowsAlignOffset) % 2 == 1 )
                         {
                         if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
@@ -1067,30 +1074,37 @@ public class MethodsForCommands
                             arrayColumn --;
                             }
                         }
+                    arrayRow = homeArrayRow + buttonPlan.moveY;
                     break;
 
+                // MOVE starts from the beginning of the line (CR - Carriage Return)
+                // The new beginning starts from the new position!!
                 case ButtonPlan.MOVE_XHOME:
-                    arrayColumn = homeArrayColumn + buttonPlan.moveX + buttonPlan.moveHalfs / 2;
+                    crArrayColumn += (buttonPlan.moveX + buttonPlan.moveHalfs / 2);
                     if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
                         {
                         if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
                             {
-                            arrayColumn ++;
+                            crArrayColumn ++;
                             }
                         }
                     else
                         {
                         if ( buttonPlan.moveHalfs % 2 < 0 ) // +1 is not allowed!!
                             {
-                            arrayColumn --;
+                            crArrayColumn --;
                             }
                         }
+                    arrayColumn = crArrayColumn;
                     arrayRow += buttonPlan.moveY;
                     break;
 
+                // MOVE starts from the last button
                 case ButtonPlan.MOVE_BUTTON:
-                    arrayColumn += ((buttonPlan.moveHalfs%2 + ((arrayRow + board.rowsAlignOffset)%2)*2 - 1) / 2);
-                    /*
+                    // it could be calculated also like this:
+                    // arrayColumn += ((buttonPlan.moveHalfs%2 + ((arrayRow + board.rowsAlignOffset)%2)*2 - 1) / 2);
+
+                    arrayColumn += (buttonPlan.moveX + buttonPlan.moveHalfs / 2);
                     if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
                         {
                         if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
@@ -1105,14 +1119,17 @@ public class MethodsForCommands
                             arrayColumn --;
                             }
                         }
-                    */
-                    arrayColumn += (buttonPlan.moveX + buttonPlan.moveHalfs / 2);
                     arrayRow += buttonPlan.moveY;
                     break;
 
+                // MOVE automatically to the next position
                 case ButtonPlan.MOVE_AUTO:
-                default:
                     arrayColumn++;
+                    break;
+
+                // DO nothing, this is just a _holder
+                case ButtonPlan.MOVE_NO:
+                default:
                 }
             }
         }
@@ -1128,6 +1145,14 @@ public class MethodsForCommands
     public ButtonPlan setButton2(ExtendedMap<Long, Object> parameters)
         {
         lastButtonPlan = new ButtonPlan();
+
+        // _HOLDER should be treated specially (and should be read last) !!
+        if ( parameters.remove( Commands.TOKEN__HOLDER ) != null )
+            {
+            // NULL Button should be returned
+            lastButtonPlan.moveType = ButtonPlan.MOVE_NO;
+            return lastButtonPlan;
+            }
 
         // "SEND" parameters could be found among "BUTTON"-s parameters
         // For testing reasons SEND remains...
@@ -1215,6 +1240,24 @@ public class MethodsForCommands
         if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
             lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
         lastButtonPlan.moveY--;
+        lastButtonPlan.moveHalfs++;
+        }
+
+    public void moveCRL()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_XHOME )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_XHOME;
+        lastButtonPlan.moveX = 0;
+        lastButtonPlan.moveY++;
+        lastButtonPlan.moveHalfs--;
+        }
+
+    public void moveCRR()
+        {
+        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_XHOME )
+            lastButtonPlan.moveType = ButtonPlan.MOVE_XHOME;
+        lastButtonPlan.moveX = 0;
+        lastButtonPlan.moveY++;
         lastButtonPlan.moveHalfs++;
         }
 
