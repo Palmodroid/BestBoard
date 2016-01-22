@@ -79,8 +79,6 @@ public class Commands
 
     public static final long TOKEN_BLOCK = 0x14c4fa3L;
 
-    public static final long TOKEN__HOLDER = 0x15ca773dc7L;
-
     public static final long TOKEN_HOME = 0xea740L;
     public static final long TOKEN_SKIP = 0x1711d2L;
     public static final long TOKEN_CRL = 0x14427L;
@@ -256,7 +254,11 @@ public class Commands
 
     private static void add( long tokenCode, long groupCode, long[] params, String methodName )
         {
-        LIST.put( tokenCode, new Data(groupCode, params, methodName ));
+        if ( LIST.put( tokenCode, new Data(groupCode, params, methodName )) != null )
+            {
+            Scribe.error("Please, check COMMANDS! " + tokenCode +
+                    " [" + Tokenizer.regenerateKeyword(tokenCode) + "] has multiple definitions!");
+            }
         }
 
     private static void add( long tokenCode, long[] params, String methodName )
@@ -429,32 +431,30 @@ public class Commands
                 TOKEN_COLUMN,
                 TOKEN_ROW,
                 TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE,
-                TOKEN_L,
-                TOKEN_R,
-                TOKEN_DL,
-                TOKEN_DR,
-                TOKEN_UL,
-                TOKEN_UR,
-                TOKEN_CRL,
-                TOKEN_CRR,
-                TOKEN_SKIP,
-                TOKEN_HOME },
+                TOKEN_L | PARAMETER_MOD_MULTIPLE,
+                TOKEN_R | PARAMETER_MOD_MULTIPLE,
+                TOKEN_DL | PARAMETER_MOD_MULTIPLE,
+                TOKEN_DR | PARAMETER_MOD_MULTIPLE,
+                TOKEN_UL | PARAMETER_MOD_MULTIPLE,
+                TOKEN_UR | PARAMETER_MOD_MULTIPLE,
+                TOKEN_CRL | PARAMETER_MOD_MULTIPLE,
+                TOKEN_CRR | PARAMETER_MOD_MULTIPLE,
+                TOKEN_SKIP | PARAMETER_MOD_MULTIPLE,
+                TOKEN_HOME | PARAMETER_MOD_MULTIPLE },
                 "setBlock" );
 
-        add(TOKEN_L, new long[]{NO_PARAMETERS}, "moveL" );
-        add(TOKEN_R, new long[]{NO_PARAMETERS}, "moveR" );
-        add(TOKEN_DL, new long[]{NO_PARAMETERS}, "moveDL" );
-        add(TOKEN_DR, new long[]{NO_PARAMETERS}, "moveDR" );
-        add(TOKEN_UL, new long[]{NO_PARAMETERS}, "moveUL" );
-        add(TOKEN_UR, new long[]{NO_PARAMETERS}, "moveUR" );
-        add(TOKEN_CRL, new long[]{NO_PARAMETERS}, "moveCRL" );
-        add(TOKEN_CRR, new long[]{NO_PARAMETERS}, "moveCRR" );
-        add(TOKEN_SKIP, new long[]{PARAMETER_INT}, "moveSkip" );
-        add(TOKEN_HOME, new long[]{NO_PARAMETERS}, "moveHome" );
+        add(TOKEN_L, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_R, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_DL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_DR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_UL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_UR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_CRL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_CRR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_SKIP, TOKEN_BUTTON, new long[]{PARAMETER_INT} );
+        add(TOKEN_HOME, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
 
-        add(TOKEN_BUTTON, new long[]{
-                TOKEN__HOLDER,
-
+        add(TOKEN_BUTTON, TOKEN_BUTTON, new long[]{
                 TOKEN_TEXT,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
@@ -489,8 +489,6 @@ public class Commands
                 // SEND remains only because label's purposes,
                 // parameters could be given directly to BUTTON
                 "setButton2");
-
-        add(TOKEN__HOLDER, new long[]{PARAMETER_FLAG} );
 
         add(TOKEN_OVERWRITE, new long[]{PARAMETER_FLAG} );
 
@@ -1260,6 +1258,15 @@ public class Commands
         public Method getMethod()
             {
             return method;
+            }
+
+        /**
+         * Commands are stored under group-code in the complex parameters.
+         * @return group code
+         */
+        public long getGroupCode()
+            {
+            return groupCode;
             }
         }
 

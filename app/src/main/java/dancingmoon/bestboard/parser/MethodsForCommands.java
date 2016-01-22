@@ -120,20 +120,6 @@ public class MethodsForCommands
      */
     private class ButtonPlan
         {
-        private final static int MOVE_NO = -1;
-        private final static int MOVE_AUTO = 0;
-        private final static int MOVE_BUTTON = 1;
-        private final static int MOVE_XHOME = 2;
-        private final static int MOVE_XYHOME = 3;
-
-        // true: automatic right move
-        // false: move by relative coordinates
-        private int moveType = MOVE_AUTO;
-
-        private int moveX = 0;
-        private int moveY = 0;
-        private int moveHalfs = 0;
-
         private String buttonName;
 
         private Button button;
@@ -1001,10 +987,12 @@ public class MethodsForCommands
         int homeArrayColumn = (int)parameters.remove(Commands.TOKEN_COLUMN, 1) -1;
         int homeArrayRow = (int)parameters.remove(Commands.TOKEN_ROW, 1) -1;
 
-        ArrayList<ButtonPlan> buttonPlans = (ArrayList<ButtonPlan>)parameters.remove(
-                Bit.setSignedBitOn(Commands.TOKEN_BUTTON) );
+        // TOKEN_BUTTON is a group code
+        // SetSignedBit states, that this will be an array list
+        ArrayList<Object> actionList = (ArrayList<Object>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_BUTTON ) );
 
-        if ( buttonPlans == null )
+        if ( actionList == null )
             {
             Scribe.error( Debug.PARSER, "BLOCK: is EMPTY!!");
             return;
@@ -1018,6 +1006,9 @@ public class MethodsForCommands
             }
         Board board = boardPlan.board;
 
+        // automatic movement
+        boolean autoMove = false;
+
         // button positions
         int arrayColumn = homeArrayColumn;
         int arrayRow = homeArrayRow;
@@ -1025,36 +1016,105 @@ public class MethodsForCommands
         // beginning of the line in the actual row
         int crArrayColumn = homeArrayColumn;
 
-        for ( ButtonPlan buttonPlan : buttonPlans )
+        for ( Object action : actionList )
             {
-            if ( buttonPlan.button != null )
+            // this is a flag
+            if ( action instanceof Long )
                 {
+                autoMove = false;
+                if ( (long)action == Commands.TOKEN_CRL )
+                    {
+                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                        crArrayColumn--;
+                    arrayColumn = crArrayColumn;
+                    arrayRow++;
+                    }
+                else if ( (long)action == Commands.TOKEN_CRR )
+                    {
+                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                        crArrayColumn++;
+                    arrayColumn = crArrayColumn;
+                    arrayRow++;
+                    }
+                else if ( (long)action == Commands.TOKEN_HOME )
+                    {
+                    arrayColumn = homeArrayColumn;
+                    arrayRow = homeArrayRow;
+                    }
+                else if ( (long)action == Commands.TOKEN_L )
+                    {
+                    arrayColumn--;
+                    }
+                else if ( (long)action == Commands.TOKEN_R )
+                    {
+                    arrayColumn++;
+                    }
+                else if ( (long)action == Commands.TOKEN_DL )
+                    {
+                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                        arrayColumn--;
+                    arrayRow++;
+                    }
+                else if ( (long)action == Commands.TOKEN_DR )
+                    {
+                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                        arrayColumn++;
+                    arrayRow++;
+                    }
+                else if ( (long)action == Commands.TOKEN_UL )
+                    {
+                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                        arrayColumn--;
+                    arrayRow--;
+                    }
+                else if ( (long)action == Commands.TOKEN_UR )
+                    {
+                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                        arrayColumn++;
+                    arrayRow--;
+                    }
+                }
+            // this is a skip (int)
+            else if (action instanceof Integer )
+                {
+                autoMove = false;
+                arrayColumn += (int)action + ( (int)action < 0 ? -1 : 1 );
+                }
+            else // this should be a buttonPlan
+                {
+                if ( autoMove ) arrayColumn ++;
+
                 try
                     {
                     if (board.addButton(
                             arrayColumn,
                             arrayRow,
-                            buttonPlan.button.clone()))
+                            ((ButtonPlan) action).button.clone()))
                         {
                         if (parameters.containsKey(Commands.TOKEN_OVERWRITE))
                             {
                             tokenizer.note(R.string.data_button_overwritten,
                                     boardPlan.toString());
-                            } else
+                            }
+                        else
                             {
                             tokenizer.error(R.string.data_button_overwritten,
                                     boardPlan.toString());
                             }
                         }
-                    tokenizer.note(buttonPlan.buttonName, R.string.data_button_added,
-                            boardPlan.toString());
-                    } catch (ExternalDataException ede)
-                    {
-                    tokenizer.error(buttonPlan.buttonName, R.string.data_button_error,
+                    tokenizer.note( ((ButtonPlan)action).buttonName, R.string.data_button_added,
                             boardPlan.toString());
                     }
+                catch (ExternalDataException ede)
+                    {
+                    tokenizer.error( ((ButtonPlan)action).buttonName, R.string.data_button_error,
+                            boardPlan.toString());
+                    }
+
+                autoMove = true;
                 }
 
+            /*
             switch (buttonPlan.moveType)
                 {
                 // MOVE starts from HOME position
@@ -1122,20 +1182,10 @@ public class MethodsForCommands
                     arrayRow += buttonPlan.moveY;
                     break;
 
-                // MOVE automatically to the next position
-                case ButtonPlan.MOVE_AUTO:
-                    arrayColumn++;
-                    break;
-
-                // DO nothing, this is just a _holder
-                case ButtonPlan.MOVE_NO:
-                default:
-                }
+                */
             }
         }
 
-    // last button to add movement information
-    private ButtonPlan lastButtonPlan = new ButtonPlan();
 
     /**
      * Creates temporary button data, which is copied into button position in setBlock
@@ -1144,36 +1194,28 @@ public class MethodsForCommands
      */
     public ButtonPlan setButton2(ExtendedMap<Long, Object> parameters)
         {
-        lastButtonPlan = new ButtonPlan();
-
-        // _HOLDER should be treated specially (and should be read last) !!
-        if ( parameters.remove( Commands.TOKEN__HOLDER ) != null )
-            {
-            // NULL Button should be returned
-            lastButtonPlan.moveType = ButtonPlan.MOVE_NO;
-            return lastButtonPlan;
-            }
+        ButtonPlan buttonPlan = new ButtonPlan();
 
         // "SEND" parameters could be found among "BUTTON"-s parameters
         // For testing reasons SEND remains...
         Object temp = parameters.remove( Commands.TOKEN_SEND );
         if ( temp != null )
             {
-            lastButtonPlan.button = (Button) temp;
+            buttonPlan.button = (Button) temp;
             }
         // ...but if SEND is missing, then parameters are submitted directly
         else
             {
-            lastButtonPlan.button = createButtonFunction(parameters);
+            buttonPlan.button = createButtonFunction(parameters);
             }
 
-        if ( lastButtonPlan.button == null )
+        if ( buttonPlan.button == null )
             {
             tokenizer.error( "BUTTON", R.string.data_button_function_missing);
-            lastButtonPlan.button = new Button();
+            buttonPlan.button = new Button();
             }
 
-        lastButtonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
+        buttonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
 
         // if no titles are added, then addTitle will add one based on default titleSlot
         // an empty parameter list is needed
@@ -1186,31 +1228,17 @@ public class MethodsForCommands
         StringBuilder buttonNameBuilder = new StringBuilder();
         for ( TitleDescriptor title : titles )
             {
-            title.checkText(lastButtonPlan.button.getString());
+            title.checkText(buttonPlan.button.getString());
             buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
             }
         buttonNameBuilder.setCharAt(0, '\"');
-        lastButtonPlan.buttonName = buttonNameBuilder.append('\"').toString();
+        buttonPlan.buttonName = buttonNameBuilder.append('\"').toString();
 
-        lastButtonPlan.button.setTitles(titles);
+        buttonPlan.button.setTitles(titles);
 
-        return lastButtonPlan;
+        return buttonPlan;
         }
-
-    public void moveL()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
-        lastButtonPlan.moveX--;
-        }
-
-    public void moveR()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
-        lastButtonPlan.moveX++;
-        }
-
+/*
     public void moveDL()
         {
         if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
@@ -1261,13 +1289,6 @@ public class MethodsForCommands
         lastButtonPlan.moveHalfs++;
         }
 
-    public void moveSkip( Object intParameter )
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
-        lastButtonPlan.moveX += (int)intParameter + ( (int)intParameter < 0 ? -1 : 1 );
-        }
-
     public void moveHome()
         {
         if ( lastButtonPlan.moveType < ButtonPlan.MOVE_XYHOME )
@@ -1276,7 +1297,7 @@ public class MethodsForCommands
         lastButtonPlan.moveY = 0;
         lastButtonPlan.moveHalfs = 0;
         }
-
+*/
 
     public void setButton(ExtendedMap<Long, Object> parameters)
         {

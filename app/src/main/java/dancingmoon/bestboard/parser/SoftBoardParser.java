@@ -341,7 +341,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
         int tokenType;
         
-        // Parameter-command's code and data
+        // Parameter-command's (inside cycle) code and data
         long commandCode;
         String commandString; // Just for debugging
         Commands.Data commandData;
@@ -477,9 +477,9 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             // Label parameter
             //      No further method is called
             // Flag parameter - doesn't have any parameter, but still will be stored
-            // among returnParameters with a fake Boolean.TRUE Object
+            // among returnParameters with a fake (long command-code itself) Object
             //      Parameters for method: none ()
-            //      Returned value: result of the method (if any) - or a fake Object ( ?? )
+            //      Returned value: result of the method (if any) - or the fake Object
             // No parameter
             //      Parameters for method: none ()
             //      Returned value: result of the method (if any) or nothing
@@ -582,7 +582,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as FLAG." );
 
                 // fake Object is needed to be stored among returnParameters
-                result = true;
+                result = commandCode;
                 }
 
             // Parameter-command is a special STOP message
@@ -668,40 +668,45 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 Scribe.debug( Debug.PARSER, "[" + commandString + "] has no method." );
                 }
 
-            // if result is not null, it will part of the returnParameters as commandCode-result pair
+            // if result is not null, it will part of the returnParameters as groupCode-result pair
             if (result != null)
                 {
+                long groupCode = commandData.getGroupCode();
+
                 // commandMultiple cannot be 0 (already checked. -1: multiple, +1: single
                 if ( commandMultiple > 0 )
                     {
                     // if there was a previous result - it is overwritten
-                    previousResult = returnParameters.put(commandCode, result);
+                    previousResult = returnParameters.put( groupCode, result );
                     if ( previousResult == null )
                         {
                         Scribe.debug( Debug.PARSER, "[" + commandString + "] (" + commandCode +
-                                ") has single result: " + result);
+                                ") has single result: " + result + " under group code: " + groupCode );
                         }
                     else
                         {
                         Scribe.debug( Debug.PARSER, "[" + commandString + "] (" + commandCode +
-                                ") overwrites previuos result (" + previousResult + ") with single result: " + result);
+                                ") overwrites previous result (" + previousResult + ") with single result: " + result +
+                                " under group code: " + groupCode );
                         tokenizer.note( commandString, R.string.parser_previous_overwritten);
                         }
                     }
                 else // MULTIPLE
                     {
-                    commandCode = Bit.setSignedBitOn( commandCode );
+                    groupCode = Bit.setSignedBitOn( groupCode );
                     ArrayList<Object> list;
 
-                    list = (ArrayList<Object>)returnParameters.get(commandCode);
+                    list = (ArrayList<Object>)returnParameters.get( groupCode );
                     if ( list == null )
                         {
                         list = new ArrayList<Object>();
-                        returnParameters.put(commandCode, list);
+                        returnParameters.put( groupCode, list);
                         }
 
                     list.add( result );
-                    Scribe.debug(Debug.PARSER, "[" + commandString + "] (" + commandCode + ") has multiple result: " + list);
+                    Scribe.debug(Debug.PARSER, "[" + commandString + "] (" + commandCode +
+                            ") has multiple result: " + list +
+                            " under group code: " + groupCode );
                     }
                 }
 
@@ -1283,6 +1288,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
         tokenizer.note(typeAsString, R.string.parser_default_added);
 
+        // !! tokenizer.note should be used - or not?? !!
         Scribe.debug(Debug.PARSER, "Default is" + (value == null ? " added: " : "changed: ") + valueAsString);
         }
 
