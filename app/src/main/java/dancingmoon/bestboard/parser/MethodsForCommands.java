@@ -39,6 +39,7 @@ import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.utils.Bit;
 import dancingmoon.bestboard.utils.ExtendedMap;
 import dancingmoon.bestboard.utils.ExternalDataException;
+import dancingmoon.bestboard.utils.KeyValuePair;
 import dancingmoon.bestboard.utils.SinglyLinkedList;
 import dancingmoon.bestboard.utils.Trilean;
 
@@ -539,7 +540,7 @@ public class MethodsForCommands
     public void setCursor(ExtendedMap<Long, Object> parameters)
         {
         // No other parameters are allowed with NONE
-        if ( parameters.containsKey( Commands.TOKEN_NONE ) )
+        if ( (boolean)parameters.remove( Commands.TOKEN_NONE, false ) )
             {
             setCursorNone();
             if ( parameters.size() != 2 )
@@ -823,7 +824,7 @@ public class MethodsForCommands
             else // if (temp instanceof String)
                 {
                 packet = new PacketText( softBoardData, (String)temp, autoCaps,
-                        parameters.containsKey( Commands.TOKEN_STRINGCAPS), autoSpace );
+                        (boolean)parameters.remove( Commands.TOKEN_STRINGCAPS, false), autoSpace );
                 }
             }
 
@@ -988,8 +989,8 @@ public class MethodsForCommands
         int homeArrayRow = (int)parameters.remove(Commands.TOKEN_ROW, 1) -1;
 
         // TOKEN_BUTTON is a group code
-        // SetSignedBit states, that this will be an array list
-        ArrayList<Object> actionList = (ArrayList<Object>)parameters.remove(
+        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
+        ArrayList<KeyValuePair> actionList = (ArrayList<KeyValuePair>)parameters.remove(
                 Bit.setSignedBitOn( Commands.TOKEN_BUTTON ) );
 
         if ( actionList == null )
@@ -1016,71 +1017,9 @@ public class MethodsForCommands
         // beginning of the line in the actual row
         int crArrayColumn = homeArrayColumn;
 
-        for ( Object action : actionList )
+        for ( KeyValuePair action : actionList )
             {
-            // this is a flag
-            if ( action instanceof Long )
-                {
-                autoMove = false;
-                if ( (long)action == Commands.TOKEN_CRL )
-                    {
-                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
-                        crArrayColumn--;
-                    arrayColumn = crArrayColumn;
-                    arrayRow++;
-                    }
-                else if ( (long)action == Commands.TOKEN_CRR )
-                    {
-                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
-                        crArrayColumn++;
-                    arrayColumn = crArrayColumn;
-                    arrayRow++;
-                    }
-                else if ( (long)action == Commands.TOKEN_HOME )
-                    {
-                    arrayColumn = homeArrayColumn;
-                    arrayRow = homeArrayRow;
-                    }
-                else if ( (long)action == Commands.TOKEN_L )
-                    {
-                    arrayColumn--;
-                    }
-                else if ( (long)action == Commands.TOKEN_R )
-                    {
-                    arrayColumn++;
-                    }
-                else if ( (long)action == Commands.TOKEN_DL )
-                    {
-                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
-                        arrayColumn--;
-                    arrayRow++;
-                    }
-                else if ( (long)action == Commands.TOKEN_DR )
-                    {
-                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
-                        arrayColumn++;
-                    arrayRow++;
-                    }
-                else if ( (long)action == Commands.TOKEN_UL )
-                    {
-                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
-                        arrayColumn--;
-                    arrayRow--;
-                    }
-                else if ( (long)action == Commands.TOKEN_UR )
-                    {
-                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
-                        arrayColumn++;
-                    arrayRow--;
-                    }
-                }
-            // this is a skip (int)
-            else if (action instanceof Integer )
-                {
-                autoMove = false;
-                arrayColumn += (int)action + ( (int)action < 0 ? -1 : 1 );
-                }
-            else // this should be a buttonPlan
+            if ( action.getKey() == Commands.TOKEN_BUTTON )
                 {
                 if ( autoMove ) arrayColumn ++;
 
@@ -1089,9 +1028,9 @@ public class MethodsForCommands
                     if (board.addButton(
                             arrayColumn,
                             arrayRow,
-                            ((ButtonPlan) action).button.clone()))
+                            ((ButtonPlan) action.getValue()).button.clone()))
                         {
-                        if (parameters.containsKey(Commands.TOKEN_OVERWRITE))
+                        if ((boolean)parameters.remove(Commands.TOKEN_OVERWRITE, false))
                             {
                             tokenizer.note(R.string.data_button_overwritten,
                                     boardPlan.toString());
@@ -1102,87 +1041,80 @@ public class MethodsForCommands
                                     boardPlan.toString());
                             }
                         }
-                    tokenizer.note( ((ButtonPlan)action).buttonName, R.string.data_button_added,
+                    tokenizer.note( ((ButtonPlan)action.getValue()).buttonName, R.string.data_button_added,
                             boardPlan.toString());
                     }
                 catch (ExternalDataException ede)
                     {
-                    tokenizer.error( ((ButtonPlan)action).buttonName, R.string.data_button_error,
+                    tokenizer.error( ((ButtonPlan)action.getValue()).buttonName, R.string.data_button_error,
                             boardPlan.toString());
                     }
 
                 autoMove = true;
+
+                continue;
                 }
 
-            /*
-            switch (buttonPlan.moveType)
+            // all others are moving commands, no autoMove is needed
+            autoMove = false;
+
+            if ( action.getKey() == Commands.TOKEN_CRL )
                 {
-                // MOVE starts from HOME position
-                case ButtonPlan.MOVE_XYHOME:
-                    arrayColumn = homeArrayColumn + buttonPlan.moveX + buttonPlan.moveHalfs / 2;
-                    if ( (homeArrayRow + board.rowsAlignOffset) % 2 == 1 )
-                        {
-                        if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
-                            {
-                            arrayColumn ++;
-                            }
-                        }
-                    else
-                        {
-                        if ( buttonPlan.moveHalfs % 2 < 0 ) // +1 is not allowed!!
-                            {
-                            arrayColumn --;
-                            }
-                        }
-                    arrayRow = homeArrayRow + buttonPlan.moveY;
-                    break;
-
-                // MOVE starts from the beginning of the line (CR - Carriage Return)
-                // The new beginning starts from the new position!!
-                case ButtonPlan.MOVE_XHOME:
-                    crArrayColumn += (buttonPlan.moveX + buttonPlan.moveHalfs / 2);
-                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
-                        {
-                        if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
-                            {
-                            crArrayColumn ++;
-                            }
-                        }
-                    else
-                        {
-                        if ( buttonPlan.moveHalfs % 2 < 0 ) // +1 is not allowed!!
-                            {
-                            crArrayColumn --;
-                            }
-                        }
-                    arrayColumn = crArrayColumn;
-                    arrayRow += buttonPlan.moveY;
-                    break;
-
-                // MOVE starts from the last button
-                case ButtonPlan.MOVE_BUTTON:
-                    // it could be calculated also like this:
-                    // arrayColumn += ((buttonPlan.moveHalfs%2 + ((arrayRow + board.rowsAlignOffset)%2)*2 - 1) / 2);
-
-                    arrayColumn += (buttonPlan.moveX + buttonPlan.moveHalfs / 2);
-                    if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
-                        {
-                        if ( buttonPlan.moveHalfs % 2 > 0 ) // -1 is not allowed!!
-                            {
-                            arrayColumn ++;
-                            }
-                        }
-                    else
-                        {
-                        if ( buttonPlan.moveHalfs % 2 < 0 ) // +1 is not allowed!!
-                            {
-                            arrayColumn --;
-                            }
-                        }
-                    arrayRow += buttonPlan.moveY;
-                    break;
-
-                */
+                if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                    crArrayColumn--;
+                arrayColumn = crArrayColumn;
+                arrayRow++;
+                }
+            else if ( action.getKey() == Commands.TOKEN_CRR )
+                {
+                if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                    crArrayColumn++;
+                arrayColumn = crArrayColumn;
+                arrayRow++;
+                }
+            else if ( action.getKey() == Commands.TOKEN_HOME )
+                {
+                arrayColumn = homeArrayColumn;
+                arrayRow = homeArrayRow;
+                crArrayColumn = homeArrayColumn;
+                }
+            else if ( action.getKey() == Commands.TOKEN_L )
+                {
+                arrayColumn--;
+                }
+            else if ( action.getKey() == Commands.TOKEN_R )
+                {
+                arrayColumn++;
+                }
+            else if ( action.getKey() == Commands.TOKEN_DL )
+                {
+                if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                    arrayColumn--;
+                arrayRow++;
+                }
+            else if ( action.getKey() == Commands.TOKEN_DR )
+                {
+                if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                    arrayColumn++;
+                arrayRow++;
+                }
+            else if ( action.getKey() == Commands.TOKEN_UL )
+                {
+                if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                    arrayColumn--;
+                arrayRow--;
+                }
+            else if ( action.getKey() == Commands.TOKEN_UR )
+                {
+                if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                    arrayColumn++;
+                arrayRow--;
+                }
+            // this is a skip (int)
+            else if (action.getKey() == Commands.TOKEN_SKIP )
+                {
+                arrayColumn += (int)action.getValue() + ( (int)action.getValue() < 0 ? -1 : 1 );
+                }
             }
         }
 
@@ -1218,7 +1150,9 @@ public class MethodsForCommands
         buttonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
 
         // if no titles are added, then addTitle will add one based on default titleSlot
-        // an empty parameter list is needed
+        // or an empty parameter list is needed
+
+        ExtendedMap<Long, Object> defaultTitle = SoftBoardParser.defaults.get( Commands.TOKEN_ADDTITLE );
         SinglyLinkedList<TitleDescriptor> titles =
                 (SinglyLinkedList<TitleDescriptor>)parameters.remove(Commands.TOKEN_ADDTITLE,
                         addTitle(new ExtendedMap<Long, Object>(0)));
@@ -1238,66 +1172,7 @@ public class MethodsForCommands
 
         return buttonPlan;
         }
-/*
-    public void moveDL()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
-        lastButtonPlan.moveY++;
-        lastButtonPlan.moveHalfs--;
-        }
 
-    public void moveDR()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
-        lastButtonPlan.moveY++;
-        lastButtonPlan.moveHalfs++;
-        }
-
-    public void moveUL()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
-        lastButtonPlan.moveY--;
-        lastButtonPlan.moveHalfs--;
-        }
-
-    public void moveUR()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_BUTTON )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_BUTTON;
-        lastButtonPlan.moveY--;
-        lastButtonPlan.moveHalfs++;
-        }
-
-    public void moveCRL()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_XHOME )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_XHOME;
-        lastButtonPlan.moveX = 0;
-        lastButtonPlan.moveY++;
-        lastButtonPlan.moveHalfs--;
-        }
-
-    public void moveCRR()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_XHOME )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_XHOME;
-        lastButtonPlan.moveX = 0;
-        lastButtonPlan.moveY++;
-        lastButtonPlan.moveHalfs++;
-        }
-
-    public void moveHome()
-        {
-        if ( lastButtonPlan.moveType < ButtonPlan.MOVE_XYHOME )
-            lastButtonPlan.moveType = ButtonPlan.MOVE_XYHOME;
-        lastButtonPlan.moveX = 0;
-        lastButtonPlan.moveY = 0;
-        lastButtonPlan.moveHalfs = 0;
-        }
-*/
 
     public void setButton(ExtendedMap<Long, Object> parameters)
         {
@@ -1352,7 +1227,7 @@ public class MethodsForCommands
                         includedBoardPlan.cursorRow,
                         button.clone() ))
                     {
-                    if ( parameters.containsKey( Commands.TOKEN_OVERWRITE ) )
+                    if ( (boolean)parameters.remove(Commands.TOKEN_OVERWRITE, false) )
                         {
                         tokenizer.note( R.string.data_button_overwritten,
                                 includedBoardPlan.toString() );
@@ -1513,7 +1388,7 @@ public class MethodsForCommands
         boolean empty = true;
         int counter = 0;
 
-        // ADDROLL-s were used!
+        // ADDROLL-s are used!
         if ( tempRolls.size() > 0)
             {
             empty = true;

@@ -2,7 +2,7 @@
 <resources>
 
     <string name="descriptor_directory_default">"_bestboard"</string>
-    <string name="descriptor_file_default">kinesa.txt</string>
+    <string name="descriptor_file_default">test.txt</string>
 
     <bool name="drawing_hide_upper_default">false</bool>
     <bool name="drawing_hide_lower_default">false</bool>

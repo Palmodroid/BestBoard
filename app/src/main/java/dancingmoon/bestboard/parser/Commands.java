@@ -26,8 +26,9 @@ public class Commands
     // Special code for first level commands
     public final static long ADDSOFTBOARD = 0x10000L;
 
-    public static final long TOKEN_LET = 0x1726fL;
     public static final long TOKEN_DEFAULT = 0x7ffa8362fL;
+    public static final long TOKEN_LET = 0x1726fL;
+    public static final long TOKEN_CHANGE = 0x3388a1fbL;
 
     // Token codes for complex parameter-commands - POSITIVE VALUES !!
     public static final long TOKEN_NAME = 0x12ff90L;
@@ -220,13 +221,18 @@ public class Commands
     public final static long PARAMETER_MOD_LIST = 0x10L;
 
     // Flag parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
-    public final static long PARAMETER_FLAG = 0x20L;
-
-    // Label parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
-    public final static long PARAMETER_LABEL = 0x40L;
+    public final static long PARAMETER_FLAG = 0x20L;        // Stores Boolean.TRUE
+    public final static long PARAMETER_FLAG_FALSE = 0x21L;  // Stores Boolean.FALSE
 
     // Default parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
     public final static long PARAMETER_DEFAULT = 0x41L;
+
+    // Label parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
+    public final static long PARAMETER_LABEL = 0x42L;
+
+    // Label parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
+    // Same as label, but change existing label without error
+    public final static long PARAMETER_CHANGE_LABEL = 0x43L;
 
     // Special "messages" are not real parameters, but messages to the parser
     // Messages - POSITIVE VALUES, ABOVE ONE AND BELOW NO-PARAMETER TYPES !!
@@ -236,7 +242,7 @@ public class Commands
     public final static long NO_PARAMETERS = 0xFFL;
 
     // These tokens (parameter-commands) can be defined as labels
-    public final static long[] DEFAULT_LABEL_ALLOWED = new long[]{
+    public final static long[] ALLOWED_AS_LABEL = new long[]{
             TOKEN_ADDBOARD,
             TOKEN_BLOCK,
             TOKEN_CURSOR,
@@ -244,6 +250,13 @@ public class Commands
             TOKEN_BUTTON,
             TOKEN_ADDTITLE };
 
+    // These tokens (parameter-commands) can be defined as labels
+    public final static long[] ALLOWED_AS_DEFAULT = new long[]{
+            TOKEN_ADDBOARD,
+            TOKEN_CURSOR,
+            TOKEN_SEND,
+            TOKEN_BUTTON,
+            TOKEN_ADDTITLE };
 
     /**
      * Parameter-commands are stored in an unmodifiable hash-HashMap (LIST)
@@ -342,8 +355,9 @@ public class Commands
                 TOKEN_STOP
         } );
 
-        add(TOKEN_LET, new long[]{PARAMETER_LABEL} );
         add(TOKEN_DEFAULT, new long[]{PARAMETER_DEFAULT} );
+        add(TOKEN_LET, new long[]{PARAMETER_LABEL} );
+        add(TOKEN_CHANGE, new long[]{PARAMETER_CHANGE_LABEL} );
 
         add(TOKEN_NAME, new long[]{PARAMETER_STRING}, "setName" );
         add(TOKEN_VERSION, new long[]{PARAMETER_INT}, "setVersion" );
@@ -376,17 +390,6 @@ public class Commands
         add(TOKEN_NONETITLE, new long[]{PARAMETER_TEXT}, "setNoneTitle" );
         add(TOKEN_UNKNOWNTITLE, new long[]{PARAMETER_TEXT}, "setUnknownTitle" );
 
-        add( TOKEN_ADDSLOT, new long[]{
-                TOKEN_ID, TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
-                TOKEN_BOLD, TOKEN_ITALICS, TOKEN_COLOR }, "addSlot" );
-        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_XOFFSET, new long[]{PARAMETER_INT} );
-        add(TOKEN_YOFFSET, new long[]{PARAMETER_INT} );
-        add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
-        add(TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR} );
-
         add(TOKEN_ADDBOARD, new long[]{
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
                 TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
@@ -400,7 +403,7 @@ public class Commands
         add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT} );
         add(TOKEN_ROWS, new long[]{PARAMETER_INT} );
         add(TOKEN_ALIGN, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR} );
+        // TOKEN_COLOR is already definied
 
         add( TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN} );
         add( TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN} );
@@ -569,6 +572,17 @@ public class Commands
         // TOKEN_BOLD is already defined
         // TOKEN_ITALICS is already defined
         // TOKEN_COLOR is already defined
+
+        add( TOKEN_ADDSLOT, new long[]{
+                TOKEN_ID, TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
+                TOKEN_BOLD, TOKEN_ITALICS, TOKEN_COLOR }, "addSlot" );
+        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_XOFFSET, new long[]{PARAMETER_INT} );
+        add(TOKEN_YOFFSET, new long[]{PARAMETER_INT} );
+        add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
+        add(TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR} );
 
         add( TOKEN_ADDLINK, new long[]{
                 TOKEN_INDEX, TOKEN_BOARD,
