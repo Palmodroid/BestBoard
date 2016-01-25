@@ -54,17 +54,15 @@ public class MethodsForCommands
      */
     private Tokenizer tokenizer;
 
+    private ExtendedMap< Long, ExtendedMap< Long, Object>> defaults;
+
     private SoftBoardData softBoardData;
 
-    public Tokenizer getTokenizer()
-        {
-        return tokenizer;
-        }
-
-    public MethodsForCommands( SoftBoardData softBoardData, Tokenizer tokenizer )
+    public MethodsForCommands( SoftBoardData softBoardData, SoftBoardParser softBoardParser )
         {
         this.softBoardData = softBoardData;
-        this.tokenizer = tokenizer;
+        this.tokenizer = softBoardParser.getTokenizer();
+        this.defaults = softBoardParser.getDefaults();
         }
 
 
@@ -175,9 +173,17 @@ public class MethodsForCommands
 
     public void createDefaultSlots()
         {
+        // !!!!!!!!!!!!!!!!!! NEM KELL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         Slots.put(
                 0L,
                 new Slot(0, 250, 1200, false, false, Color.BLACK));
+
+        ExtendedMap<Long, Object> defaultTitle = new ExtendedMap<>();
+        defaultTitle.put( Commands.TOKEN_YOFFSET, 250 ); // PARAMETER_INT
+        defaultTitle.put( Commands.TOKEN_SIZE, 1200 ); // PARAMETER_INT
+        defaultTitle.put( Commands.TOKEN_COLOR, Color.BLACK ); // PARAMETER_COLOR (int)
+
+        defaults.put( Commands.TOKEN_ADDTITLE, defaultTitle );
         }
 
     /**
@@ -1151,11 +1157,19 @@ public class MethodsForCommands
 
         // if no titles are added, then addTitle will add one based on default titleSlot
         // or an empty parameter list is needed
+        ExtendedMap<Long, Object> defaultTitle;
+        if ( defaults.containsKey( Commands.TOKEN_ADDTITLE ) )
+            {
+            defaultTitle = (ExtendedMap<Long, Object>)(defaults.get( Commands.TOKEN_ADDTITLE )).clone();
+            }
+        else
+            {
+            defaultTitle = new ExtendedMap<Long, Object>(0);
+            }
 
-        ExtendedMap<Long, Object> defaultTitle = SoftBoardParser.defaults.get( Commands.TOKEN_ADDTITLE );
         SinglyLinkedList<TitleDescriptor> titles =
                 (SinglyLinkedList<TitleDescriptor>)parameters.remove(Commands.TOKEN_ADDTITLE,
-                        addTitle(new ExtendedMap<Long, Object>(0)));
+                        addTitle( defaultTitle ));
 
         // if title text is null, code should be used
         // button id can be created from the titles (and from the code)
@@ -1199,7 +1213,9 @@ public class MethodsForCommands
 
         button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
 
-        // if no titles are added, then addTitle will add one based on default titleSlot
+        // if no titles are added, then addTitle will add one based on default title
+        ExtendedMap<Long, Object> defaultTitle = defaults.get(Commands.TOKEN_ADDTITLE);
+
         // an empty parameter list is needed
         SinglyLinkedList<TitleDescriptor> titles =
                 (SinglyLinkedList<TitleDescriptor>)parameters.remove(Commands.TOKEN_ADDTITLE,

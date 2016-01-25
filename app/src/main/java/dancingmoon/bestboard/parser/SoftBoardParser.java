@@ -15,14 +15,13 @@ import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.R;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.SoftBoardData.SoftBoardListener;
+import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.Bit;
 import dancingmoon.bestboard.utils.ExtendedMap;
@@ -45,6 +44,11 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
     // parseDescriptorFile creates tokenizer - temporary
     private Tokenizer tokenizer;
 
+    public Tokenizer getTokenizer()
+        {
+        return tokenizer;
+        }
+
     // parseSoftBoard creates softBoardata
     private SoftBoardData softBoardData;
 
@@ -52,9 +56,20 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
     private Labels labels;
 
     // parseSoftBoard creates default values for complex parameters - temporary
-    private ExtendedMap< Long, ExtendedMap< Long, Object>> defaults = new ExtendedMap<>();
+    private ExtendedMap< Long, ExtendedMap< Long, Object>> defaults;
+
+    public ExtendedMap< Long, ExtendedMap< Long, Object>> getDefaults()
+        {
+        return defaults;
+        }
 
     // (Static) Commands class is needed, too
+
+    /**
+     * Methods needed by parsing phase (during data-load).
+     * It should be cleared, after data-load is ready.
+     */
+    public MethodsForCommands methodsForCommands;
 
 
     /**
@@ -300,7 +315,11 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             }
 
         labels = Commands.createLabels();
-        softBoardData = new SoftBoardData( caller.getSoftBoardDataListener(), tokenizer );
+        defaults = new ExtendedMap<>();
+        softBoardData = new SoftBoardData( caller.getSoftBoardDataListener() );
+
+        methodsForCommands = new MethodsForCommands( softBoardData, this );
+        methodsForCommands.createDefaultSlots();
 
         try
             {
@@ -316,7 +335,19 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             tokenizer.error( R.string.parser_addsoftboard_data_missing );
             }
 
-        softBoardData.parsingFinished();
+        // This was originally the SoftBoardData.parserFinished();
+
+        if ( softBoardData.firstBoard == null )
+            {
+            throw new ExternalDataException("No board!");
+            }
+
+        if ( softBoardData.linkState.isFirstBoardMissing() )
+            {
+            softBoardData.linkState.setLinkBoardTable( 0, softBoardData.firstBoard );
+            tokenizer.error(R.string.data_primary_board_missing);
+            }
+
         }
 
 
@@ -505,10 +536,16 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     continue;
                     }
 
+                ExtendedMap<Long, Object> forwardedDefaults = null;
+                if ( defaults.containsKey(commandCode) )
+                    {
+                    forwardedDefaults = (ExtendedMap<Long, Object>)(defaults.get(commandCode)).clone();
+                    }
+
                 // tokenizer.note( commandString, R.string.parser_complex_started);
                 forwardParameters = parseComplexParameter(commandCode,
                         commandData.getAllowedParameters(),
-                        defaults.get( commandCode ));
+                        forwardParameters );
 
                 // forward results of previous parameter-commands with the same code to method
                 // forwarded value can be null
@@ -577,7 +614,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 {
                 Scribe.debug( Debug.PARSER, "[" + commandString + "] creates label." );
 
-                parseLabelParameter( true );
+                parseLabelParameter(true);
                 continue;
 
                 // no method to call; no result to return
@@ -588,7 +625,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 {
                 Scribe.debug( Debug.PARSER, "[" + commandString + "] creates label." );
 
-                parseLabelParameter( false );
+                parseLabelParameter(false);
                 continue;
 
                 // no method to call; no result to return
@@ -641,7 +678,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     // Parameter-command has COMPLEX parameters - forwardParameters
                     if ( commandData.getParameterType() >= Tokenizer.TOKEN_CODE_SHIFT || commandData.getParameterType() < 0L )
                         {
-                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands, forwardParameters);
+                        result = commandData.getMethod().invoke( methodsForCommands, forwardParameters);
                         // As 'get' removes the entries from forwardparameters, it should be empty after the call
 
                         if ( forwardParameters.size() > 0 )
@@ -655,13 +692,13 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                         }
                     // Parameter-command has ONE parameter - result
                     else if ( commandData.getParameterType() <= Commands.PARAMETER_KEYWORD )
-                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands, result );
+                        result = commandData.getMethod().invoke( methodsForCommands, result );
                     // Parameter-command has LIST parameter - result
                     else if ( commandData.getParameterType() <= ( Commands.PARAMETER_KEYWORD | Commands.PARAMETER_MOD_LIST) )
-                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands, (List)result );
+                        result = commandData.getMethod().invoke( methodsForCommands, (List)result );
                     // Parameter-command has NO or FLAG parameters - no parameters
                     else
-                        result = commandData.getMethod().invoke(softBoardData.methodsForCommands );
+                        result = commandData.getMethod().invoke( methodsForCommands );
                     // Label-parameters cannot arrive here
 
                     // if ( result != null )

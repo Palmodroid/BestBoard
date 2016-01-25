@@ -15,29 +15,15 @@ import java.util.Locale;
 import dancingmoon.bestboard.buttons.TitleDescriptor;
 import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.modify.Modify;
-import dancingmoon.bestboard.parser.MethodsForCommands;
-import dancingmoon.bestboard.parser.Tokenizer;
 import dancingmoon.bestboard.prefs.PrefsFragment;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.server.TextBeforeCursor;
 import dancingmoon.bestboard.states.BoardStates;
 import dancingmoon.bestboard.states.LinkState;
-import dancingmoon.bestboard.utils.ExternalDataException;
 
 
 public class SoftBoardData
     {
-    /**
-     ** TEMPORARY CLASSES NEEDED ONLY BY THE PARSING PHASE
-     **/
-
-    /**
-     * Methods needed by parsing phase (during data-load).
-     * It should be cleared, after data-load is ready.
-     */
-    public MethodsForCommands methodsForCommands;
-
-
     /**
      ** VARIABLES NEEDED BY THE SOFTBOARD
      ** (Variables are initialized with default values)
@@ -316,13 +302,11 @@ public class SoftBoardData
     /**
      * Constructor
      * Definies default TitleSlots
-     * @param tokenizer to use for messages
      * @param softBoardListener to connect with service
      */
-    public SoftBoardData( SoftBoardListener softBoardListener, Tokenizer tokenizer )
+    public SoftBoardData( SoftBoardListener softBoardListener )
         {
         this.softBoardListener = softBoardListener;
-        this.methodsForCommands = new MethodsForCommands( this, tokenizer );
 
         // static variables should be deleted!!
         TitleDescriptor.setTypeface( null );
@@ -332,33 +316,12 @@ public class SoftBoardData
 
         linkState = new LinkState( softBoardListener );
 
-        methodsForCommands.createDefaultSlots();
-
         // This could go into parsingFinished()
         readPreferences();
         }
 
-    /**
-     * Tokenizer is not needed after the parsing process
-     */
-    public void parsingFinished() throws ExternalDataException
-        {
-        if ( firstBoard == null )
-            {
-            throw new ExternalDataException("No board!");
-            }
 
-        if ( linkState.isFirstBoardMissing() )
-            {
-            linkState.setLinkBoardTable( 0, firstBoard );
-            methodsForCommands.getTokenizer().error(R.string.data_primary_board_missing);
-            }
-
-        methodsForCommands = null;
-        }
-
-
-    /**
+   /**
      ** SETTERS AND GETTERS CALLED DURING RUNTIME
      **/
 
