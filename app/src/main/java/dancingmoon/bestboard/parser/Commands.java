@@ -44,8 +44,6 @@ public class Commands
     public static final long TOKEN_COUNTRY = 0x791c65f9aL;
     public static final long TOKEN_VARIANT = 0x12b1368887L;
 
-    public static final long TOKEN_SLOT = 0x17180dL;
-
     public static final long TOKEN_METACOLOR = 0x478ed1032506L;
     public static final long TOKEN_LOCKCOLOR = 0x45300a4413a0L;
     public static final long TOKEN_AUTOCOLOR = 0x229aefe38af0L;
@@ -63,7 +61,6 @@ public class Commands
     public static final long TOKEN_NONETITLE = 0x4b9a25bff026L;
     public static final long TOKEN_UNKNOWNTITLE = 0x4ba5296e5766a85dL;
 
-    public static final long TOKEN_ADDSLOT = 0x6309100f5L;
     public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
     public static final long TOKEN_YOFFSET = 0x14b484849aL;
@@ -99,22 +96,11 @@ public class Commands
     public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
     public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
 
-    public static final long TOKEN_CURSOR = 0x3509a5d7L;
-    public static final long TOKEN_NONE = 0x134a93L;
-    public static final long TOKEN_ALSO = 0x92f12L;
-    public static final long TOKEN_ONLY = 0x140ae1L;
     public static final long TOKEN_BOARD = 0x14e5880L;
     public static final long TOKEN_COLUMN = 0x34597767L;
     public static final long TOKEN_ROW = 0x193faL;
 
-    public static final long TOKEN_NEXT = 0x13169aL;
-    public static final long TOKEN_NEXTROW = 0xdfb045ec9L;
-
-//    public static final long TOKEN_SKIP = 0x1711d2L;
-    public static final long TOKEN_SKIPROW = 0x110ec65621L;
-
     public static final long TOKEN_OVERWRITE = 0x4f61843c6a0fL;
-    public static final long TOKEN_TRANSFORM = 0x5effb66e5b7cL;
 
     public static final long TOKEN_BUTTON = 0x30e91c11L;
 
@@ -245,7 +231,6 @@ public class Commands
     public final static long[] ALLOWED_AS_LABEL = new long[]{
             TOKEN_ADDBOARD,
             TOKEN_BLOCK,
-            TOKEN_CURSOR,
             TOKEN_SEND,
             TOKEN_BUTTON,
             TOKEN_ADDTITLE };
@@ -253,7 +238,6 @@ public class Commands
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] ALLOWED_AS_DEFAULT = new long[]{
             TOKEN_ADDBOARD,
-            TOKEN_CURSOR,
             TOKEN_SEND,
             TOKEN_BUTTON,
             TOKEN_ADDTITLE };
@@ -312,9 +296,10 @@ public class Commands
         // - array (long) of allowed parameters for this command
         //      AT LEAST FIRST ITEM IS NEEDED (NO_PARAMETERS if there are no parameters allowed)
         // - method to call in SoftBoardClass (method should have a map parameter)
-        add(ADDSOFTBOARD, new long[] {
-                TOKEN_LET,
+        add(ADDSOFTBOARD, new long[]{
                 TOKEN_DEFAULT,
+                TOKEN_LET,
+                TOKEN_CHANGE,
 
                 TOKEN_NAME,
                 TOKEN_VERSION,
@@ -341,54 +326,48 @@ public class Commands
                 TOKEN_NONETITLE,
                 TOKEN_UNKNOWNTITLE,
 
-                TOKEN_ADDSLOT,
                 TOKEN_ADDBOARD,
                 TOKEN_BLOCK,
 
-                TOKEN_CURSOR,
-                TOKEN_NEXT,
-                TOKEN_NEXTROW,
-                TOKEN_SKIPROW,
-                TOKEN_BUTTON,
                 TOKEN_ADDLINK,
                 TOKEN_ADDMODIFY,
                 TOKEN_STOP
-        } );
+        });
 
-        add(TOKEN_DEFAULT, new long[]{PARAMETER_DEFAULT} );
-        add(TOKEN_LET, new long[]{PARAMETER_LABEL} );
-        add(TOKEN_CHANGE, new long[]{PARAMETER_CHANGE_LABEL} );
+        add(TOKEN_DEFAULT, new long[]{PARAMETER_DEFAULT});
+        add(TOKEN_LET, new long[]{PARAMETER_LABEL});
+        add(TOKEN_CHANGE, new long[]{PARAMETER_CHANGE_LABEL});
 
-        add(TOKEN_NAME, new long[]{PARAMETER_STRING}, "setName" );
-        add(TOKEN_VERSION, new long[]{PARAMETER_INT}, "setVersion" );
-        add(TOKEN_AUTHOR, new long[]{PARAMETER_STRING}, "setAuthor" );
-        add(TOKEN_ADDTAGS, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)}, "addTags" );
-        add(TOKEN_DESCRIPTION, new long[]{PARAMETER_STRING}, "setDescription" );
-        add(TOKEN_DOCFILE, new long[]{PARAMETER_FILE}, "setDocFile" );
-        add(TOKEN_DOCURI, new long[]{PARAMETER_STRING}, "setDocUri" );
+        add(TOKEN_NAME, new long[]{PARAMETER_STRING}, "setName");
+        add(TOKEN_VERSION, new long[]{PARAMETER_INT}, "setVersion");
+        add(TOKEN_AUTHOR, new long[]{PARAMETER_STRING}, "setAuthor");
+        add(TOKEN_ADDTAGS, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)}, "addTags");
+        add(TOKEN_DESCRIPTION, new long[]{PARAMETER_STRING}, "setDescription");
+        add(TOKEN_DOCFILE, new long[]{PARAMETER_FILE}, "setDocFile");
+        add(TOKEN_DOCURI, new long[]{PARAMETER_STRING}, "setDocUri");
 
         add(TOKEN_LOCALE, new long[]{
-                TOKEN_LANGUAGE, TOKEN_COUNTRY, TOKEN_VARIANT }, "setLocale" );
-        add(TOKEN_LANGUAGE, new long[]{PARAMETER_STRING} );
-        add(TOKEN_COUNTRY, new long[]{PARAMETER_STRING} );
-        add(TOKEN_VARIANT, new long[]{PARAMETER_STRING} );
+                TOKEN_LANGUAGE, TOKEN_COUNTRY, TOKEN_VARIANT}, "setLocale");
+        add(TOKEN_LANGUAGE, new long[]{PARAMETER_STRING});
+        add(TOKEN_COUNTRY, new long[]{PARAMETER_STRING});
+        add(TOKEN_VARIANT, new long[]{PARAMETER_STRING});
 
-        add(TOKEN_METACOLOR, new long[]{PARAMETER_COLOR}, "setMetaColor" );
-        add(TOKEN_LOCKCOLOR, new long[]{PARAMETER_COLOR}, "setLockColor" );
-        add(TOKEN_AUTOCOLOR, new long[]{PARAMETER_COLOR}, "setAutoColor" );
-        add(TOKEN_TOUCHCOLOR, new long[]{PARAMETER_COLOR}, "setTouchColor" );
-        add(TOKEN_STROKECOLOR, new long[]{PARAMETER_COLOR}, "setStrokeColor" );
-        add(TOKEN_TITLEFONT, new long[]{PARAMETER_FILE}, "setTypeface" );
+        add(TOKEN_METACOLOR, new long[]{PARAMETER_COLOR}, "setMetaColor");
+        add(TOKEN_LOCKCOLOR, new long[]{PARAMETER_COLOR}, "setLockColor");
+        add(TOKEN_AUTOCOLOR, new long[]{PARAMETER_COLOR}, "setAutoColor");
+        add(TOKEN_TOUCHCOLOR, new long[]{PARAMETER_COLOR}, "setTouchColor");
+        add(TOKEN_STROKECOLOR, new long[]{PARAMETER_COLOR}, "setStrokeColor");
+        add(TOKEN_TITLEFONT, new long[]{PARAMETER_FILE}, "setTypeface");
 
-        add(TOKEN_ENTERTITLE, new long[]{PARAMETER_TEXT}, "setEnterTitle" );
-        add(TOKEN_GOTITLE, new long[]{PARAMETER_TEXT}, "setGoTitle" );
-        add(TOKEN_SEARCHTITLE, new long[]{PARAMETER_TEXT}, "setSearchTitle" );
-        add(TOKEN_SENDTITLE, new long[]{PARAMETER_TEXT}, "setSendTitle" );
-        add(TOKEN_NEXTTITLE, new long[]{PARAMETER_TEXT}, "setNextTitle" );
-        add(TOKEN_DONETITLE, new long[]{PARAMETER_TEXT}, "setDoneTitle" );
-        add(TOKEN_PREVTITLE, new long[]{PARAMETER_TEXT}, "setPrevTitle" );
-        add(TOKEN_NONETITLE, new long[]{PARAMETER_TEXT}, "setNoneTitle" );
-        add(TOKEN_UNKNOWNTITLE, new long[]{PARAMETER_TEXT}, "setUnknownTitle" );
+        add(TOKEN_ENTERTITLE, new long[]{PARAMETER_TEXT}, "setEnterTitle");
+        add(TOKEN_GOTITLE, new long[]{PARAMETER_TEXT}, "setGoTitle");
+        add(TOKEN_SEARCHTITLE, new long[]{PARAMETER_TEXT}, "setSearchTitle");
+        add(TOKEN_SENDTITLE, new long[]{PARAMETER_TEXT}, "setSendTitle");
+        add(TOKEN_NEXTTITLE, new long[]{PARAMETER_TEXT}, "setNextTitle");
+        add(TOKEN_DONETITLE, new long[]{PARAMETER_TEXT}, "setDoneTitle");
+        add(TOKEN_PREVTITLE, new long[]{PARAMETER_TEXT}, "setPrevTitle");
+        add(TOKEN_NONETITLE, new long[]{PARAMETER_TEXT}, "setNoneTitle");
+        add(TOKEN_UNKNOWNTITLE, new long[]{PARAMETER_TEXT}, "setUnknownTitle");
 
         add(TOKEN_ADDBOARD, new long[]{
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
@@ -397,200 +376,174 @@ public class Commands
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT}, "addBoard" );
         // TOKEN_ID is already defined
         // Useless parametercommand - just for clearer readability
-        add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS} );
-        add(TOKEN_WIDE, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_COLUMNS, new long[]{PARAMETER_INT} );
-        add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT} );
-        add(TOKEN_ROWS, new long[]{PARAMETER_INT} );
+        add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS});
+        add(TOKEN_WIDE, new long[]{PARAMETER_FLAG});
+        add(TOKEN_COLUMNS, new long[]{PARAMETER_INT});
+        add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT});
+        add(TOKEN_ROWS, new long[]{PARAMETER_INT});
         add(TOKEN_ALIGN, new long[]{PARAMETER_KEYWORD} );
         // TOKEN_COLOR is already definied
 
-        add( TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN} );
-        add( TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN} );
-        add( TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN} );
-        add( TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN} );
+        add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
 
-        add( TOKEN_CURSOR, new long[]{
-                TOKEN_NONE, TOKEN_ALSO, TOKEN_ONLY,
-                TOKEN_BOARD, TOKEN_COLUMN, TOKEN_ROW,
-                TOKEN_TRANSFORM }, "setCursor" );
-        add(TOKEN_NONE, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_ALSO, new long[]{PARAMETER_FLAG} );
-        // TOKEN_ONLY is currently NOT checked, If TOKEN_ALSO can be found it is used
-        add(TOKEN_ONLY, new long[]{NO_PARAMETERS} );
-        add(TOKEN_BOARD, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_COLUMN, new long[]{PARAMETER_INT} );
-        add(TOKEN_ROW, new long[]{PARAMETER_INT} );
-        add(TOKEN_TRANSFORM, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_BOARD, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_COLUMN, new long[]{PARAMETER_INT});
+        add(TOKEN_ROW, new long[]{PARAMETER_INT});
 
-        add(TOKEN_NEXT, new long[]{NO_PARAMETERS}, "next" );
-        add(TOKEN_NEXTROW, new long[]{NO_PARAMETERS}, "nextRow" );
+        add(TOKEN_BLOCK, new long[]{
+                        TOKEN_BOARD,
+                        TOKEN_COLUMN,
+                        TOKEN_ROW,
+                        TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_L | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_R | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_DL | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_DR | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_UL | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_UR | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_CRL | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_CRR | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_SKIP | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_HOME | PARAMETER_MOD_MULTIPLE},
+                "setBlock");
 
-        add( TOKEN_SKIPROW, new long[]{PARAMETER_INT}, "skipRow" );
-
-
-        add( TOKEN_BLOCK, new long[]{
-                TOKEN_BOARD,
-                TOKEN_COLUMN,
-                TOKEN_ROW,
-                TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE,
-                TOKEN_L | PARAMETER_MOD_MULTIPLE,
-                TOKEN_R | PARAMETER_MOD_MULTIPLE,
-                TOKEN_DL | PARAMETER_MOD_MULTIPLE,
-                TOKEN_DR | PARAMETER_MOD_MULTIPLE,
-                TOKEN_UL | PARAMETER_MOD_MULTIPLE,
-                TOKEN_UR | PARAMETER_MOD_MULTIPLE,
-                TOKEN_CRL | PARAMETER_MOD_MULTIPLE,
-                TOKEN_CRR | PARAMETER_MOD_MULTIPLE,
-                TOKEN_SKIP | PARAMETER_MOD_MULTIPLE,
-                TOKEN_HOME | PARAMETER_MOD_MULTIPLE },
-                "setBlock" );
-
-        add(TOKEN_L, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_R, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_DL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_DR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_UL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_UR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_CRL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_CRR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_SKIP, TOKEN_BUTTON, new long[]{PARAMETER_INT} );
-        add(TOKEN_HOME, TOKEN_BUTTON, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_L, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_R, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_DL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_DR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_UL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_UR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_CRL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_CRR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_SKIP, TOKEN_BUTTON, new long[]{PARAMETER_INT});
+        add(TOKEN_HOME, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_BUTTON, TOKEN_BUTTON, new long[]{
-                TOKEN_TEXT,
-                TOKEN_AUTOCAPS,
-                TOKEN_STRINGCAPS,
-                TOKEN_ERASESPACES,
-                TOKEN_AUTOSPACE,
+                        TOKEN_TEXT,
+                        TOKEN_AUTOCAPS,
+                        TOKEN_STRINGCAPS,
+                        TOKEN_ERASESPACES,
+                        TOKEN_AUTOSPACE,
 
-                TOKEN_KEY,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                        TOKEN_KEY,
+                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                TOKEN_DO,
+                        TOKEN_DO,
 
-                TOKEN_REPEAT,
+                        TOKEN_REPEAT,
 
-                TOKEN_META,
-                TOKEN_LINK,
-                TOKEN_SPACETRAVEL,
+                        TOKEN_META,
+                        TOKEN_LINK,
+                        TOKEN_SPACETRAVEL,
 
-                TOKEN_LOCK,
+                        TOKEN_LOCK,
 
-                TOKEN_MODIFY,
-                TOKEN_REVERSE,
+                        TOKEN_MODIFY,
+                        TOKEN_REVERSE,
 
-                TOKEN_ENTER,
+                        TOKEN_ENTER,
 
-                TOKEN_ADDTITLE,
-                TOKEN_COLOR,
+                        TOKEN_ADDTITLE,
+                        TOKEN_COLOR,
 
-                TOKEN_OVERWRITE,
+                        TOKEN_OVERWRITE,
 
-                TOKEN_SECOND,
-                TOKEN_SEND },
+                        TOKEN_SECOND,
+                        TOKEN_SEND},
                 // SEND remains only because label's purposes,
                 // parameters could be given directly to BUTTON
-                "setButton2");
+                "setButton");
 
-        add(TOKEN_OVERWRITE, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_OVERWRITE, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_SEND, new long[]{
-                TOKEN_TEXT,
-                TOKEN_AUTOCAPS,
-                TOKEN_STRINGCAPS,
-                TOKEN_ERASESPACES,
-                TOKEN_AUTOSPACE,
+                        TOKEN_TEXT,
+                        TOKEN_AUTOCAPS,
+                        TOKEN_STRINGCAPS,
+                        TOKEN_ERASESPACES,
+                        TOKEN_AUTOSPACE,
 
-                TOKEN_KEY,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                        TOKEN_KEY,
+                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                TOKEN_DO,
+                        TOKEN_DO,
 
-                TOKEN_REPEAT,
+                        TOKEN_REPEAT,
 
-                TOKEN_META,
-                TOKEN_LINK,
-                TOKEN_SPACETRAVEL,
+                        TOKEN_META,
+                        TOKEN_LINK,
+                        TOKEN_SPACETRAVEL,
 
-                TOKEN_LOCK,
+                        TOKEN_LOCK,
 
-                TOKEN_MODIFY,
-                TOKEN_REVERSE,
+                        TOKEN_MODIFY,
+                        TOKEN_REVERSE,
 
-                TOKEN_ENTER },
+                        TOKEN_ENTER},
                 "createButtonFunction");
 
         add(TOKEN_SECOND, new long[]{
-                TOKEN_TEXT,
-                TOKEN_AUTOCAPS,
-                TOKEN_STRINGCAPS,
-                TOKEN_ERASESPACES,
-                TOKEN_AUTOSPACE,
+                        TOKEN_TEXT,
+                        TOKEN_AUTOCAPS,
+                        TOKEN_STRINGCAPS,
+                        TOKEN_ERASESPACES,
+                        TOKEN_AUTOSPACE,
 
-                TOKEN_KEY,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                        TOKEN_KEY,
+                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                TOKEN_DO },
+                        TOKEN_DO },
                 "packet");
 
-        add(TOKEN_TEXT, new long[]{PARAMETER_TEXT} );
-        add(TOKEN_KEY, new long[]{PARAMETER_INT} );
-        add(TOKEN_DO, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_TEXT, new long[]{PARAMETER_TEXT});
+        add(TOKEN_KEY, new long[]{PARAMETER_INT});
+        add(TOKEN_DO, new long[]{PARAMETER_KEYWORD});
 
-        add(TOKEN_META, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_LINK, new long[]{PARAMETER_INT} );
+        add(TOKEN_META, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_LINK, new long[]{PARAMETER_INT});
 
-        add(TOKEN_LOCK, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
 
-        add(TOKEN_AUTOCAPS, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_STRINGCAPS, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_AUTOCAPS, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_STRINGCAPS, new long[]{PARAMETER_FLAG});
 
-        add(TOKEN_REPEAT, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_REPEAT, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_SPACETRAVEL, new long[]{PARAMETER_FLAG} );
 
         // TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT are already defined
 
-        add(TOKEN_AUTOSPACE, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_ERASESPACES, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_AUTOSPACE, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_ERASESPACES, new long[]{PARAMETER_KEYWORD});
 
-        add(TOKEN_MODIFY, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_REVERSE, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_MODIFY, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_REVERSE, new long[]{PARAMETER_FLAG});
 
-        add(TOKEN_ENTER, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_ENTER, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_ADDTITLE, new long[]{
-                TOKEN_TEXT, TOKEN_SLOT,
+                TOKEN_TEXT,
                 TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
                 TOKEN_BOLD, TOKEN_ITALICS, TOKEN_COLOR }, "addTitle");
-        // TOKEN_TEXT is already defined
-        add(TOKEN_SLOT, new long[]{PARAMETER_KEYWORD} );
-        // TOKEN_XOFFSET is already defined
-        // TOKEN_YOFFSET is already defined
-        // TOKEN_SIZE is already defined
-        // TOKEN_BOLD is already defined
-        // TOKEN_ITALICS is already defined
-        // TOKEN_COLOR is already defined
-
-        add( TOKEN_ADDSLOT, new long[]{
-                TOKEN_ID, TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
-                TOKEN_BOLD, TOKEN_ITALICS, TOKEN_COLOR }, "addSlot" );
-        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD} );
         add(TOKEN_XOFFSET, new long[]{PARAMETER_INT} );
         add(TOKEN_YOFFSET, new long[]{PARAMETER_INT} );
         add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
         add(TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
         add(TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR} );
+        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
 
-        add( TOKEN_ADDLINK, new long[]{
+        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
+
+        add(TOKEN_ADDLINK, new long[]{
                 TOKEN_INDEX, TOKEN_BOARD,
-                TOKEN_PORTRAIT, TOKEN_LANDSCAPE }, "addLink");
+                TOKEN_PORTRAIT, TOKEN_LANDSCAPE}, "addLink");
         add(TOKEN_INDEX, new long[]{PARAMETER_INT} );
         // TOKEN_BOARD is already defined
-        add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
 
         add(TOKEN_ADDMODIFY, new long[]{
                 TOKEN_ID, TOKEN_ADDROLL, TOKEN_ROLLS,
@@ -598,9 +551,9 @@ public class Commands
         // TOKEN_ID is already defined
         // !! addRollHelper functionality should be avoided !!
         // "Multiple" type parameters are needed
-        add(TOKEN_ADDROLL, new long[]{ (PARAMETER_STRING | PARAMETER_MOD_LIST) }, "addRollHelper" );
-        add(TOKEN_ROLLS, new long[]{ (PARAMETER_STRING | PARAMETER_MOD_LIST) } );
-        add(TOKEN_IGNORESPACE, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_ADDROLL, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST) }, "addRollHelper");
+        add(TOKEN_ROLLS, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)});
+        add(TOKEN_IGNORESPACE, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_STOP, new long[]{MESSAGE_STOP} );
 

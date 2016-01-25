@@ -49,13 +49,20 @@ import dancingmoon.bestboard.utils.Trilean;
 public class MethodsForCommands
     {
     /**
-     * Tokenizer is needed for messaging during data-load.
+     * Tokenizer (from SoftBoardParser) is needed for messaging during data-load.
      * It should be cleared, after data-load is ready.
      */
     private Tokenizer tokenizer;
 
+    /**
+     * Defaults (from SoftBoardParser) is needed for messaging during data-load.
+     * It should be cleared, after data-load is ready.
+     */
     private ExtendedMap< Long, ExtendedMap< Long, Object>> defaults;
 
+    /**
+     * SoftBoardData will be populated during the parsing process
+     */
     private SoftBoardData softBoardData;
 
     public MethodsForCommands( SoftBoardData softBoardData, SoftBoardParser softBoardParser )
@@ -64,7 +71,6 @@ public class MethodsForCommands
         this.tokenizer = softBoardParser.getTokenizer();
         this.defaults = softBoardParser.getDefaults();
         }
-
 
     /**
      * Temporary data for creating boards
@@ -77,42 +83,12 @@ public class MethodsForCommands
         {
         private Board board;
 
-        private int cursorRow = 0;
-        private int cursorColumn = 0;
-        private int cursorDefaultColumn = 0;
-
-        private boolean transform = false;
-
         private BoardPlan(Board board)
             {
             this.board = board;
             }
 
-        // toString is needed only for debugging
-        public String toString()
-            {
-            StringBuilder result = new StringBuilder();
-            result.append("C:").append(cursorColumn);
-            result.append("/R:").append(cursorRow);
-            return result.toString();
-            }
-
-        public int getTransformedCursorColumn()
-            {
-            // rowsAlignOffset:
-            // 1 if first (0) row starts with WHOLE button on the left
-            // 0 if first (0) row starts with HALF button on the left
-            //              0 if EVEN is half
-            // cursorRow % 2:
-            // 1 in 1, 3, 5...; 0 in 0, 2, 4...
-            //              0 if row is EVEN
-            if ( transform && (cursorRow % 2 == board.rowsAlignOffset) )
-                return cursorColumn + 1;
-            else
-                return cursorColumn;
-            }
         }
-
 
     /**
      * Temporary data to create buttons
@@ -120,63 +96,12 @@ public class MethodsForCommands
     private class ButtonPlan
         {
         private String buttonName;
-
         private Button button;
         }
 
 
-    /**
-     * Temporary data for title-slots
-     * Title-slots describe the position and size of a title on the buttons.
-     * Data can be reached directly within SoftBoardData
-     * DefaultTitleSlot (0L initially) will be used instead of missing data.
-     */
-    private class Slot
+    public void createDefaults()
         {
-        private int xOffset;
-        private int yOffset;
-        private int size;
-        private boolean bold;
-        private boolean italics;
-        private int color;
-
-        private Slot( int xOffset,
-                      int yOffset,
-                      int size,
-                      boolean bold,
-                      boolean italics,
-                      int color )
-            {
-            this.xOffset = xOffset;
-            this.yOffset = yOffset;
-            this.size = size;
-            this.bold = bold;
-            this.italics = italics;
-            this.color = color;
-            }
-
-        // toString is needed only for debugging
-        public String toString()
-            {
-            StringBuilder result = new StringBuilder();
-            result.append("XO:").append(xOffset);
-            result.append("/YO:").append(yOffset);
-            result.append("/S:").append(size);
-            result.append("/C:").append(Integer.toHexString(color));
-            if (bold)
-                result.append("/B");
-            if (italics)
-                result.append("/I");
-            return result.toString();
-            }
-        }
-
-    public void createDefaultSlots()
-        {
-        // !!!!!!!!!!!!!!!!!! NEM KELL !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        Slots.put(
-                0L,
-                new Slot(0, 250, 1200, false, false, Color.BLACK));
 
         ExtendedMap<Long, Object> defaultTitle = new ExtendedMap<>();
         defaultTitle.put( Commands.TOKEN_YOFFSET, 250 ); // PARAMETER_INT
@@ -201,17 +126,11 @@ public class MethodsForCommands
     /** Button's default background */
     public static final int DEFAULT_BUTTON_COLOR = Color.LTGRAY;
 
-    /** Title's default position */
-    // public long defaultSlot = 0L;
-
     /** Map of temporary boardPlans, identified by code of keywords */
     public Map<Long, BoardPlan> boardPlans = new HashMap<>();
 
     /** List of active (included) boardPlans */
     public Set<BoardPlan> includedBoardPlans = new HashSet<>();
-
-    /** Map of temporary Slots, identified by code of keywords */
-    public Map<Long, Slot> Slots = new HashMap<>();
 
 
     /**
@@ -404,31 +323,6 @@ public class MethodsForCommands
         tokenizer.note(R.string.data_unknowntitle, softBoardData.actionTitles[SoftBoardData.ACTION_UNSPECIFIED] );
         }
 
-    public void addSlot( ExtendedMap<Long, Object> parameters )
-        {
-        Long id = (Long)parameters.remove( Commands.TOKEN_ID );
-        if (id == null)
-            {
-            tokenizer.error("ADDSLOT", R.string.data_slot_no_id );
-            return;
-            }
-
-        // default TitleSlot cannot be null, it is checked on selection
-        Slot dts = Slots.get( 0L );
-        int xOffset = (int)parameters.remove(Commands.TOKEN_XOFFSET, dts.xOffset);
-        int yOffset = (int)parameters.remove(Commands.TOKEN_YOFFSET, dts.yOffset);
-        int size = (int)parameters.remove(Commands.TOKEN_SIZE, dts.size);
-        boolean bold = (boolean)parameters.remove(Commands.TOKEN_BOLD, dts.bold);
-        boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, dts.italics);
-        int color = (int)parameters.remove(Commands.TOKEN_COLOR, dts.color);
-
-        Slot slot = new Slot( xOffset, yOffset, size, bold, italics, color );
-        Slots.put( id, slot );
-        tokenizer.note( Tokenizer.regenerateKeyword( (long)id),
-                R.string.data_slot_added,
-                slot.toString());
-        }
-
     public void addBoard( ExtendedMap<Long, Object> parameters )
         {
         Object temp;
@@ -512,8 +406,6 @@ public class MethodsForCommands
             // needed only by debugging purposes
             board.setBoardId( id );
 
-            // exclude all boards
-            setCursorNone();
             // but the new board which will be included, cursor set to the first position
             BoardPlan boardPlan = new BoardPlan(board);
             boardPlans.put( id, boardPlan );
@@ -534,87 +426,6 @@ public class MethodsForCommands
             {
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_board_error );
-            }
-        }
-
-    public void setCursorNone()
-        {
-        includedBoardPlans.clear();
-        tokenizer.note( R.string.data_boards_excluded );
-        }
-
-    public void setCursor(ExtendedMap<Long, Object> parameters)
-        {
-        // No other parameters are allowed with NONE
-        if ( (boolean)parameters.remove( Commands.TOKEN_NONE, false ) )
-            {
-            setCursorNone();
-            if ( parameters.size() != 2 )
-                {
-                tokenizer.error( "CURSOR", R.string.data_none_parameters_not_allowed );
-                }
-            return;
-            }
-
-        Long boardId = (Long)parameters.remove( Commands.TOKEN_BOARD );
-        if (boardId == null)
-            {
-            tokenizer.error( "CURSOR", R.string.data_board_missing );
-            return;
-            }
-
-        int column = (int)parameters.remove(Commands.TOKEN_COLUMN, 0);
-        int row = (int)parameters.remove(Commands.TOKEN_ROW, 0);
-        boolean also = (boolean)parameters.remove(Commands.TOKEN_ALSO, false);
-        boolean transform = (boolean)parameters.remove(Commands.TOKEN_TRANSFORM, false);
-
-        // exclude all boards, if also is not given
-        if ( !also )
-            setCursorNone();
-
-        BoardPlan boardPlan = boardPlans.get( boardId );
-        if ( boardPlan == null )
-            {
-            tokenizer.error( Tokenizer.regenerateKeyword( (long)boardId),
-                    R.string.data_no_board );
-            return;
-            }
-
-        includedBoardPlans.add( boardPlan );
-        boardPlan.cursorColumn = column;
-        boardPlan.cursorDefaultColumn = column;
-        boardPlan.cursorRow = row;
-        boardPlan.transform = transform;
-
-        tokenizer.note( Tokenizer.regenerateKeyword( (long)boardId),
-                R.string.data_cursor_set,
-                boardPlan.toString() );
-        }
-
-    public void next()
-        {
-        for (BoardPlan includedBoardPlan : includedBoardPlans)
-            {
-            includedBoardPlan.cursorColumn++;
-            }
-        }
-
-    public void nextRow()
-        {
-        for (BoardPlan includedBoardPlan : includedBoardPlans)
-            {
-            includedBoardPlan.cursorRow++;
-            includedBoardPlan.cursorColumn = includedBoardPlan.cursorDefaultColumn;
-            }
-        }
-
-    public void skipRow( Object intParameter )
-        {
-        for (BoardPlan includedBoardPlan : includedBoardPlans)
-            {
-            includedBoardPlan.cursorRow += (int)intParameter + 1;
-            // because nextrow is missing, while next is part of the button
-            includedBoardPlan.cursorColumn = includedBoardPlan.cursorDefaultColumn;
             }
         }
 
@@ -1130,7 +941,7 @@ public class MethodsForCommands
      * @param parameters
      * @return
      */
-    public ButtonPlan setButton2(ExtendedMap<Long, Object> parameters)
+    public ButtonPlan setButton(ExtendedMap<Long, Object> parameters)
         {
         ButtonPlan buttonPlan = new ButtonPlan();
 
@@ -1185,87 +996,6 @@ public class MethodsForCommands
         buttonPlan.button.setTitles(titles);
 
         return buttonPlan;
-        }
-
-
-    public void setButton(ExtendedMap<Long, Object> parameters)
-        {
-        Button button;
-
-        // "SEND" parameters could be found among "BUTTON"-s parameters
-        // For testing reasons SEND remains...
-        Object temp = parameters.remove( Commands.TOKEN_SEND );
-        if ( temp != null )
-            {
-            button = (Button) temp;
-            }
-        // ...but if SEND is missing, then parameters are submitted directly
-        else
-            {
-            button = createButtonFunction(parameters);
-            }
-
-        if ( button == null )
-            {
-            tokenizer.error( "BUTTON", R.string.data_button_function_missing);
-            button = new Button();
-            }
-
-        button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
-
-        // if no titles are added, then addTitle will add one based on default title
-        ExtendedMap<Long, Object> defaultTitle = defaults.get(Commands.TOKEN_ADDTITLE);
-
-        // an empty parameter list is needed
-        SinglyLinkedList<TitleDescriptor> titles =
-                (SinglyLinkedList<TitleDescriptor>)parameters.remove(Commands.TOKEN_ADDTITLE,
-                        addTitle(new ExtendedMap<Long, Object>(0)));
-
-        // if title text is null, code should be used
-        // button id can be created from the titles (and from the code)
-        StringBuilder buttonNameBuilder = new StringBuilder();
-        for ( TitleDescriptor title : titles )
-            {
-            title.checkText( button.getString() );
-            buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
-            }
-        buttonNameBuilder.setCharAt( 0, '\"');
-        String buttonName = buttonNameBuilder.append('\"').toString();
-
-        button.setTitles( titles );
-
-        for (BoardPlan includedBoardPlan : includedBoardPlans)
-            {
-            try
-                {
-                if (includedBoardPlan.board.addButton(
-                        includedBoardPlan.getTransformedCursorColumn(),
-                        includedBoardPlan.cursorRow,
-                        button.clone() ))
-                    {
-                    if ( (boolean)parameters.remove(Commands.TOKEN_OVERWRITE, false) )
-                        {
-                        tokenizer.note( R.string.data_button_overwritten,
-                                includedBoardPlan.toString() );
-                        }
-                    else
-                        {
-                        tokenizer.error( R.string.data_button_overwritten,
-                                includedBoardPlan.toString() );
-                        }
-                    }
-                tokenizer.note( buttonName, R.string.data_button_added,
-                        includedBoardPlan.toString() );
-                }
-            catch (ExternalDataException ede)
-                {
-                tokenizer.error( buttonName, R.string.data_button_error,
-                        includedBoardPlan.toString()  );
-                }
-            }
-
-        // Button can call next without explicitly writing it.
-        next();
         }
 
     public void addLink( ExtendedMap<Long, Object> parameters )

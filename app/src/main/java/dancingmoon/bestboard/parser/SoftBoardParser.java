@@ -319,7 +319,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         softBoardData = new SoftBoardData( caller.getSoftBoardDataListener() );
 
         methodsForCommands = new MethodsForCommands( softBoardData, this );
-        methodsForCommands.createDefaultSlots();
+        methodsForCommands.createDefaults();
 
         try
             {

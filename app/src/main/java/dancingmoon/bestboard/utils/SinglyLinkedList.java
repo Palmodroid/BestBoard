@@ -6,7 +6,9 @@ import java.util.NoSuchElementException;
 /**
  * Singly linked, non deletable list
  * List can grow (implements add), but items cannot be removed.
- * List can only be iterated form last to first element.
+ * List can only be iterated
+ * form lastly added (first in the list)
+ * to firstly added (last in the list) element.
  */
 public class SinglyLinkedList<E> implements Iterable<E>
     {
@@ -25,8 +27,30 @@ public class SinglyLinkedList<E> implements Iterable<E>
         }
 
     // Starting point (last element) of list
-    private Link<E> start = null;
+    private Link<E> start;
 
+
+    public SinglyLinkedList()
+        {
+        this.start = null;
+        }
+
+    public SinglyLinkedList( SinglyLinkedList root )
+        {
+        this.start = root.start;
+        }
+
+    // These mathods are not needed
+    private SinglyLinkedList( Link<E> start )
+        {
+        this.start = start;
+        }
+
+    public SinglyLinkedList<E> createCopy()
+        {
+        return new SinglyLinkedList( start );
+        }
+    // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
     /**
      * Adds an item to the beginning of the list.
