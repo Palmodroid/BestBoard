@@ -111,6 +111,10 @@ public class Button implements Cloneable
         this.titles = titles;
         }
 
+    public SinglyLinkedList<TitleDescriptor> getTitles()
+        {
+        return titles;
+        }
 
     /** Hexagons fill paint will be set in static initialization, color is variable */
     protected static Paint hexagonFillPaint = new Paint();

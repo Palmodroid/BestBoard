@@ -328,7 +328,7 @@ public class SoftBoardData
 
     /**
      * Set action of the enter key defined by imeOptions.
-     * !! Could be changed to a direct equalation?
+     * !! Could be changed to a direct equation?
      * @param imeOptions provided by EditorInfo of onStartInput
      */
     public void setAction( int imeOptions )

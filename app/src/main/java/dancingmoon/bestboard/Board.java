@@ -329,6 +329,26 @@ public class Board
 
 
     /**
+     * Gets an existing button.
+     * @param arrayColumn arrayColumn (in hexagons) of the button
+     * @param arrayRow    arrayRow (in hexagons) of the button
+     * @return button instance (which is already on the board!)
+     * @throws ExternalDataException If button position is not valid
+     */
+    public Button getButton( int arrayColumn, int arrayRow ) throws ExternalDataException
+        {
+        if (!isValidPosition(arrayColumn, arrayRow))
+            {
+            throw new ExternalDataException("This button position is not valid! Button cannot be get!");
+            }
+
+        int index = touchCodeFromPosition(arrayColumn, arrayRow);
+
+        return buttons[index];
+        }
+
+
+    /**
      * Calculates board dimensions from screen specific data:
      * - xOffset, boardWidthInPixels, boardHeightInPixels
      * - halfHexagonWidthInPixels, halfHexagonWidthInPixels

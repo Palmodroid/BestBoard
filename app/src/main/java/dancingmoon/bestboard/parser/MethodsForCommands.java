@@ -2,16 +2,15 @@ package dancingmoon.bestboard.parser;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.inputmethodservice.ExtractEditText;
 import android.view.KeyEvent;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 
 import dancingmoon.bestboard.Board;
 import dancingmoon.bestboard.R;
@@ -100,6 +99,16 @@ public class MethodsForCommands
         }
 
 
+    /**
+     * Buttons can be extended after definition
+     */
+    private class ButtonExtension
+        {
+        private Integer color = null;
+        private ArrayList<KeyValuePair> titleList = null;
+        }
+
+
     public void createDefaults()
         {
 
@@ -109,6 +118,7 @@ public class MethodsForCommands
         defaultTitle.put( Commands.TOKEN_COLOR, Color.BLACK ); // PARAMETER_COLOR (int)
 
         defaults.put( Commands.TOKEN_ADDTITLE, defaultTitle );
+
         }
 
     /**
@@ -128,9 +138,6 @@ public class MethodsForCommands
 
     /** Map of temporary boardPlans, identified by code of keywords */
     public Map<Long, BoardPlan> boardPlans = new HashMap<>();
-
-    /** List of active (included) boardPlans */
-    public Set<BoardPlan> includedBoardPlans = new HashSet<>();
 
 
     /**
@@ -393,7 +400,7 @@ public class MethodsForCommands
         metaStates[ BoardStates.META_SHIFT ] =
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCESHIFT ));
         metaStates[ BoardStates.META_CTRL ] =
-                Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCECTRL ));
+                Trilean.valueOf((Boolean) parameters.remove(Commands.TOKEN_FORCECTRL));
         metaStates[ BoardStates.META_ALT ] =
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCEALT ));
         metaStates[ BoardStates.META_CAPS ] =
@@ -408,8 +415,7 @@ public class MethodsForCommands
 
             // but the new board which will be included, cursor set to the first position
             BoardPlan boardPlan = new BoardPlan(board);
-            boardPlans.put( id, boardPlan );
-            includedBoardPlans.add( boardPlan );
+            boardPlans.put(id, boardPlan);
 
             tokenizer.note( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_board_added,
@@ -499,7 +505,7 @@ public class MethodsForCommands
             buttonFunction = new ButtonSpaceTravel( packet(parameters, " ") );
             }
 
-        temp = parameters.remove( Commands.TOKEN_MODIFY );
+        temp = parameters.remove(Commands.TOKEN_MODIFY);
         if (temp != null)
             {
             counter++;
@@ -741,50 +747,27 @@ public class MethodsForCommands
         }
 
 
-    public SinglyLinkedList<TitleDescriptor> addTitle( ExtendedMap<Long, Object> parameters )
+    public TitleDescriptor addTitle( ExtendedMap<Long, Object> parameters )
         {
         // !! http://stackoverflow.com/questions/509076/how-do-i-address-unchecked-cast-warnings
         // Maybe better to avoid Unchecked cast warnings
 
-        // Check the result of previous ADDTITLE parameter-commands
-        SinglyLinkedList<TitleDescriptor> titles =
-                (SinglyLinkedList<TitleDescriptor>)
-                        parameters.remove(Commands.TOKEN_ADDTITLE, new SinglyLinkedList<TitleDescriptor>());
-
-        // text is optional, if it is null, then button's function will be used
+        // text is optional, if it is null, then button's getString() function will be used
         String text = null;
-        Object temp = parameters.remove( Commands.TOKEN_TEXT );
+        Object temp = parameters.remove(Commands.TOKEN_TEXT);
         if ( temp != null )
             {
             text = SoftBoardParser.stringFromText( temp );
             }
 
-        Slot ts = null;
+        int xOffset = (int)parameters.remove(Commands.TOKEN_XOFFSET, 0);
+        int yOffset = (int)parameters.remove(Commands.TOKEN_YOFFSET, 0);
+        int size = (int)parameters.remove(Commands.TOKEN_SIZE, 1000);
+        boolean bold = (boolean)parameters.remove(Commands.TOKEN_BOLD, false);
+        boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, false);
+        int color = (int)parameters.remove(Commands.TOKEN_COLOR, Color.BLACK);
 
-        Long titleSlotId = (Long)parameters.remove( Commands.TOKEN_SLOT );
-        if (titleSlotId != null) // SLOT is definied
-            {
-            ts = Slots.get(titleSlotId);
-            if (ts == null)
-                tokenizer.error( text != null ? text : "ADDTITLE",
-                        R.string.data_titleslot_invalid,
-                        Tokenizer.regenerateKeyword( titleSlotId ));
-            }
-
-        if (ts == null) // default SLOT should be used
-            ts = Slots.get( 0L );
-        // default TitleSlot cannot be null, it is checked on selection
-
-        int xOffset = (int)parameters.remove(Commands.TOKEN_XOFFSET, ts.xOffset);
-        int yOffset = (int)parameters.remove(Commands.TOKEN_YOFFSET, ts.yOffset);
-        int size = (int)parameters.remove(Commands.TOKEN_SIZE, ts.size);
-        boolean bold = (boolean)parameters.remove(Commands.TOKEN_BOLD, ts.bold);
-        boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, ts.italics);
-        int color = (int)parameters.remove(Commands.TOKEN_COLOR, ts.color);
-
-        titles.add( new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color ) );
-
-        return titles;
+        return new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color );
         }
 
 
@@ -868,7 +851,55 @@ public class MethodsForCommands
                     }
 
                 autoMove = true;
+                continue;
+                }
+            else if ( action.getKey() == Commands.TOKEN_EXTEND )
+                {
+                if ( autoMove ) arrayColumn ++;
 
+                Button button = null;
+                try
+                    {
+                    button = board.getButton( arrayColumn, arrayRow );
+                    }
+                catch ( ExternalDataException ede)
+                    {
+                    ; // Nothing to do, button remains null, which elevates an error
+                    }
+
+                if ( button == null )
+                    {
+                    tokenizer.error( R.string.data_button_not_exist );
+                    }
+                else
+                    {
+                    ButtonExtension buttonExtension = (ButtonExtension)action.getValue();
+
+                    if ( buttonExtension.color != null )
+                        {
+                        button.setColor( buttonExtension.color );
+                        tokenizer.note( R.string.data_button_color_changed );
+                        }
+
+                    if ( buttonExtension.titleList != null )
+                        {
+                        SinglyLinkedList<TitleDescriptor> titles =
+                                new SinglyLinkedList<>( button.getTitles() );
+
+                        for ( KeyValuePair title : buttonExtension.titleList )
+                            {
+                            TitleDescriptor titleDescriptor =
+                                    ((TitleDescriptor)title.getValue()).copy();
+                            titleDescriptor.checkText( button.getString() );
+                            titles.add( titleDescriptor );
+                            }
+
+                        button.setTitles(titles);
+                        tokenizer.note(R.string.data_button_color_changed);
+                        }
+                    }
+
+                autoMove = true;
                 continue;
                 }
 
@@ -966,21 +997,35 @@ public class MethodsForCommands
 
         buttonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
 
-        // if no titles are added, then addTitle will add one based on default titleSlot
-        // or an empty parameter list is needed
-        ExtendedMap<Long, Object> defaultTitle;
-        if ( defaults.containsKey( Commands.TOKEN_ADDTITLE ) )
+        // TOKEN_ADDTITLE is a group code
+        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
+        ArrayList<KeyValuePair> titleList = (ArrayList<KeyValuePair>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_ADDTITLE ) );
+
+        SinglyLinkedList<TitleDescriptor> titles = new SinglyLinkedList<>();
+
+        if ( titleList != null )
             {
-            defaultTitle = (ExtendedMap<Long, Object>)(defaults.get( Commands.TOKEN_ADDTITLE )).clone();
+            for (KeyValuePair title : titleList)
+                {
+                titles.add((TitleDescriptor) title.getValue());
+                }
             }
         else
             {
-            defaultTitle = new ExtendedMap<Long, Object>(0);
+            // if no titles are added, then addTitle will add one based on default titleSlot
+            // if no default exist (impossible situation!) then an empty parameter list is needed
+            ExtendedMap<Long, Object> defaultTitle;
+            if (defaults.containsKey(Commands.TOKEN_ADDTITLE))
+                {
+                defaultTitle = (ExtendedMap<Long, Object>) (defaults.get(Commands.TOKEN_ADDTITLE)).clone();
+                }
+            else
+                {
+                defaultTitle = new ExtendedMap<Long, Object>(0);
+                }
+            titles.add(addTitle(defaultTitle));
             }
-
-        SinglyLinkedList<TitleDescriptor> titles =
-                (SinglyLinkedList<TitleDescriptor>)parameters.remove(Commands.TOKEN_ADDTITLE,
-                        addTitle( defaultTitle ));
 
         // if title text is null, code should be used
         // button id can be created from the titles (and from the code)
@@ -997,6 +1042,20 @@ public class MethodsForCommands
 
         return buttonPlan;
         }
+
+
+    public ButtonExtension extendButton( ExtendedMap<Long, Object> parameters )
+        {
+        ButtonExtension buttonExtension = new ButtonExtension();
+
+        buttonExtension.color = (Integer) parameters.remove( Commands.TOKEN_COLOR );
+
+        buttonExtension.titleList = (ArrayList<KeyValuePair>) parameters
+                .remove(Bit.setSignedBitOn(Commands.TOKEN_ADDTITLE));
+
+        return buttonExtension;
+        }
+
 
     public void addLink( ExtendedMap<Long, Object> parameters )
         {

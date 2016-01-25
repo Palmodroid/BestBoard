@@ -112,10 +112,10 @@ public class TitleDescriptor
         }
 
     // !! Cloneable could be used here, but it has some problems !!
-    // public TitleDescriptor copy()
-    //    {
-    //    return new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color);
-    //    }
+    public TitleDescriptor copy()
+        {
+        return new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color);
+        }
 
     /**
      * Draws the stored title on the button.

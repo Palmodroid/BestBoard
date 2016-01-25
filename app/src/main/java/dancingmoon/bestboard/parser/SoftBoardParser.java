@@ -525,7 +525,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             result = null;
 
             // Parameter-command has COMPLEX parameters
-            if ( commandData.getParameterType() >= Tokenizer.TOKEN_CODE_SHIFT )
+            if ( Bit.setSignedBitOff(commandData.getParameterType()) >= Tokenizer.TOKEN_CODE_SHIFT )
                 {
                 Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as COMPLEX parameter. " );
                 // surrounding parentheses are checked here
@@ -545,7 +545,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 // tokenizer.note( commandString, R.string.parser_complex_started);
                 forwardParameters = parseComplexParameter(commandCode,
                         commandData.getAllowedParameters(),
-                        forwardParameters );
+                        forwardedDefaults );
 
                 // forward results of previous parameter-commands with the same code to method
                 // forwarded value can be null
@@ -564,7 +564,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 }
 
             // Parameter-command has ONE parameter
-            else if ( commandData.getParameterType() <= Commands.PARAMETER_KEYWORD )
+            else if ( Bit.setSignedBitOff(commandData.getParameterType()) <= Commands.PARAMETER_KEYWORD )
                 {
                 result = parseOneParameter( commandData.getParameterType());
                 // tokenizer.note( commandString, R.string.parser_one_finished, result.toString() );
@@ -581,7 +581,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 }
 
             // Parameter-command has LIST parameter
-            else if ( commandData.getParameterType() <= (Commands.PARAMETER_KEYWORD | Commands.PARAMETER_MOD_LIST) )
+            else if ( Bit.setSignedBitOff(commandData.getParameterType()) <= (Commands.PARAMETER_KEYWORD | Commands.PARAMETER_MOD_LIST) )
                 {
                 result = parseListParameter( commandData.getParameterType() );
                 // tokenizer.note( commandString, R.string.parser_list_finished, result.toString() );
@@ -1473,8 +1473,12 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         {
         for (final long i : array)
             {
+            // Scribe.debug( Tokenizer.regenerateKeyword(i) );
             if ( Bit.setSignedBitOff( i ) == item)
+                {
+                // Scribe.debug( " * ITEM WAS FOUND! " + Tokenizer.regenerateKeyword(item) );
                 return i < 0 ? -1 : +1;
+                }
             }
         return 0;
         }

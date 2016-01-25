@@ -11,8 +11,6 @@
     <string name="data_locale">"Locale: (Error check was not preformed!)"</string>
     <string name="data_default_boardcolor">"Default color for board: "</string>
     <string name="data_default_buttoncolor">"Default color for button: "</string>
-    <string name="data_default_titleslot">"Default title-slot: "</string>
-    <string name="data_titleslot_invalid">"Title-slot is not yet definied!"</string>
     <string name="data_metacolor">"Color of active meta-keys:"</string>
     <string name="data_lockcolor">"Color of locked meta-keys:"</string>
     <string name="data_autocolor">"Color of activated autocaps:"</string>
@@ -57,6 +55,9 @@
     <string name="data_button_overwritten">"Previous button definition is overwritten!"</string>
     <string name="data_button_added">"Button added:"</string>
     <string name="data_button_error">"Cannot create button!"</string>
+    <string name="data_button_not_exist">"EXTEND: Cannot get button!"</string>
+    <string name="data_button_color_changed">"EXTEND: The color of the button is changed!"</string>
+    <string name="data_button_titles_extended">"EXTEND: The titles of the button are extended!"</string>
     <string name="data_addlink_no_index">"Link index is missing!"</string>
     <string name="data_addlink_invalid_index">"Link index is invalid:"</string>
     <string name="data_addlink_board_set">"Link index is set to a board:"</string>
