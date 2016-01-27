@@ -301,7 +301,7 @@ public class Board
         // BUTTONS ARE COMING FROM COAT DESCRIPTOR FILE
         // Scribe.locus();
 
-        if (!isValidPosition(arrayColumn, arrayRow))
+        if ( checkPosition(arrayColumn, arrayRow) == POSITION_INVALID )
             {
             throw new ExternalDataException("This button position is not valid! Button cannot be added!");
             }
@@ -337,7 +337,7 @@ public class Board
      */
     public Button getButton( int arrayColumn, int arrayRow ) throws ExternalDataException
         {
-        if (!isValidPosition(arrayColumn, arrayRow))
+        if ( checkPosition(arrayColumn, arrayRow) == POSITION_INVALID )
             {
             throw new ExternalDataException("This button position is not valid! Button cannot be get!");
             }
@@ -503,17 +503,56 @@ public class Board
         return true;
         }
 
-    /**
-     * True if this hexagonal position is a valid on this board
-     * This is checked before adding a button
-     */
-    public boolean isValidPosition(int column, int row)
+    public static final int POSITION_INVALID = -1;
+    public static final int POSITION_LINE_ENDED = 0;
+    public static final int POSITION_HALF_HEXAGON = POSITION_LINE_ENDED + 1;
+    public static final int POSITION_WHOLE_HEXAGON = POSITION_HALF_HEXAGON + 1;
+    public static final int POSITION_OCCUPIED = 0x10;
+    public static final int POSITION_HALF_OCCUPIED = POSITION_HALF_HEXAGON | POSITION_OCCUPIED;
+    public static final int POSITION_WHOLE_OCCUPIED = POSITION_WHOLE_HEXAGON | POSITION_OCCUPIED;
+
+    public int checkPosition( int arrayColumn, int arrayRow )
         {
-        if (row < 0 || row >= boardHeightInHexagons)
-            return false;
-        if (column < 0 || column >= boardWidthInHexagons)
-            return false;
-        return true;
+        if ( arrayRow >= 0 && arrayRow < boardHeightInHexagons )
+            {
+            // row is valid
+            if ( arrayColumn > 0 && arrayColumn < boardWidthInHexagons-1 )
+                {
+                // rows, (cental) columns are valid, cell is whole
+                return POSITION_WHOLE_HEXAGON;
+                }
+            if ( arrayColumn == 0 )
+                {
+                // first (0) column check
+                return (arrayRow % 2 == rowsAlignOffset) ? POSITION_HALF_HEXAGON : POSITION_WHOLE_HEXAGON;
+                // array-odd (1) == array-evens start with whole (1)
+                // array-evens (0) != array-evens start with whole (1)
+                }
+            if ( arrayColumn == boardWidthInHexagons -1 )
+                {
+                // last column check
+                return  (areaWidthInGrids % 2) + ((arrayRow % 2 == rowsAlignOffset ) ? POSITION_HALF_HEXAGON : POSITION_LINE_ENDED);
+                //  if ( areaWidthInGrids % 2 == 1 )
+                //    return (arrayColumn % 2 == rowsAlignOffset ) ? POSITION_WHOLE_HEXAGON : POSITION_HALF_HEXAGON;...
+                }
+            if ( arrayColumn >= boardWidthInHexagons )
+                return POSITION_LINE_ENDED;
+            }
+        // row or column is invalid
+        return POSITION_INVALID;
+        }
+
+    public int checkButton( int arrayColumn, int arrayRow )
+        {
+        int result = checkPosition( arrayColumn, arrayRow );
+
+        if ( result > POSITION_INVALID &&
+                buttons[touchCodeFromPosition(arrayColumn, arrayRow)] != null )
+            {
+            result |= POSITION_OCCUPIED;
+            }
+
+        return result;
         }
 
 

@@ -2,7 +2,6 @@ package dancingmoon.bestboard.parser;
 
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.inputmethodservice.ExtractEditText;
 import android.view.KeyEvent;
 
 import java.io.File;
@@ -957,6 +956,23 @@ public class MethodsForCommands
                 if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
                     arrayColumn++;
                 arrayRow--;
+                }
+            else if ( action.getKey() == Commands.TOKEN_FINDFREE )
+                {
+                int occupied;
+                while ( ( occupied = board.checkButton( arrayColumn, arrayRow )) != Board.POSITION_WHOLE_HEXAGON
+                        && occupied != Board.POSITION_INVALID )
+                    {
+                    if (occupied == Board.POSITION_LINE_ENDED)
+                        {
+                        arrayRow++;
+                        arrayColumn = 0;
+                        }
+                    else
+                        {
+                        arrayColumn++;
+                        }
+                    }
                 }
             // this is a skip (int)
             else if (action.getKey() == Commands.TOKEN_SKIP )

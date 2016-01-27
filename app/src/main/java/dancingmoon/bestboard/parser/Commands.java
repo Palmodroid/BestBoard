@@ -87,6 +87,7 @@ public class Commands
     public static final long TOKEN_R = 0x1001aL;
     public static final long TOKEN_DL = 0x101f5L;
     public static final long TOKEN_DR = 0x101fbL;
+    public static final long TOKEN_FINDFREE = 0x156ad0179aeL;
 
     public static final long TOKEN_ODDS = 0x13d439L;
     public static final long TOKEN_EVENS = 0x1a9a13dL;
@@ -391,6 +392,7 @@ public class Commands
                         TOKEN_UR | PARAMETER_MOD_MULTIPLE,
                         TOKEN_CRL | PARAMETER_MOD_MULTIPLE,
                         TOKEN_CRR | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_FINDFREE | PARAMETER_MOD_MULTIPLE,
                         TOKEN_SKIP | PARAMETER_MOD_MULTIPLE,
                         TOKEN_HOME | PARAMETER_MOD_MULTIPLE,
                         TOKEN_EXTEND | PARAMETER_MOD_MULTIPLE },
@@ -408,6 +410,7 @@ public class Commands
         add(TOKEN_UR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
         add(TOKEN_CRL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
         add(TOKEN_CRR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_FINDFREE, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
         add(TOKEN_SKIP, TOKEN_BUTTON, new long[]{PARAMETER_INT});
         add(TOKEN_HOME, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
 
