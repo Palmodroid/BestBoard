@@ -95,10 +95,10 @@ let (l_exp 19)
 
 ; begin Kinesa
 cursor (none)
-cursor (also board cseh row 2 column 1)
-cursor (also board shcseh row 2 column 1)
-cursor (also board num row 2 column 1)
-cursor (also board shnum row 2 column 1)
+cursor (also layout cseh row 2 column 1)
+cursor (also layout shcseh row 2 column 1)
+cursor (also layout num row 2 column 1)
+cursor (also layout shnum row 2 column 1)
 
 next
 button (text 'q' color qwx)
@@ -144,8 +144,8 @@ button (text 'ú' color vfb)
 ;end
 ; begin cirill
 cursor (none)
-cursor (also board cyr row 2 column 0)
-cursor (also board shcyr row 2 column 0)
+cursor (also layout cyr row 2 column 0)
+cursor (also layout shcyr row 2 column 0)
 
 skip 1
 button (text 'є' color qwx)
@@ -207,8 +207,8 @@ button (text 'ќ' color qwx)
 ;end
 ; begin görög
 cursor (none)
-cursor (also board grk row 2 column 1)
-cursor (also board shgrk row 2 column 1)
+cursor (also layout grk row 2 column 1)
+cursor (also layout shgrk row 2 column 1)
 
 next
 button (modify oxia color archgrkcolor addtitle (text '´' greektitle))
@@ -258,10 +258,10 @@ button (text 'β' color vfb)
 ;   begin normál
 ;     begin felső sor
 cursor (none)
-cursor (also board cseh row 1 column 1)
-cursor (also board num row 1 column 1)
-cursor (also board cyr row 1 column 1)
-cursor (also board grk row 1 column 1)
+cursor (also layout cseh row 1 column 1)
+cursor (also layout num row 1 column 1)
+cursor (also layout cyr row 1 column 1)
+cursor (also layout grk row 1 column 1)
 
 button (text "!" erasespaces before autospace after autocaps on color punct1
 	addtitle ()
@@ -287,10 +287,10 @@ button (text '.' erasespaces before autospace after autocaps on color punct4
 ;end
 ;     begin bal csoport
 cursor (none)
-cursor (also board cseh row 2 column 1)
-cursor (also board num row 2 column 1)
-cursor (also board cyr row 2 column 0)
-cursor (also board grk row 2 column 1)
+cursor (also layout cseh row 2 column 1)
+cursor (also layout num row 2 column 1)
+cursor (also layout cyr row 2 column 0)
+cursor (also layout grk row 2 column 1)
 
 button (text '’' color punct1
 	addtitle ()
@@ -316,9 +316,9 @@ button (text ';' erasespaces before autospace after color punct3
 ;end
 ;     begin jobb sarok
 cursor (none)
-cursor (also board cseh row 6 column 7)
-cursor (also board num row 6 column 7)
-cursor (also board grk row 6 column 7)
+cursor (also layout cseh row 6 column 7)
+cursor (also layout num row 6 column 7)
+cursor (also layout grk row 6 column 7)
 
 skip 2
 button (text '>' color punct5
@@ -339,10 +339,10 @@ button (text '/' color punct5
 ;   begin Shift
 ;     begin felső sor
 cursor (none)
-cursor (also board shcseh row 1 column 1)
-cursor (also board shnum row 1 column 1)
-cursor (also board shcyr row 1 column 1)
-cursor (also board shgrk row 1 column 1)
+cursor (also layout shcseh row 1 column 1)
+cursor (also layout shnum row 1 column 1)
+cursor (also layout shcyr row 1 column 1)
+cursor (also layout shgrk row 1 column 1)
 
 button (text '[' color punct1 erasespaces after
 	addtitle (shiftcenter))
@@ -361,10 +361,10 @@ button (text '*' color punct4
 ;    end
 ;     begin bal csoport
 cursor (none)
-cursor (also board shcseh row 2 column 1)
-cursor (also board shnum row 2 column 1)
-cursor (also board shcyr row 2 column 0)
-cursor (also board shgrk row 2 column 1)
+cursor (also layout shcseh row 2 column 1)
+cursor (also layout shnum row 2 column 1)
+cursor (also layout shcyr row 2 column 0)
+cursor (also layout shgrk row 2 column 1)
 
 button (text '=' color punct1
 	addtitle (shiftcenter))
@@ -384,9 +384,9 @@ button (text '“' color punct3
 ;  end
 ;     begin jobb sarok
 cursor (none)
-cursor (also board shcseh row 6 column 7)
-cursor (also board shnum row 6 column 7)
-cursor (also board shgrk row 6 column 7)
+cursor (also layout shcseh row 6 column 7)
+cursor (also layout shnum row 6 column 7)
+cursor (also layout shgrk row 6 column 7)
 
 skip 2
 button (text '%' color punct5
@@ -404,24 +404,24 @@ button (text '\\' color punct5
 ; begin ç
 
 cursor (none)
-cursor (also board cseh row 3 column 1)
-cursor (also board shcseh row 3 column 1)
-cursor (also board num row 3 column 1)
-cursor (also board shnum row 3 column 1)
+cursor (also layout cseh row 3 column 1)
+cursor (also layout shcseh row 3 column 1)
+cursor (also layout num row 3 column 1)
+cursor (also layout shnum row 3 column 1)
 
 button (text 'ç' color punct4)
 ;end
 ; begin nyilak
 
 cursor (none)
-cursor (also board cseh row 7 column 3)
-cursor (also board shcseh row 7 column 3)
-cursor (also board num row 7 column 3)
-cursor (also board shnum row 7 column 3)
-cursor (also board cyr row 7 column 3)
-cursor (also board shcyr row 7 column 3)
-cursor (also board grk row 7 column 3)
-cursor (also board shgrk row 7 column 3)
+cursor (also layout cseh row 7 column 3)
+cursor (also layout shcseh row 7 column 3)
+cursor (also layout num row 7 column 3)
+cursor (also layout shnum row 7 column 3)
+cursor (also layout cyr row 7 column 3)
+cursor (also layout shcyr row 7 column 3)
+cursor (also layout grk row 7 column 3)
+cursor (also layout shgrk row 7 column 3)
 
 button (key keydpadup repeat addtitle (text '↑') color arrow)
 button (key keydpaddown repeat addtitle (text '↓') color arrow)
@@ -431,64 +431,64 @@ button (key keydpadright repeat addtitle (text '→') color arrowgreen)
 ; begin Backspace
 
 cursor (none)
-cursor (also board cseh row 1 column 9)
-cursor (also board shcseh row 1 column 9)
-cursor (also board num row 1 column 9)
-cursor (also board shnum row 1 column 9)
-cursor (also board cyr row 1 column 9)
-cursor (also board shcyr row 1 column 9)
-cursor (also board grk row 1 column 9)
-cursor (also board shgrk row 1 column 9)
+cursor (also layout cseh row 1 column 9)
+cursor (also layout shcseh row 1 column 9)
+cursor (also layout num row 1 column 9)
+cursor (also layout shnum row 1 column 9)
+cursor (also layout cyr row 1 column 9)
+cursor (also layout shcyr row 1 column 9)
+cursor (also layout grk row 1 column 9)
+cursor (also layout shgrk row 1 column 9)
 
 button (do backspace repeat color delete addtitle (text "🚑" size 3000))
 ;end
 ; begin Enter
 
 cursor (none)
-cursor (also board cseh row 2 column 9)
-cursor (also board shcseh row 2 column 9)
-cursor (also board num row 2 column 9)
-cursor (also board shnum row 2 column 9)
-cursor (also board cyr row 2 column 9)
-cursor (also board shcyr row 2 column 9)
-cursor (also board grk row 2 column 9)
-cursor (also board shgrk row 2 column 9)
+cursor (also layout cseh row 2 column 9)
+cursor (also layout shcseh row 2 column 9)
+cursor (also layout num row 2 column 9)
+cursor (also layout shnum row 2 column 9)
+cursor (also layout cyr row 2 column 9)
+cursor (also layout shcyr row 2 column 9)
+cursor (also layout grk row 2 column 9)
+cursor (also layout shgrk row 2 column 9)
 
 button (enter color enter erasespaces around autocaps on addtitle (size 3000))
 ;end
 ; begin Caps Shift
 
 cursor (none)
-cursor (also board cseh row 1 column 8)
-cursor (also board shcseh row 1 column 8)
-cursor (also board num row 1 column 8)
-cursor (also board shnum row 1 column 8)
-; cursor (also board cyr row 1 column 10)
-; cursor (also board shcyr row 1 column 10)
-; cursor (also board grk row 1 column 10)
-; cursor (also board shgrk row 1 column 10)
+cursor (also layout cseh row 1 column 8)
+cursor (also layout shcseh row 1 column 8)
+cursor (also layout num row 1 column 8)
+cursor (also layout shnum row 1 column 8)
+; cursor (also layout cyr row 1 column 10)
+; cursor (also layout shcyr row 1 column 10)
+; cursor (also layout grk row 1 column 10)
+; cursor (also layout shgrk row 1 column 10)
 
 button (meta caps color shift addtitle (text "CAPS" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
 ;end
 ; begin Caps Lock
 
 cursor (none)
-cursor (also board cseh row 1 column 10)
-cursor (also board shcseh row 1 column 10)
-cursor (also board num row 1 column 10)
-cursor (also board shnum row 1 column 10)
-cursor (also board cyr row 1 column 10)
-cursor (also board shcyr row 1 column 10)
-cursor (also board grk row 1 column 10)
-cursor (also board shgrk row 1 column 10)
+cursor (also layout cseh row 1 column 10)
+cursor (also layout shcseh row 1 column 10)
+cursor (also layout num row 1 column 10)
+cursor (also layout shnum row 1 column 10)
+cursor (also layout cyr row 1 column 10)
+cursor (also layout shcyr row 1 column 10)
+cursor (also layout grk row 1 column 10)
+cursor (also layout shgrk row 1 column 10)
 
 button (meta caps lock color shift addtitle (text "CAPS" xoffset -500 yoffset -300 size 800 color 0cfe0) addtitle (text "LOCK" xoffset -500 yoffset 400 size 800 color 0cfe0))
 ;end
 ; begin cseh
 
 cursor (none)
-cursor (also board cseh row 0 column 0)
-cursor (also board shcseh row 0 column 0)
+cursor (also layout cseh row 0 column 0)
+cursor (also layout shcseh row 0 column 0)
 
 button (text 'ď' color hanka)
 button (text 'ň' color hanka)
@@ -503,9 +503,9 @@ button (text 'ž' color hankaf)
 ;end
 ; begin numerikus
 cursor (none)
-cursor (also board num row 0 column 0)
-cursor (also board cyr row 0 column 0)
-cursor (also board grk row 0 column 0)
+cursor (also layout num row 0 column 0)
+cursor (also layout cyr row 0 column 0)
+cursor (also layout grk row 0 column 0)
 
 button (text '0' color numrow
 	addtitle ()
@@ -540,9 +540,9 @@ button (text '9' color numrow
 ;end
 ; begin numerikus Shift
 cursor (none)
-cursor (also board shnum row 0 column 0)
-cursor (also board shcyr row 0 column 0)
-cursor (also board shgrk row 0 column 0)
+cursor (also layout shnum row 0 column 0)
+cursor (also layout shcyr row 0 column 0)
+cursor (also layout shgrk row 0 column 0)
 
 button (text '{' color numrow addtitle (shiftcenter))
 button (text '}' color numrow addtitle (shiftcenter))
@@ -559,74 +559,74 @@ button (text '§' color numrow addtitle (shiftcenter))
 ;   begin Shift gomb
 
 ; cseh → Shift
-cursor (only board cseh row 4 column 0)
+cursor (only layout cseh row 4 column 0)
 button (link l_shcseh color shift addtitle (text "SYMBOL" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
 ; Shift → cseh
-cursor (only board shcseh row 4 column 0)
+cursor (only layout shcseh row 4 column 0)
 button (link l_cseh color shift addtitle (text "SYMBOL" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
 ; numerikus → Shift
-cursor (only board num row 4 column 0)
+cursor (only layout num row 4 column 0)
 button (link l_shnum color shift addtitle (text "SYMBOL" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
 ; Shift → numerikus
-cursor (only board shnum row 4 column 0)
+cursor (only layout shnum row 4 column 0)
 button (link l_num color shift addtitle (text "SYMBOL" yoffset -300 size 1000 color 0cfe0) addtitle (text "SHIFT" yoffset 400 size 1000 color 0cfe0))
 ; cirill → Shift
-cursor (only board cyr row 3 column 10)
+cursor (only layout cyr row 3 column 10)
 button (link l_shcyr color shift addtitle (text "🔺" xoffset -500))
 ; Shift → cirill
-cursor (only board shcyr row 3 column 10)
+cursor (only layout shcyr row 3 column 10)
 button (link l_cyr color shift addtitle (text "🔻" xoffset -500))
 ; görög → Shift
-cursor (only board grk  row 3 column 10)
+cursor (only layout grk  row 3 column 10)
 button (link l_shgrk color shift addtitle (text "🔺" xoffset -500))
 ; Shift → görög
-cursor (only board shgrk row 3 column 10)
+cursor (only layout shgrk row 3 column 10)
 button (link l_grk color shift addtitle (text "🔻" xoffset -500))
 ;end
 ;   begin numerikus váltógomb
 
 ; cseh → numerikus
-cursor (only board cseh row 5 column 10)
+cursor (only layout cseh row 5 column 10)
 button (link l_num lock color script addtitle (text "🎒" xoffset -500))
 ; numerikus → cseh
-cursor (only board num row 5 column 10)
+cursor (only layout num row 5 column 10)
 button (link l_cseh lock color script addtitle (text "🎒" xoffset -500))
 ; Shift cseh → Shift numerikus
-cursor (only board shcseh row 5 column 10)
+cursor (only layout shcseh row 5 column 10)
 button (link l_shnum lock color script addtitle (text "🎒" xoffset -500))
 ; Shift numerikus → Shift cseh
-cursor (only board shnum row 5 column 10)
+cursor (only layout shnum row 5 column 10)
 button (link l_shcseh lock color script addtitle (text "🎒" xoffset -500))
 ;end
 ;   begin menügomb
 
 cursor (none)
-cursor (also board cseh row 1 column 0)
-cursor (also board shcseh row 1 column 0)
-cursor (also board num row 1 column 0)
-cursor (also board shnum row 1 column 0)
-cursor (also board cyr row 1 column 0)
-cursor (also board shcyr row 1 column 0)
-cursor (also board grk row 1 column 0)
-cursor (also board shgrk row 1 column 0)
-cursor (also board modifyboard row 0 column 0)
-cursor (also board experimental row 0 column 0)
+cursor (also layout cseh row 1 column 0)
+cursor (also layout shcseh row 1 column 0)
+cursor (also layout num row 1 column 0)
+cursor (also layout shnum row 1 column 0)
+cursor (also layout cyr row 1 column 0)
+cursor (also layout shcyr row 1 column 0)
+cursor (also layout grk row 1 column 0)
+cursor (also layout shgrk row 1 column 0)
+cursor (also layout modifyboard row 0 column 0)
+cursor (also layout experimental row 0 column 0)
 button (link l_menu color cboard addtitle (text "🍝" xoffset 500))
 ;end
 ;   begin  gomb
 
 cursor (none)
-cursor (also board cseh row 2 column 0)
-cursor (also board shcseh row 2 column 0)
-cursor (also board num row 2 column 0)
-cursor (also board shnum row 2 column 0)
+cursor (also layout cseh row 2 column 0)
+cursor (also layout shcseh row 2 column 0)
+cursor (also layout num row 2 column 0)
+cursor (also layout shnum row 2 column 0)
 button (link l_modif lock color dia1 addtitle (text ''))
 ;end
 ;end
 ; begin menü
 
-cursor (only board menu row 0 column 0)
-cursor (also board modifyboard row 3 column 0)
+cursor (only layout menu row 0 column 0)
+cursor (also layout modifyboard row 3 column 0)
 button (link l_cseh lock color cboard addtitle (text 'č'))
 button (link l_shcseh lock color cboard addtitle (text 'Č'))
 button (link l_num lock color cboard addtitle (text '9'))
@@ -642,47 +642,47 @@ button (link l_exp lock color cboard addtitle (text '‽'))
 ; begin Draft
 
 cursor (none)
-cursor (also board cseh row 7 column 0)
-cursor (also board shcseh row 7 column 0)
-cursor (also board num row 7 column 0)
-cursor (also board shnum row 7 column 0)
-cursor (also board cyr row 7 column 0)
-cursor (also board shcyr row 7 column 0)
-cursor (also board grk row 7 column 0)
-cursor (also board shgrk row 7 column 0)
+cursor (also layout cseh row 7 column 0)
+cursor (also layout shcseh row 7 column 0)
+cursor (also layout num row 7 column 0)
+cursor (also layout shnum row 7 column 0)
+cursor (also layout cyr row 7 column 0)
+cursor (also layout shcyr row 7 column 0)
+cursor (also layout grk row 7 column 0)
+cursor (also layout shgrk row 7 column 0)
 
 button (do draft addtitle (text "♻" size 2000 xoffset 500))
 ;end
 ; begin Case gomb
 cursor (none)
-cursor (also board cseh row 3 column 10)
-cursor (also board shcseh row 3 column 10)
-cursor (also board num row 3 column 10)
-cursor (also board shnum row 3 column 10)
-cursor (also board cyr row 3 column 10)
-cursor (also board shcyr row 3 column 10)
-cursor (also board grk row 3 column 10)
-cursor (also board shgrk row 3 column 10)
+cursor (also layout cseh row 3 column 10)
+cursor (also layout shcseh row 3 column 10)
+cursor (also layout num row 3 column 10)
+cursor (also layout shnum row 3 column 10)
+cursor (also layout cyr row 3 column 10)
+cursor (also layout shcyr row 3 column 10)
+cursor (also layout grk row 3 column 10)
+cursor (also layout shgrk row 3 column 10)
 
 button (modify case color casebutton addtitle (text "✳" size 2000 xoffset -500))
 ; end
 ; begin Android Back
 
 cursor (none)
-cursor (also board cseh row 7 column 10)
-cursor (also board shcseh row 7 column 10)
-cursor (also board num row 7 column 10)
-cursor (also board shnum row 7 column 10)
-cursor (also board cyr row 7 column 10)
-cursor (also board shcyr row 7 column 10)
-cursor (also board grk row 7 column 10)
-cursor (also board shgrk row 7 column 10)
+cursor (also layout cseh row 7 column 10)
+cursor (also layout shcseh row 7 column 10)
+cursor (also layout num row 7 column 10)
+cursor (also layout shnum row 7 column 10)
+cursor (also layout cyr row 7 column 10)
+cursor (also layout shcyr row 7 column 10)
+cursor (also layout grk row 7 column 10)
+cursor (also layout shgrk row 7 column 10)
 
 button (key keyback addtitle (text "🔙" xoffset -500))
 ;end
 ; begin diakritikus billentyűzet
 
-cursor (only board modifyboard row 0 column 1)
+cursor (only layout modifyboard row 0 column 1)
 button (modify acute color dia1 addtitle (text 'ˊ' modifier))
 button (modify grave color dia2 addtitle (text 'ˋ' modifier))
 button (modify trema color dia3 addtitle (text '¨' modifier))
@@ -695,7 +695,7 @@ button (modify dot color dia3 addtitle (text '˙' modifier))
 button (modify dotbelow color dia1 addtitle (text '.' modifier))
 button (modify eaccent color dia2 addtitle (text '' modifier))
 
-cursor (only board modifyboard row 1 column 0)
+cursor (only layout modifyboard row 1 column 0)
 button (modify horn  color dia2 addtitle (text '̉' modifier))
 button (modify stroke color dia3 addtitle (text '/' modifier))
 button (modify ring color dia1 addtitle (text '˚' modifier))
@@ -707,7 +707,7 @@ button (modify special color dia3 addtitle (text 'ß' modifier))
 button (modify invbreve color dia1 addtitle (text '̑' modifier))
 button (modify diaindex color dia2 addtitle (text '²' modifier))
 
-cursor (only board modifyboard row 2 column 1)
+cursor (only layout modifyboard row 2 column 1)
 button (modify down color dia1 addtitle (text '˯' modifier))
 button (modify up color dia2 addtitle (text '˰' modifier))
 button (modify left color dia3 addtitle (text '˱' modifier))
@@ -718,17 +718,17 @@ button (modify misc color dia1 addtitle (text '̱' modifier))
 ;end
 ; begin ADDLINK
 
-addlink (index l_cseh board cseh)
-addlink (index l_shcseh board shcseh)
-addlink (index l_num board num)
-addlink (index l_shnum board shnum)
-addlink (index l_cyr board cyr)
-addlink (index l_shcyr board shcyr)
-addlink (index l_grk board grk)
-addlink (index l_shgrk board shgrk)
-addlink (index l_menu board menu)
-addlink (index l_modif board modifyboard)
-addlink (index l_exp board experimental)
+addlink (index l_cseh layout cseh)
+addlink (index l_shcseh layout shcseh)
+addlink (index l_num layout num)
+addlink (index l_shnum layout shnum)
+addlink (index l_cyr layout cyr)
+addlink (index l_shcyr layout shcyr)
+addlink (index l_grk layout grk)
+addlink (index l_shgrk layout shgrk)
+addlink (index l_menu layout menu)
+addlink (index l_modif layout modifyboard)
+addlink (index l_exp layout experimental)
 ;end
 ; begin módosítók táblázata
 ;   begin latin
@@ -912,7 +912,7 @@ ADDMODIFY (ID ipogegrameni ROLLS (
 ;end
 ; begin experimental
 
-cursor (only board experimental row 0 column 1)
+cursor (only layout experimental row 0 column 1)
 
 button (text 'ť')
 button (text 'c')

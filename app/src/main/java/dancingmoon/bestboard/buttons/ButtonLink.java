@@ -4,7 +4,7 @@ import android.graphics.Canvas;
 
 import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
-import dancingmoon.bestboard.states.LinkState;
+import dancingmoon.bestboard.states.BoardLinks;
 
 public class ButtonLink extends ButtonMultiTouch implements
         Button.ChangingButton, Cloneable
@@ -32,7 +32,7 @@ public class ButtonLink extends ButtonMultiTouch implements
     @Override
     public String getString()
         {
-        if ( index < 0 || index >= LinkState.MAX_LINKS )
+        if ( index < 0 || index >= BoardLinks.MAX_LINKS )
             return "PREV";
         else
             return (lockKey ? "L" : "") + Integer.toHexString( index );
@@ -41,13 +41,13 @@ public class ButtonLink extends ButtonMultiTouch implements
     @Override
     public void drawChangingButton(Canvas canvas)
         {
-        if ( board.softBoardData.linkState.getState( index ) == LinkState.ACTIVE )
-            drawButton( canvas, board.softBoardData.metaColor, board.boardXOffset, board.boardYOffset);
-        else if ( board.softBoardData.linkState.getState( index ) == LinkState.LOCKED )
-            drawButton( canvas, board.softBoardData.lockColor, board.boardXOffset, board.boardYOffset);
-        else if ( board.softBoardData.linkState.getState( index ) == LinkState.TOUCHED &&
-                board.softBoardData.displayTouch)
-            drawButton( canvas, board.softBoardData.touchColor, board.boardXOffset, board.boardYOffset);
+        if ( layout.softBoardData.boardLinks.getState( index ) == BoardLinks.ACTIVE )
+            drawButton( canvas, layout.softBoardData.metaColor, layout.layoutXOffset, layout.layoutYOffset);
+        else if ( layout.softBoardData.boardLinks.getState( index ) == BoardLinks.LOCKED )
+            drawButton( canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
+        else if ( layout.softBoardData.boardLinks.getState( index ) == BoardLinks.TOUCHED &&
+                layout.softBoardData.displayTouch)
+            drawButton( canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
         // If state == HIDDEN, then no redraw is needed
         }
 
@@ -59,17 +59,17 @@ public class ButtonLink extends ButtonMultiTouch implements
         if ( phase == ButtonMultiTouch.META_TOUCH )
             {
             Scribe.debug( Debug.BUTTON, "Index " + index + " USE Button TOUCH.");
-            board.softBoardData.linkState.touch( index );
+            layout.softBoardData.boardLinks.touch( index );
             }
         else if ( phase == ButtonMultiTouch.META_RELEASE )
             {
             Scribe.debug( Debug.BUTTON, "Index " + index + " USE Button RELEASE.");
-            board.softBoardData.linkState.release( index, lockKey );
+            layout.softBoardData.boardLinks.release( index, lockKey );
             }
         else if ( phase == ButtonMultiTouch.META_CANCEL )
             {
             Scribe.debug( Debug.BUTTON, "Index " + index + " USE Button CANCEL.");
-            board.softBoardData.linkState.cancel( index );
+            layout.softBoardData.boardLinks.cancel( index );
             }
         }
     }

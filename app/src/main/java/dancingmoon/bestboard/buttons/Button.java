@@ -5,7 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
 
-import dancingmoon.bestboard.Board;
+import dancingmoon.bestboard.Layout;
 import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.SinglyLinkedList;
@@ -18,13 +18,13 @@ public class Button implements Cloneable
     {
     /**
      * If a Button subclass implements ChangingButton interface,
-     * then Board.onDraw() calls its drawChangingButton() method,
+     * then Layout.onDraw() calls its drawChangingButton() method,
      * which can redraw the changed button over the layout-bitmap.
-     * Buttons with ChangingButton interface will be collected in the Board.addButton method().
+     * Buttons with ChangingButton interface will be collected in the Layout.addButton method().
      */
     public interface ChangingButton
         {
-        // offset is always board.xOffset (direct draw on screen)
+        // offset is always layout.xOffset (direct draw on screen)
         public void drawChangingButton(Canvas canvas);
         }
 
@@ -62,8 +62,8 @@ public class Button implements Cloneable
         }
 
 
-    /** Button's board */
-    protected Board board;
+    /** Button's layout */
+    protected Layout layout;
 
     /** Button's position in grid */
     protected int columnInGrids;
@@ -77,15 +77,15 @@ public class Button implements Cloneable
 
 
     /**
-     * Connects the Button instance to its board and position.
+     * Connects the Button instance to its layout and position.
      * (Each Button instance refers to only one specific button.)
-     * @param board button's board
+     * @param layout button's layout
      * @param arrayColumn column (hexagonal)
      * @param arrayRow row (hexagonal)
      */
-    public void setPosition( Board board, int arrayColumn, int arrayRow )
+    public void setPosition( Layout layout, int arrayColumn, int arrayRow )
         {
-        this.board = board;
+        this.layout = layout;
         this.columnInGrids = getGridX( arrayColumn, arrayRow );
         this.rowInGrids = getGridY( arrayRow );
         }
@@ -133,7 +133,7 @@ public class Button implements Cloneable
 
     // !! Always use X-Y or Column-Row pairs !!
     // GridX = HX * 2 + ( (HY + HK) % 2 )
-    // + 1 because board is wider then area
+    // + 1 because layout is wider then area
 
     /**
      * Converts columns (hexagon) into grids
@@ -144,8 +144,8 @@ public class Button implements Cloneable
      */
     protected int getGridX( int arrayColumn, int arrayRow )
         {
-        int gridX = arrayColumn * 2 + 1 + (( arrayRow + board.rowsAlignOffset ) % 2 );
-        Scribe.debug(Debug.BUTTON, "ArrayX: " + arrayColumn + ", GridX: " + gridX + ", Align: " + board.rowsAlignOffset);
+        int gridX = arrayColumn * 2 + 1 + (( arrayRow + layout.rowsAlignOffset ) % 2 );
+        Scribe.debug(Debug.BUTTON, "ArrayX: " + arrayColumn + ", GridX: " + gridX + ", Align: " + layout.rowsAlignOffset);
         return gridX;
         }
 
@@ -176,7 +176,7 @@ public class Button implements Cloneable
      */
     protected int getPixelX( int gridX, int xOffsetInPixel )
         {
-        return gridX * board.areaWidthInPixels / board.areaWidthInGrids + xOffsetInPixel;
+        return gridX * layout.areaWidthInPixels / layout.areaWidthInGrids + xOffsetInPixel;
         }
 
 
@@ -189,7 +189,7 @@ public class Button implements Cloneable
      */
     protected int getPixelY( int gridY, int yOffsetInPixel )
         {
-        return gridY * board.boardHeightInPixels / board.boardHeightInGrids + yOffsetInPixel;
+        return gridY * layout.layoutHeightInPixels / layout.layoutHeightInGrids + yOffsetInPixel;
         }
 
 
@@ -197,9 +197,9 @@ public class Button implements Cloneable
      * Creates button's hexagon with the use of the grids
      * The created path can be used both for outline and fill
      * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or layout.xOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
      * @return created path
      */
     protected Path hexagonPath( int xOffsetInPixel, int yOffsetInPixel)
@@ -225,19 +225,19 @@ public class Button implements Cloneable
 
 
     /**
-     * Draw button directly on the screen (above layout-bitmap) (Board.onDraw)
-     * Background color is the color of the touched keys (board.softBoardData.touchColor)
-     * Board.xOffset is applied (as for the layout-bitmap)
+     * Draw button directly on the screen (above layout-bitmap) (Layout.onDraw)
+     * Background color is the color of the touched keys (layout.softBoardData.touchColor)
+     * Layout.xOffset is applied (as for the layout-bitmap)
      * @param canvas canvas of the bitmap
      */
     public void drawTouchedButton( Canvas canvas )
         {
-        drawButton( canvas, board.softBoardData.touchColor, board.boardXOffset, board.boardYOffset);
+        drawButton( canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
         }
 
 
     /**
-     * Draw button on layout-bitmap (Board.createLayoutScreen())
+     * Draw button on layout-bitmap (Layout.createLayoutScreen())
      * Background color is the button's original color
      * No x offset is applied
      * @param canvas canvas of the bitmap
@@ -253,9 +253,9 @@ public class Button implements Cloneable
      * @param canvas canvas to draw on
      * @param color background color
      * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or board.xOffset-board.boardXOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or layout.xOffset-layout.layoutXOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
      */
     protected void drawButton( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
@@ -273,9 +273,9 @@ public class Button implements Cloneable
      * @param canvas canvas to draw on
      * @param color background color
      * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or layout.xOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
      */
     protected void drawButtonBackground( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
@@ -293,9 +293,9 @@ public class Button implements Cloneable
      * This method could be changed, if not all titles are needed
      * @param canvas canvas to draw on
      * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or board.xOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or layout.xOffset (direct draw on screen)
      * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -board.boardYOffset (direct draw on screen)
+     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
      */
     protected void drawButtonTitles( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
         {
@@ -308,7 +308,7 @@ public class Button implements Cloneable
 
         for ( TitleDescriptor title : titles )
             {
-            title.drawTitle(canvas, board, centerX, centerY);
+            title.drawTitle(canvas, layout, centerX, centerY);
             }
         }
     }

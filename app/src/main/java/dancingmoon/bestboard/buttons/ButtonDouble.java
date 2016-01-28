@@ -52,7 +52,7 @@ public class ButtonDouble extends ButtonMainTouch implements Cloneable
     @Override
     public void mainTouchOnCircle( boolean isHardPress )
         {
-        if ( board.softBoardData.softBoardListener.undoLastString() )
+        if ( layout.softBoardData.softBoardListener.undoLastString() )
             {
             if ( counter == 1 )
                 {

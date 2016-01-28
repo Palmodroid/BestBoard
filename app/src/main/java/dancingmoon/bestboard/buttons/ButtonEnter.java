@@ -27,7 +27,7 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
     @Override
     public String getChangingString()
         {
-        return board.softBoardData.getActionTitle();
+        return layout.softBoardData.getActionTitle();
         }
 
     @Override
@@ -57,11 +57,11 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
 
     private void fire( )
         {
-        if ( board.softBoardData.isActionSupplied() )
+        if ( layout.softBoardData.isActionSupplied() )
             {
             // fromEnterKey parameter is useless, because multiline actions are performed separately
             // ?? What to do with repeat here ??
-            if ( !board.softBoardData.softBoardListener.sendDefaultEditorAction( true ) )
+            if ( !layout.softBoardData.softBoardListener.sendDefaultEditorAction( true ) )
                 {
                 Scribe.error( "ENTER: default action was not accepted by editor!" );
                 }
@@ -71,7 +71,7 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
         else
             {
             // editor
-            if ( board.softBoardData.action == SoftBoardData.ACTION_MULTILINE )
+            if ( layout.softBoardData.action == SoftBoardData.ACTION_MULTILINE )
                 {
                 if ( !packetKey.sendIfNoMeta() )    // if any meta is turned on - send HARD-KEY
                     {

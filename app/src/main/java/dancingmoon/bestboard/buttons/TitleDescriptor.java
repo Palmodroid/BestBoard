@@ -5,7 +5,7 @@ import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
 
-import dancingmoon.bestboard.Board;
+import dancingmoon.bestboard.Layout;
 
 /**
  * Describes titles (formatted strings) on buttons.
@@ -36,15 +36,15 @@ public class TitleDescriptor
         }
 
     /**
-     * Calculates text size for each board.
+     * Calculates text size for each layout.
      * All TitleDescriptor instances use the same paint and the same typeface.
-     * Text size is different for each board (and is stored in board's data)
+     * Text size is different for each layout (and is stored in layout's data)
      * At least 4 "ly"-s (vertically) and 5 "M"-s (horizontally) drawn with this size
      * can be placed inside one hexagon.
-     * @param board calculate text size for this board
-     * @return text size for this board
+     * @param layout calculate text size for this layout
+     * @return text size for this layout
      */
-    public static int calculateTextSize( Board board )
+    public static int calculateTextSize( Layout layout)
         {
         Rect bounds = new Rect();
 
@@ -59,14 +59,14 @@ public class TitleDescriptor
         int textHeight = bounds.height();
 
         // Calculate font size from the height of "ly" characters
-        // intendedHeightInPixels is one grid (1/4 hexagon) == boardHeightInPixels / boardHeightInGrids
+        // intendedHeightInPixels is one grid (1/4 hexagon) == layoutHeightInPixels / layoutHeightInGrids
         // Ratio => SIZE : intendedHeightInPixels = 1000f : bounds.height()
-        int textSizeFromHeight = 1000 * board.boardHeightInPixels / (board.boardHeightInGrids * textHeight) ;
+        int textSizeFromHeight = 1000 * layout.layoutHeightInPixels / (layout.layoutHeightInGrids * textHeight) ;
 
         // Calculate font size from the width of "MMMMM" characters
         // intendedWidthInPixels is one hexagon (2 grids) == 2 * areaWidthInPixels / areaWidthInGrids
         // Ratio => SIZE : intendedWidthInPixels = 1000f : bounds.width()
-        int textSizeFromWidth = 2 * 1000 * board.areaWidthInPixels / (board.areaWidthInGrids * textWidth);
+        int textSizeFromWidth = 2 * 1000 * layout.areaWidthInPixels / (layout.areaWidthInGrids * textWidth);
 
         // In most cases textSizeFromWidth is smaller
         // Now text with max. 5 characters can fit in the width of a hexagon
@@ -122,28 +122,28 @@ public class TitleDescriptor
      * Title can be attached to several buttons, so position data is given as parameter.
      * Because button's background is drawn first, the buttons calculated position can be used.
      * (Repeated calculation is not needed.)
-     * Title text will be uppercase if capslock is forced by the board
+     * Title text will be uppercase if capslock is forced by the layout
      * @param canvas to draw on
-     * @param board provides screen specific information (text and hexagon size)
+     * @param layout provides screen specific information (text and hexagon size)
      * @param centerX coord. in pixels (offset included)
      * @param centerY coord. in pixels
      */
-    public void drawTitle( Canvas canvas, Board board, int centerX, int centerY )
+    public void drawTitle( Canvas canvas, Layout layout, int centerX, int centerY )
         {
-        drawTitle( canvas, board, text, centerX, centerY );
+        drawTitle( canvas, layout, text, centerX, centerY );
         }
 
     /**
      * Draws an external title on the button.
      * @param canvas to draw on
-     * @param board provides screen specific information (text and hexagon size)
+     * @param layout provides screen specific information (text and hexagon size)
      * @param text external text to show as title
      * @param centerX coord. in pixels (offset included)
      * @param centerY coord. in pixels
      */
-    public void drawTitle( Canvas canvas, Board board, String text, int centerX, int centerY )
+    public void drawTitle( Canvas canvas, Layout layout, String text, int centerX, int centerY )
         {
-        textPaint.setTextSize(board.textSize * size / 1000);
+        textPaint.setTextSize(layout.textSize * size / 1000);
         textPaint.setColor(color);
 
         textPaint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
@@ -153,9 +153,9 @@ public class TitleDescriptor
         textPaint.setTextSkewX(italics ? -0.25f : 0);
 
         canvas.drawText(
-                board.isCapsForced() ? text.toUpperCase( board.softBoardData.locale ) : text,
-                centerX + xOffset * board.halfHexagonWidthInPixels / 1000,
-                centerY + yOffset * board.halfHexagonHeightInPixels / 1000,
+                layout.isCapsForced() ? text.toUpperCase( layout.softBoardData.locale ) : text,
+                centerX + xOffset * layout.halfHexagonWidthInPixels / 1000,
+                centerY + yOffset * layout.halfHexagonHeightInPixels / 1000,
                 textPaint);
         }
 

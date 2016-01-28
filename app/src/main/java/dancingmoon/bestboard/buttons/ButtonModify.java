@@ -30,7 +30,7 @@ public class ButtonModify extends ButtonMainTouch implements Cloneable
     @Override
     public void mainTouchStart( boolean isTouchDown )
         {
-        Modify modify = board.softBoardData.modify.get( modifyId );
+        Modify modify = layout.softBoardData.modify.get( modifyId );
         if ( modify != null )
             {
             modify.change( reverse );
@@ -40,7 +40,7 @@ public class ButtonModify extends ButtonMainTouch implements Cloneable
             // Error message should mimic tokenizer error
             Scribe.error_secondary(
                     "[RUNTIME ERROR] " +
-                            board.softBoardData.softBoardListener.getApplicationContext().getString( R.string.modify_missing ) +
+                            layout.softBoardData.softBoardListener.getApplicationContext().getString( R.string.modify_missing ) +
                             Tokenizer.regenerateKeyword( modifyId ) );
             }
         }

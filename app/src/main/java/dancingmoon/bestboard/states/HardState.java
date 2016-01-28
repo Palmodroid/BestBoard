@@ -11,7 +11,7 @@ public class HardState extends MetaState
 
     public final int selfMetaState;
 
-    public final BoardStates boardStates;
+    public final LayoutStates layoutStates;
 
     public final static int FORCE_MASK = 3;
 
@@ -23,10 +23,10 @@ public class HardState extends MetaState
 
     public final static int FORCE_OFF = 1;
 
-    public HardState( int selfMetaState, BoardStates boardStates )
+    public HardState( int selfMetaState, LayoutStates layoutStates)
         {
         this.selfMetaState = selfMetaState;
-        this.boardStates = boardStates;
+        this.layoutStates = layoutStates;
         }
 
     /**
@@ -59,18 +59,18 @@ public class HardState extends MetaState
         {
         if ( isStateActive() )
             {
-            if ( !boardStates.isSimulatedMetaButtonPressed( selfMetaState ) )
+            if ( !layoutStates.isSimulatedMetaButtonPressed( selfMetaState ) )
                 {
                 Scribe.debug( Debug.HARDSTATE, selfMetaState + " hard state's button is pressed! " );
-                boardStates.pressSimulatedMetaButton( selfMetaState );
+                layoutStates.pressSimulatedMetaButton( selfMetaState );
                 }
             }
         else
             {
-            if ( boardStates.isSimulatedMetaButtonPressed( selfMetaState) )
+            if ( layoutStates.isSimulatedMetaButtonPressed( selfMetaState) )
                 {
                 Scribe.debug( Debug.HARDSTATE, selfMetaState + " hard state's button is released! ");
-                boardStates.releaseSimulatedMetaButton( selfMetaState );
+                layoutStates.releaseSimulatedMetaButton( selfMetaState );
                 }
             }
         }

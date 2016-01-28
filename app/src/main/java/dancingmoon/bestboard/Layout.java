@@ -12,12 +12,12 @@ import dancingmoon.bestboard.buttons.TitleDescriptor;
 import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.parser.Tokenizer;
 import dancingmoon.bestboard.scribe.Scribe;
-import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.LayoutStates;
 import dancingmoon.bestboard.states.MetaState;
 import dancingmoon.bestboard.utils.ExternalDataException;
 import dancingmoon.bestboard.utils.Trilean;
 
-public class Board
+public class Layout
     {
     /**
      ** CLASS VARIABLES - LOADED FROM COAT DESCRIPTOR FILE
@@ -38,41 +38,41 @@ public class Board
     /**
      * Maximal layout width in hexagons
      */
-    public static final int MAX_BOARD_WIDTH_IN_HEXAGONS = 48;
+    public static final int MAX_LAYOUT_WIDTH_IN_HEXAGONS = 48;
 
     /**
      * Maximal layout height in hexagons
      */
-    public static final int MAX_BOARD_HEIGHT_IN_HEXAGONS = 24;
+    public static final int MAX_LAYOUT_HEIGHT_IN_HEXAGONS = 24;
 
     /**
-     * Data stored in softBoardData is needed for each board.
+     * Data stored in softBoardData is needed for each layout.
      */
     public SoftBoardData softBoardData;
 
     /**
-     * number of keys (full hexagons) in one row of the board
+     * number of keys (full hexagons) in one row of the layout
      * This is the number of the STORED keys, and NOT the displayed hexagons
      */
-    public int boardWidthInHexagons;
+    public int layoutWidthInHexagons;
 
     /**
      * number of hexagon rows
      * This is the number of the STORED rows, and NOT the displayed hexagons
      */
-    public int boardHeightInHexagons;
+    public int layoutHeightInHexagons;
 
     /**
      * displayed half hexagons in one row (this value is used for calculations)
-     * board is one hexagon wider
+     * layout is one hexagon wider
      */
     public int areaWidthInGrids;
 
     /**
-     * board height in quarter hexagon rows (this value is used for calculations)
+     * layout height in quarter hexagon rows (this value is used for calculations)
      * displayed area can be smaller if hideTop or hideBottom are active
      */
-    public int boardHeightInGrids;
+    public int layoutHeightInGrids;
 
     /**
      * 1 if first (0) row starts with WHOLE button on the left
@@ -81,14 +81,14 @@ public class Board
     public int rowsAlignOffset;
 
     /**
-     * true if board is optimised for landscape. Portrait (false) boards can be used in both modes
+     * true if layout is optimised for landscape. Portrait (false) layouts can be used in both modes
      */
     public boolean wide = false;
 
     /**
-     * background color of the board
+     * background color of the layout
      */
-    public int boardColor;
+    public int layoutColor;
 
     /**
      * meta-states to force
@@ -97,20 +97,20 @@ public class Board
 
     /**
      * Needed by TitleDescriptor to change titles to uppercase if CAPS is forced
-     * @return true if caps lock is forced by the board
+     * @return true if caps lock is forced by the layout
      */
     public boolean isCapsForced()
         {
-        return metaStates[BoardStates.META_CAPS].isTrue();
+        return metaStates[LayoutStates.META_CAPS].isTrue();
         }
 
     /**
-     * Buttons of the board - will be initialized in constructor, and filled up by addButton
+     * Buttons of the layout - will be initialized in constructor, and filled up by addButton
      */
     public Button[] buttons;
 
     /**
-     * Changeable buttons of the board - filled up by addButton
+     * Changeable buttons of the layout - filled up by addButton
      */
     public ArrayList<Button.ChangingButton> changingButtons = new ArrayList<>();
 
@@ -127,43 +127,43 @@ public class Board
     public int validatedWidthInPixels = -1;
 
     /**
-     ** areaWidth and boardHeight are measured and calculated first
-     ** boardWidth is two halfhexagons wider then areaWidth,
-     ** Xoffset is one (-)halfhexagon and the offset of the whole board
+     ** areaWidth and layoutHeight are measured and calculated first
+     ** layoutWidth is two halfhexagons wider then areaWidth,
+     ** Xoffset is one (-)halfhexagon and the offset of the whole layout
      ** (non-wide on wide screen oe 0)
      ** areaHeight depends on hidden edges and on monitor row,
      ** Yoffset depends on hidden upper part
      **/
 
     /**
-     * width of the visible area (equals to screen's lower diameter for non-wide boards)
+     * width of the visible area (equals to screen's lower diameter for non-wide layouts)
      */
     public int areaWidthInPixels;
 
     /**
-     * visible height: height of the board - hidden edges and monitor
+     * visible height: height of the layout - hidden edges and monitor
      */
     public int areaHeightInPixels;
 
     /**
-     * board width in pixels - it contains the non-visible two half-hexagons, too
+     * layout width in pixels - it contains the non-visible two half-hexagons, too
      */
-    public int boardWidthInPixels;
+    public int layoutWidthInPixels;
 
     /**
-     * board height in pixels (calculated from width)
+     * layout height in pixels (calculated from width)
      */
-    public int boardHeightInPixels;
+    public int layoutHeightInPixels;
 
     /**
-     * offset in landscape if board is not wide - a half hexagon width
+     * offset in landscape if layout is not wide - a half hexagon width
      */
-    public int boardXOffset;
+    public int layoutXOffset;
 
     /**
      * equals with a quarter of hexagon, if upper edge is hidden
      */
-    public int boardYOffset;
+    public int layoutYOffset;
 
     /**
      * Text with this size:
@@ -187,16 +187,16 @@ public class Board
     /**
      * Map contains the touchCodes for all levels
      */
-    private Bitmap boardMap;
+    private Bitmap layoutMap;
 
     /**
      * Layout skin for the current layout.
      */
-    private Bitmap boardLayout = null;
+    private Bitmap layoutPicture = null;
 
 
     /**
-     ** CONSTRUCTION OF THE BOARD
+     ** CONSTRUCTION OF THE LAYOUT
      ** Parsing phase:
      **   1. Constructor - adds non screen-specific data
      **      setForcedMeta() - if meta-states should be forced
@@ -209,26 +209,26 @@ public class Board
 
     /**
      * Constructor needs data to generate a keyboard with button-holes.
-     * It needs information about the measures of the board.
+     * It needs information about the measures of the layout.
      * All specific data (buttons etc.) will be added later.
-     * Screen information is needed to draw the board.
+     * Screen information is needed to draw the layout.
      * It will added in the calculateScreenData() method.
      *
      * @param data           softBoardData for all boards
      * @param halfcolumns    width in half hexagons (grids)
      * @param rows           height in full hexagons
      * @param oddRowsAligned first row (0) starts with whole button on the left
-     * @param wide           board is optimised for wide (landscape) screen (cannot be used in portrait)
+     * @param wide           layout is optimised for wide (landscape) screen (cannot be used in portrait)
      * @param color          background color
      * @param metaStates     forced metastates
-     * @throws IllegalArgumentException if board cannot be created with this dimension
+     * @throws IllegalArgumentException if layout cannot be created with this dimension
      *                                  Dimension can be checked previously with isValidDimension()
      */
-    public Board( SoftBoardData data, int halfcolumns, int rows,
-                 boolean oddRowsAligned, boolean wide, int color,
-                 Trilean[] metaStates ) throws ExternalDataException
+    public Layout(SoftBoardData data, int halfcolumns, int rows,
+                  boolean oddRowsAligned, boolean wide, int color,
+                  Trilean[] metaStates) throws ExternalDataException
         {
-        Scribe.locus( Debug.BOARD );
+        Scribe.locus( Debug.LAYOUT);
         // NON SCREEN-SPECIFIC DATA
 
         // Common data is needed
@@ -237,30 +237,30 @@ public class Board
         // first two hidden, "side" halfcolumns are added, then full columns are calculated
         // even halfcolumns: last button can be in hidden position,
         // but starting with a half button it will appear
-        this.boardWidthInHexagons = (halfcolumns + 2) / 2;
-        this.boardHeightInHexagons = rows;
+        this.layoutWidthInHexagons = (halfcolumns + 2) / 2;
+        this.layoutHeightInHexagons = rows;
 
         // Each row has one more half hexagon column
         this.areaWidthInGrids = halfcolumns;
 
         // Each row has three quarters of hexagonal height (3 grids) + 1 for the last row
-        this.boardHeightInGrids = boardHeightInHexagons * 3 + 1;
+        this.layoutHeightInGrids = layoutHeightInHexagons * 3 + 1;
 
-        if (!isValidDimension(boardWidthInHexagons, boardHeightInHexagons))
+        if (!isValidDimension(layoutWidthInHexagons, layoutHeightInHexagons))
             {
-            throw new ExternalDataException("Board cannot be created with these arguments!");
+            throw new ExternalDataException("Layout cannot be created with these arguments!");
             }
 
         this.rowsAlignOffset = oddRowsAligned ? 1 : 0;
 
         this.wide = wide;
 
-        this.boardColor = color;
+        this.layoutColor = color;
 
         // INITIALIZE BUTTONS' ARRAY
         // this two-dimensional array will be populated later
         // null: non-defined (empty) button
-        buttons = new Button[boardWidthInHexagons * boardHeightInHexagons];
+        buttons = new Button[layoutWidthInHexagons * layoutHeightInHexagons];
         // ADDBUTTON will fill up this array
 
         // SETSCREENDATA is needed for screen-specific information
@@ -271,16 +271,16 @@ public class Board
 
     /**
      * Force meta-states, as defined by setForcedMeta()
-     * This method is called when board is chosen.
+     * This method is called when layout is chosen.
      */
     public void forceMetaStates()
         {
         for (int m = 0; m < metaStates.length; m++)
             {
             if ( metaStates[m].isTrue() )
-                softBoardData.boardStates.metaStates[m].setState( MetaState.META_LOCK );
+                softBoardData.layoutStates.metaStates[m].setState( MetaState.META_LOCK );
             else if ( metaStates[m].isFalse() )
-                softBoardData.boardStates.metaStates[m].setState( MetaState.META_OFF );
+                softBoardData.layoutStates.metaStates[m].setState( MetaState.META_OFF );
             // IGNORE -> no change
             }
         }
@@ -288,11 +288,11 @@ public class Board
 
     /**
      * Predefined button is added at the defined position.
-     * Board and position infos are added previously.
+     * Layout and position infos are added previously.
      *
      * @param arrayColumn arrayColumn (in hexagons) of the button
      * @param arrayRow    arrayRow (in hexagons) of the button
-     * @param button predefined button instance (board, positions are not needed)
+     * @param button predefined button instance (layout, positions are not needed)
      * @return true if button overwrites an other button
      * @throws ExternalDataException If button position is not valid
      */
@@ -332,7 +332,7 @@ public class Board
      * Gets an existing button.
      * @param arrayColumn arrayColumn (in hexagons) of the button
      * @param arrayRow    arrayRow (in hexagons) of the button
-     * @return button instance (which is already on the board!)
+     * @return button instance (which is already on the layout!)
      * @throws ExternalDataException If button position is not valid
      */
     public Button getButton( int arrayColumn, int arrayRow ) throws ExternalDataException
@@ -349,12 +349,12 @@ public class Board
 
 
     /**
-     * Calculates board dimensions from screen specific data:
-     * - xOffset, boardWidthInPixels, boardHeightInPixels
+     * Calculates layout dimensions from screen specific data:
+     * - xOffset, layoutWidthInPixels, layoutHeightInPixels
      * - halfHexagonWidthInPixels, halfHexagonWidthInPixels
      * - textSize
      * It is called by BoardView.onMeasure() when screen (width) is changed or
-     * board is changed. Recalculation is needed only, when ScreenWidthInPixels changed.
+     * layout is changed. Recalculation is needed only, when ScreenWidthInPixels changed.
      * This method also calculates data from preferences.
      * If those data are changed, invalidateCalculations should be called, to invalidate data.
      * @param screenWidthInPixels  screen width
@@ -362,7 +362,7 @@ public class Board
      */
     public void calculateScreenData( int screenWidthInPixels, int screenHeightInPixels )
         {
-        Scribe.locus( Debug.BOARD );
+        Scribe.locus( Debug.LAYOUT);
         
         // calculateScreenData is needed only, if orientation was changed
         // invalidateCalculations invalidates it to force calculations
@@ -374,84 +374,84 @@ public class Board
         boolean landscape = (screenWidthInPixels > screenHeightInPixels);
         
         // orientation can be found in UseState also
-        if ( landscape != softBoardData.linkState.isLandscape() )
+        if ( landscape != softBoardData.boardLinks.isLandscape() )
             Scribe.error("Orientation in onMeasure and in link-state is not the same!");
 
-        // temporary variables are needed to check whether board dimension is changed
+        // temporary variables are needed to check whether layout dimension is changed
 
         // IMPORTANT!
-        // New area WIDTH is calculated, real board width is wider with one hexagon, and
-        // New board HEIGHT is calculated, real height is calculated from hideupper/lower and monitor
+        // New area WIDTH is calculated, real layout width is wider with one hexagon, and
+        // New layout HEIGHT is calculated, real height is calculated from hideupper/lower and monitor
 
         int newAreaWidthInPixels;
-        int newBoardHeightInPixels;
+        int newLayoutHeightInPixels;
 
         // Calculate AreaWidth and Offset
 
-        // WIDE board for LANDSCAPE mode OR NORMAL board for PORTRAIT mode
+        // WIDE layout for LANDSCAPE mode OR NORMAL layout for PORTRAIT mode
         if (wide == landscape)
             {
             newAreaWidthInPixels = screenWidthInPixels;
-            boardXOffset = 0;
-            Scribe.debug( Debug.BOARD, "Full width keyboard");
+            layoutXOffset = 0;
+            Scribe.debug( Debug.LAYOUT, "Full width keyboard");
             }
-        // NORMAL board for LANDSCAPE mode - change values
+        // NORMAL layout for LANDSCAPE mode - change values
         else if (!wide) // && landscape)
             {
             // noinspection SuspiciousNameCombination
             newAreaWidthInPixels = screenHeightInPixels; // This is the shorter diameter
-            boardXOffset = (screenWidthInPixels - newAreaWidthInPixels) *
+            layoutXOffset = (screenWidthInPixels - newAreaWidthInPixels) *
                     softBoardData.landscapeOffsetPermil / 1000;
-            Scribe.debug( Debug.BOARD, "Normal keyboard for landscape. Offset:" + boardXOffset);
+            Scribe.debug( Debug.LAYOUT, "Normal keyboard for landscape. Offset:" + layoutXOffset);
             }
-        // LANDSCAPE board PORTRAIT mode - incompatible board! - !! NOW WE LET IT WORK (TESTING!!) !!
+        // LANDSCAPE layout PORTRAIT mode - incompatible layout! - !! NOW WE LET IT WORK (TESTING!!) !!
         else // if (wide && !landscape)
             {
-            newAreaWidthInPixels = screenWidthInPixels; // Board will be distorted!!
-            boardXOffset = 0;
-            Scribe.debug( Debug.BOARD, "Wide keyboard for portrait! NOT POSSIBLE! Keyboard is distorted.");
+            newAreaWidthInPixels = screenWidthInPixels; // Layout will be distorted!!
+            layoutXOffset = 0;
+            Scribe.debug( Debug.LAYOUT, "Wide keyboard for portrait! NOT POSSIBLE! Keyboard is distorted.");
             }
 
         // Calculate BoardHeight - from AreaWidth
 
-        // Board pixel height is calculated with the ratio of a regular hexagon
+        // Layout pixel height is calculated with the ratio of a regular hexagon
         // after this point all the measurements are calculated from pixelHeight backwards
-        newBoardHeightInPixels = ((boardHeightInGrids * newAreaWidthInPixels * 1000) /
+        newLayoutHeightInPixels = ((layoutHeightInGrids * newAreaWidthInPixels * 1000) /
                 ( areaWidthInGrids * 1732));
 
         // Only part of the real height can be occupied, this can be set by prefs
-        // this true even for NORMAL board: the actual height (== width of the board) should be calculated
+        // this true even for NORMAL layout: the actual height (== width of the layout) should be calculated
         screenHeightInPixels *= softBoardData.heightRatioPermil;
         screenHeightInPixels /= 1000;
         
-        // If board height exceeds maximal value, board will be distorted
-        if (newBoardHeightInPixels > screenHeightInPixels)
-            newBoardHeightInPixels = screenHeightInPixels;
+        // If layout height exceeds maximal value, layout will be distorted
+        if (newLayoutHeightInPixels > screenHeightInPixels)
+            newLayoutHeightInPixels = screenHeightInPixels;
 
-        // If board dimensions are changed then layout should be redrawn
+        // If layout dimensions are changed then layout should be redrawn
         if (newAreaWidthInPixels != areaWidthInPixels ||
-                newBoardHeightInPixels != boardHeightInPixels)
+                newLayoutHeightInPixels != layoutHeightInPixels)
             {
             // release layout picture
-            boardMap = null;
-            boardLayout = null;
+            layoutMap = null;
+            layoutPicture = null;
             }
 
         // if dimensions are changed, all variables should be recalculated
 
         areaWidthInPixels = newAreaWidthInPixels;
-        boardHeightInPixels = newBoardHeightInPixels;
+        layoutHeightInPixels = newLayoutHeightInPixels;
 
         halfHexagonWidthInPixels = areaWidthInPixels / areaWidthInGrids;
-        int quarterHexagonHeightInPixels = boardHeightInPixels / boardHeightInGrids;
+        int quarterHexagonHeightInPixels = layoutHeightInPixels / layoutHeightInGrids;
         halfHexagonHeightInPixels = 2 * quarterHexagonHeightInPixels;
 
-        // Area is one hexagon wider, then board width
-        boardXOffset -= halfHexagonWidthInPixels;
-        boardWidthInPixels = areaWidthInPixels + 2* halfHexagonWidthInPixels;
+        // Area is one hexagon wider, then layout width
+        layoutXOffset -= halfHexagonWidthInPixels;
+        layoutWidthInPixels = areaWidthInPixels + 2* halfHexagonWidthInPixels;
 
-        boardYOffset = - softBoardData.hideTop * quarterHexagonHeightInPixels;
-        areaHeightInPixels = boardHeightInPixels
+        layoutYOffset = - softBoardData.hideTop * quarterHexagonHeightInPixels;
+        areaHeightInPixels = layoutHeightInPixels
                 - softBoardData.hideTop * quarterHexagonHeightInPixels
                 - softBoardData.hideBottom * quarterHexagonHeightInPixels
                 + (softBoardData.monitorRow ? halfHexagonHeightInPixels : 0);
@@ -476,8 +476,8 @@ public class Board
 
         if ( erasePictures )
             {
-            boardMap = null;
-            boardLayout = null;
+            layoutMap = null;
+            layoutPicture = null;
             }
         }
 
@@ -487,17 +487,17 @@ public class Board
      **/
 
     /**
-     * True if a board can be created with these parameters.
-     * This is checked before creating board
+     * True if a layout can be created with these parameters.
+     * This is checked before creating layout
      */
     public static boolean isValidDimension(
-            int boardWidthInHexagons, int boardHeightInHexagons)
+            int layoutWidthInHexagons, int layoutHeightInHexagons)
         {
-        if (boardWidthInHexagons < 1 || boardWidthInHexagons > MAX_BOARD_WIDTH_IN_HEXAGONS)
+        if (layoutWidthInHexagons < 1 || layoutWidthInHexagons > MAX_LAYOUT_WIDTH_IN_HEXAGONS)
             return false;
-        if (boardHeightInHexagons < 1 || boardHeightInHexagons > MAX_BOARD_HEIGHT_IN_HEXAGONS)
+        if (layoutHeightInHexagons < 1 || layoutHeightInHexagons > MAX_LAYOUT_HEIGHT_IN_HEXAGONS)
             return false;
-        if (boardWidthInHexagons * boardHeightInHexagons > MAX_BUTTONS)
+        if (layoutWidthInHexagons * layoutHeightInHexagons > MAX_BUTTONS)
             return false;
 
         return true;
@@ -513,10 +513,10 @@ public class Board
 
     public int checkPosition( int arrayColumn, int arrayRow )
         {
-        if ( arrayRow >= 0 && arrayRow < boardHeightInHexagons )
+        if ( arrayRow >= 0 && arrayRow < layoutHeightInHexagons)
             {
             // row is valid
-            if ( arrayColumn > 0 && arrayColumn < boardWidthInHexagons-1 )
+            if ( arrayColumn > 0 && arrayColumn < layoutWidthInHexagons -1 )
                 {
                 // rows, (cental) columns are valid, cell is whole
                 return POSITION_WHOLE_HEXAGON;
@@ -528,14 +528,14 @@ public class Board
                 // array-odd (1) == array-evens start with whole (1)
                 // array-evens (0) != array-evens start with whole (1)
                 }
-            if ( arrayColumn == boardWidthInHexagons -1 )
+            if ( arrayColumn == layoutWidthInHexagons -1 )
                 {
                 // last column check
                 return  (areaWidthInGrids % 2) + ((arrayRow % 2 == rowsAlignOffset ) ? POSITION_HALF_HEXAGON : POSITION_LINE_ENDED);
                 //  if ( areaWidthInGrids % 2 == 1 )
                 //    return (arrayColumn % 2 == rowsAlignOffset ) ? POSITION_WHOLE_HEXAGON : POSITION_HALF_HEXAGON;...
                 }
-            if ( arrayColumn >= boardWidthInHexagons )
+            if ( arrayColumn >= layoutWidthInHexagons)
                 return POSITION_LINE_ENDED;
             }
         // row or column is invalid
@@ -571,7 +571,7 @@ public class Board
      */
     public int touchCodeFromPosition(int hexagonCol, int hexagonRow)
         {
-        return hexagonRow * boardWidthInHexagons + hexagonCol;
+        return hexagonRow * layoutWidthInHexagons + hexagonCol;
         }
 
     // !! isValid(touchCode, layout) nem kéne???
@@ -609,83 +609,83 @@ public class Board
 		{
 		int mapX = canvasX - xOffset;
 
-		if ( mapX < 0 || mapX >= getBoardMap().getWidth() )
-			return Board.EMPTY_TOUCH_CODE;
+		if ( mapX < 0 || mapX >= getLayoutMap().getWidth() )
+			return Layout.EMPTY_TOUCH_CODE;
 
-		if ( canvasY < 0 || canvasY >= getBoardMap().getHeight() )
-			return Board.EMPTY_TOUCH_CODE;
+		if ( canvasY < 0 || canvasY >= getLayoutMap().getHeight() )
+			return Layout.EMPTY_TOUCH_CODE;
 
-		int color = getBoardMap().getPixel( mapX, canvasY );
+		int color = getLayoutMap().getPixel( mapX, canvasY );
 
-		return Board.touchCodeFromColor(color);
+		return Layout.touchCodeFromColor(color);
 		}
 */
 
     public int colorFromMap(int canvasX, int canvasY)
         {
-        int mapX = canvasX - boardXOffset;
-        int mapY = canvasY - boardYOffset;
+        int mapX = canvasX - layoutXOffset;
+        int mapY = canvasY - layoutYOffset;
 
-        if (mapX < 0 || mapX >= getBoardMap().getWidth())
-            return Board.EMPTY_TOUCH_CODE;
+        if (mapX < 0 || mapX >= getLayoutMap().getWidth())
+            return Layout.EMPTY_TOUCH_CODE;
 
-        if (mapY < 0 || mapY >= getBoardMap().getHeight())
-            return Board.EMPTY_TOUCH_CODE;
+        if (mapY < 0 || mapY >= getLayoutMap().getHeight())
+            return Layout.EMPTY_TOUCH_CODE;
 
-        int color = getBoardMap().getPixel( mapX, mapY );
+        int color = getLayoutMap().getPixel( mapX, mapY );
 
         return color;
         }
 
 
     /**
-     * * CREATE BOARD MAP
+     * * CREATE LAYOUT MAP
      */
 
-    private void createBoardMap()
+    private void createLayoutMap()
         {
-        Scribe.debug( Debug.BOARD, "Board Map is created - W: " + boardWidthInPixels + " H: " + boardHeightInPixels );
+        Scribe.debug( Debug.LAYOUT, "Layout Map is created - W: " + layoutWidthInPixels + " H: " + layoutHeightInPixels);
 
-        boardMap = Bitmap.createBitmap(boardWidthInPixels, boardHeightInPixels, Bitmap.Config.RGB_565);
-        boardMap.eraseColor( colorFromTouchCode( EMPTY_TOUCH_CODE, false ) );
+        layoutMap = Bitmap.createBitmap(layoutWidthInPixels, layoutHeightInPixels, Bitmap.Config.RGB_565);
+        layoutMap.eraseColor(colorFromTouchCode(EMPTY_TOUCH_CODE, false));
 
-        Canvas canvas = new Canvas( boardMap );
+        Canvas canvas = new Canvas(layoutMap);
 
         // Cannot be created before setting screen specific data
         ButtonForMaps buttonForMaps = new ButtonForMaps(this);
 
         // hexagon rows
-        for (int row = 0; row < boardHeightInHexagons; row++)
+        for (int row = 0; row < layoutHeightInHexagons; row++)
             {
             // hexagon columns
-            for (int col = 0; col < boardWidthInHexagons; col++)
+            for (int col = 0; col < layoutWidthInHexagons; col++)
                 {
                 buttonForMaps.drawButtonForMap(canvas, col, row);
                 }
             }
         }
 
-    public Bitmap getBoardMap()
+    public Bitmap getLayoutMap()
         {
-        if ( boardMap == null)
-            createBoardMap();
-        return boardMap;
+        if ( layoutMap == null)
+            createLayoutMap();
+        return layoutMap;
         }
 
     // Just for debugging purposes
-    public void drawBoardMap( Canvas canvas )
+    public void drawLayoutMap(Canvas canvas)
         {
-        canvas.drawBitmap( getBoardMap(), (float) boardXOffset, (float) boardYOffset, null);
+        canvas.drawBitmap( getLayoutMap(), (float) layoutXOffset, (float) layoutYOffset, null);
         }
 
 
     /**
-     * * CREATE BOARD LAYOUT
+     * * CREATE LAYOUT LAYOUT
      */
 
-    public void drawBoardLayout( Canvas canvas )
+    public void drawLayoutPicture(Canvas canvas)
         {
-        canvas.drawBitmap( getBoardLayout(), (float) boardXOffset, (float) boardYOffset, null);
+        canvas.drawBitmap( getLayoutPicture(), (float) layoutXOffset, (float) layoutYOffset, null);
         }
 
     public void drawChangedButtons(Canvas canvas)
@@ -699,31 +699,31 @@ public class Board
         
     /*
      * Not all layout can be stored as bitmap because of memory problems.
-     * Now only one layout is cached in boardLayout.
+     * Now only one layout is cached in layoutPicture.
      * The process could be quicker, if bitmaps (same size!) could be reused.
      * Now a new bitmap will be generated for every bitmap.
      */
-    public Bitmap getBoardLayout()
+    public Bitmap getLayoutPicture()
         {
-        if ( boardLayout != null)
+        if ( layoutPicture != null)
             {
-            return boardLayout;
+            return layoutPicture;
             }
 
-        Scribe.debug( Debug.BOARD, "Layout skin is created for " + toString());
+        Scribe.debug( Debug.LAYOUT, "Layout skin is created for " + toString());
 
-        boardLayout = createBoardLayout();
+        layoutPicture = createLayoutPicture();
 
-        return boardLayout;
+        return layoutPicture;
         }
 
-    private Bitmap createBoardLayout()
+    private Bitmap createLayoutPicture()
         {
-        Scribe.debug( Debug.BOARD, "Board Layout is created - W: " + boardWidthInPixels + " H: " + boardHeightInPixels );
+        Scribe.debug( Debug.LAYOUT, "Layout Layout is created - W: " + layoutWidthInPixels + " H: " + layoutHeightInPixels);
 
-        Bitmap skin = Bitmap.createBitmap(boardWidthInPixels, boardHeightInPixels, Bitmap.Config.RGB_565);
+        Bitmap skin = Bitmap.createBitmap(layoutWidthInPixels, layoutHeightInPixels, Bitmap.Config.RGB_565);
         Canvas canvas = new Canvas(skin);
-        skin.eraseColor(boardColor);
+        skin.eraseColor(layoutColor);
 
         for (Button button : buttons)
             {
@@ -748,13 +748,13 @@ public class Board
         }
 
     // id is needed only for debug
-    private long boardId;    
+    private long layoutId;
     
     // set id could be part of the constructor
-    public void setBoardId( long boardId )
+    public void setLayoutId(long layoutId)
         {
-        this.boardId = boardId;
-        Scribe.debug( Debug.BOARD, "Board is created: " + toString());
+        this.layoutId = layoutId;
+        Scribe.debug( Debug.LAYOUT, "Layout is created: " + toString());
         }
     
     // toString is needed only for debuging
@@ -762,9 +762,9 @@ public class Board
     public String toString()
         {
         StringBuilder result = new StringBuilder();
-        result.append("Board ").append( Tokenizer.regenerateKeyword(boardId));
-        result.append(" - C:").append(boardWidthInHexagons);
-        result.append("/R:").append(boardHeightInHexagons);
+        result.append("Layout ").append( Tokenizer.regenerateKeyword(layoutId));
+        result.append(" - C:").append(layoutWidthInHexagons);
+        result.append("/R:").append(layoutHeightInHexagons);
         result.append("/A:").append(rowsAlignOffset);
         return result.toString();
         }

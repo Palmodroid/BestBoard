@@ -23,16 +23,16 @@ import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.states.MetaState;
 
-public class BoardView extends View
+public class LayoutView extends View
     {
     /**
      ** CLASS VARIABLES
      **/
 
     /**
-     * Data of actual board
+     * Data of actual layout
      */
-    private Board board = null;
+    private Layout layout = null;
 
     /**
      * screen width is stored to check whether new measurement is needed
@@ -43,21 +43,21 @@ public class BoardView extends View
 
 
     /**
-     ** CONSTRUCTION OF THE BOARD
-     ** Parsing phase (Board):
+     ** CONSTRUCTION OF THE LAYOUT
+     ** Parsing phase (Layout):
      **   1. Constructor - adds non screen-specific data
      **   2. addButton - populates the buttons array and
      **      setShift - sets the shift levels by descriptor file
-     ** Displaying phase (BoardView):
+     ** Displaying phase (LayoutView):
      **   3. onMeasure - receives screen diameters
      **   4. calculateScreenData - screen specific information set by onMeasure
      **/
 
     /**
      * Originally standard View constructors were used,
-     * Now BoardView can only be started from code, with its own constructor
+     * Now LayoutView can only be started from code, with its own constructor
      */
-    public BoardView(Context context)
+    public LayoutView(Context context)
         {
         super( context );
         Scribe.locus( Debug.VIEW );
@@ -68,50 +68,50 @@ public class BoardView extends View
         }
 
     /**
-     * Attached Board data is needed right after construction.
+     * Attached Layout data is needed right after construction.
      * First set is NOT checked!
      * It can be changed later
      * If size is changed, then requestLayout is called
      * If size is the same, then only invalidate() is needed
      */
-    public void setBoard(Board board)
+    public void setLayout(Layout layout)
         {
         Scribe.locus( Debug.VIEW );
 
-        // same board can be at several use levels
+        // same layout can be at several use levels
         // orientation change will cancel touches
-        if ( this.board != board )
+        if ( this.layout != layout)
             {
-            Scribe.debug( Debug.VIEW, "Board is about to set: " + board.toString() );
-            if ( this.board != null )
+            Scribe.debug( Debug.VIEW, "Layout is about to set: " + layout.toString() );
+            if ( this.layout != null )
                 {
                 Scribe.debug(Debug.VIEW, "Layout request is called");
                 requestLayout(); // it should be called later
                 }
             
-            this.board = board;
+            this.layout = layout;
 
-            // mainTouchBow cannot be null, but it cannot get value before setBoard
+            // mainTouchBow cannot be null, but it cannot get value before setLayout
             // !! THIS SHOULD BE ORGANISED ON AN OTHER WAY !!
             if ( mainTouchBow == null )
                 {
                 mainTouchBow = new MainTouchBow();
                 }
 
-            board.forceMetaStates();
+            layout.forceMetaStates();
 
             /**
-             * Multi touches connect to their board.
-             * If board is changed, then these touches cannot start a new MAIN touch,
+             * Multi touches connect to their layout.
+             * If layout is changed, then these touches cannot start a new MAIN touch,
              * even not if main touch is empty.
-             * The only possible action is ACTION_UP (or CANCEL) which release the button (on its board).
+             * The only possible action is ACTION_UP (or CANCEL) which release the button (on its layout).
              * This method will disable active multi-touches
              * !! CHANGED !!
              */
 
             for (MultiTouchBow multiTouchBow : multiTouchPointers.values())
                 {
-                multiTouchBow.touchCode = Board.EMPTY_TOUCH_CODE;
+                multiTouchBow.touchCode = Layout.EMPTY_TOUCH_CODE;
                 }
 
             // main touch
@@ -122,7 +122,7 @@ public class BoardView extends View
             // if change happens during evaluation, evaluation should be stopped
             pointerChangeFlag = BOARD_CHANGE;
 
-            strokePaint.setColor( board.softBoardData.strokeColor );
+            strokePaint.setColor( layout.softBoardData.strokeColor );
             }
         // !!!!!!! SIZE CONTROL IS STILL MISSING !!!!!!!!!
 
@@ -133,7 +133,7 @@ public class BoardView extends View
         {
         Scribe.locus( Debug.VIEW );
 
-        // board-change needs recalculation
+        // layout-change needs recalculation
         validatedWidthInPixels = -1;
 
         super.requestLayout();
@@ -143,7 +143,7 @@ public class BoardView extends View
      * Parent is a FrameView with "match_parent" width and "wrap_content" height.
      * Therefore the parameters are: EXACTLY screen_width and AT_MOST screen_height values.
      * There are two (several?) cycles of measuring. Calculation is performed during the first cycle,
-     * after that boardHeightInPixels will be set, and the second calculations are skipped.
+     * after that layoutHeightInPixels will be set, and the second calculations are skipped.
      * Screen width is stored in validatedWidthInPixels, so new calculations with this with are skipped.
      */
     @Override
@@ -156,7 +156,7 @@ public class BoardView extends View
 
         // onMeasure will be called several times.
         // Calculation will be performed only when screen parameters are changed 
-        // (screen rotated or board changed (requestLayout())
+        // (screen rotated or layout changed (requestLayout())
         if (widthSize != validatedWidthInPixels)
             {
             int widthMode = MeasureSpec.getMode(widthMeasureSpec);
@@ -165,17 +165,17 @@ public class BoardView extends View
             // ?? Can't call it with exact height in the second run?
             if (widthMode != MeasureSpec.EXACTLY || heightMode != MeasureSpec.AT_MOST)
                 {
-                Scribe.error("Measure modes are incompatible with BoardView!");
-                throw new InflateException("Measure modes are incompatible with BoardView!");
+                Scribe.error("Measure modes are incompatible with LayoutView!");
+                throw new InflateException("Measure modes are incompatible with LayoutView!");
                 }
 
 
-            // boardWidthInPixels and boardHeightInPixels are set here
-            board.calculateScreenData( widthSize, heightSize );
+            // layoutWidthInPixels and layoutHeightInPixels are set here
+            layout.calculateScreenData( widthSize, heightSize );
 
             Scribe.debug(Debug.VIEW, "FIRST Calculation");
             Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
-            Scribe.debug( Debug.VIEW, "- Calculated boardheight: " + board.boardHeightInPixels);
+            Scribe.debug( Debug.VIEW, "- Calculated layout-height: " + layout.layoutHeightInPixels);
 
             validatedWidthInPixels = widthSize;
             }
@@ -189,7 +189,7 @@ public class BoardView extends View
 
         // !!!!!!!!!!! JUST PROBING !!!!!!!!!!!
 
-        probe.setTextSize( board.textSize * 2 );
+        probe.setTextSize( layout.textSize * 2 );
         probe.setColor(Color.CYAN);
         probe.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
                 Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
@@ -198,7 +198,7 @@ public class BoardView extends View
         probeBackground.setColor( Color.BLUE );
 
         // calculateScreen data has calculated height of the area
-        setMeasuredDimension(widthSize, board.areaHeightInPixels);
+        setMeasuredDimension(widthSize, layout.areaHeightInPixels);
         }
 
 
@@ -258,7 +258,7 @@ public class BoardView extends View
         // Elevated (empty) main touch
         MainTouchBow()
             {
-            this( Board.EMPTY_TOUCH_CODE, null );
+            this( Layout.EMPTY_TOUCH_CODE, null );
             }
 
         MainTouchBow(int touchCode, ButtonMainTouch buttonMainTouch)
@@ -273,15 +273,15 @@ public class BoardView extends View
                 {
                 Scribe.debug( Debug.TOUCH, "MainTouchBow created.");
                 // in light-check cursor position should be checked before a new bow
-                board.softBoardData.softBoardListener.checkAtBowStart();
+                layout.softBoardData.softBoardListener.checkAtBowStart();
 
                 // start timing of repeats
-                repeatHandler.postDelayed( repeatRunnable, board.softBoardData.stayBowTime );
+                repeatHandler.postDelayed( repeatRunnable, layout.softBoardData.stayBowTime );
                 }
             else
                 {
                 Scribe.debug( Debug.TOUCH, "MainTouchBow with no button created.");
-                board.softBoardData.softBoardListener.checkAtStrokeEnd();
+                layout.softBoardData.softBoardListener.checkAtStrokeEnd();
                 }
             }
 
@@ -314,12 +314,12 @@ public class BoardView extends View
 
         boolean isLong()
             {
-            return moveCounter == board.softBoardData.longBowCount;
+            return moveCounter == layout.softBoardData.longBowCount;
             }
 
         boolean isPressed()
             {
-            return pressureCounter == board.softBoardData.pressBowCount;
+            return pressureCounter == layout.softBoardData.pressBowCount;
             }
         }
 
@@ -342,7 +342,7 @@ public class BoardView extends View
             Scribe.debug( Debug.TOUCH, "REPEAT touch is detected." );
             repeatHandler.postDelayed( repeatRunnable,
                     mainTouchBow.buttonMainTouch.mainTouchOnStay() ?
-                    board.softBoardData.repeatTime : board.softBoardData.stayBowTime );
+                    layout.softBoardData.repeatTime : layout.softBoardData.stayBowTime );
             }
         };
 
@@ -444,9 +444,9 @@ public class BoardView extends View
                     }
 
                 // just for security use- and meta-states are checked, that no touch remained
-                for (MetaState metaState : board.softBoardData.boardStates.metaStates)
+                for (MetaState metaState : layout.softBoardData.layoutStates.metaStates)
                     metaState.checkNoTouch();
-                board.softBoardData.linkState.checkNoTouch();
+                layout.softBoardData.boardLinks.checkNoTouch();
 
                 // break is not needed here, code continues with new touch
 
@@ -456,7 +456,7 @@ public class BoardView extends View
                 Scribe.debug( Debug.TOUCH, "Pointer is DOWN." );
 
                 // bowPointerId should be empty to start new bow (there is no bow currently)
-                // THIS CAN START A NEW BOW ON A PREVIOUSLY HIDDEN BOARD
+                // THIS CAN START A NEW BOW ON A PREVIOUSLY HIDDEN LAYOUT
                 if (strokePointerId < 0)
                     {
                     index = event.getActionIndex(); // index of the newest touch
@@ -484,13 +484,13 @@ public class BoardView extends View
 
                 // !! Theoretically invalidated phase affects all motion-events !!
                 // But
-                // UP and CANCEL events do not need any board-specific data
+                // UP and CANCEL events do not need any layout-specific data
                 // DOWN/POINTER_DOWN cannot happen so early !! (Is it true ??)
                 // If not, an other check could be inserted between DOWN and POINTER_DOWN
 
                 if ( validatedWidthInPixels < 0 )
                     {
-                    Scribe.debug( Debug.TOUCH, "Board is not ready yet, touch moves are dropped: " + event.getHistorySize()+1 );
+                    Scribe.debug( Debug.TOUCH, "Layout is not ready yet, touch moves are dropped: " + event.getHistorySize()+1 );
                     return true;
                     }
 
@@ -511,20 +511,20 @@ public class BoardView extends View
                         {
                         Scribe.debug(Debug.TOUCH_VERBOSE, "META pointer check: " + index);
 
-                        int color = board.colorFromMap((int) event.getX(index), (int) event.getY(index));
-                        int newTouchCode = Board.touchCodeFromColor(color);
+                        int color = layout.colorFromMap((int) event.getX(index), (int) event.getY(index));
+                        int newTouchCode = Layout.touchCodeFromColor(color);
 
                         if (newTouchCode != multiTouchPointer.getValue().touchCode)
                             {
-                            // if board was changed for this pointer,
-                            // new button (touchCode) will behave, as the previous one on the previous board
-                            if (multiTouchPointer.getValue().touchCode == Board.EMPTY_TOUCH_CODE)
+                            // if layout was changed for this pointer,
+                            // new button (touchCode) will behave, as the previous one on the previous layout
+                            if (multiTouchPointer.getValue().touchCode == Layout.EMPTY_TOUCH_CODE)
                                 {
-                                Scribe.debug(Debug.TOUCH, "META button will refer to new touchCode on new board: " + newTouchCode);
+                                Scribe.debug(Debug.TOUCH, "META button will refer to new touchCode on new layout: " + newTouchCode);
                                 multiTouchPointer.getValue().touchCode = newTouchCode;
                                 }
                             // if button-center was reached
-                            else if (!Board.outerRimFromColor(color))
+                            else if (!Layout.outerRimFromColor(color))
                                 {
                                 Scribe.debug(Debug.TOUCH, "META pointer left its button.");
                                 multiTouchPointer.getValue().buttonMultiTouch.multiTouchEvent(ButtonMultiTouch.META_RELEASE);
@@ -664,15 +664,15 @@ public class BoardView extends View
     // Helper for onTouchEvents() - both MOVE and HOLD touches come here
     private void _touchEventsHoldAndMove(int canvasX, int canvasY, float canvasPressure)
         {
-        if (canvasPressure > board.softBoardData.pressBowThreshold && canvasPressure != 1.0f)
+        if (canvasPressure > layout.softBoardData.pressBowThreshold && canvasPressure != 1.0f)
             {
-            Scribe.debug( Debug.TOUCH, " prefsPressureThreshold: " + board.softBoardData.pressBowThreshold + ", canvasPressure: " + canvasPressure);
+            Scribe.debug( Debug.TOUCH, " prefsPressureThreshold: " + layout.softBoardData.pressBowThreshold + ", canvasPressure: " + canvasPressure);
             mainTouchBow.increasePressureCounter();
             }
 
         // Scribe.debug( Debug.VIEW, "StrokePoints size: " + strokePoints.size() );
         StrokePoint strokePoint = new StrokePoint(canvasX, canvasY);
-        if ( strokePoints.size() > 0 && // after setBoard() stroke can start with "move" - it will be HOLD
+        if ( strokePoints.size() > 0 && // after setLayout() stroke can start with "move" - it will be HOLD
         		strokePoints.get(strokePoints.size() - 1).canvasX == strokePoint.canvasX &&
                 strokePoints.get(strokePoints.size() - 1).canvasY == strokePoint.canvasY)
             {
@@ -700,7 +700,7 @@ public class BoardView extends View
 
 
     /**
-     * !! THIS SHOULD GO TO BOARD STATES !!
+     * !! THIS SHOULD GO TO LAYOUT STATES !!
      * "type" will turn off meta/link ON states
      */
     public void type()
@@ -715,7 +715,7 @@ public class BoardView extends View
     private void typeMetaState()
         {
         // if not meta -> call meta-states, maybe they should finish
-        for (MetaState metaState : board.softBoardData.boardStates.metaStates)
+        for (MetaState metaState : layout.softBoardData.layoutStates.metaStates)
             {
             metaState.type();
             }
@@ -726,7 +726,7 @@ public class BoardView extends View
      */
     private void typeLinkState()
         {
-        board.softBoardData.linkState.type();
+        layout.softBoardData.boardLinks.type();
         }
 
 
@@ -751,7 +751,7 @@ public class BoardView extends View
             {
             // if (bowAction != TOUCH_HOLD) - but HOLD never calls evaluate main
             strokePoints.add(strokePoint);
-            if (board.softBoardData.displayStroke) this.invalidate();
+            if (layout.softBoardData.displayStroke) this.invalidate();
             }
         // if bowAction == TOUCH_UP - strokePoints will be cleared later
 
@@ -761,14 +761,14 @@ public class BoardView extends View
 
         if (bowAction == TOUCH_DOWN)
             {
-            newBowTouchCode = Board.touchCodeFromColor(board.colorFromMap(strokePoint.canvasX, strokePoint.canvasY));
+            newBowTouchCode = Layout.touchCodeFromColor(layout.colorFromMap(strokePoint.canvasX, strokePoint.canvasY));
             // Scribe.debug( Debug.TOUCH, "MAIN pointer DOWN.");
             }
         else if (bowAction == TOUCH_MOVE)
             {
             // touchCode changes only if move arrives inside the rim
-            int color = board.colorFromMap(strokePoint.canvasX, strokePoint.canvasY);
-            newBowTouchCode = Board.touchCodeFromColor(color);
+            int color = layout.colorFromMap(strokePoint.canvasX, strokePoint.canvasY);
+            newBowTouchCode = Layout.touchCodeFromColor(color);
 
             // touch is on the same button - independently from center/outer rim
             if ( newBowTouchCode == mainTouchBow.touchCode )
@@ -777,7 +777,7 @@ public class BoardView extends View
                 }
 
             // invalidate touch code if touch is not arrived in the center of an other button
-            else if ( Board.outerRimFromColor(color) )
+            else if ( Layout.outerRimFromColor(color) )
                 {
                 newBowTouchCode = mainTouchBow.touchCode;
                 }
@@ -785,13 +785,13 @@ public class BoardView extends View
         else if (bowAction == TOUCH_UP)
             {
             // UP is the same as MOVE to an empty button
-            newBowTouchCode = Board.EMPTY_TOUCH_CODE;
+            newBowTouchCode = Layout.EMPTY_TOUCH_CODE;
             // Scribe.debug( Debug.TOUCH, "MAIN pointer UP.");
 
             // Main stroke was freed because of TOUCH_UP action
             strokePoints.clear(); // if we want the stroke to disappear
             // Because this.invalidate will be called in the next section, this is not needed:
-            // if (board.softBoardData.displayStroke) this.invalidate();
+            // if (layout.softBoardData.displayStroke) this.invalidate();
             }
         // else TOUCH_HOLD - but HOLD never calls evaluateMain - will not change the touchCode
 
@@ -825,7 +825,7 @@ public class BoardView extends View
                 // Clears link ON states - this could clear mainTouchBow, too
                 typeLinkState();
 
-                // if board was changed during type, no further buttons could be evaluated!
+                // if layout was changed during type, no further buttons could be evaluated!
                 if ( pointerChangeFlag == BOARD_CHANGE )
                 	{
                     return;
@@ -833,10 +833,10 @@ public class BoardView extends View
 
                 }
 
-            if (newBowTouchCode != Board.EMPTY_TOUCH_CODE)
+            if (newBowTouchCode != Layout.EMPTY_TOUCH_CODE)
                 {
                 // touch is on a new and valid button
-                Button newBowButton = board.buttons[newBowTouchCode];
+                Button newBowButton = layout.buttons[newBowTouchCode];
 
                 // Button is on MAIN TOUCH
                 if (newBowButton instanceof ButtonMainTouch)
@@ -874,7 +874,7 @@ public class BoardView extends View
 
                     // Similar as _touchUp(), but previous button will be not finished
                     strokePointerId = -1;
-                    newBowTouchCode = Board.EMPTY_TOUCH_CODE;
+                    newBowTouchCode = Layout.EMPTY_TOUCH_CODE;
                     }
 
                 // ButtonMainTouch finished and returned with a real bow previously
@@ -918,21 +918,21 @@ public class BoardView extends View
         {
         Scribe.locus( Debug.DRAW_VERBOSE );
 
-        // board.drawBoardMap(canvas);
-        // board.drawBoardLayout(canvas, 0);
+        // layout.drawLayoutMap(canvas);
+        // layout.drawLayoutPicture(canvas, 0);
 
-        board.drawBoardLayout( canvas );
+        layout.drawLayoutPicture(canvas);
 
         // ChangedButtons - draw over the bitmap, too
         // !! ha nem touched ??
-        board.drawChangedButtons(canvas);
+        layout.drawChangedButtons(canvas);
 
         // TouchedButton - draw over the bitmap!
-        if (mainTouchBow.buttonMainTouch != null && board.softBoardData.displayTouch)
+        if (mainTouchBow.buttonMainTouch != null && layout.softBoardData.displayTouch)
             mainTouchBow.buttonMainTouch.drawTouchedButton(canvas);
 
         // TouchedPoints - if needed
-        if (board.softBoardData.displayStroke)
+        if (layout.softBoardData.displayStroke)
             {
             for (StrokePoint touchedPoint : strokePoints)
                 {
@@ -940,21 +940,21 @@ public class BoardView extends View
                 }
             }
 
-        if ( board.softBoardData.monitorRow )
+        if ( layout.softBoardData.monitorRow )
             {
             canvas.drawRect(
                     0f,
-                    board.areaHeightInPixels - board.halfHexagonHeightInPixels,
-                    board.validatedWidthInPixels,
-                    board.areaHeightInPixels,
+                    layout.areaHeightInPixels - layout.halfHexagonHeightInPixels,
+                    layout.validatedWidthInPixels,
+                    layout.areaHeightInPixels,
                     probeBackground);
 
-            canvas.drawText(board.softBoardData.softBoardListener.getTextBeforeCursor().toString(),
-                    board.halfHexagonWidthInPixels,
-                    //(float)(board.boardHeightInPixels + board.halfHexagonHeightInPixels),
-                    // board.boardHeightInPixels - probe.descent(),
-                    // board.boardHeightInPixels - probe.ascent(),
-                    board.areaHeightInPixels - probe.descent(),
+            canvas.drawText(layout.softBoardData.softBoardListener.getTextBeforeCursor().toString(),
+                    layout.halfHexagonWidthInPixels,
+                    //(float)(layout.layoutHeightInPixels + layout.halfHexagonHeightInPixels),
+                    // layout.layoutHeightInPixels - probe.descent(),
+                    // layout.layoutHeightInPixels - probe.ascent(),
+                    layout.areaHeightInPixels - probe.descent(),
                     probe);
             }
         }

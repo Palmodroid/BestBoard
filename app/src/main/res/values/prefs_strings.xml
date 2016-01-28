@@ -41,15 +41,15 @@
     <string name="drawing_hide_lower_off">Full size bottom row can be seen</string>
 
     <string name="drawing_height_ratio_key">heightratio</string>
-    <string name="drawing_height_ratio_title">Screen height ratio, which can be occupied by the board</string>
+    <string name="drawing_height_ratio_title">Screen height ratio, which can be occupied by the layout</string>
     <string name="drawing_height_ratio_summary">Allowed screen height ratio: </string>
-    <string name="drawing_height_ratio_dialog_title">Screen height ratio, which can be occupied by the board</string>
+    <string name="drawing_height_ratio_dialog_title">Screen height ratio, which can be occupied by the layout</string>
     <string name="drawing_height_ratio_dialog_message">Enter screen height ratio (per mille)!</string>
 
     <string name="drawing_landscape_offset_key">landscapeoffset</string>
-    <string name="drawing_landscape_offset_title">Vertical offset, if non-wide board is displayed in landscape view</string>
+    <string name="drawing_landscape_offset_title">Vertical offset, if non-wide layout is displayed in landscape view</string>
     <string name="drawing_landscape_offset_summary">Vertical offset in landscape view: </string>
-    <string name="drawing_landscape_offset_dialog_title">Vertical offset, if non-wide board is displayed in landscape view</string>
+    <string name="drawing_landscape_offset_dialog_title">Vertical offset, if non-wide layout is displayed in landscape view</string>
     <string name="drawing_landscape_offset_dialog_message">Enter vertical offset for non-wide boards (per mille)!</string>
 
     <string name="drawing_outer_rim_key">outerrim</string>
@@ -60,7 +60,7 @@
 
     <string name="drawing_monitor_row_key">monitorrow</string>
     <string name="drawing_monitor_row_title">Monitor row</string>
-    <string name="drawing_monitor_row_on">Monitor row is visible below the board</string>
+    <string name="drawing_monitor_row_on">Monitor row is visible below the layout</string>
     <string name="drawing_monitor_row_off">Monitor row is switched off</string>
 
 

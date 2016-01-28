@@ -1,7 +1,7 @@
 package dancingmoon.bestboard.buttons;
 
 import dancingmoon.bestboard.SoftBoardData;
-import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.LayoutStates;
 import dancingmoon.bestboard.utils.HardKey;
 
 
@@ -66,10 +66,10 @@ public class PacketKey extends Packet
 
         // In most cases forced state is IGNORED
         if ( binaryHardState != 0 )
-            softBoardData.boardStates.forceBinaryHardState( binaryHardState );
+            softBoardData.layoutStates.forceBinaryHardState( binaryHardState );
 
         // If no meta is set or forced, then android meta state remains 0
-        if ( anyMeta || softBoardData.boardStates.getAndroidMetaState() != BoardStates.ANDROID_META_STATE_OFF )
+        if ( anyMeta || softBoardData.layoutStates.getAndroidMetaState() != LayoutStates.ANDROID_META_STATE_OFF )
             {
             softBoardData.softBoardListener.sendKeyDownUp( hardKeyCode );
             sent = true;
@@ -77,7 +77,7 @@ public class PacketKey extends Packet
 
         // In most cases forced state is IGNORED
         if ( binaryHardState != 0 )
-            softBoardData.boardStates.clearBinaryHardState();
+            softBoardData.layoutStates.clearBinaryHardState();
 
         return sent;
         }

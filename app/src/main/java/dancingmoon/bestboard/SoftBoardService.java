@@ -30,7 +30,7 @@ import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.server.Connection;
 import dancingmoon.bestboard.server.TextAfterCursor;
 import dancingmoon.bestboard.server.TextBeforeCursor;
-import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.LayoutStates;
 import dancingmoon.bestboard.states.CapsState;
 
 
@@ -59,12 +59,12 @@ public class SoftBoardService extends InputMethodService implements
     private SoftBoardData softBoardData = null;
 
     /** There is only ONE boardView for the whole softBoard, generated in softBoardParserFinished() */
-    private BoardView boardView;
+    private LayoutView layoutView;
 
     @Override
-    public BoardView getBoardView()
+    public LayoutView getLayoutView()
         {
-        return boardView;
+        return layoutView;
         }
 
     /** Temporary variable to store string to be send */
@@ -100,8 +100,8 @@ public class SoftBoardService extends InputMethodService implements
                     if ( softBoardData != null)
                         {
                         softBoardData.readPreferences();
-                        softBoardData.linkState.invalidateCalculations( false );
-                        boardView.requestLayout();
+                        softBoardData.boardLinks.invalidateCalculations( false );
+                        layoutView.requestLayout();
                         }
                     break;
 
@@ -110,8 +110,8 @@ public class SoftBoardService extends InputMethodService implements
                     if ( softBoardData != null)
                         {
                         softBoardData.readPreferences();
-                        softBoardData.linkState.invalidateCalculations( true );
-                        boardView.requestLayout();
+                        softBoardData.boardLinks.invalidateCalculations( true );
+                        layoutView.requestLayout();
                         }
                     break;
 
@@ -189,7 +189,7 @@ public class SoftBoardService extends InputMethodService implements
         // This should be called at every starting point
         Ignition.start(this);
 
-        Scribe.title( "SOFT-BOARD-SERVICE HAS STARTED" );
+        Scribe.title( "SOFT-LAYOUT-SERVICE HAS STARTED" );
         Scribe.locus( Debug.SERVICE );
 
         super.onCreate();
@@ -209,7 +209,7 @@ public class SoftBoardService extends InputMethodService implements
     public void onDestroy()
         {
         Scribe.locus( Debug.SERVICE );
-        Scribe.title("SOFT-BOARD-SERVICE HAS FINISHED");
+        Scribe.title("SOFT-LAYOUT-SERVICE HAS FINISHED");
 
         super.onDestroy();
 
@@ -223,7 +223,7 @@ public class SoftBoardService extends InputMethodService implements
 
     /**
      * Stops any previous parsing, and starts a new parse.
-     * As a result a completely new soft-board will be created.
+     * As a result a completely new soft-layout will be created.
      */
     public void startSoftBoardParser()
         {
@@ -252,9 +252,9 @@ public class SoftBoardService extends InputMethodService implements
 
 
     /**
-     * Soft-board is first displayed. This will be called after orientation change.
+     * Soft-layout is first displayed. This will be called after orientation change.
      * Originally noKeyboardView is displayed.
-     * If soft-board is ready, then it will be returned.
+     * If soft-layout is ready, then it will be returned.
      * @return view of the current keyboard
      */
     @Override
@@ -264,26 +264,26 @@ public class SoftBoardService extends InputMethodService implements
 
         if (softBoardData == null)
             {
-            Scribe.note(Debug.SERVICE, "Soft-board is not ready yet, no-keyboard-view will be displayed.");
+            Scribe.note(Debug.SERVICE, "Soft-layout is not ready yet, no-keyboard-view will be displayed.");
             return noKeyboardView();
             }
         else
             {
-            Scribe.note( Debug.SERVICE, "Soft-board ready, it will be displayed initially.");
+            Scribe.note( Debug.SERVICE, "Soft-layout ready, it will be displayed initially.");
 
             // setting index is not necessary
-            softBoardData.linkState.setOrientation();
+            softBoardData.boardLinks.setOrientation();
 
             // boardView should be saved
-            ViewGroup parent = (ViewGroup) getBoardView().getParent();
+            ViewGroup parent = (ViewGroup) getLayoutView().getParent();
             if (parent != null) 
                 {
-                parent.removeView( getBoardView() );
+                parent.removeView( getLayoutView() );
                 }
 
-            getBoardView().setBoard(softBoardData.linkState.getActiveBoard());
+            getLayoutView().setLayout(softBoardData.boardLinks.getActiveBoard());
 
-            return getBoardView();
+            return getLayoutView();
             }
         }
 
@@ -304,7 +304,7 @@ public class SoftBoardService extends InputMethodService implements
 
 
     /**
-     * Parsing of soft-board finished, but soft-board cannot be displayed because of critical errors.
+     * Parsing of soft-layout finished, but soft-layout cannot be displayed because of critical errors.
      * @param errorInfo id of the critical error
      */
     @Override
@@ -324,7 +324,7 @@ public class SoftBoardService extends InputMethodService implements
                 warning = "Critical error! Coat file is not valid! Please, correct it, or a choose an other coat file in the preferences!";
                 break;
             case SoftBoardParser.CRITICAL_PARSING_ERROR:
-                warning = "Critical error! No board is defined in coat file! Please, correct it!";
+                warning = "Critical error! No layout is defined in coat file! Please, correct it!";
                 break;
             // no warning is necessary for CANCEL
             default:
@@ -341,8 +341,8 @@ public class SoftBoardService extends InputMethodService implements
 
 
     /**
-     * Soft-board starts to work here.
-     * Parsing has finished, new soft-board and new boardView is set.
+     * Soft-layout starts to work here.
+     * Parsing has finished, new soft-layout and new boardView is set.
      * @param softBoardData newly generated class containing all softboard data
      * @param errorCount    number of non-critical errors (error messages can be found in the log)
      */
@@ -376,12 +376,12 @@ public class SoftBoardService extends InputMethodService implements
         
         // Orientation should be checked, but index is 0 by default.
         // No setIndex() is needed
-        softBoardData.linkState.setOrientation();
+        softBoardData.boardLinks.setOrientation();
 
-        boardView = new BoardView( this );        
-        boardView.setBoard(softBoardData.linkState.getActiveBoard());
+        layoutView = new LayoutView( this );
+        layoutView.setLayout(softBoardData.boardLinks.getActiveBoard());
         
-        setInputView( boardView );
+        setInputView(layoutView);
 
         softBoardParser = null;
 
@@ -488,10 +488,10 @@ textAfterCursor. ;
 
         if ( softBoardData != null && softBoardData.textSessionSetsMetastates )
             {
-            boardView.type();
-            ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
+            layoutView.type();
+            ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
                     .setAutoCapsState(CapsState.AUTOCAPS_OFF);
-            boardView.invalidate();
+            layoutView.invalidate();
             }
 
         }
@@ -575,7 +575,7 @@ textAfterCursor. ;
                 }
 
             // pressed hard-keys are released
-            softBoardData.boardStates.resetSimulatedMetaButtons();
+            softBoardData.layoutStates.resetSimulatedMetaButtons();
 
             // enter's title is set
             softBoardData.setAction(editorInfo.imeOptions);
@@ -585,7 +585,7 @@ textAfterCursor. ;
             // set autocaps state depending on field behavior and cursor position
             if ( calculatedCursorPosition == 0 && editorInfo.initialCapsMode != 0 )
                 {
-                ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
+                ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
                         .setAutoCapsState(CapsState.AUTOCAPS_ON);
                 }
             }
@@ -932,9 +932,9 @@ textAfterCursor. ;
                 {
                 Scribe.debug(Debug.TEXT, "No more text to delete, hard DEL is sent!");
 
-                softBoardData.boardStates.forceBinaryHardState( 0x15 );
+                softBoardData.layoutStates.forceBinaryHardState( 0x15 );
                 sendKeyDownUp( KeyEvent.KEYCODE_DEL );
-                softBoardData.boardStates.clearBinaryHardState();
+                softBoardData.layoutStates.clearBinaryHardState();
 
                 return;
                 }
@@ -984,9 +984,9 @@ textAfterCursor. ;
                 {
                 Scribe.debug(Debug.TEXT, "No more text to delete, hard FORWARD_DEL is sent!");
 
-                softBoardData.boardStates.forceBinaryHardState( 0x15 );
+                softBoardData.layoutStates.forceBinaryHardState( 0x15 );
                 sendKeyDownUp( KeyEvent.KEYCODE_FORWARD_DEL );
-                softBoardData.boardStates.clearBinaryHardState();
+                softBoardData.layoutStates.clearBinaryHardState();
 
                 return;
                 }
@@ -1033,7 +1033,7 @@ textAfterCursor. ;
                 keyEventAction,         // ACTION_DOWN or ACTION_UP
                 keyEventCode,           // android keyCode
                 0,                      // repeat is not implemented
-                softBoardData.boardStates.getAndroidMetaState(),
+                softBoardData.layoutStates.getAndroidMetaState(),
                 // meta-state in android format
                 KeyCharacterMap.VIRTUAL_KEYBOARD,
                 // device id FIX

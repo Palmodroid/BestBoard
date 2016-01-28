@@ -61,12 +61,8 @@ public class Commands
     public static final long TOKEN_NONETITLE = 0x4b9a25bff026L;
     public static final long TOKEN_UNKNOWNTITLE = 0x4ba5296e5766a85dL;
 
+    public static final long TOKEN_ADDLAYOUT = 0x211993f479afL;
     public static final long TOKEN_ID = 0x102a6L;
-    public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
-    public static final long TOKEN_YOFFSET = 0x14b484849aL;
-    public static final long TOKEN_SIZE = 0x17098aL;
-
-    public static final long TOKEN_ADDBOARD = 0xe502ed0208L;
     public static final long TOKEN_HEXAGONAL = 0x379824b9b62fL;
     public static final long TOKEN_WIDE = 0x1a1dd0L;
     public static final long TOKEN_HALFCOLUMNS = 0x1274de67161b456L;
@@ -74,6 +70,18 @@ public class Commands
     public static final long TOKEN_ROWS = 0x166362L;
     public static final long TOKEN_ALIGN = 0x12f9733L;
     public static final long TOKEN_COLOR = 0x16b2be3L;
+
+    public static final long TOKEN_ADDBOARD = 0xe502ed0208L;
+    // public static final long TOKEN_ID = 0x102a6L;
+    public static final long TOKEN_LAYOUT = 0x5805f907L;
+    public static final long TOKEN_LANDSCAPE = 0x44010ff937b3L;
+    public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
+
+
+
+    public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
+    public static final long TOKEN_YOFFSET = 0x14b484849aL;
+    public static final long TOKEN_SIZE = 0x17098aL;
 
     public static final long TOKEN_BLOCK = 0x14c4fa3L;
 
@@ -97,7 +105,7 @@ public class Commands
     public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
     public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
 
-    public static final long TOKEN_BOARD = 0x14e5880L;
+    // public static final long TOKEN_BOARD = 0x14e5880L;
     public static final long TOKEN_COLUMN = 0x34597767L;
     public static final long TOKEN_ROW = 0x193faL;
 
@@ -165,12 +173,6 @@ public class Commands
 
     public static final long TOKEN_INDEX = 0x215cf78L;
 
-    public static final long TOKEN_ADDLINK = 0x6308b87b1L;
-    // public static final long TOKEN_INDEX = 0x215cf78L;
-    // public static final long TOKEN_BOARD = 0x14e5880L;
-    public static final long TOKEN_LANDSCAPE = 0x44010ff937b3L;
-    public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
-
     public static final long TOKEN_ADDMODIFY = 0x211999969455L;
     // public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_ROLLS = 0x3182194L;
@@ -233,7 +235,7 @@ public class Commands
 
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] ALLOWED_AS_LABEL = new long[]{
-            TOKEN_ADDBOARD,
+            TOKEN_ADDLAYOUT,
             TOKEN_BLOCK,
             TOKEN_SEND,
             TOKEN_BUTTON,
@@ -242,7 +244,7 @@ public class Commands
 
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] ALLOWED_AS_DEFAULT = new long[]{
-            TOKEN_ADDBOARD,
+            TOKEN_ADDLAYOUT,
             TOKEN_SEND,
             TOKEN_BUTTON,
             TOKEN_EXTEND,
@@ -332,11 +334,13 @@ public class Commands
                 TOKEN_NONETITLE,
                 TOKEN_UNKNOWNTITLE,
 
+                TOKEN_ADDLAYOUT,
                 TOKEN_ADDBOARD,
+
                 TOKEN_BLOCK,
 
-                TOKEN_ADDLINK,
                 TOKEN_ADDMODIFY,
+
                 TOKEN_STOP
         });
 
@@ -375,12 +379,41 @@ public class Commands
         add(TOKEN_NONETITLE, new long[]{PARAMETER_TEXT}, "setNoneTitle");
         add(TOKEN_UNKNOWNTITLE, new long[]{PARAMETER_TEXT}, "setUnknownTitle");
 
+        add(TOKEN_ADDLAYOUT, new long[]{
+                TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
+                TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
+                TOKEN_ALIGN, TOKEN_COLOR,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT}, "addLayout" );
+
+        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS}); // Useless parametercommand - just for clearer readability
+        add(TOKEN_WIDE, new long[]{PARAMETER_FLAG});
+        add(TOKEN_COLUMNS, new long[]{PARAMETER_INT});
+        add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT});
+        add(TOKEN_ROWS, new long[]{PARAMETER_INT});
+        add(TOKEN_ALIGN, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
+
+        add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
+
+        add(TOKEN_ADDBOARD, new long[]{
+                TOKEN_ID,
+                TOKEN_LAYOUT,
+                TOKEN_PORTRAIT, TOKEN_LANDSCAPE}, "addBoard");
+        // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
+
 
 
 
 
         add(TOKEN_BLOCK, new long[]{
-                        TOKEN_BOARD,
+                        TOKEN_LAYOUT,
                         TOKEN_COLUMN,
                         TOKEN_ROW,
                         TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE,
@@ -398,7 +431,7 @@ public class Commands
                         TOKEN_EXTEND | PARAMETER_MOD_MULTIPLE },
                 "setBlock");
 
-        add(TOKEN_BOARD, new long[]{PARAMETER_KEYWORD});
+        // add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_COLUMN, new long[]{PARAMETER_INT});
         add(TOKEN_ROW, new long[]{PARAMETER_INT});
 
@@ -470,30 +503,10 @@ public class Commands
         add(TOKEN_NONBOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG_FALSE} );
         add(TOKEN_ITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
         add(TOKEN_NONITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG_FALSE} );
-        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
+        // COLOR
 
 
 
-
-        add(TOKEN_ADDBOARD, new long[]{
-                TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
-                TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
-                TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT}, "addBoard" );
-        // TOKEN_ID is already defined
-        // Useless parametercommand - just for clearer readability
-        add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS});
-        add(TOKEN_WIDE, new long[]{PARAMETER_FLAG});
-        add(TOKEN_COLUMNS, new long[]{PARAMETER_INT});
-        add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT});
-        add(TOKEN_ROWS, new long[]{PARAMETER_INT});
-        add(TOKEN_ALIGN, new long[]{PARAMETER_KEYWORD} );
-        // TOKEN_COLOR is already definied
-
-        add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
 
         add(TOKEN_OVERWRITE, new long[]{PARAMETER_FLAG});
 
@@ -561,16 +574,6 @@ public class Commands
         add(TOKEN_REVERSE, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_ENTER, new long[]{PARAMETER_FLAG});
-
-        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
-
-        add(TOKEN_ADDLINK, new long[]{
-                TOKEN_INDEX, TOKEN_BOARD,
-                TOKEN_PORTRAIT, TOKEN_LANDSCAPE}, "addLink");
-        add(TOKEN_INDEX, new long[]{PARAMETER_INT} );
-        // TOKEN_BOARD is already defined
-        add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
 
         add(TOKEN_ADDMODIFY, new long[]{
                 TOKEN_ID, TOKEN_ADDROLL, TOKEN_ROLLS,

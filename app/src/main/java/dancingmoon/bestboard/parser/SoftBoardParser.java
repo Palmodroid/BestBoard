@@ -35,7 +35,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      ** PRIVATE VARIABLES
      **/
 
-    /** IN: Board descriptor file source contains board data in human readable coat format */
+    /** IN: Layout descriptor file source contains layout data in human readable coat format */
     private File descriptorFile;
 
 
@@ -113,7 +113,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
     /** Not valid descriptor file */
     public static final int CRITICAL_NOT_VALID_FILE_ERROR = -4;
 
-    /** Critical error during parsing phase: no board is defined */
+    /** Critical error during parsing phase: no layout is defined */
     public static final int CRITICAL_PARSING_ERROR = -5;
 
 
@@ -337,14 +337,14 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
         // This was originally the SoftBoardData.parserFinished();
 
-        if ( softBoardData.firstBoard == null )
+        if ( softBoardData.firstLayout == null )
             {
-            throw new ExternalDataException("No board!");
+            throw new ExternalDataException("No layout!");
             }
 
-        if ( softBoardData.linkState.isFirstBoardMissing() )
+        if ( softBoardData.boardLinks.isFirstBoardMissing() )
             {
-            softBoardData.linkState.setLinkBoardTable( 0, softBoardData.firstBoard );
+            softBoardData.boardLinks.addBoardLink(0, softBoardData.firstLayout);
             tokenizer.error(R.string.data_primary_board_missing);
             }
 

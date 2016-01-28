@@ -1,8 +1,6 @@
 package dancingmoon.bestboard.buttons;
 
 import dancingmoon.bestboard.SoftBoardData;
-import dancingmoon.bestboard.states.BoardStates;
-import dancingmoon.bestboard.states.CapsState;
 
 /**
  * Packet represents the data sent by the keyboard.

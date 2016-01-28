@@ -22,7 +22,7 @@ public abstract class ButtonMultiTouch extends Button
 
     /**
      * Button performs its action by fire method.
-     * It is called at several phases by Board.evaluateTouch()
+     * It is called at several phases by Layout.evaluateTouch()
      */
     public abstract void multiTouchEvent( int phase );
     }

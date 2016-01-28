@@ -18,8 +18,8 @@ import dancingmoon.bestboard.modify.Modify;
 import dancingmoon.bestboard.prefs.PrefsFragment;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.server.TextBeforeCursor;
-import dancingmoon.bestboard.states.BoardStates;
-import dancingmoon.bestboard.states.LinkState;
+import dancingmoon.bestboard.states.BoardLinks;
+import dancingmoon.bestboard.states.LayoutStates;
 
 
 public class SoftBoardData
@@ -30,10 +30,10 @@ public class SoftBoardData
      **/
 
     /**
-     * The firstly defined non-wide board
-     * It is the default board if no other board is set
+     * The firstly defined non-wide layout
+     * It is the default layout if no other layout is set
      */
-    public Board firstBoard = null;
+    public Layout firstLayout = null;
 
     /** Softboard's name */
     public String name = "";
@@ -124,7 +124,7 @@ public class SoftBoardData
 
 
     /**
-     * Hide grids from the top of the board - VALUE IS NOT VERIFIED!
+     * Hide grids from the top of the layout - VALUE IS NOT VERIFIED!
      * 0 - no hide
      * 1 - hide one quarter (one grid) from the top row
      * 2 - hide one half (two grids) from the top row
@@ -132,7 +132,7 @@ public class SoftBoardData
     public int hideTop = 0;
 
     /**
-     * Hide grids from the bottom of the board - VALUE IS NOT VERIFIED!
+     * Hide grids from the bottom of the layout - VALUE IS NOT VERIFIED!
      * 0 - no hide
      * 1 - hide one quarter (one grid) from the bottom row
      * 2 - hide one half (two grids) from the bottom row
@@ -140,7 +140,7 @@ public class SoftBoardData
     public int hideBottom = 0;
 
     /**
-     * Maximal screen height ratio which can be occupied by the board
+     * Maximal screen height ratio which can be occupied by the layout
      */
     public int heightRatioPermil;
 
@@ -206,10 +206,10 @@ public class SoftBoardData
      ** STATES NEEDED BY THE SOFTBOARD
      **/
 
-    public BoardStates boardStates;
+    public LayoutStates layoutStates;
 
     // defined in constructor, because SoftBoardDataListener is needed
-    public LinkState linkState;
+    public BoardLinks boardLinks;
 
     /**
      * Action of the enter key defined by imeOptions of onStartInput's EditorInfo
@@ -260,7 +260,7 @@ public class SoftBoardData
          * @return application context
          */
         Context getApplicationContext();
-        // THIS IS NOT NEEDED (MAYBE) IF BOARD and BOARDVIEW IS DIVIDED
+        // THIS IS NOT NEEDED (MAYBE) IF LAYOUT and BOARDVIEW IS DIVIDED
         // UseState.checkOrientation() needs context
         // readPreferences() need context
 
@@ -269,10 +269,10 @@ public class SoftBoardData
         void sendKeyDownUp( int keyEventCode );
 
         void sendString( String string, int autoSpace );
-        // UseState needs this to change board
+        // UseState needs this to change layout
         public boolean undoLastString();
 
-        BoardView getBoardView();
+        LayoutView getLayoutView();
 
         TextBeforeCursor getTextBeforeCursor();
 
@@ -312,9 +312,9 @@ public class SoftBoardData
         TitleDescriptor.setTypeface( null );
 
         
-        boardStates = new BoardStates( softBoardListener );
+        layoutStates = new LayoutStates( softBoardListener );
 
-        linkState = new LinkState( softBoardListener );
+        boardLinks = new BoardLinks( softBoardListener );
 
         // This could go into parsingFinished()
         readPreferences();

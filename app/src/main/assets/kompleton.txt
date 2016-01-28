@@ -113,7 +113,7 @@ ADDBOARD ( ID minisigns HEXAGONAL HALFCOLUMNS 15 ROWS 5 ALIGN EVENS FORCESHIFT O
 ; table of boards 
 ; #############################################
 
-; ADDLINK ( INDEX index BOARD board / PORTRAIT board LANDSCAPE board )
+; ADDLINK ( INDEX index BOARD layout / PORTRAIT layout LANDSCAPE layout )
 
 ADDLINK ( INDEX 0 BOARD lit )
 ADDLINK ( INDEX 20 BOARD prog )
@@ -146,7 +146,7 @@ BUTTON ( LINK 0 LOCK
 ; #############################################
 
 ; CURSOR ( NONE
-; 	ALSO / ONLY BOARD board COLUMN num ROW num )
+; 	ALSO / ONLY BOARD layout COLUMN num ROW num )
 
 CURSOR ( NONE )          
 CURSOR ( BOARD lit ALSO COLUMN 2 TRANSFORM )

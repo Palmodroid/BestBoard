@@ -9,7 +9,7 @@
     <string name="data_docfile">"Doc-file:"</string>
     <string name="data_docuri">"Doc-URI:"</string>
     <string name="data_locale">"Locale: (Error check was not preformed!)"</string>
-    <string name="data_default_boardcolor">"Default color for board: "</string>
+    <string name="data_default_boardcolor">"Default color for layout: "</string>
     <string name="data_default_buttoncolor">"Default color for button: "</string>
     <string name="data_metacolor">"Color of active meta-keys:"</string>
     <string name="data_lockcolor">"Color of locked meta-keys:"</string>
@@ -29,19 +29,15 @@
     <string name="data_nonetitle">"None title: "</string>
     <string name="data_unknowntitle">"Unknown title: "</string>
 
-    <string name="data_slot_no_id">"New slot has no ID!"</string>
-    <string name="data_slot_added">"New slot added:"</string>
-    <string name="data_board_no_id">"New board has no ID!"</string>
-    <string name="data_columns_missing">"Columns parameter is missing for board!"</string>
-    <string name="data_rows_missing">"Rows parameter is missing for board!"</string>
-    <string name="data_board_added">"New board added:"</string>
+    <string name="data_layout_no_id">"New layout has no ID!"</string>
+    <string name="data_columns_missing">"Columns parameter is missing for layout!"</string>
+    <string name="data_rows_missing">"Rows parameter is missing for layout!"</string>
+    <string name="data_layout_added">"New layout added:"</string>
+    <string name="data_layout_overwritten">"Previous layout was overwritten!"</string>
     <string name="data_align_bad_parameter">"Align parameter cannot be identified!"</string>
-    <string name="data_board_error">"New board cannot be created with these parameters!"</string>
-    <string name="data_board_missing">"Board parameter is missing!"</string>
-    <string name="data_no_board">"Board does not exist!"</string>
-    <string name="data_boards_excluded">"All boards are excluded."</string>
-    <string name="data_none_parameters_not_allowed">"No other parameters are allowed with NONE! Parameters are skipped."</string>
-    <string name="data_cursor_set">"Cursor set"</string>
+    <string name="data_layout_error">"New layout cannot be created with these parameters!"</string>
+    <string name="data_layout_missing">"Layout parameter is missing!"</string>
+    <string name="data_no_layout">"Layout does not exist!"</string>
     <string name="data_send_packet_text_override">"Packet default text was overwritten!"</string>
     <string name="data_send_packet_key_override">"Packet default key was overwritten!"</string>
     <string name="data_send_function_invalid">"Function token is invalid!"</string>
@@ -58,9 +54,10 @@
     <string name="data_button_not_exist">"EXTEND: Cannot get button!"</string>
     <string name="data_button_color_changed">"EXTEND: The color of the button is changed!"</string>
     <string name="data_button_titles_extended">"EXTEND: The titles of the button are extended!"</string>
-    <string name="data_addlink_no_index">"Link index is missing!"</string>
+
+    <string name="data_board_no_id">"New board has no id!"</string>
     <string name="data_addlink_invalid_index">"Link index is invalid:"</string>
-    <string name="data_addlink_board_set">"Link index is set to a board:"</string>
+    <string name="data_addlink_board_set">"Link index is set to a layout:"</string>
     <string name="data_addlink">"Link parameter LANDSCAPE is missing!"</string>
     <string name="data_addlink_portrait_missing">"Link parameter PORTRAIT is missing!"</string>
     <string name="data_modify_no_id">"New modify has no ID!"</string>
@@ -68,6 +65,6 @@
     <string name="data_modify_no_rolls">"Modify has no valid rolls!"</string>
     <string name="data_modify_overwritten">"Previous modification data is overwritten!"</string>
     <string name="data_modify_added">"Modification data is added."</string>
-    <string name="data_primary_board_missing">"Primary board is not defined, first board is used."</string>
+    <string name="data_primary_board_missing">"Primary layout is not defined, first layout is used."</string>
 
 </resources>

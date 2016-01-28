@@ -4,10 +4,10 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Path;
 
-import dancingmoon.bestboard.Board;
+import dancingmoon.bestboard.Layout;
 
 /**
- * Board map uses only one ButtonForMaps instance.
+ * Layout map uses only one ButtonForMaps instance.
  * It is NOT Cloneable.
  */
 public class ButtonForMaps extends Button
@@ -24,15 +24,15 @@ public class ButtonForMaps extends Button
     private int pixelRimQuarterHeight;
     private int pixelRimHalfWidth;
 
-    public ButtonForMaps(Board board)
+    public ButtonForMaps(Layout layout)
         {
-        // board is stored in Button superclass
-        this.board = board;
+        // layout is stored in Button superclass
+        this.layout = layout;
 
-        pixelRimQuarterHeight = (board.boardHeightInPixels * (1000 - board.softBoardData.outerRimPermil)) /
-                (board.boardHeightInGrids * 1000);
-        pixelRimHalfWidth = (board.areaWidthInPixels * (1000 - board.softBoardData.outerRimPermil))
-                / (board.areaWidthInGrids * 1000);
+        pixelRimQuarterHeight = (layout.layoutHeightInPixels * (1000 - layout.softBoardData.outerRimPermil)) /
+                (layout.layoutHeightInGrids * 1000);
+        pixelRimHalfWidth = (layout.areaWidthInPixels * (1000 - layout.softBoardData.outerRimPermil))
+                / (layout.areaWidthInGrids * 1000);
         }
 
 
@@ -60,13 +60,13 @@ public class ButtonForMaps extends Button
         this.rowInGrids = getGridY(rowInHexagons);
 
         hexagonMapPaint.setColor(
-                board.colorFromTouchCode(
-                        board.touchCodeFromPosition(columnInHexagons, rowInHexagons), false));
+                layout.colorFromTouchCode(
+                        layout.touchCodeFromPosition(columnInHexagons, rowInHexagons), false));
         canvas.drawPath(hexagonPath( 0,0 ), hexagonMapPaint);
 
         hexagonMapPaint.setColor(
-                board.colorFromTouchCode(
-                        board.touchCodeFromPosition(columnInHexagons, rowInHexagons), true));
+                layout.colorFromTouchCode(
+                        layout.touchCodeFromPosition(columnInHexagons, rowInHexagons), true));
         canvas.drawPath(RimHexagonPath(), hexagonMapPaint);
 
         // Scribe.debug("touchCode: " + touchCodeFromPosition(row, col) +

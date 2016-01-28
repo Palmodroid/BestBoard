@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import dancingmoon.bestboard.Board;
+import dancingmoon.bestboard.Layout;
 import dancingmoon.bestboard.R;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.buttons.Button;
@@ -32,7 +32,7 @@ import dancingmoon.bestboard.modify.Modify;
 import dancingmoon.bestboard.modify.ModifyChar;
 import dancingmoon.bestboard.modify.ModifyText;
 import dancingmoon.bestboard.scribe.Scribe;
-import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.LayoutStates;
 import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.utils.Bit;
 import dancingmoon.bestboard.utils.ExtendedMap;
@@ -52,16 +52,19 @@ public class MethodsForCommands
      */
     private Tokenizer tokenizer;
 
+
     /**
      * Defaults (from SoftBoardParser) is needed for messaging during data-load.
      * It should be cleared, after data-load is ready.
      */
     private ExtendedMap< Long, ExtendedMap< Long, Object>> defaults;
 
+
     /**
      * SoftBoardData will be populated during the parsing process
      */
     private SoftBoardData softBoardData;
+
 
     public MethodsForCommands( SoftBoardData softBoardData, SoftBoardParser softBoardParser )
         {
@@ -70,23 +73,6 @@ public class MethodsForCommands
         this.defaults = softBoardParser.getDefaults();
         }
 
-    /**
-     * Temporary data for creating boards
-     * Button position is stored for every Board independently.
-     * After finishing, these supplementary data is not needed any more,
-     * board itself will be part of the use-key's data.
-     * Data can be reached directly within SoftBoardData
-     */
-    private class BoardPlan
-        {
-        private Board board;
-
-        private BoardPlan(Board board)
-            {
-            this.board = board;
-            }
-
-        }
 
     /**
      * Temporary data to create buttons
@@ -110,15 +96,14 @@ public class MethodsForCommands
 
     public void createDefaults()
         {
-
         ExtendedMap<Long, Object> defaultTitle = new ExtendedMap<>();
         defaultTitle.put( Commands.TOKEN_YOFFSET, 250 ); // PARAMETER_INT
         defaultTitle.put( Commands.TOKEN_SIZE, 1200 ); // PARAMETER_INT
         defaultTitle.put( Commands.TOKEN_COLOR, Color.BLACK ); // PARAMETER_COLOR (int)
 
         defaults.put( Commands.TOKEN_ADDTITLE, defaultTitle );
-
         }
+
 
     /**
      ** TEMPORARY VARIABLES NEEDED ONLY BY THE PARSING PHASE
@@ -129,42 +114,42 @@ public class MethodsForCommands
     public static final int NO_DEFAULT_KEY = -1;
 
 
-    /** Board's default background */
-    public static final int DEFAULT_BOARD_COLOR = Color.LTGRAY;
+    /** Layout's default background */
+    public static final int DEFAULT_LAYOUT_COLOR = Color.LTGRAY;
 
     /** Button's default background */
     public static final int DEFAULT_BUTTON_COLOR = Color.LTGRAY;
 
-    /** Map of temporary boardPlans, identified by code of keywords */
-    public Map<Long, BoardPlan> boardPlans = new HashMap<>();
+    /** Map of temporary layouts, identified by code of keywords */
+    public Map<Long, Layout> layouts = new HashMap<>();
 
 
     /**
      ** SETTERS CALLED ONLY BY PARSING PHASE
      **/
 
-    /** Set softboard's name */
+    /** Set softboard's name * NAME (string) */
     public void setName( Object stringParameter )
         {
         softBoardData.name = (String) stringParameter;
         tokenizer.note(R.string.data_name, softBoardData.name );
         }
 
-    /** Set softboard's version */
+    /** Set softboard's version * VERSION (int) */
     public void setVersion( Object intParameter )
         {
         softBoardData.version = (int)intParameter;
         tokenizer.note(R.string.data_version, String.valueOf(softBoardData.version));
         }
 
-    /** Set softboard's author */
+    /** Set softboard's author * AUTHOR (string) */
     public void setAuthor( Object stringParameter )
         {
         softBoardData.author = (String)stringParameter;
         tokenizer.note(R.string.data_author, softBoardData.author );
         }
 
-    /** Add softboard's tags */
+    /** Add softboard's tags * ADDTAGS (string-list) */
     public void addTags( List<Object> stringListParameter )
         {
         // PARAMETER_STRING_LIST gives only non-null String items
@@ -175,7 +160,7 @@ public class MethodsForCommands
             }
         }
 
-    /** Set softboard's short description */
+    /** Set softboard's short description * DESCRIPTION (string) */
     public void setDescription( Object stringParameter )
         {
         softBoardData.description = (String)stringParameter;
@@ -185,6 +170,7 @@ public class MethodsForCommands
     /**
      * Set file name of softboard's document (should be in the same directory) - if available
      * DocFile is not checked, just stored !!
+     * DOCFILE (file)
      */
     public void setDocFile( Object fileParameter )
         {
@@ -195,6 +181,7 @@ public class MethodsForCommands
     /**
      * Set full URI of softboard's document - if available
      * DocUri is not checked, just stored !!
+     * DOCURI (string)
      */
     public void setDocUri( Object stringParameter )
         {
@@ -205,6 +192,7 @@ public class MethodsForCommands
     /**
      * Set softboard's locale
      * Locale is not checked, just set !!
+     * LOCALE ( LANGUAGE (string) TOKEN_COUNTRY (string) TOKEN_VARIANT (string) )
      */
     public void setLocale( ExtendedMap<Long, Object> parameters )
         {
@@ -216,42 +204,42 @@ public class MethodsForCommands
         tokenizer.note(R.string.data_locale, String.valueOf(softBoardData.locale) );
         }
 
-    /** Set color of touched meta keys */
+    /** Set color of touched meta keys * METACOLOR (color) */
     public void setMetaColor(Object colorParameter)
         {
         softBoardData.metaColor = (int)colorParameter;
         tokenizer.note(R.string.data_metacolor, Integer.toHexString( softBoardData.metaColor));
         }
 
-    /** Set color of locked meta keys */
+    /** Set color of locked meta keys * LOCKCOLOR (color) */
     public void setLockColor(Object colorParameter)
         {
         softBoardData.lockColor = (int)colorParameter;
         tokenizer.note(R.string.data_lockcolor, Integer.toHexString( softBoardData.lockColor));
         }
 
-    /** Set color of locked meta keys */
+    /** Set color of locked meta keys * AUTOCOLOR (color) */
     public void setAutoColor(Object colorParameter)
         {
         softBoardData.autoColor = (int)colorParameter;
         tokenizer.note(R.string.data_autocolor, Integer.toHexString( softBoardData.autoColor));
         }
 
-    /** Set color of touched button */
+    /** Set color of touched button * TOUCHCOLOR (color) */
     public void setTouchColor(Object colorParameter)
         {
         softBoardData.touchColor = (int)colorParameter;
         tokenizer.note(R.string.data_touchcolor, Integer.toHexString( softBoardData.touchColor));
         }
 
-    /** Set color of stroke */
+    /** Set color of stroke * STROKECOLOR (color) */
     public void setStrokeColor(Object colorParameter)
         {
         softBoardData.strokeColor = (int)colorParameter;
         tokenizer.note(R.string.data_strokecolor, Integer.toHexString( softBoardData.strokeColor));
         }
 
-    /** Set typeface of title font from file */
+    /** Set typeface of title font from file * TITLEFONT (file) */
     public void setTypeface( Object fileParameter )
         {
         try
@@ -266,70 +254,82 @@ public class MethodsForCommands
             }
         }
 
-    /** Set entertitle */
+    /** Set entertitle * ENTERTITLE (text) */
     public void setEnterTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_MULTILINE] = SoftBoardParser.stringFromText(textParameter);
         tokenizer.note(R.string.data_entertitle, softBoardData.actionTitles[SoftBoardData.ACTION_MULTILINE] );
         }
 
-    /** Set gotitle */
+    /** Set gotitle * GOTITLE (text) */
     public void setGoTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_GO] = SoftBoardParser.stringFromText( textParameter );
         tokenizer.note(R.string.data_gotitle, softBoardData.actionTitles[SoftBoardData.ACTION_GO] );
         }
 
-    /** Set searchtitle */
+    /** Set searchtitle * SEARCHTITLE (text) */
     public void setSearchTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_SEARCH] = SoftBoardParser.stringFromText( textParameter );
         tokenizer.note(R.string.data_searchtitle, softBoardData.actionTitles[SoftBoardData.ACTION_SEARCH] );
         }
 
-    /** Set sendtitle */
+    /** Set sendtitle * SENDTITLE (text) */
     public void setSendTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_SEND] = SoftBoardParser.stringFromText( textParameter );
         tokenizer.note(R.string.data_sendtitle, softBoardData.actionTitles[SoftBoardData.ACTION_SEND] );
         }
 
-    /** Set nexttitle */
+    /** Set nexttitle * NEXTTITLE (text) */
     public void setNextTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_NEXT] = SoftBoardParser.stringFromText( textParameter );
         tokenizer.note(R.string.data_nexttitle, softBoardData.actionTitles[SoftBoardData.ACTION_NEXT] );
         }
 
-    /** Set donetitle */
+    /** Set donetitle * DONETITLE (text) */
     public void setDoneTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_DONE] = SoftBoardParser.stringFromText( textParameter );
         tokenizer.note(R.string.data_donetitle, softBoardData.actionTitles[SoftBoardData.ACTION_DONE] );
         }
 
-    /** Set prevtitle */
+    /** Set prevtitle * PREVTITLE (text) */
     public void setPrevTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_PREVIOUS] = SoftBoardParser.stringFromText( textParameter );
         tokenizer.note(R.string.data_prevtitle, softBoardData.actionTitles[SoftBoardData.ACTION_PREVIOUS] );
         }
 
-    /** Set nonetitle */
+    /** Set nonetitle * NONETITLE (text) */
     public void setNoneTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_NONE] = SoftBoardParser.stringFromText( textParameter );
         tokenizer.note(R.string.data_nonetitle, softBoardData.actionTitles[SoftBoardData.ACTION_NONE] );
         }
 
-    /** Set unknowntitle */
+    /** Set unknowntitle * UNKNOWNTITLE (text) */
     public void setUnknownTitle( Object textParameter )
         {
         softBoardData.actionTitles[SoftBoardData.ACTION_UNSPECIFIED] = SoftBoardParser.stringFromText( textParameter );
         tokenizer.note(R.string.data_unknowntitle, softBoardData.actionTitles[SoftBoardData.ACTION_UNSPECIFIED] );
         }
 
-    public void addBoard( ExtendedMap<Long, Object> parameters )
+    /**
+     * Adds a new layout
+     * ID (keyword) - obligatory layout id
+     * HALFCOLUMNS (int) or COLUMNS (int) - obligatory layout width
+     * ROWS (int) - obligatory layout height
+     * HEXAGONAL - (flag) currently all layouts are hexagonal
+     * WIDE - (flag) default: non-wide. Wide layouts can be displayed only in landscape mode
+     * ALIGN (keyword: ODDS or EVENS) - default: ODDS. Odds or even rows start whit whole hexagons.
+     * COLOR (color) - default: light-gray
+     * FORCESHIFT (boolean) FORCECTRL (boolean) FORCEALT  (boolean) FORCECAPS (boolean) -
+     * Trilean values, default: not-given-value. Otherwise META state is forced on or off, depending on the value.
+     */
+    public void addLayout( ExtendedMap<Long, Object> parameters )
         {
         Object temp;
 
@@ -340,12 +340,12 @@ public class MethodsForCommands
         boolean wide; // default false
         boolean oddRowsAligned; // default: EVENS ALIGNED
         int color; // default: defaultBoardColor
-        Trilean[] metaStates = new Trilean[ BoardStates.META_STATES_SIZE]; // default: IGNORED
+        Trilean[] metaStates = new Trilean[ LayoutStates.META_STATES_SIZE ]; // default: IGNORED
 
         id = (Long)parameters.remove( Commands.TOKEN_ID );
         if (id == null)
             {
-            tokenizer.error( "ADDBOARD", R.string.data_board_no_id );
+            tokenizer.error( "ADDLAYOUT", R.string.data_layout_no_id);
             return;
             }
 
@@ -381,9 +381,12 @@ public class MethodsForCommands
             }
         rows = (int)temp;
 
+        // optional parameter should be deleted
+        parameters.remove( Commands.TOKEN_HEXAGONAL );
+
         wide = (boolean)parameters.remove(Commands.TOKEN_WIDE, false);
 
-        oddRowsAligned = true; // default: ODDS_ALIGNED
+        oddRowsAligned = true; // default: ODDS
         long alignFlag = (long)parameters.remove(Commands.TOKEN_ALIGN, -1L);
         if ( alignFlag == Commands.TOKEN_ODDS )
             ; // default remains
@@ -393,46 +396,150 @@ public class MethodsForCommands
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_align_bad_parameter );
 
-        color = (int)parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BOARD_COLOR);
+        color = (int)parameters.remove(Commands.TOKEN_COLOR, DEFAULT_LAYOUT_COLOR);
 
         // missing token (null) is interpreted as IGNORE
-        metaStates[ BoardStates.META_SHIFT ] =
+        metaStates[ LayoutStates.META_SHIFT ] =
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCESHIFT ));
-        metaStates[ BoardStates.META_CTRL ] =
+        metaStates[ LayoutStates.META_CTRL ] =
                 Trilean.valueOf((Boolean) parameters.remove(Commands.TOKEN_FORCECTRL));
-        metaStates[ BoardStates.META_ALT ] =
+        metaStates[ LayoutStates.META_ALT ] =
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCEALT ));
-        metaStates[ BoardStates.META_CAPS ] =
+        metaStates[ LayoutStates.META_CAPS ] =
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCECAPS ));
 
         try
             {
-            Board board = new Board(softBoardData, halfColumns, rows, oddRowsAligned, wide, color, metaStates );
+            Layout layout = new Layout(softBoardData, halfColumns, rows, oddRowsAligned, wide, color, metaStates );
 
             // needed only by debugging purposes
-            board.setBoardId( id );
+            layout.setLayoutId(id);
 
-            // but the new board which will be included, cursor set to the first position
-            BoardPlan boardPlan = new BoardPlan(board);
-            boardPlans.put(id, boardPlan);
+            if ( layouts.put(id, layout) != null )
+                {
+                tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
+                        R.string.data_layout_overwritten );
+                }
 
             tokenizer.note( Tokenizer.regenerateKeyword( (long)id),
-                    R.string.data_board_added,
-                    board.toString());
+                    R.string.data_layout_added,
+                    layout.toString());
 
-            // the first non-wide board is stored
-            if ( softBoardData.firstBoard == null && !wide )
+            // the first non-wide layout is stored
+            if ( softBoardData.firstLayout == null && !wide )
                 {
-                softBoardData.firstBoard = board;
+                softBoardData.firstLayout = layout;
                 }
 
             }
         catch (ExternalDataException ede)
             {
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
-                    R.string.data_board_error );
+                    R.string.data_layout_error);
             }
         }
+
+
+    /**
+     * Adds a new board - portrait-landscape layout pair
+     */
+    public void addBoard( ExtendedMap<Long, Object> parameters )
+        {
+        Long id = (Long)parameters.remove( Commands.TOKEN_ID );
+        if (id == null)
+            {
+            tokenizer.error( "ADDLAYOUT", R.string.data_board_no_id);
+            return;
+            }
+
+        // LAYOUT is given, no other parameters are checked
+        Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
+        if (layoutId != null)
+            {
+            Layout layout = layouts.get( layoutId );
+            if ( layout == null )
+                {
+                tokenizer.error( "LAYOUT", R.string.data_no_layout,
+                        Tokenizer.regenerateKeyword( (long)layoutId));
+                return;
+                }
+
+            // !! Common try/catch could be used !!
+            // !! Overwritten entry could be checked (addBoardLink returns true if entry is overwritten) !!
+            try
+                {
+                softBoardData.boardLinks.addBoardLink(index, layout);
+
+                tokenizer.note( index.toString(), R.string.data_addlink_board_set,
+                        Tokenizer.regenerateKeyword( (long)layoutId));
+                }
+            catch (ExternalDataException e)
+                {
+                tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, index.toString());
+                }
+            }
+
+        // no LAYOUT is given, so PORTRAIT AND LANDSCAPE is needed
+        // BOTH parameters are checked completely before
+        else
+            {
+            Long portraitId = (Long)parameters.remove( Commands.TOKEN_PORTRAIT );
+            Layout portrait = null;
+
+            if ( portraitId != null )
+                {
+                portrait = layouts.get( portraitId );
+                if ( portrait == null )
+                    {
+                    tokenizer.error( "PORTRAIT", R.string.data_no_layout,
+                            Tokenizer.regenerateKeyword( (long)portraitId));
+                    }
+                }
+            else
+                {
+                tokenizer.error( index.toString(), R.string.data_addlink_portrait_missing );
+                }
+
+            Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
+            Layout landscape = null;
+
+            if ( landscapeId != null )
+                {
+                landscape = layouts.get( landscapeId );
+                if ( landscape == null )
+                    {
+                    tokenizer.error( "LANDSCAPE", R.string.data_no_layout,
+                            Tokenizer.regenerateKeyword( (long)landscapeId));
+                    }
+                }
+            else
+                {
+                tokenizer.error( index.toString(), R.string.data_addlink );
+                }
+
+            // only if both parameters are ok
+            if ( portrait != null && landscape != null )
+                {
+                // !! Common try/catch could be used !!
+                // !! Overwritten entry could be checked (addBoardLink returns true if entry is overwritten) !!
+                try
+                    {
+                    softBoardData.boardLinks.addBoardLink(index, portrait, landscape);
+
+                    tokenizer.note( index.toString(), R.string.data_addlink_board_set,
+                            Tokenizer.regenerateKeyword( (long)portraitId) +
+                                    "/" +
+                                    Tokenizer.regenerateKeyword( (long)landscapeId));
+                    }
+                catch (ExternalDataException e)
+                    {
+                    tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, index.toString());
+                    }
+                }
+
+            }
+        }
+
 
     public Button createButtonFunction(ExtendedMap<Long, Object> parameters)
         {
@@ -466,7 +573,7 @@ public class MethodsForCommands
             counter++;
             buttonFunction = new ButtonLink( (int)temp,
                     parameters.containsKey(Commands.TOKEN_LOCK) );
-            // invalid index - (int)temp - means go back to previous board
+            // invalid index - (int)temp - means go back to previous layout
             }
 
         temp = parameters.remove( Commands.TOKEN_META );
@@ -476,13 +583,13 @@ public class MethodsForCommands
             int meta = -1;
 
             if ( (long)temp == Commands.TOKEN_CAPS )
-                meta = BoardStates.META_CAPS;
+                meta = LayoutStates.META_CAPS;
             else if ( (long)temp == Commands.TOKEN_SHIFT )
-                meta = BoardStates.META_SHIFT;
+                meta = LayoutStates.META_SHIFT;
             else if ( (long)temp == Commands.TOKEN_CTRL )
-                meta = BoardStates.META_CTRL;
+                meta = LayoutStates.META_CTRL;
             else if ( (long)temp == Commands.TOKEN_ALT )
-                meta = BoardStates.META_ALT;
+                meta = LayoutStates.META_ALT;
 
             // ButtonMeta constructor will not accept any non-valid parameter
 
@@ -566,7 +673,7 @@ public class MethodsForCommands
             {
             // TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT feldolgozása
             packet = new PacketKey( softBoardData, temp,
-                    BoardStates.generateBinaryHardState( parameters ));
+                    LayoutStates.generateBinaryHardState(parameters));
             }
 
         return packet;
@@ -776,10 +883,10 @@ public class MethodsForCommands
      */
     public void setBlock(ExtendedMap<Long, Object> parameters)
         {
-        Long boardId = (Long)parameters.remove( Commands.TOKEN_BOARD );
-        if (boardId == null)
+        Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
+        if (layoutId == null)
             {
-            tokenizer.error( "CURSOR", R.string.data_board_missing );
+            tokenizer.error( "CURSOR", R.string.data_layout_missing);
             return;
             }
 
@@ -798,13 +905,12 @@ public class MethodsForCommands
             return;
             }
 
-        BoardPlan boardPlan = boardPlans.get( boardId );
-        if ( boardPlan == null )
+        Layout layout = layouts.get( layoutId );
+        if ( layout == null )
             {
-            Scribe.error( Debug.PARSER, "BLOCK: board is missing!!");
+            Scribe.error(Debug.PARSER, "BLOCK: layout is missing!!");
             return;
             }
-        Board board = boardPlan.board;
 
         // automatic movement
         boolean autoMove = false;
@@ -824,7 +930,7 @@ public class MethodsForCommands
 
                 try
                     {
-                    if (board.addButton(
+                    if (layout.addButton(
                             arrayColumn,
                             arrayRow,
                             ((ButtonPlan) action.getValue()).button.clone()))
@@ -832,21 +938,21 @@ public class MethodsForCommands
                         if ((boolean)parameters.remove(Commands.TOKEN_OVERWRITE, false))
                             {
                             tokenizer.note(R.string.data_button_overwritten,
-                                    boardPlan.toString());
+                                    layout.toString());
                             }
                         else
                             {
                             tokenizer.error(R.string.data_button_overwritten,
-                                    boardPlan.toString());
+                                    layout.toString());
                             }
                         }
                     tokenizer.note( ((ButtonPlan)action.getValue()).buttonName, R.string.data_button_added,
-                            boardPlan.toString());
+                            layout.toString());
                     }
                 catch (ExternalDataException ede)
                     {
                     tokenizer.error( ((ButtonPlan)action.getValue()).buttonName, R.string.data_button_error,
-                            boardPlan.toString());
+                            layout.toString());
                     }
 
                 autoMove = true;
@@ -859,7 +965,7 @@ public class MethodsForCommands
                 Button button = null;
                 try
                     {
-                    button = board.getButton( arrayColumn, arrayRow );
+                    button = layout.getButton( arrayColumn, arrayRow );
                     }
                 catch ( ExternalDataException ede)
                     {
@@ -907,14 +1013,14 @@ public class MethodsForCommands
 
             if ( action.getKey() == Commands.TOKEN_CRL )
                 {
-                if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                if ( (arrayRow + layout.rowsAlignOffset) % 2 == 0 )
                     crArrayColumn--;
                 arrayColumn = crArrayColumn;
                 arrayRow++;
                 }
             else if ( action.getKey() == Commands.TOKEN_CRR )
                 {
-                if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                if ( (arrayRow + layout.rowsAlignOffset) % 2 == 1 )
                     crArrayColumn++;
                 arrayColumn = crArrayColumn;
                 arrayRow++;
@@ -935,35 +1041,35 @@ public class MethodsForCommands
                 }
             else if ( action.getKey() == Commands.TOKEN_DL )
                 {
-                if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                if ( (arrayRow + layout.rowsAlignOffset) % 2 == 0 )
                     arrayColumn--;
                 arrayRow++;
                 }
             else if ( action.getKey() == Commands.TOKEN_DR )
                 {
-                if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                if ( (arrayRow + layout.rowsAlignOffset) % 2 == 1 )
                     arrayColumn++;
                 arrayRow++;
                 }
             else if ( action.getKey() == Commands.TOKEN_UL )
                 {
-                if ( (arrayRow + board.rowsAlignOffset) % 2 == 0 )
+                if ( (arrayRow + layout.rowsAlignOffset) % 2 == 0 )
                     arrayColumn--;
                 arrayRow--;
                 }
             else if ( action.getKey() == Commands.TOKEN_UR )
                 {
-                if ( (arrayRow + board.rowsAlignOffset) % 2 == 1 )
+                if ( (arrayRow + layout.rowsAlignOffset) % 2 == 1 )
                     arrayColumn++;
                 arrayRow--;
                 }
             else if ( action.getKey() == Commands.TOKEN_FINDFREE )
                 {
                 int occupied;
-                while ( ( occupied = board.checkButton( arrayColumn, arrayRow )) != Board.POSITION_WHOLE_HEXAGON
-                        && occupied != Board.POSITION_INVALID )
+                while ( ( occupied = layout.checkButton( arrayColumn, arrayRow )) != Layout.POSITION_WHOLE_HEXAGON
+                        && occupied != Layout.POSITION_INVALID )
                     {
-                    if (occupied == Board.POSITION_LINE_ENDED)
+                    if (occupied == Layout.POSITION_LINE_ENDED)
                         {
                         arrayRow++;
                         arrayColumn = 0;
@@ -1070,114 +1176,6 @@ public class MethodsForCommands
                 .remove(Bit.setSignedBitOn(Commands.TOKEN_ADDTITLE));
 
         return buttonExtension;
-        }
-
-
-    public void addLink( ExtendedMap<Long, Object> parameters )
-        {
-        Integer index = (Integer)parameters.remove( Commands.TOKEN_INDEX );
-        if (index == null)
-            {
-            tokenizer.error("ADDLINK", R.string.data_addlink_no_index );
-            return;
-            }
-
-        // BOARD is given, no other parameters are checked
-        Long boardId = (Long)parameters.remove( Commands.TOKEN_BOARD );
-        if (boardId != null)
-            {
-            BoardPlan boardPlan = boardPlans.get( boardId );
-            if ( boardPlan == null )
-                {
-                tokenizer.error( "BOARD", R.string.data_no_board,
-                        Tokenizer.regenerateKeyword( (long)boardId));
-                return;
-                }
-
-            // !! Common try/catch could be used !!
-            // !! Overwritten entry could be checked (setLinkBoardTable returns true if entry is overwritten) !!
-            try
-                {
-                softBoardData.linkState.setLinkBoardTable( index, boardPlan.board );
-
-                tokenizer.note( index.toString(), R.string.data_addlink_board_set,
-                        Tokenizer.regenerateKeyword( (long)boardId));
-                }
-            catch (ExternalDataException e)
-                {
-                tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, index.toString());
-                }
-            }
-
-        // no BOARD is given, so PORTRAIT AND LANDSCAPE is needed
-        // BOTH parameters are checked completely before
-        else
-            {
-            BoardPlan boardPlan;
-
-            Long portraitId = (Long)parameters.remove( Commands.TOKEN_PORTRAIT );
-            Board portrait = null;
-
-            if ( portraitId != null )
-                {
-                boardPlan = boardPlans.get( portraitId );
-                if ( boardPlan != null )
-                    {
-                    portrait = boardPlan.board;
-                    }
-                else
-                    {
-                    tokenizer.error( "PORTRAIT", R.string.data_no_board,
-                            Tokenizer.regenerateKeyword( (long)portraitId));
-                    }
-                }
-            else
-                {
-                tokenizer.error( index.toString(), R.string.data_addlink_portrait_missing );
-                }
-
-            Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
-            Board landscape = null;
-
-            if ( landscapeId != null )
-                {
-                boardPlan = boardPlans.get( landscapeId );
-                if ( boardPlan != null )
-                    {
-                    landscape = boardPlan.board;
-                    }
-                else
-                    {
-                    tokenizer.error( "LANDSCAPE", R.string.data_no_board,
-                            Tokenizer.regenerateKeyword( (long)landscapeId));
-                    }
-                }
-            else
-                {
-                tokenizer.error( index.toString(), R.string.data_addlink );
-                }
-
-            // only if both parameters are ok
-            if ( portrait != null && landscape != null )
-                {
-                // !! Common try/catch could be used !!
-                // !! Overwritten entry could be checked (setLinkBoardTable returns true if entry is overwritten) !!
-                try
-                    {
-                    softBoardData.linkState.setLinkBoardTable( index, portrait, landscape );
-
-                    tokenizer.note( index.toString(), R.string.data_addlink_board_set,
-                            Tokenizer.regenerateKeyword( (long)portraitId) +
-                                    "/" +
-                                    Tokenizer.regenerateKeyword( (long)landscapeId));
-                    }
-                catch (ExternalDataException e)
-                    {
-                    tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, index.toString());
-                    }
-                }
-
-            }
         }
 
 

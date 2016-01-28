@@ -3,7 +3,7 @@ package dancingmoon.bestboard.buttons;
 import dancingmoon.bestboard.debug.Debug;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.scribe.Scribe;
-import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.LayoutStates;
 import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.utils.HardKey;
 import dancingmoon.bestboard.utils.StringUtils;
@@ -118,7 +118,7 @@ public class PacketText extends Packet
     @Override
     public void send()
         {
-        if ( softBoardData.boardStates.isHardKeyForced() )
+        if ( softBoardData.layoutStates.isHardKeyForced() )
             {
             if ( string.length() == 1 )
                 {
@@ -129,7 +129,7 @@ public class PacketText extends Packet
         else
             {
             // state can be: META_OFF (no upper) IN_TOUCH META_ON AUTOCAPS_ON (first upper) META_LOCK (all upper)
-            int state = softBoardData.boardStates.metaStates[BoardStates.META_CAPS].getState();
+            int state = softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS].getState();
             if ( state == CapsState.META_OFF )
                 {
                 capsState = 0;
@@ -173,7 +173,7 @@ public class PacketText extends Packet
     public void release()
     	{
         // If needed, this could be a standalone method, called when touch releases the button
-        ( (CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS] ).setAutoCapsState( autoCaps );
+        ( (CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS] ).setAutoCapsState( autoCaps );
         Scribe.debug(Debug.TEXT, "PacketText released, autocaps state is set.");
         }
     }

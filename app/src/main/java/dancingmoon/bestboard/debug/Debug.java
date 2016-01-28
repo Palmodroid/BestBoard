@@ -27,7 +27,7 @@ public class Debug
     private static final int LIMIT = 500;
 
     public static final int PREF = 10;
-    public static final int BOARD = 20;
+    public static final int LAYOUT = 20;
     public static final int TOUCH = 24;
     public static final int TOUCH_VERBOSE = 24;
     public static final int DRAW =26;

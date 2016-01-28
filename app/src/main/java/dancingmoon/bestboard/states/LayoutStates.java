@@ -14,13 +14,13 @@ import dancingmoon.bestboard.utils.ExtendedMap;
 /**
  * Summary of the states
  * All meta-states including hard-states and caps-state are stored in this class.
- * This class stores the android meta-state information needed by senKey... methods.
+ * This class stores the android meta-state information needed by sendKey... methods.
  *
  * Helper methods: hard-states should simulate meta-key events before and after hard-keys.
  * Actual meta-key status (sent out to the android system) is stored here.
  * !!These helper methods could be moved to the HardState class!!
  */
-public class BoardStates
+public class LayoutStates
     {
 
     /** Size of the whole meta-state array - including hard-states and caps-state */
@@ -57,7 +57,7 @@ public class BoardStates
      * Down-time of simulated hard-state buttons.
      * RELEASED (-1L) for non-active state.
      */
-    private long hardStateTimes[] = new long[ BoardStates.HARD_STATES_SIZE];
+    private long hardStateTimes[] = new long[ LayoutStates.HARD_STATES_SIZE];
 
     /** Android meta-state masks for simulated hard-state buttons */
     private static int hardStateAndroidMasks[] = new int[HARD_STATES_SIZE];
@@ -78,7 +78,7 @@ public class BoardStates
      * Constructor populates arrays
      * @param softBoardListener ??????????
      */
-    public BoardStates( SoftBoardData.SoftBoardListener softBoardListener )
+    public LayoutStates(SoftBoardData.SoftBoardListener softBoardListener)
         {
         this.softBoardListener = softBoardListener;
 
@@ -123,7 +123,7 @@ public class BoardStates
     private void calculateAndroidMetaState()
         {
         androidMetaState = ANDROID_META_STATE_OFF;
-        for ( int m = 0; m < BoardStates.HARD_STATES_SIZE; m++ )
+        for ( int m = 0; m < LayoutStates.HARD_STATES_SIZE; m++ )
             {
             if ( isSimulatedMetaButtonPressed( m ) )
                 androidMetaState |= hardStateAndroidMasks[m];

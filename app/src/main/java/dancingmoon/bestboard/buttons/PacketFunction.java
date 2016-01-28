@@ -5,7 +5,7 @@ import android.content.Intent;
 import dancingmoon.bestboard.parser.Commands;
 import dancingmoon.bestboard.prefs.PrefsActivity;
 import dancingmoon.bestboard.SoftBoardData;
-import dancingmoon.bestboard.states.BoardStates;
+import dancingmoon.bestboard.states.LayoutStates;
 import dancingmoon.bestboard.states.CapsState;
 import dancingmoon.bestboard.utils.ExternalDataException;
 
@@ -95,7 +95,7 @@ public class PacketFunction extends Packet
 
         else if (functionCode == Commands.TOKEN_SETTINGS )
             {
-            // The whole part is copied from Best's Board ver 1.
+            // The whole part is copied from Best's Layout ver 1.
 
             // Original idea: http://stackoverflow.com/a/3607934
             // but it doesn't work without Single_top - BACK went back to an other instance
@@ -117,7 +117,7 @@ public class PacketFunction extends Packet
         {
         if ( functionCode == Commands.TOKEN_BACKSPACE )
             {
-            ((CapsState) softBoardData.boardStates.metaStates[BoardStates.META_CAPS])
+            ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
                     .setAutoCapsState(CapsState.AUTOCAPS_OFF);
             }
         }
