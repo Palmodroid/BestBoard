@@ -5,7 +5,7 @@ android {
     buildToolsVersion "23.0.2"
 
     defaultConfig {
-        applicationId "dancingmoon.bestboard"
+        applicationId "org.lattilad.bestboard"
         minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
