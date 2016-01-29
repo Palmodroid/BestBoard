@@ -1,0 +1,350 @@
+﻿COAT ( 1000 )
+
+LET ( green 0c8e8 )
+LET ( yellow 0cee4 )
+LET ( magenta 0c800080 )
+LET ( white 0cffe )
+LET ( red 0ca00 )
+
+ADDBOARD ( ID teszt HEXAGONAL ALIGN evens ROWS 6 HALFCOLUMNS 24 COLOR 0cee4 )
+
+DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 250 SIZE 1000 BOLD ITALICS )
+
+BLOCK ( BOARD teszt COLUMN 1 ROW 1
+    BUTTON ( TEXT "Teszt" ADDTITLE (NONBOLD NONITALICS))
+    BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) 
+      )
+
+DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 500 SIZE 1200 )
+	
+LET ( abc BLOCK ( 
+	BUTTON ( TEXT "A") 
+	BUTTON ( TEXT "B") 
+	BUTTON ( TEXT "C") ))
+
+LET ( def BLOCK ( 
+	BUTTON ( TEXT "d") 
+	BUTTON ( TEXT "e") 
+	BUTTON ( TEXT "f") ))
+
+DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET -250 SIZE 1200 BOLD ITALICS)
+
+LET ( _abc BLOCK ( 
+	EXTEND ( COLOR green ADDTITLE ( TEXT "Hi" COLOR red )) 
+	EXTEND ( COLOR magenta ADDTITLE () ) 
+	EXTEND ( COLOR yellow ADDTITLE (NONBOLD NONITALICS COLOR magenta )) ))
+
+	
+BLOCK ( BOARD teszt COLUMN 5 ROW 1 abc )
+BLOCK ( BOARD teszt COLUMN 5 ROW 1 _abc )
+
+BLOCK ( BOARD teszt COLUMN 5 ROW 3 def )
+BLOCK ( BOARD teszt COLUMN 5 ROW 3 _abc )
+
+DEFAULT BUTTON (color green)
+
+DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 250 SIZE 1200 )
+LET ( fel ADDTITLE ( XOFFSET 0 YOFFSET -250 SIZE 800 COLOR red ))
+	
+CHANGE ( abc BLOCK ( 
+	BUTTON ( TEXT "A" ADDTITLE() ADDTITLE (fel TEXT "H")) 
+	BUTTON ( TEXT "B" ADDTITLE() ADDTITLE (fel TEXT "H")) 
+	BUTTON ( TEXT "C" ADDTITLE() ADDTITLE (fel TEXT "H")) ))
+
+BLOCK ( BOARD teszt COLUMN 5 ROW 5 abc )
+      
+      
+STOP
+      
+LET ( green 0c8e8 )
+LET ( yellow 0cee4 )
+LET ( magenta 0c800080 )
+LET ( white 0cffe )
+LET ( red 0ca00 )
+
+DEFAULT BUTTON ( COLOR green )
+
+LET ( zold BUTTON ( COLOR green ) )
+LET ( piros BUTTON ( COLOR red ) )
+
+BLOCK ( BOARD teszt COLUMN 1 ROW 1
+    BUTTON ( TEXT "Teszt" COLOR white )
+    BUTTON ( DO DRAFT COLOR RED ) 
+      )
+
+
+LET ( abc BLOCK ( 
+	BUTTON ( TEXT "A") 
+	BUTTON ( TEXT "B") 
+	BUTTON ( TEXT "C") ))
+
+LET ( def BLOCK ( 
+	UR
+	BUTTON ( TEXT "D") 
+	DR
+	BUTTON ( TEXT "E") 
+	UR
+	BUTTON ( TEXT "F") 
+	DR ))
+
+LET ( ghi BLOCK ( 
+	BUTTON ( TEXT "G") 
+	BUTTON ( TEXT "H") 
+	BUTTON ( TEXT "I") ))
+
+
+BLOCK ( BOARD teszt COLUMN 1 ROW 4
+    BUTTON ( TEXT "->" ) crl Button ( text "crl" ) home crr Button ( text "crr" ) skip (2) abc r def r ghi crr Button ( text "crr" )
+      )
+
+
+BLOCK ( BOARD teszt COLUMN 5 ROW 2
+    BUTTON ( TEXT "1" zold )
+    SKIP 2
+    BUTTON ( TEXT "N" zold )
+    HOME
+    DR
+    BUTTON ( TEXT "DR" piros )
+    HOME
+    DL
+    BUTTON ( TEXT "DL" piros )
+    HOME
+    UR
+    BUTTON ( TEXT "UR" piros )
+    HOME
+    UL
+    BUTTON ( TEXT "UL" piros )
+    HOME
+    R
+    BUTTON ( TEXT "R" piros )
+    HOME
+    L
+    BUTTON ( TEXT "L" piros )
+      )
+    
+BLOCK ( BOARD teszt COLUMN 11 ROW 2
+    BUTTON ( TEXT "0" zold )
+    UL
+    BUTTON ( TEXT "1" piros )
+    R
+    BUTTON ( TEXT "2" piros )
+    DR
+    BUTTON ( TEXT "3" piros )
+    DL
+    BUTTON ( TEXT "4" piros )
+    L
+    BUTTON ( TEXT "5" piros )
+    UL
+    BUTTON ( TEXT "6" piros )
+      )
+
+      
+STOP
+
+LET ( black 0c0 )
+LET ( blue 0c99e )
+LET ( rose 0ce6b2ab )
+LET ( brown 0ccb2 )
+LET ( pink 0cfcf )
+LET ( darkpink 0ce99 )
+LET ( purple 0cc673d9 )
+LET ( gray 0c9 )
+LET ( orange 0cf84 )
+LET ( khaki 0cd4ddaa )
+
+
+
+
+
+
+
+
+
+; NEXT  
+; NEXTROW
+; SKIP num
+; SKIPROW num
+; BUTTON (
+; 	TEXT "text" 
+; 	AUTOCAPS ON / OFF / WAIT / HOLD
+; 	STRINGCAPS 
+; 	ERASESPACES BEFORE / AFTER / AROUND 
+; 	AUTOSPACE BEFORE / AFTER / AROUND 
+; 	REPEAT
+; 	
+; 	KEY num	FORCECAPS FORCESHIFT FORCECTRL FORCEALT REPEAT
+; 	
+; 	DO DELETE / BACKSPACE REPEAT
+; 
+; 	SPACETRAVEL
+; 
+; 	ENTER REPEAT
+; 
+; 	META CAPS / SHIFT / CTRL / ALT LOCK
+; 
+; 	LINK num LOCK
+; 
+; 	MODIFY keyword REVERSE
+; 
+; 	ADDTITLE ( TEXT "text " BOLD ITALICS COLOR color SLOT keyword )
+; 
+; 	COLOR color )
+
+NAME "Tesztboard"
+VERSION 2
+AUTHOR "thon"
+
+; LOCALE ( LANGUAGE "string" COUNTRY "string" VARIANT "string" )
+
+LET ( black 0c0 )
+LET ( green 0c8e8 )
+LET ( yellow 0cee4 )
+LET ( blue 0c99e )
+LET ( rose 0ce6b2ab )
+LET ( brown 0ccb2 )
+LET ( pink 0cfcf )
+LET ( darkpink 0ce99 )
+LET ( purple 0cc673d9 )
+LET ( gray 0c9 )
+LET ( white 0cffe )
+LET ( orange 0cf84 )
+LET ( khaki 0cd4ddaa )
+LET ( magenta 0c800080 )
+LET ( red 0ca00 )
+
+; ADDSLOT ( ID keyword XOFFSET milli YOFFSET milli SIZE milli BOLD ITALICS COLOR color)
+
+ADDSLOT ( ID center SIZE 1900 )
+ADDSLOT ( ID script YOFFSET +300 SIZE 1400 BOLD COLOR magenta)
+ADDSLOT ( ID link YOFFSET +300 SIZE 1400 BOLD COLOR white)
+ADDSLOT ( ID north YOFFSET -350 SIZE 1400 COLOR red )
+ADDSLOT ( ID south YOFFSET +400 SIZE 1800 )
+
+DEFAULT (
+;	BOARDCOLOR color
+;	BUTTONCOLOR color
+	SLOT center )
+
+; METACOLOR color
+; LOCKCOLOR color
+; AUTOCOLOR color
+; TOUCHCOLOR color
+; STROKECOLOR color
+TITLEFONT "font2.ttf"
+
+ENTERTITLE "E"
+GOTITLE "G"
+SEARCHTITLE "H"
+SENDTITLE "S"
+NEXTTITLE 'N'
+DONETITLE 'D'
+PREVTITLE 'P'
+NONETITLE "NONE"
+UNKNOWNTITLE "UN"
+
+ADDMODIFY ( ID textmod ADDROLL ( "le" "el" "sem" "mes" "ezt" "tze" ) ADDROLL ( "aki" "abc" "def" "ghi" ) IGNORESPACE )
+ADDMODIFY ( ID mod ROLLS (  "hpud" "1234567890" ".,-+=;!@" ) IGNORESPACE )
+
+
+ADDBOARD ( ID teszt HEXAGONAL ALIGN evens HALFCOLUMNS 20 ROWS 5)
+
+BUTTON ( TEXT "Teszt" COLOR purple )
+
+BUTTON ( TEXT " v      " SECOND ( TEXT "vakond" ) COLOR blue ) 
+BUTTON ( TEXT 'c' SECOND ( TEXT '&' ) COLOR blue AUTOSPACE around ERASESPACES before AUTOCAPS ON) 
+BUTTON ( KEY KEYZ COLOR green ) 
+BUTTON ( KEY KEYM COLOR green ) 
+
+BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" SLOT script ) COLOR white )
+BUTTON ( DO BACKSPACE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+BUTTON ( DO DELETE REPEAT
+	ADDTITLE ( SLOT script ) COLOR white )
+
+NEXTROW
+
+BUTTON ( TEXT 'b' COLOR blue ) 
+BUTTON ( TEXT "le" COLOR green ) 
+BUTTON ( TEXT "sem" COLOR yellow ) 
+BUTTON ( TEXT "ezt" COLOR yellow ) 
+BUTTON ( TEXT "te" COLOR green ) 
+
+BUTTON ( ENTER REPEAT ADDTITLE ( SLOT script ) COLOR white )
+
+NEXTROW
+
+BUTTON ( TEXT 'f' COLOR blue )
+BUTTON ( TEXT 'r' COLOR green ) 
+BUTTON ( TEXT "AKI" COLOR yellow ) 
+BUTTON ( SPACETRAVEL 
+  ERASESPACES AROUND
+  AUTOCAPS HOLD
+  COLOR darkpink ) 
+BUTTON ( TEXT 'n' COLOR yellow ) 
+BUTTON ( TEXT 'y' COLOR green ) 
+NEXTROW
+
+BUTTON ( TEXT 'j' COLOR blue ) 
+BUTTON ( TEXT 'o' COLOR green ) 
+BUTTON ( TEXT "Kié" COLOR yellow ) 
+BUTTON ( TEXT 'i' COLOR yellow ) 
+BUTTON ( TEXT 'g' COLOR green ) 
+
+BUTTON ( TEXT '.' COLOR orange
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER 
+	AUTOCAPS ON )
+BUTTON ( TEXT ',' COLOR orange
+	ERASESPACES AROUND 
+	AUTOSPACE AFTER ) 
+
+
+NEXTROW
+
+BUTTON ( MODIFY mod ADDTITLE ( TEXT '↺' SLOT script SIZE 2000 ) COLOR white )
+
+BUTTON ( TEXT 'a' COLOR blue AUTOCAPS OFF ) 
+BUTTON ( TEXT 'o' COLOR green AUTOCAPS ON ) 
+BUTTON ( TEXT 'w' COLOR green AUTOCAPS WAIT ) 
+BUTTON ( TEXT 'h' COLOR green AUTOCAPS HOLD ) 
+
+BUTTON ( MODIFY textmod ADDTITLE ( TEXT "a↺z" SLOT script SIZE 2000 ) COLOR white )
+
+BUTTON ( TEXT "🚀" COLOR rose ) 
+BUTTON ( TEXT "🚢" COLOR rose ) 
+BUTTON ( TEXT "o🚲🚲o" COLOR rose ) 
+BUTTON ( TEXT "Hop 🚃" COLOR rose ) 
+BUTTON ( TEXT "🛀" COLOR rose autospace around ) 
+
+
+CURSOR ( BOARD teszt COLUMN  7 TRANSFORM)
+
+BUTTON ( KEY 'C' FORCECTRL ON FORCESHIFT OFF 
+	ADDTITLE ( TEXT "COPY" SLOT script COLOR white ) COLOR blue )
+BUTTON ( KEY 'V' FORCECTRL ON FORCESHIFT OFF 
+	ADDTITLE ( TEXT "PASTE" SLOT script COLOR white ) COLOR blue )
+BUTTON ( META CAPS ADDTITLE ( SLOT script ) COLOR white )
+
+CURSOR ( BOARD teszt COLUMN 6 ROW 1)
+
+SKIP 2
+BUTTON ( KEY KEYDPADUP REPEAT
+	ADDTITLE ( TEXT '▲' SLOT script COLOR black ) COLOR gray )
+NEXTROW
+
+BUTTON ( META SHIFT LOCK ADDTITLE ( SLOT script ) COLOR white )
+
+BUTTON ( DO SETTINGS
+	ADDTITLE ( SLOT script ) COLOR red )
+
+BUTTON ( KEY KEYDPADLEFT REPEAT
+	ADDTITLE ( TEXT '◀' SLOT script COLOR black ) COLOR gray )
+BUTTON ( KEY KEYDPADRIGHT REPEAT 
+	ADDTITLE ( TEXT '▶' SLOT script COLOR black ) COLOR gray ) 
+NEXTROW
+
+SKIP 2
+BUTTON ( KEY KEYDPADDOWN REPEAT 
+	ADDTITLE ( TEXT '▼' SLOT script COLOR black ) COLOR gray )
+
+ADDLINK (INDEX 0 BOARD teszt) ; zero

@@ -8,9 +8,16 @@ import java.util.Map;
 import dancingmoon.bestboard.Layout;
 import dancingmoon.bestboard.SoftBoardData;
 import dancingmoon.bestboard.debug.Debug;
+import dancingmoon.bestboard.parser.Tokenizer;
 import dancingmoon.bestboard.scribe.Scribe;
 import dancingmoon.bestboard.utils.ExternalDataException;
 
+/**
+ * Boards consist of two layouts (the two can be tha same): one for portrait,
+ * and one for landscape mode.
+ * Boards identified by their keyword token id.
+ * BoardLinks stores all these Boards, and switches between them, if needed by link-buttons.
+ */
 public class BoardLinks
     {
     // boardLinks is defined in the constructor of SoftBoardData
@@ -18,6 +25,9 @@ public class BoardLinks
     // - SoftBoardService.softBoardParserFinished()
     // - SoftBoardService.onCreateInputView()
     // - SoftBoardService.setBoardUse()
+
+    public static final int LINK_PORTRAIT = 0;
+    public static final int LINK_LANDSCAPE = 1;
 
     private class Board
         {
@@ -30,46 +40,69 @@ public class BoardLinks
             }
         }
 
+    /** Id - Board map for the boards */
     private Map<Long, Board> boards = new HashMap<>();
 
-    public static final int LINK_PORTRAIT = 0;
-    public static final int LINK_LANDSCAPE = 1;
+    /**
+     * base-board is the root of all boards.
+     * If not explicitly defined, then the first board will be the base-board.
+     */
+    private Long baseBoardId = null;
 
-    // orientation: can be LINK_PORTRAIT or LINK_LANDSCAPE
+    /* Orientation: can be LINK_PORTRAIT or LINK_LANDSCAPE */
     private int orientation = LINK_PORTRAIT;
 
-    // Connection to service
+    /* Connection to service */
     private SoftBoardData.SoftBoardListener softBoardListener;
 
 
-    // Constructor - BoardLinks should be able to reach Service (SoftBoardDataListener)
+    /* Constructor - BoardLinks should be able to reach Service (SoftBoardDataListener) */
     public BoardLinks(SoftBoardData.SoftBoardListener softBoardListener)
         {
         this.softBoardListener = softBoardListener;
         }
 
 
-    // Use the same not/wide layout
-    // SoftBoardParser calls it
+    /**
+     * Use the same not/wide layout
+     * SoftBoardParser calls it
+     * returns TRUE, if Board was already defined
+     */
     public boolean addBoardLink(Long id, Layout layout) throws ExternalDataException
         {
         return addBoardLink(id, layout, layout);
         }
 
-    // Use portrait/landscape layout pair
-    // SoftBoardParser calls it
-    // returns TRUE, if Board was already definied
+    /**
+     * Use portrait/landscape layout pair
+     * SoftBoardParser calls it
+     * returns TRUE, if Board was already defined
+     */
     public boolean addBoardLink(Long id, Layout portrait, Layout landscape) throws ExternalDataException
         {
         Board board = new Board( portrait, landscape );
+        if ( baseBoardId == null )
+            baseBoardId = id;
         return ( boards.put( id, board ) != null );
         }
 
-    // true if first (activeIndex 0) layout is missing
-    // UseBoard activeIndex 0 is obligatory
-    public boolean isFirstBoardMissing()
+    /**
+     * Explicitly sets baseBoard
+     * @param baseBoardId id of the base board
+     */
+    public void addBaseBoardLink(Long baseBoardId)
         {
-        return linkLayout[0][0] == null;
+        this.baseBoardId = baseBoardId;
+        }
+
+    /**
+     * If base-board is missing, then there are no boards at all.
+     * This is not possible!
+     * @return true if there are no boards
+     */
+    public boolean isBaseBoardMissing()
+        {
+        return baseBoardId == null;
         }
 
     // sets orientation
@@ -91,12 +124,18 @@ public class BoardLinks
         return orientation == LINK_LANDSCAPE;
         }
 
-    // returns selected layout
-    // !! activeIndex cannot be invalid !!
-    // All three SoftBoardService methods calls this
-    public Layout getActiveBoard()
+
+    /**
+     * Returns the currently selected (active) layout
+     * (depending on the active board and orientation)
+     * All three SoftBoardService methods calls this
+     * !! activeBoardId cannot be invalid !!
+     * @return the active layout
+     */
+    public Layout getActiveLayout()
         {
-        return linkLayout[activeIndex][orientation];
+        Board board = boards.get( activeBoardId );
+        return board.layouts[orientation];
         }
 
 
@@ -107,14 +146,11 @@ public class BoardLinks
      */
     public void invalidateCalculations( boolean erasePictures )
         {
-        for ( int b = 0; b < MAX_LINKS; b++ )
+        for ( Board board : boards.values() )
             {
             for ( int o = 0; o < 2; o++ )
                 {
-                if ( linkLayout[b][o] != null )
-                    {
-                    linkLayout[b][o].invalidateCalculations( erasePictures );
-                    }
+                board.layouts[o].invalidateCalculations(erasePictures);
                 }
             }
         }
@@ -130,17 +166,19 @@ public class BoardLinks
     public final static int LOCKED = 2;
 
     /**
-     * Index of the active layout.
-     * Only one layout can be active.
+     * Index of the active board.
+     * Only one board can be active, and this variable cannot be invalid!!
+     * BaseBoardId will change, but activeId will change accordingly during the parsing process
      */
-    private int activeIndex = 0;
+    private Long activeBoardId = baseBoardId;
 
     /**
-     * Index of the previous layout, where active layout could return.
-     * Layout cannot be nested. Return works only ONE LEVEL deep.
-     * After that layout will return to layout 0.
+     * Index of the previous board, where active board could return.
+     * Boards cannot be nested. Return works only ONE LEVEL deep.
+     * After that layout will return to base-board.
+     * BaseBoardId will change, but previousId will change accordingly during the parsing process
      */
-    private int previousIndex = 0;
+    private Long previousBoardId = baseBoardId;
 
     /**
      * state: HIDDEN / ACTIVE / LOCKED
@@ -162,24 +200,23 @@ public class BoardLinks
 
 
     /**
-     * Check whether this activeIndex signs the current layout.
-     * Invalid indices also signs the current layout!
-     * @param index to check
-     * @return true, if activeIndex signs the current layout
+     * Check whether this id signs the current board.
+     * @param id to check
+     * @return true, if id signs the current board
      */
-    public boolean isActive(int index)
+    private boolean isActive( Long id )
         {
-        return ( index < 0 || index == this.activeIndex || index >= MAX_LINKS );
+        return id.equals( activeBoardId );
         }
 
     /**
-     * State of the layout.
-     * @param index Index of layout to check
+     * State of the board.
+     * @param id board id to check
      * @return TOUCHED / ACTIVE / LOCK / HIDDEN
      */
-    public int getState( int index )
+    public int getState( Long id )
         {
-        if ( isActive(index) )
+        if ( isActive(id) )
             {
             if ( touchCounter > 0 )
                 return TOUCHED;
@@ -196,14 +233,15 @@ public class BoardLinks
 
     private void activatePreviousBoard()
         {
-        if ( activeIndex != previousIndex )
+        if ( !activeBoardId.equals(previousBoardId) )
             {
-            Scribe.debug( Debug.LINKSTATE, "Returning to layout: " + previousIndex );
-            activeIndex = previousIndex;
-            previousIndex = 0;
+            Scribe.debug( Debug.LINKSTATE, "Returning to board: " +
+                    Tokenizer.regenerateKeyword( previousBoardId ));
+            activeBoardId = previousBoardId;
+            previousBoardId = baseBoardId;
             state = LOCKED;
             typeFlag = false;
-            softBoardListener.getLayoutView().setLayout(getActiveBoard());
+            softBoardListener.getLayoutView().setLayout(getActiveLayout());
             }
         else
             {
@@ -213,38 +251,42 @@ public class BoardLinks
 
 
     /**
-     * Use-key is touched
+     * Link-key is touched
      * OTHER LAYOUT'S USE-KEY:
      * Immediately changes to the other layout (if new layout exists)
      * ACTIVE LAYOUT'S USE-KEY:
      * Touch is stored, but nothing happens until release.
      */
-    public void touch( int index )
+    public void touch( Long id )
         {
         // BACK key
-        if ( isActive( index ) )
+        if ( isActive( id ) )
             {
             touchCounter++;
             }
-
-        // NEW layout - if exist
-        else if ( linkLayout[index][0] != null )
-            {
-            Scribe.debug( Debug.LINKSTATE, "New layout was selected: " + index );
-            previousIndex = this.activeIndex;
-            this.activeIndex = index;
-            touchCounter = 1; // previous touches are cleared
-            state = HIDDEN; // it is only active because of TOUCHED
-            typeFlag = false;
-
-            // requestLayout is called by setLayout
-            softBoardListener.getLayoutView().setLayout(getActiveBoard());
-            }
-
-        // NEW layout is missing - nothing happens
         else
             {
-            Scribe.error( "Layout missing, it cannot be selected: " + index );
+            // NEW layout - if exist
+            Board board = boards.get(id);
+            if (board != null)
+                {
+                Scribe.debug(Debug.LINKSTATE, "New board was selected: " +
+                        Tokenizer.regenerateKeyword(id));
+                previousBoardId = activeBoardId;
+                activeBoardId = id;
+                touchCounter = 1; // previous touches are cleared
+                state = HIDDEN; // it is only active because of TOUCHED
+                typeFlag = false;
+
+                // requestLayout is called by setLayout
+                softBoardListener.getLayoutView().setLayout(board.layouts[orientation]);
+                }
+            // NEW layout is missing - nothing happens
+            else
+                {
+                Scribe.error("Layout missing, it cannot be selected: " +
+                        Tokenizer.regenerateKeyword(id));
+                }
             }
         }
 
@@ -295,11 +337,11 @@ public class BoardLinks
      * If non-meta was used during this touch, than nothing happens
      * else state cycles up
      */
-    public void release( int index, boolean lockKey )
+    public void release( Long id, boolean lockKey )
         {
         // touchCounter can be 0 if use-key was continuously pressed,
         // while selection/return happens
-        if (isActive(index) && touchCounter > 0)
+        if (isActive( id ) && touchCounter > 0)
             {
             touchCounter--;
             Scribe.debug( Debug.LINKSTATE, "BoardLinks RELEASE, touch-counter: " + touchCounter );
@@ -344,10 +386,10 @@ public class BoardLinks
      * Meta-key is cancelled (because SPen is activated)
      * Similar to release, but state will be always META_LOCK
      */
-    public void cancel( int index )
+    public void cancel( Long id )
         {
         // This should be always true
-        if (isActive(index))
+        if (isActive( id ))
             {
             typeFlag = false;
             touchCounter = 0;

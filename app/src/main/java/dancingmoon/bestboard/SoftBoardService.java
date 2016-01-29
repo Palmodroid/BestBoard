@@ -281,7 +281,7 @@ public class SoftBoardService extends InputMethodService implements
                 parent.removeView( getLayoutView() );
                 }
 
-            getLayoutView().setLayout(softBoardData.boardLinks.getActiveBoard());
+            getLayoutView().setLayout(softBoardData.boardLinks.getActiveLayout());
 
             return getLayoutView();
             }
@@ -379,7 +379,7 @@ public class SoftBoardService extends InputMethodService implements
         softBoardData.boardLinks.setOrientation();
 
         layoutView = new LayoutView( this );
-        layoutView.setLayout(softBoardData.boardLinks.getActiveBoard());
+        layoutView.setLayout(softBoardData.boardLinks.getActiveLayout());
         
         setInputView(layoutView);
 

@@ -342,7 +342,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             throw new ExternalDataException("No layout!");
             }
 
-        if ( softBoardData.boardLinks.isFirstBoardMissing() )
+        if ( softBoardData.boardLinks.isBaseBoardMissing() )
             {
             softBoardData.boardLinks.addBoardLink(0, softBoardData.firstLayout);
             tokenizer.error(R.string.data_primary_board_missing);
