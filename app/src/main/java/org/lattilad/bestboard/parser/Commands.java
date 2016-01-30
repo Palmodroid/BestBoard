@@ -1,15 +1,15 @@
 package org.lattilad.bestboard.parser;
 
+import org.lattilad.bestboard.debug.Debug;
+import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.utils.ExtendedMap;
+
 import java.lang.reflect.Method;
 import java.security.InvalidKeyException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.lattilad.bestboard.debug.Debug;
-import org.lattilad.bestboard.scribe.Scribe;
-import org.lattilad.bestboard.utils.ExtendedMap;
 
 
 /**
@@ -554,7 +554,7 @@ public class Commands
         add(TOKEN_DO, new long[]{PARAMETER_KEYWORD});
 
         add(TOKEN_META, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_LINK, new long[]{PARAMETER_INT});
+        add(TOKEN_LINK, new long[]{PARAMETER_KEYWORD});
 
         add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
 

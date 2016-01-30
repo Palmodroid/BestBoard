@@ -468,14 +468,14 @@ public class MethodsForCommands
             // !! Overwritten entry could be checked (addBoardLink returns true if entry is overwritten) !!
             try
                 {
-                softBoardData.boardLinks.addBoardLink(index, layout);
+                softBoardData.boardLinks.addBoardLink( id, layout);
 
-                tokenizer.note( index.toString(), R.string.data_addlink_board_set,
+                tokenizer.note( Tokenizer.regenerateKeyword(id), R.string.data_addlink_board_set,
                         Tokenizer.regenerateKeyword( (long)layoutId));
                 }
             catch (ExternalDataException e)
                 {
-                tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, index.toString());
+                tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, Tokenizer.regenerateKeyword(id));
                 }
             }
 
@@ -497,7 +497,7 @@ public class MethodsForCommands
                 }
             else
                 {
-                tokenizer.error( index.toString(), R.string.data_addlink_portrait_missing );
+                tokenizer.error( Tokenizer.regenerateKeyword(id), R.string.data_addlink_portrait_missing );
                 }
 
             Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
@@ -514,7 +514,7 @@ public class MethodsForCommands
                 }
             else
                 {
-                tokenizer.error( index.toString(), R.string.data_addlink );
+                tokenizer.error( Tokenizer.regenerateKeyword(id), R.string.data_addlink );
                 }
 
             // only if both parameters are ok
@@ -524,16 +524,16 @@ public class MethodsForCommands
                 // !! Overwritten entry could be checked (addBoardLink returns true if entry is overwritten) !!
                 try
                     {
-                    softBoardData.boardLinks.addBoardLink(index, portrait, landscape);
+                    softBoardData.boardLinks.addBoardLink( id, portrait, landscape);
 
-                    tokenizer.note( index.toString(), R.string.data_addlink_board_set,
+                    tokenizer.note( Tokenizer.regenerateKeyword(id), R.string.data_addlink_board_set,
                             Tokenizer.regenerateKeyword( (long)portraitId) +
                                     "/" +
                                     Tokenizer.regenerateKeyword( (long)landscapeId));
                     }
                 catch (ExternalDataException e)
                     {
-                    tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, index.toString());
+                    tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, Tokenizer.regenerateKeyword(id));
                     }
                 }
 
@@ -571,7 +571,7 @@ public class MethodsForCommands
         if (temp != null)
             {
             counter++;
-            buttonFunction = new ButtonLink( (int)temp,
+            buttonFunction = new ButtonLink( (long)temp,
                     parameters.containsKey(Commands.TOKEN_LOCK) );
             // invalid index - (int)temp - means go back to previous layout
             }
