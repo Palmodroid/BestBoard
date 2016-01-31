@@ -374,7 +374,7 @@ public class Layout
         boolean landscape = (screenWidthInPixels > screenHeightInPixels);
         
         // orientation can be found in UseState also
-        if ( landscape != softBoardData.boardLinks.isLandscape() )
+        if ( landscape != softBoardData.boardTable.isLandscape() )
             Scribe.error("Orientation in onMeasure and in link-state is not the same!");
 
         // temporary variables are needed to check whether layout dimension is changed

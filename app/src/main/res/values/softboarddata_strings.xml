@@ -56,8 +56,8 @@
     <string name="data_button_titles_extended">"EXTEND: The titles of the button are extended!"</string>
 
     <string name="data_board_no_id">"New board has no id!"</string>
-    <string name="data_addlink_invalid_index">"Link index is invalid:"</string>
-    <string name="data_addlink_board_set">"Link index is set to a layout:"</string>
+    <string name="data_addlink_id_overwritten">"Previously defined board is overwritten!"</string>
+    <string name="data_addlink_board_set">"Board id is set to a layout:"</string>
     <string name="data_addlink">"Link parameter LANDSCAPE is missing!"</string>
     <string name="data_addlink_portrait_missing">"Link parameter PORTRAIT is missing!"</string>
     <string name="data_modify_no_id">"New modify has no ID!"</string>

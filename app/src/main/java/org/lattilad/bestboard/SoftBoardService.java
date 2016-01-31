@@ -100,7 +100,7 @@ public class SoftBoardService extends InputMethodService implements
                     if ( softBoardData != null)
                         {
                         softBoardData.readPreferences();
-                        softBoardData.boardLinks.invalidateCalculations( false );
+                        softBoardData.boardTable.invalidateCalculations( false );
                         layoutView.requestLayout();
                         }
                     break;
@@ -110,7 +110,7 @@ public class SoftBoardService extends InputMethodService implements
                     if ( softBoardData != null)
                         {
                         softBoardData.readPreferences();
-                        softBoardData.boardLinks.invalidateCalculations( true );
+                        softBoardData.boardTable.invalidateCalculations( true );
                         layoutView.requestLayout();
                         }
                     break;
@@ -272,7 +272,7 @@ public class SoftBoardService extends InputMethodService implements
             Scribe.note( Debug.SERVICE, "Soft-layout ready, it will be displayed initially.");
 
             // setting index is not necessary
-            softBoardData.boardLinks.setOrientation();
+            softBoardData.boardTable.setOrientation();
 
             // boardView should be saved
             ViewGroup parent = (ViewGroup) getLayoutView().getParent();
@@ -281,7 +281,7 @@ public class SoftBoardService extends InputMethodService implements
                 parent.removeView( getLayoutView() );
                 }
 
-            getLayoutView().setLayout(softBoardData.boardLinks.getActiveLayout());
+            getLayoutView().setLayout(softBoardData.boardTable.getActiveLayout());
 
             return getLayoutView();
             }
@@ -376,10 +376,10 @@ public class SoftBoardService extends InputMethodService implements
         
         // Orientation should be checked, but index is 0 by default.
         // No setIndex() is needed
-        softBoardData.boardLinks.setOrientation();
+        softBoardData.boardTable.setOrientation();
 
         layoutView = new LayoutView( this );
-        layoutView.setLayout(softBoardData.boardLinks.getActiveLayout());
+        layoutView.setLayout(softBoardData.boardTable.getActiveLayout());
         
         setInputView(layoutView);
 

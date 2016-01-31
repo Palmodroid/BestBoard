@@ -76,7 +76,7 @@ public class Commands
     public static final long TOKEN_LAYOUT = 0x5805f907L;
     public static final long TOKEN_LANDSCAPE = 0x44010ff937b3L;
     public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
-
+    public static final long TOKEN_MAIN = 0x123928L;
 
 
     public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
@@ -136,7 +136,7 @@ public class Commands
     public static final long TOKEN_ALT = 0x1389fL;
     public static final long TOKEN_SHIFT = 0x32f4092L;
 
-    public static final long TOKEN_LINK = 0x119ec9L;
+    public static final long TOKEN_SWITCH = 0x775d93d7L;
 
     public static final long TOKEN_LOCK = 0x11bd48L;
 
@@ -402,11 +402,13 @@ public class Commands
         add(TOKEN_ADDBOARD, new long[]{
                 TOKEN_ID,
                 TOKEN_LAYOUT,
-                TOKEN_PORTRAIT, TOKEN_LANDSCAPE}, "addBoard");
+                TOKEN_PORTRAIT, TOKEN_LANDSCAPE,
+                TOKEN_MAIN}, "addBoard");
         // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_MAIN, new long[]{PARAMETER_FLAG});
 
 
 
@@ -466,7 +468,7 @@ public class Commands
                         TOKEN_REPEAT,
 
                         TOKEN_META,
-                        TOKEN_LINK,
+                        TOKEN_SWITCH,
                         TOKEN_SPACETRAVEL,
 
                         TOKEN_LOCK,
@@ -525,7 +527,7 @@ public class Commands
                         TOKEN_REPEAT,
 
                         TOKEN_META,
-                        TOKEN_LINK,
+                        TOKEN_SWITCH,
                         TOKEN_SPACETRAVEL,
 
                         TOKEN_LOCK,
@@ -554,7 +556,7 @@ public class Commands
         add(TOKEN_DO, new long[]{PARAMETER_KEYWORD});
 
         add(TOKEN_META, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_LINK, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_SWITCH, new long[]{PARAMETER_KEYWORD});
 
         add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
 

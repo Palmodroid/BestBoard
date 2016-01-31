@@ -2,6 +2,7 @@ package org.lattilad.bestboard.states;
 
 import android.content.res.Configuration;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,12 +14,12 @@ import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.ExternalDataException;
 
 /**
- * Boards consist of two layouts (the two can be tha same): one for portrait,
- * and one for landscape mode.
+ * Boards consist of two layouts (however the two can be tha same):
+ * one for portrait and one for landscape mode.
  * Boards identified by their keyword token id.
  * BoardLinks stores all these Boards, and switches between them, if needed by link-buttons.
  */
-public class BoardLinks
+public class BoardTable
     {
     // boardLinks is defined in the constructor of SoftBoardData
     // There are 3 entry points:
@@ -26,17 +27,27 @@ public class BoardLinks
     // - SoftBoardService.onCreateInputView()
     // - SoftBoardService.setBoardUse()
 
-    public static final int LINK_PORTRAIT = 0;
-    public static final int LINK_LANDSCAPE = 1;
+    public static final int ORIENTATION_PORTRAIT = 0;
+    public static final int ORIENTATION_LANDSCAPE = 1;
 
+    /** Orientation: can be ORIENTATION_PORTRAIT or ORIENTATION_LANDSCAPE */
+    private int orientation = ORIENTATION_PORTRAIT;
+
+    /**
+     * Boards consists of two layouts:
+     * layout[ORIENTATION_PORTRAIT] and layout[ORIENTATION_LANDSCAPE]
+     * "main" boards cannot switch back to previous boards
+     */
     private class Board
         {
-        Layout[] layouts = new Layout[2];
+        Layout[] layout = new Layout[2];
+        boolean main = false;
 
-        Board( Layout portrait, Layout landscape )
+        Board( Layout portrait, Layout landscape, boolean main )
             {
-            this.layouts[LINK_PORTRAIT] = portrait;
-            this.layouts[LINK_LANDSCAPE] = landscape;
+            this.layout[ORIENTATION_PORTRAIT] = portrait;
+            this.layout[ORIENTATION_LANDSCAPE] = landscape;
+            this.main = main;
             }
         }
 
@@ -44,116 +55,25 @@ public class BoardLinks
     private Map<Long, Board> boards = new HashMap<>();
 
     /**
-     * base-board is the root of all boards.
-     * If not explicitly defined, then the first board will be the base-board.
+     * Root-board is the root of all boards.
+     * If not explicitly defined, then the first board will be the root-board.
      */
-    private Long baseBoardId = null;
-
-    /* Orientation: can be LINK_PORTRAIT or LINK_LANDSCAPE */
-    private int orientation = LINK_PORTRAIT;
-
-    /* Connection to service */
-    private SoftBoardData.SoftBoardListener softBoardListener;
-
-
-    /* Constructor - BoardLinks should be able to reach Service (SoftBoardDataListener) */
-    public BoardLinks(SoftBoardData.SoftBoardListener softBoardListener)
-        {
-        this.softBoardListener = softBoardListener;
-        }
-
+    private Long rootBoardId = null;
 
     /**
-     * Use the same not/wide layout
-     * SoftBoardParser calls it
-     * returns TRUE, if Board was already defined
+     * Id of the currently active board
+     * Only one board can be active, and this variable cannot be invalid!!
      */
-    public boolean addBoardLink(Long id, Layout layout) throws ExternalDataException
-        {
-        return addBoardLink(id, layout, layout);
-        }
+    private Long visibleBoardId = null;
 
     /**
-     * Use portrait/landscape layout pair
-     * SoftBoardParser calls it
-     * returns TRUE, if Board was already defined
+     * Previous boards are stored in an array-list.
+     * Boards can be switched back with the use of this list.
+     * "Main" boards clear this list; it is not possible to go back from a "main" board
+     * Each board can be only once in the list.
+     * After adding the same board twice, the list will switch back to the previous entry.
      */
-    public boolean addBoardLink(Long id, Layout portrait, Layout landscape) throws ExternalDataException
-        {
-        Board board = new Board( portrait, landscape );
-        if ( baseBoardId == null )
-            baseBoardId = id;
-        return ( boards.put( id, board ) != null );
-        }
-
-    /**
-     * Explicitly sets baseBoard
-     * @param baseBoardId id of the base board
-     */
-    public void addBaseBoardLink(Long baseBoardId)
-        {
-        this.baseBoardId = baseBoardId;
-        }
-
-    /**
-     * If base-board is missing, then there are no boards at all.
-     * This is not possible!
-     * @return true if there are no boards
-     */
-    public boolean isBaseBoardMissing()
-        {
-        return baseBoardId == null;
-        }
-
-    // sets orientation
-    // SoftBoardService.softBoardParserFinished() (!!this call could be in constructor!!)
-    // and .SoftBoardService.onCreateInputView()
-    public void setOrientation()
-        {
-        Configuration config = softBoardListener.getApplicationContext().getResources().getConfiguration();
-        orientation = (config.orientation == Configuration.ORIENTATION_PORTRAIT ? LINK_PORTRAIT : LINK_LANDSCAPE );
-        // Theoretically it could be undefined, but then it will be treated as landscape
-
-        Scribe.debug( Debug.LINKSTATE, "Orientation is " + ( orientation == LINK_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
-        }
-
-    // BoardView.onMeasure() and Layout.calculateScreenData checks orientation
-    // This can be used at least for error checking
-    public boolean isLandscape()
-        {
-        return orientation == LINK_LANDSCAPE;
-        }
-
-
-    /**
-     * Returns the currently selected (active) layout
-     * (depending on the active board and orientation)
-     * All three SoftBoardService methods calls this
-     * !! activeBoardId cannot be invalid !!
-     * @return the active layout
-     */
-    public Layout getActiveLayout()
-        {
-        Board board = boards.get( activeBoardId );
-        return board.layouts[orientation];
-        }
-
-
-    /**
-     * All calculations should be cleared in all boards, if preference changes.
-     * After this clear a new requestLayout() call will refresh the screen.
-     * @param erasePictures pictures will be deleted, if true
-     */
-    public void invalidateCalculations( boolean erasePictures )
-        {
-        for ( Board board : boards.values() )
-            {
-            for ( int o = 0; o < 2; o++ )
-                {
-                board.layouts[o].invalidateCalculations(erasePictures);
-                }
-            }
-        }
+    private ArrayList<Long> previousBoardIds= new ArrayList<>();
 
 
     /** Layout is active because of continuous touch of its button */
@@ -166,23 +86,9 @@ public class BoardLinks
     public final static int LOCKED = 2;
 
     /**
-     * Index of the active board.
-     * Only one board can be active, and this variable cannot be invalid!!
-     * BaseBoardId will change, but activeId will change accordingly during the parsing process
-     */
-    private Long activeBoardId = baseBoardId;
-
-    /**
-     * Index of the previous board, where active board could return.
-     * Boards cannot be nested. Return works only ONE LEVEL deep.
-     * After that layout will return to base-board.
-     * BaseBoardId will change, but previousId will change accordingly during the parsing process
-     */
-    private Long previousBoardId = baseBoardId;
-
-    /**
      * state: HIDDEN / ACTIVE / LOCKED
-     * Layout 0 is always LOCKED.
+     * Non-active boards are always HIDDEN
+     * "Main" boards are always LOCKED.
      */
     private int state = LOCKED;
 
@@ -198,6 +104,112 @@ public class BoardLinks
      */
     private boolean typeFlag = false;
 
+    /** Connection to service */
+    private SoftBoardData.SoftBoardListener softBoardListener;
+
+
+    /** Constructor - BoardLinks should be able to reach Service (SoftBoardDataListener) */
+    public BoardTable(SoftBoardData.SoftBoardListener softBoardListener)
+        {
+        this.softBoardListener = softBoardListener;
+        }
+
+
+    /**
+     * Use the same not/wide layout
+     * SoftBoardParser calls it
+     * returns TRUE, if Board was already defined
+     */
+    public boolean addBoard(Long id, Layout layout, boolean main)
+        {
+        return addBoard(id, layout, layout, main);
+        }
+
+    /**
+     * Use portrait/landscape layout pair
+     * SoftBoardParser calls it
+     * returns TRUE, if Board was already defined
+     */
+    public boolean addBoard(Long id, Layout portrait, Layout landscape, boolean main)
+        {
+        Board board = new Board( portrait, landscape, main );
+        if ( rootBoardId == null )
+            {
+            rootBoardId = id;
+            visibleBoardId = id;
+            }
+        return ( boards.put( id, board ) != null );
+        }
+
+    /**
+     * Explicitly sets baseBoard
+     * @param baseBoardId id of the base board
+     */
+    public void addBaseBoardLink(Long baseBoardId)
+        {
+        this.rootBoardId = baseBoardId;
+        }
+
+    /**
+     * If base-board is missing, then there are no boards at all.
+     * This is not possible!
+     * @return true if there are no boards
+     */
+    public boolean isBaseBoardMissing()
+        {
+        return rootBoardId == null;
+        }
+
+    // sets orientation
+    // SoftBoardService.softBoardParserFinished() (!!this call could be in constructor!!)
+    // and .SoftBoardService.onCreateInputView()
+    public void setOrientation()
+        {
+        Configuration config = softBoardListener.getApplicationContext().getResources().getConfiguration();
+        orientation = (config.orientation == Configuration.ORIENTATION_PORTRAIT ? ORIENTATION_PORTRAIT : ORIENTATION_LANDSCAPE);
+        // Theoretically it could be undefined, but then it will be treated as landscape
+
+        Scribe.debug( Debug.LINKSTATE, "Orientation is " + ( orientation == ORIENTATION_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
+        }
+
+    // BoardView.onMeasure() and Layout.calculateScreenData checks orientation
+    // This can be used at least for error checking
+    public boolean isLandscape()
+        {
+        return orientation == ORIENTATION_LANDSCAPE;
+        }
+
+
+    /**
+     * Returns the currently selected (active) layout
+     * (depending on the active board and orientation)
+     * All three SoftBoardService methods calls this
+     * !! visibleBoardId cannot be invalid !!
+     * @return the active layout
+     */
+    public Layout getActiveLayout()
+        {
+        Board board = boards.get(visibleBoardId);
+        return board.layout[orientation];
+        }
+
+
+    /**
+     * All calculations should be cleared in all boards, if preference changes.
+     * After this clear a new requestLayout() call will refresh the screen.
+     * @param erasePictures pictures will be deleted, if true
+     */
+    public void invalidateCalculations( boolean erasePictures )
+        {
+        for ( Board board : boards.values() )
+            {
+            for ( int o = 0; o < 2; o++ )
+                {
+                board.layout[o].invalidateCalculations(erasePictures);
+                }
+            }
+        }
+
 
     /**
      * Check whether this id signs the current board.
@@ -206,7 +218,7 @@ public class BoardLinks
      */
     private boolean isActive( Long id )
         {
-        return id.equals( activeBoardId );
+        return id.equals(visibleBoardId);
         }
 
     /**
@@ -233,12 +245,12 @@ public class BoardLinks
 
     private void activatePreviousBoard()
         {
-        if ( !activeBoardId.equals(previousBoardId) )
+        if ( !visibleBoardId.equals(previousBoardId) )
             {
             Scribe.debug( Debug.LINKSTATE, "Returning to board: " +
                     Tokenizer.regenerateKeyword( previousBoardId ));
-            activeBoardId = previousBoardId;
-            previousBoardId = baseBoardId;
+            visibleBoardId = previousBoardId;
+            previousBoardId = rootBoardId;
             state = LOCKED;
             typeFlag = false;
             softBoardListener.getLayoutView().setLayout(getActiveLayout());
@@ -272,14 +284,14 @@ public class BoardLinks
                 {
                 Scribe.debug(Debug.LINKSTATE, "New board was selected: " +
                         Tokenizer.regenerateKeyword(id));
-                previousBoardId = activeBoardId;
-                activeBoardId = id;
+                previousBoardId = visibleBoardId;
+                visibleBoardId = id;
                 touchCounter = 1; // previous touches are cleared
                 state = HIDDEN; // it is only active because of TOUCHED
                 typeFlag = false;
 
                 // requestLayout is called by setLayout
-                softBoardListener.getLayoutView().setLayout(board.layouts[orientation]);
+                softBoardListener.getLayoutView().setLayout(board.layout[orientation]);
                 }
             // NEW layout is missing - nothing happens
             else

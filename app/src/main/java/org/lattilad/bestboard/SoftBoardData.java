@@ -13,7 +13,7 @@ import org.lattilad.bestboard.modify.Modify;
 import org.lattilad.bestboard.prefs.PrefsFragment;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.server.TextBeforeCursor;
-import org.lattilad.bestboard.states.BoardLinks;
+import org.lattilad.bestboard.states.BoardTable;
 import org.lattilad.bestboard.states.LayoutStates;
 
 import java.io.File;
@@ -209,7 +209,7 @@ public class SoftBoardData
     public LayoutStates layoutStates;
 
     // defined in constructor, because SoftBoardDataListener is needed
-    public BoardLinks boardLinks;
+    public BoardTable boardTable;
 
     /**
      * Action of the enter key defined by imeOptions of onStartInput's EditorInfo
@@ -314,7 +314,7 @@ public class SoftBoardData
         
         layoutStates = new LayoutStates( softBoardListener );
 
-        boardLinks = new BoardLinks( softBoardListener );
+        boardTable = new BoardTable( softBoardListener );
 
         // This could go into parsingFinished()
         readPreferences();

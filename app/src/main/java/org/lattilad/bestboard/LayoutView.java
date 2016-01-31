@@ -446,7 +446,7 @@ public class LayoutView extends View
                 // just for security use- and meta-states are checked, that no touch remained
                 for (MetaState metaState : layout.softBoardData.layoutStates.metaStates)
                     metaState.checkNoTouch();
-                layout.softBoardData.boardLinks.checkNoTouch();
+                layout.softBoardData.boardTable.checkNoTouch();
 
                 // break is not needed here, code continues with new touch
 
@@ -726,7 +726,7 @@ public class LayoutView extends View
      */
     private void typeLinkState()
         {
-        layout.softBoardData.boardLinks.type();
+        layout.softBoardData.boardTable.type();
         }
 
 

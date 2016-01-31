@@ -452,6 +452,8 @@ public class MethodsForCommands
             return;
             }
 
+        boolean main = (boolean)parameters.remove( Commands.TOKEN_MAIN, false );
+
         // LAYOUT is given, no other parameters are checked
         Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
         if (layoutId != null)
@@ -464,19 +466,13 @@ public class MethodsForCommands
                 return;
                 }
 
-            // !! Common try/catch could be used !!
-            // !! Overwritten entry could be checked (addBoardLink returns true if entry is overwritten) !!
-            try
+            if ( softBoardData.boardTable.addBoard(id, layout, main) )
                 {
-                softBoardData.boardLinks.addBoardLink( id, layout);
+                tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_addlink_id_overwritten );
+                }
 
-                tokenizer.note( Tokenizer.regenerateKeyword(id), R.string.data_addlink_board_set,
+            tokenizer.note( Tokenizer.regenerateKeyword(id), R.string.data_addlink_board_set,
                         Tokenizer.regenerateKeyword( (long)layoutId));
-                }
-            catch (ExternalDataException e)
-                {
-                tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, Tokenizer.regenerateKeyword(id));
-                }
             }
 
         // no LAYOUT is given, so PORTRAIT AND LANDSCAPE is needed
@@ -518,25 +514,18 @@ public class MethodsForCommands
                 }
 
             // only if both parameters are ok
-            if ( portrait != null && landscape != null )
+            if ( portrait == null || landscape == null )
+                return;
+
+            if ( softBoardData.boardTable.addBoard(id, portrait, landscape, main) )
                 {
-                // !! Common try/catch could be used !!
-                // !! Overwritten entry could be checked (addBoardLink returns true if entry is overwritten) !!
-                try
-                    {
-                    softBoardData.boardLinks.addBoardLink( id, portrait, landscape);
-
-                    tokenizer.note( Tokenizer.regenerateKeyword(id), R.string.data_addlink_board_set,
-                            Tokenizer.regenerateKeyword( (long)portraitId) +
-                                    "/" +
-                                    Tokenizer.regenerateKeyword( (long)landscapeId));
-                    }
-                catch (ExternalDataException e)
-                    {
-                    tokenizer.error("ADDLINK", R.string.data_addlink_invalid_index, Tokenizer.regenerateKeyword(id));
-                    }
+                tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_addlink_id_overwritten );
                 }
+            }
 
+        if (main)
+            {
+            softBoardData.boardTable.addBaseBoardLink( id );
             }
         }
 
@@ -567,7 +556,7 @@ public class MethodsForCommands
             counter++;
             }
 
-        temp = parameters.remove( Commands.TOKEN_LINK );
+        temp = parameters.remove( Commands.TOKEN_SWITCH );
         if (temp != null)
             {
             counter++;
