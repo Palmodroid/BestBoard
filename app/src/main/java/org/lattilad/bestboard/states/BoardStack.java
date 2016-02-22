@@ -1,6 +1,7 @@
 package org.lattilad.bestboard.states;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * BoardStack stores all previous boards
@@ -31,7 +32,24 @@ public class BoardStack
 
     public void addBoard( Long boardId, boolean locked )
         {
+        Iterator<BoardEntry> boardIterator = boards.iterator();
 
+        boolean delete = false;
+
+        while ( boardIterator.hasNext() )
+            {
+            if ( boardId.equals( boardIterator.next().boardId) )
+                {
+                delete = true;
+                }
+
+            if ( delete )
+                {
+                boardIterator.remove();
+                }
+            }
+
+        boards.add( new BoardEntry(boardId, locked) );
         }
 
     public void back()
