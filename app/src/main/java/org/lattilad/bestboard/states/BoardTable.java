@@ -66,16 +66,6 @@ public class BoardTable
      */
     private Long visibleBoardId = null;
 
-    /**
-     * Previous boards are stored in an array-list.
-     * Boards can be switched back with the use of this list.
-     * "Main" boards clear this list; it is not possible to go back from a "main" board
-     * Each board can be only once in the list.
-     * After adding the same board twice, the list will switch back to the previous entry.
-     */
-    private ArrayList<Long> previousBoardIds= new ArrayList<>();
-
-
     /** Layout is active because of continuous touch of its button */
     public final static int TOUCHED = -1;
     /** Layout is inactive */
