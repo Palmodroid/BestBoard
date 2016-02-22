@@ -27,9 +27,6 @@ public class BoardTable
     // - SoftBoardService.onCreateInputView()
     // - SoftBoardService.setBoardUse()
 
-    public static final int ORIENTATION_PORTRAIT = 0;
-    public static final int ORIENTATION_LANDSCAPE = 1;
-
     /** Orientation: can be ORIENTATION_PORTRAIT or ORIENTATION_LANDSCAPE */
     private int orientation = ORIENTATION_PORTRAIT;
 
