@@ -34,11 +34,17 @@ public class BoardTable
     private Map<Long, Board> boards = new HashMap<>();
 
     /**
-     * BoardStack handles the already opened boards.
-     * It can be initialized, when MAIN board is definied
+     * BoardStack handles already opened boards.
+     * It can be initialized, when MAIN board is defined
      */
     private BoardStack boardStack = null;
 
+/*
+ LOCK állapotot definiálhatunk a Board megadásánál, vagy a SWITCH billentyűnél.
+ Az alap (MAIN) Board fogja megnyitni a BoardStack-et, ez mindig LOCK állapotú.
+ Új board beállításánál a LOCK állapotot a fentiek szerint beállítjuk, de ezt megváltoztathatjuk.
+
+ */
 
     /** Layout is active because of continuous touch of its button */
     public final static int TOUCHED = -1;
