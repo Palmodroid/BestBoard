@@ -21,47 +21,24 @@ import org.lattilad.bestboard.utils.ExternalDataException;
  */
 public class BoardTable
     {
-    // boardLinks is defined in the constructor of SoftBoardData
+    // boardTable is defined in the constructor of SoftBoardData
     // There are 3 entry points:
     // - SoftBoardService.softBoardParserFinished()
     // - SoftBoardService.onCreateInputView()
-    // - SoftBoardService.setBoardUse()
+    // - LayoutView.setLayout()??
 
-    /** Orientation: can be ORIENTATION_PORTRAIT or ORIENTATION_LANDSCAPE */
-    private int orientation = ORIENTATION_PORTRAIT;
+    /** Orientation: can be Board.ORIENTATION_PORTRAIT or Board.ORIENTATION_LANDSCAPE */
+    private int orientation = Board.ORIENTATION_PORTRAIT;
 
-    /**
-     * Boards consists of two layouts:
-     * layout[ORIENTATION_PORTRAIT] and layout[ORIENTATION_LANDSCAPE]
-     * "main" boards cannot switch back to previous boards
-     */
-    private class Board
-        {
-        Layout[] layout = new Layout[2];
-        boolean main = false;
-
-        Board( Layout portrait, Layout landscape, boolean main )
-            {
-            this.layout[ORIENTATION_PORTRAIT] = portrait;
-            this.layout[ORIENTATION_LANDSCAPE] = landscape;
-            this.main = main;
-            }
-        }
-
-    /** Id - Board map for the boards */
+    /** board-id/board pairs are stored here */
     private Map<Long, Board> boards = new HashMap<>();
 
     /**
-     * Root-board is the root of all boards.
-     * If not explicitly defined, then the first board will be the root-board.
+     * BoardStack handles the already opened boards.
+     * It can be initialized, when MAIN board is definied
      */
-    private Long rootBoardId = null;
+    private BoardStack boardStack = null;
 
-    /**
-     * Id of the currently active board
-     * Only one board can be active, and this variable cannot be invalid!!
-     */
-    private Long visibleBoardId = null;
 
     /** Layout is active because of continuous touch of its button */
     public final static int TOUCHED = -1;
@@ -107,9 +84,9 @@ public class BoardTable
      * SoftBoardParser calls it
      * returns TRUE, if Board was already defined
      */
-    public boolean addBoard(Long id, Layout layout, boolean main)
+    public boolean addBoard(Long id, Layout layout, boolean locked)
         {
-        return addBoard(id, layout, layout, main);
+        return addBoard(id, layout, layout, locked);
         }
 
     /**
@@ -117,14 +94,9 @@ public class BoardTable
      * SoftBoardParser calls it
      * returns TRUE, if Board was already defined
      */
-    public boolean addBoard(Long id, Layout portrait, Layout landscape, boolean main)
+    public boolean addBoard(Long id, Layout portrait, Layout landscape, boolean locked)
         {
-        Board board = new Board( portrait, landscape, main );
-        if ( rootBoardId == null )
-            {
-            rootBoardId = id;
-            visibleBoardId = id;
-            }
+        Board board = new Board( portrait, landscape, locked );
         return ( boards.put( id, board ) != null );
         }
 
@@ -132,9 +104,14 @@ public class BoardTable
      * Explicitly sets baseBoard
      * @param baseBoardId id of the base board
      */
-    public void addBaseBoardLink(Long baseBoardId)
+    public void defineBaseBoard(Long baseBoardId)
         {
-        this.rootBoardId = baseBoardId;
+        Board board = boards.get( baseBoardId );
+        if ( board != null )
+            {
+            boardStack = new BoardStack( baseBoardId, board );
+            }
+        // !! else: there is a serious error - baseBoard is not defined yet !!
         }
 
     /**
@@ -144,7 +121,7 @@ public class BoardTable
      */
     public boolean isBaseBoardMissing()
         {
-        return rootBoardId == null;
+        return boardStack == null;
         }
 
     // sets orientation
@@ -152,18 +129,21 @@ public class BoardTable
     // and .SoftBoardService.onCreateInputView()
     public void setOrientation()
         {
-        Configuration config = softBoardListener.getApplicationContext().getResources().getConfiguration();
-        orientation = (config.orientation == Configuration.ORIENTATION_PORTRAIT ? ORIENTATION_PORTRAIT : ORIENTATION_LANDSCAPE);
+        Configuration config = softBoardListener.getApplicationContext()
+                .getResources().getConfiguration();
+        orientation = (config.orientation == Configuration.ORIENTATION_PORTRAIT ?
+                Board.ORIENTATION_PORTRAIT : Board.ORIENTATION_LANDSCAPE);
         // Theoretically it could be undefined, but then it will be treated as landscape
 
-        Scribe.debug( Debug.LINKSTATE, "Orientation is " + ( orientation == ORIENTATION_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
+        Scribe.debug( Debug.LINKSTATE, "Orientation is " +
+                ( orientation == Board.ORIENTATION_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
         }
 
     // BoardView.onMeasure() and Layout.calculateScreenData checks orientation
     // This can be used at least for error checking
     public boolean isLandscape()
         {
-        return orientation == ORIENTATION_LANDSCAPE;
+        return orientation == Board.ORIENTATION_LANDSCAPE;
         }
 
 
@@ -176,8 +156,8 @@ public class BoardTable
      */
     public Layout getActiveLayout()
         {
-        Board board = boards.get(visibleBoardId);
-        return board.layout[orientation];
+        Board board = boardStack.getActiveBoard();
+        return board.getLayout(orientation);
         }
 
 
@@ -192,7 +172,7 @@ public class BoardTable
             {
             for ( int o = 0; o < 2; o++ )
                 {
-                board.layout[o].invalidateCalculations(erasePictures);
+                board.getLayout(o).invalidateCalculations(erasePictures);
                 }
             }
         }
@@ -205,7 +185,7 @@ public class BoardTable
      */
     private boolean isActive( Long id )
         {
-        return id.equals(visibleBoardId);
+        return (long)id==boardStack.getActiveBoardId();
         }
 
     /**

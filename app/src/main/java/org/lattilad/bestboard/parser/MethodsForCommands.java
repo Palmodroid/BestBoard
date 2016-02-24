@@ -525,7 +525,7 @@ public class MethodsForCommands
 
         if (main)
             {
-            softBoardData.boardTable.addBaseBoardLink( id );
+            softBoardData.boardTable.defineBaseBoard(id);
             }
         }
 

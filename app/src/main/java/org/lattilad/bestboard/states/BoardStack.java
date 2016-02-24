@@ -12,11 +12,13 @@ public class BoardStack
     {
     private class BoardEntry
         {
+        long boardId;
         Board board;
         boolean locked;
 
-        BoardEntry( Board board, boolean locked )
+        BoardEntry( long boardId, Board board, boolean locked )
             {
+            this.boardId = boardId;
             this.board = board;
             this.locked = locked;
             }
@@ -24,20 +26,30 @@ public class BoardStack
 
     private ArrayList<BoardEntry> boardEntries;
 
-    public BoardStack( Board board )
+    public BoardStack( long boardId, Board board )
         {
         boardEntries = new ArrayList<>();
-        boardEntries.add(new BoardEntry(board, true));
+        boardEntries.add(new BoardEntry(boardId, board, true));
         }
 
-    public void addBoard( Board board, boolean locked )
+    public Board getActiveBoard()
+        {
+        return boardEntries.get( boardEntries.size()-1 ).board;
+        }
+
+    public long getActiveBoardId()
+        {
+        return boardEntries.get( boardEntries.size()-1 ).boardId;
+        }
+
+    public void addBoard( long boardId, Board board, boolean locked )
         {
         Iterator<BoardEntry> boardIterator = boardEntries.iterator();
 
         while ( boardIterator.hasNext() )
             {
             // board already stored, all proceeding boards are cleared
-            if (board.equals(boardIterator.next().board))
+            if ( boardId == boardIterator.next().boardId )
                 {
                 while (boardIterator.hasNext())
                     {
@@ -47,7 +59,7 @@ public class BoardStack
                 return;
                 }
             }
-        boardEntries.add(new BoardEntry( board, locked ));
+        boardEntries.add(new BoardEntry( boardId, board, locked ));
         }
 
     public Board backBoard( boolean currentlyLocked )
