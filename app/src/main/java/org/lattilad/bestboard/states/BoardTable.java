@@ -4,6 +4,7 @@ import android.content.res.Configuration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import org.lattilad.bestboard.Layout;
@@ -11,7 +12,6 @@ import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
-import org.lattilad.bestboard.utils.ExternalDataException;
 
 /**
  * Boards consist of two layouts (however the two can be tha same):
@@ -27,63 +27,48 @@ public class BoardTable
     // - SoftBoardService.onCreateInputView()
     // - LayoutView.setLayout()??
 
-    /** Orientation: can be Board.ORIENTATION_PORTRAIT or Board.ORIENTATION_LANDSCAPE */
-    private int orientation = Board.ORIENTATION_PORTRAIT;
-
-    /** board-id/board pairs are stored here */
-    private Map<Long, Board> boards = new HashMap<>();
-
-    /**
-     * BoardStack handles already opened boards.
-     * It can be initialized, when MAIN board is defined
-     */
-    private BoardStack boardStack = null;
-
-/*
- LOCK állapotot definiálhatunk a Board megadásánál, vagy a SWITCH billentyűnél.
- Az alap (MAIN) Board fogja megnyitni a BoardStack-et, ez mindig LOCK állapotú.
- Új board beállításánál a LOCK állapotot a fentiek szerint beállítjuk, de ezt megváltoztathatjuk.
-
- */
-
-    /** Layout is active because of continuous touch of its button */
-    public final static int TOUCHED = -1;
-    /** Layout is inactive */
-    public final static int HIDDEN = 0;
-    /** Layout is active for one main stream button, then it will return to the previous layout */
-    public final static int ACTIVE = 1;
-    /** Layout is active */
-    public final static int LOCKED = 2;
-
-    /**
-     * state: HIDDEN / ACTIVE / LOCKED
-     * Non-active boards are always HIDDEN
-     * "Main" boards are always LOCKED.
-     */
-    private int state = LOCKED;
-
-    /**
-     * Touch counter of the use key of the active layout.
-     * Key is released, when counter is 0
-     */
-    private int touchCounter = 0;
-
-    /**
-     * Type flag of the active layout.
-     * True, if main stream button was used during the TOUCH.
-     */
-    private boolean typeFlag = false;
-
     /** Connection to service */
     private SoftBoardData.SoftBoardListener softBoardListener;
 
 
-    /** Constructor - BoardLinks should be able to reach Service (SoftBoardDataListener) */
-    public BoardTable(SoftBoardData.SoftBoardListener softBoardListener)
+    public static final int ORIENTATION_PORTRAIT = 0;
+    public static final int ORIENTATION_LANDSCAPE = 1;
+
+    /** Orientation: can be Board.ORIENTATION_PORTRAIT or Board.ORIENTATION_LANDSCAPE */
+    private int orientation = ORIENTATION_PORTRAIT;
+
+
+    /******** DATA OF ALL BOARDS ********/
+
+    /**
+     * Boards consists of two layouts:
+     * layout[ORIENTATION_PORTRAIT] and layout[ORIENTATION_LANDSCAPE]
+     */
+    private class BoardEntry
         {
-        this.softBoardListener = softBoardListener;
+        private Layout[] layout = new Layout[2];
+        private boolean locked = false;
+
+        public BoardEntry(Layout portrait, Layout landscape, boolean locked)
+            {
+            this.layout[ORIENTATION_PORTRAIT] = portrait;
+            this.layout[ORIENTATION_LANDSCAPE] = landscape;
+            this.locked = locked;
+            }
+
+        public boolean isLocked()
+            {
+            return locked;
+            }
+
+        public Layout getLayout( int orientation )
+            {
+            return layout[ orientation ];
+            }
         }
 
+    /** All boards are listed here as board-id/board-entry pairs */
+    private Map<Long, BoardEntry> boards = new HashMap<>();
 
     /**
      * Use the same not/wide layout
@@ -102,33 +87,167 @@ public class BoardTable
      */
     public boolean addBoard(Long id, Layout portrait, Layout landscape, boolean locked)
         {
-        Board board = new Board( portrait, landscape, locked );
-        return ( boards.put( id, board ) != null );
+        BoardEntry boardEntry = new BoardEntry( portrait, landscape, locked );
+        return ( boards.put( id, boardEntry ) != null );
         }
 
+
+    /******** DATA OF PREVIOUS BOARDS ********/
+
     /**
-     * Explicitly sets baseBoard
-     * @param baseBoardId id of the base board
+     * BoardStackEntry describes previous boards (but not the active one!)
+     * BoardId, BoardEntry, locked (if state was locked at exit)
      */
-    public void defineBaseBoard(Long baseBoardId)
+    private class BoardStackEntry
         {
-        Board board = boards.get( baseBoardId );
-        if ( board != null )
+        long boardId;
+        BoardEntry boardEntry;
+        boolean locked;
+
+        BoardStackEntry(long boardId, BoardEntry boardEntry, boolean locked)
             {
-            boardStack = new BoardStack( baseBoardId, board );
+            this.boardId = boardId;
+            this.boardEntry = boardEntry;
+            this.locked = locked;
+            }
+        }
+
+    /** Previous boards without the active one */
+    private ArrayList<BoardStackEntry> boardStackEntries;
+
+    private void checkBoardStack( long boardId )
+        {
+        Iterator<BoardStackEntry> boardIterator = boardStackEntries.iterator();
+
+        while ( boardIterator.hasNext() )
+            {
+            if ( boardId == boardIterator.next().boardId )
+                {
+                while (true)
+                    {
+                    boardIterator.remove();
+                    if ( !boardIterator.hasNext() )
+                        return;
+                    boardIterator.next();
+                    }
+                }
+            }
+        }
+
+    private void pushBoard( long boardId, BoardEntry boardEntry, boolean locked )
+        {
+        boardStackEntries.add(new BoardStackEntry(boardId, boardEntry, locked));
+        }
+
+    public BoardEntry popBoard( boolean currentlyLocked )
+        {
+        if ( boardStackEntries.size() > 1 )
+            {
+            // remove last (currently selected) board
+            boardStackEntries.remove( boardStackEntries.size()-1 );
+
+            if ( currentlyLocked )
+                {
+                // if currently locked, then previous board should lock as well
+                // (or can be locked originally)
+                boardStackEntries.get( boardStackEntries.size()-1 ).locked = true;
+                }
+            else
+                {
+                // if currently not locked, then all previous non-locked boards should be skipped
+                // (first board is ALWAYS locked!)
+                while ( !boardStackEntries.get( boardStackEntries.size()-1 ).locked )
+                    {
+                    boardStackEntries.remove( boardStackEntries.size()-1 );
+                    }
+                }
+            }
+        // return the remaining top element
+        return boardStackEntries.get( boardStackEntries.size()-1 ).board;
+        }
+
+
+    /******** DATA OF THE ACTIVE BOARD ********/
+
+    /**
+     * Active board can be:
+     * - TOUCHED if touchCounter > 0
+     * - ACTIVE
+     * - LOCKED
+     * Non-active boards are always:
+     * - HIDDEN
+     */
+
+    /** Layout is active because of continuous touch of its button */
+    public final static int TOUCHED = -1;
+    /** Layout is inactive - all previous boards */
+    public final static int HIDDEN = 0;
+    /** Layout is active for one main stream button, then it will return to the previous layout */
+    public final static int ACTIVE = 1;
+    /** Layout is active */
+    public final static int LOCKED = 2;
+
+
+    /** Id of the currently visible (active) board */
+    private long activeBoardId;
+
+    /** Currently visible (active) board */
+    private BoardEntry activeBoard;
+
+    /** State of the currently active board */
+    private int state = LOCKED;
+
+    /**
+     * Touch counter of the use key of the active layout.
+     * Key is released, when counter is 0
+     */
+    private int touchCounter = 0;
+
+    /**
+     * Type flag of the active layout.
+     * True, if main stream button was used during the TOUCH.
+     */
+    private boolean typeFlag = false;
+
+
+    /******** MAIN PART OF THE CODE ********/
+
+    /** Constructor - BoardLinks should be able to reach Service (SoftBoardDataListener) */
+    public BoardTable(SoftBoardData.SoftBoardListener softBoardListener)
+        {
+        this.softBoardListener = softBoardListener;
+        }
+
+
+    /**
+     * Explicitly sets active board (or the root board, if stack is empty)
+     * IT SHOULD BE USED ONLY DURING THA PARSING PHASE!!
+     * @param boardId id of the root board
+     */
+    public void defineRootBoard(long boardId)
+        {
+        // Emptiness of BoardStack is not checked - it should be empty at the parsing phase
+        BoardEntry boardEntry = boards.get( boardId );
+        if ( boardEntry != null )
+            {
+            activeBoardId = boardId;
+            activeBoard = boardEntry;
+            // state = LOCKED; not needed during parsing phase
             }
         // !! else: there is a serious error - baseBoard is not defined yet !!
         }
 
+
     /**
-     * If base-board is missing, then there are no boards at all.
+     * If active-board is missing, then there are no boards at all.
      * This is not possible!
      * @return true if there are no boards
      */
-    public boolean isBaseBoardMissing()
+    public boolean isRootBoardMissing()
         {
-        return boardStack == null;
+        return activeBoard == null;
         }
+
 
     // sets orientation
     // SoftBoardService.softBoardParserFinished() (!!this call could be in constructor!!)
@@ -138,18 +257,19 @@ public class BoardTable
         Configuration config = softBoardListener.getApplicationContext()
                 .getResources().getConfiguration();
         orientation = (config.orientation == Configuration.ORIENTATION_PORTRAIT ?
-                Board.ORIENTATION_PORTRAIT : Board.ORIENTATION_LANDSCAPE);
+                ORIENTATION_PORTRAIT : ORIENTATION_LANDSCAPE);
         // Theoretically it could be undefined, but then it will be treated as landscape
 
         Scribe.debug( Debug.LINKSTATE, "Orientation is " +
-                ( orientation == Board.ORIENTATION_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
+                ( orientation == ORIENTATION_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
         }
+
 
     // BoardView.onMeasure() and Layout.calculateScreenData checks orientation
     // This can be used at least for error checking
     public boolean isLandscape()
         {
-        return orientation == Board.ORIENTATION_LANDSCAPE;
+        return orientation == ORIENTATION_LANDSCAPE;
         }
 
 
@@ -157,42 +277,41 @@ public class BoardTable
      * Returns the currently selected (active) layout
      * (depending on the active board and orientation)
      * All three SoftBoardService methods calls this
-     * !! visibleBoardId cannot be invalid !!
+     * activeBoardId cannot be invalid, but it should be checked during parsing process
      * @return the active layout
      */
     public Layout getActiveLayout()
         {
-        Board board = boardStack.getActiveBoard();
-        return board.getLayout(orientation);
+        return activeBoard.getLayout(orientation);
         }
 
 
     /**
      * All calculations should be cleared in all boards, if preference changes.
-     * After this clear a new requestLayout() call will refresh the screen.
+     * After this clearing a new requestLayout() call will refresh the screen.
+     * ?? List of all Layouts - does it exist ??
      * @param erasePictures pictures will be deleted, if true
      */
     public void invalidateCalculations( boolean erasePictures )
         {
-        for ( Board board : boards.values() )
+        for ( BoardEntry boardEntry : boards.values() )
             {
-            for ( int o = 0; o < 2; o++ )
-                {
-                board.getLayout(o).invalidateCalculations(erasePictures);
-                }
+            boardEntry.getLayout(ORIENTATION_PORTRAIT).invalidateCalculations( erasePictures );
+            boardEntry.getLayout(ORIENTATION_LANDSCAPE).invalidateCalculations( erasePictures );
             }
         }
 
 
     /**
-     * Check whether this id signs the current board.
+     * Check whether this id signs the currently active board.
      * @param id to check
      * @return true, if id signs the current board
      */
-    private boolean isActive( Long id )
+    private boolean isActive( long id )
         {
-        return (long)id==boardStack.getActiveBoardId();
+        return id==activeBoardId;
         }
+
 
     /**
      * State of the board.
@@ -211,6 +330,7 @@ public class BoardTable
 
             return ACTIVE;
             }
+
         else
             return HIDDEN;
         }
@@ -252,7 +372,7 @@ public class BoardTable
         else
             {
             // NEW layout - if exist
-            Board board = boards.get(id);
+            Board boardEntry = boards.get(id);
             if (board != null)
                 {
                 Scribe.debug(Debug.LINKSTATE, "New board was selected: " +
