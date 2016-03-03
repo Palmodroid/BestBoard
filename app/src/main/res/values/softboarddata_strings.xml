@@ -65,6 +65,6 @@
     <string name="data_modify_no_rolls">"Modify has no valid rolls!"</string>
     <string name="data_modify_overwritten">"Previous modification data is overwritten!"</string>
     <string name="data_modify_added">"Modification data is added."</string>
-    <string name="data_primary_board_missing">"Primary layout is not defined, first layout is used."</string>
+    <string name="data_primary_board_missing">"Root board is not defined, first non-wide layout is used."</string>
 
 </resources>

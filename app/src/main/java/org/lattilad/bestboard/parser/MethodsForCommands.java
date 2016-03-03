@@ -328,6 +328,7 @@ public class MethodsForCommands
      * COLOR (color) - default: light-gray
      * FORCESHIFT (boolean) FORCECTRL (boolean) FORCEALT  (boolean) FORCECAPS (boolean) -
      * Trilean values, default: not-given-value. Otherwise META state is forced on or off, depending on the value.
+     * ASBOARD - new board is generated with this layout under the same id
      */
     public void addLayout( ExtendedMap<Long, Object> parameters )
         {
@@ -431,6 +432,15 @@ public class MethodsForCommands
                 softBoardData.firstLayout = layout;
                 }
 
+            // ASBOARD - a new board is defined, same id, only one layout
+            if ( (boolean)parameters.remove( Commands.TOKEN_ASBOARD, false ) )
+                {
+                parameters.put( Commands.TOKEN_ID, id );
+                parameters.put( Commands.TOKEN_LAYOUT, id);
+                addBoard( parameters );
+                }
+
+
             }
         catch (ExternalDataException ede)
             {
@@ -448,11 +458,12 @@ public class MethodsForCommands
         Long id = (Long)parameters.remove( Commands.TOKEN_ID );
         if (id == null)
             {
-            tokenizer.error( "ADDLAYOUT", R.string.data_board_no_id);
+            tokenizer.error( "ADDBOARD", R.string.data_board_no_id);
             return;
             }
 
-        boolean main = (boolean)parameters.remove( Commands.TOKEN_MAIN, false );
+        boolean locked = (boolean)parameters.remove( Commands.TOKEN_LOCK, false );
+        boolean root = (boolean)parameters.remove( Commands.TOKEN_ROOT, false );
 
         // LAYOUT is given, no other parameters are checked
         Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
@@ -466,7 +477,7 @@ public class MethodsForCommands
                 return;
                 }
 
-            if ( softBoardData.boardTable.addBoard(id, layout, main) )
+            if ( softBoardData.boardTable.addBoard(id, layout, locked) )
                 {
                 tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_addlink_id_overwritten );
                 }
@@ -517,15 +528,15 @@ public class MethodsForCommands
             if ( portrait == null || landscape == null )
                 return;
 
-            if ( softBoardData.boardTable.addBoard(id, portrait, landscape, main) )
+            if ( softBoardData.boardTable.addBoard(id, portrait, landscape, locked) )
                 {
                 tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_addlink_id_overwritten );
                 }
             }
 
-        if (main)
+        if (root)
             {
-            softBoardData.boardTable.defineBaseBoard(id);
+            softBoardData.boardTable.defineRootBoard( id );
             }
         }
 

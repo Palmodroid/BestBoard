@@ -342,12 +342,15 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             throw new ExternalDataException("No layout!");
             }
 
-/*        if ( softBoardData.boardLinks.isBaseBoardMissing() )
+        // if no root board is specified,
+        // then a new board is created (id: 1L) using the first non-wide layout.
+        // This new board will be used as root.
+        if  ( !softBoardData.boardTable.isRootBoardDefined() )
             {
-            softBoardData.boardLinks.addBoardLink(0, softBoardData.firstLayout);
+            softBoardData.boardTable.addBoard( 1L, softBoardData.firstLayout, true );
+            softBoardData.boardTable.defineRootBoard( 1L );
             tokenizer.error(R.string.data_primary_board_missing);
             }
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!*/
         }
 
 

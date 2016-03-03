@@ -10,6 +10,7 @@ import java.util.Map;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.debug.Debug;
+import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
 
@@ -17,7 +18,16 @@ import org.lattilad.bestboard.scribe.Scribe;
  * Boards consist of two layouts (however the two can be tha same):
  * one for portrait and one for landscape mode.
  * Boards identified by their keyword token id.
- * BoardLinks stores all these Boards, and switches between them, if needed by link-buttons.
+ * BoardTable stores all these Boards, and switches between them by switch buttons.
+ * <p>
+ * PARSING PHASE:
+ * BoardTable should be filled up with boards: addBoard() methods.
+ * First (root) board should be selected: defineRootBoard().
+ * Root board could be changed during the process,
+ * but it should be checked at the end: isRootBoardDefined().
+ *
+ *
+ *
  */
 public class BoardTable
     {
@@ -49,19 +59,19 @@ public class BoardTable
         private Layout[] layout = new Layout[2];
         private boolean locked = false;
 
-        public BoardEntry(Layout portrait, Layout landscape, boolean locked)
+        BoardEntry(Layout portrait, Layout landscape, boolean locked)
             {
             this.layout[ORIENTATION_PORTRAIT] = portrait;
             this.layout[ORIENTATION_LANDSCAPE] = landscape;
             this.locked = locked;
             }
 
-        public boolean isLocked()
+        boolean isLocked()
             {
             return locked;
             }
 
-        public Layout getLayout( int orientation )
+        Layout getLayout( int orientation )
             {
             return layout[ orientation ];
             }
@@ -113,15 +123,21 @@ public class BoardTable
         }
 
     /** Previous boards without the active one */
-    private ArrayList<BoardStackEntry> boardStackEntries;
+    private ArrayList<BoardStackEntry> boardStackEntries = new ArrayList<>();
 
-    private void checkBoardStack( long boardId )
+
+    /**
+     * If active board can be found in the stack,
+     * it and all boards after it will be removed.
+     * This should be called every time, when a new board is selected.
+     */
+    private void checkBoardStack( )
         {
         Iterator<BoardStackEntry> boardIterator = boardStackEntries.iterator();
 
         while ( boardIterator.hasNext() )
             {
-            if ( boardId == boardIterator.next().boardId )
+            if ( activeBoardId == boardIterator.next().boardId )
                 {
                 while (true)
                     {
@@ -134,42 +150,66 @@ public class BoardTable
             }
         }
 
-    private void pushBoard( long boardId, BoardEntry boardEntry, boolean locked )
+
+    /**
+     * Pushes currently active board onto the stack
+     */
+    private void pushBoard( )
         {
-        boardStackEntries.add(new BoardStackEntry(boardId, boardEntry, locked));
+        boardStackEntries.add(new BoardStackEntry(activeBoardId, activeBoard, state == LOCKED ));
         }
 
-    public BoardEntry popBoard( boolean currentlyLocked )
+    /**
+     * Pops the previous board from the stack, and load it as the currently active board
+     * (Prev. active board is released)
+     * @param currentlyLocked
+     * If true, then the last board is selected (and became locked).
+     * If false, then the last LOCKED board is selected.
+     * @return true on success, false if stack is empty
+     */
+    private boolean popBoard( boolean currentlyLocked )
         {
-        if ( boardStackEntries.size() > 1 )
-            {
-            // remove last (currently selected) board
-            boardStackEntries.remove( boardStackEntries.size()-1 );
+        if ( boardStackEntries.isEmpty() )
+            return false;
 
-            if ( currentlyLocked )
+        // if currently locked, then last board is needed
+        // if not, not-locked boards should be removed from the end of the stack
+        // (first board is ALWAYS locked!)
+        if ( !currentlyLocked )
+            {
+            while ( !boardStackEntries.get( boardStackEntries.size()-1 ).locked )
                 {
-                // if currently locked, then previous board should lock as well
-                // (or can be locked originally)
-                boardStackEntries.get( boardStackEntries.size()-1 ).locked = true;
-                }
-            else
-                {
-                // if currently not locked, then all previous non-locked boards should be skipped
-                // (first board is ALWAYS locked!)
-                while ( !boardStackEntries.get( boardStackEntries.size()-1 ).locked )
-                    {
-                    boardStackEntries.remove( boardStackEntries.size()-1 );
-                    }
+                boardStackEntries.remove( boardStackEntries.size()-1 );
                 }
             }
-        // return the remaining top element
-        return boardStackEntries.get( boardStackEntries.size()-1 ).board;
+
+        // Now the last entry should became active, and it should be removed
+        BoardStackEntry lastEntry = boardStackEntries.get( boardStackEntries.size()-1 );
+
+        activeBoard = lastEntry.boardEntry;
+        activeBoardId = lastEntry.boardId;
+        state = LOCKED;
+        typeFlag = false;
+        // touchCounter is 0 in most cases. In case of SWITCH BACK, it should be 0
+        touchCounter = 0;
+
+        boardStackEntries.remove( boardStackEntries.size()-1 );
+        return true;
         }
 
 
     /******** DATA OF THE ACTIVE BOARD ********/
 
     /**
+     * touch: TOUCHED ( touchCounter > 0 )
+     * |                    |
+     * type: typeFlag       release
+     * |                    |
+     * release: BACK        - TOUCHED/locked?       LOCKED
+     *                      - TOUCHED/non-locked?   ACTIVE
+     *                      - ACTIVE                LOCKED
+     *                      - LOCKED                BACK
+     *
      * Active board can be:
      * - TOUCHED if touchCounter > 0
      * - ACTIVE
@@ -194,17 +234,17 @@ public class BoardTable
     /** Currently visible (active) board */
     private BoardEntry activeBoard;
 
-    /** State of the currently active board */
+    /** State of the currently visible (active) board */
     private int state = LOCKED;
 
     /**
-     * Touch counter of the use key of the active layout.
+     * Touch counter of the use key of currently visible (active) board
      * Key is released, when counter is 0
      */
     private int touchCounter = 0;
 
     /**
-     * Type flag of the active layout.
+     * Type flag of the currently visible (active) board
      * True, if main stream button was used during the TOUCH.
      */
     private boolean typeFlag = false;
@@ -241,11 +281,11 @@ public class BoardTable
     /**
      * If active-board is missing, then there are no boards at all.
      * This is not possible!
-     * @return true if there are no boards
+     * @return true if boards are ready
      */
-    public boolean isRootBoardMissing()
+    public boolean isRootBoardDefined()
         {
-        return activeBoard == null;
+        return activeBoard != null;
         }
 
 
@@ -336,62 +376,78 @@ public class BoardTable
         }
 
 
-    private void activatePreviousBoard()
+    private void selectPreviousBoard()
         {
-        if ( !visibleBoardId.equals(previousBoardId) )
+        if ( popBoard(state == LOCKED) )
             {
             Scribe.debug( Debug.LINKSTATE, "Returning to board: " +
-                    Tokenizer.regenerateKeyword( previousBoardId ));
-            visibleBoardId = previousBoardId;
-            previousBoardId = rootBoardId;
-            state = LOCKED;
-            typeFlag = false;
+                    Tokenizer.regenerateKeyword( activeBoardId ));
             softBoardListener.getLayoutView().setLayout(getActiveLayout());
             }
         else
             {
-            Scribe.error( "No previous layout is available!" );
+            Scribe.error( "No previous board is available!" );
+            }
+        }
+
+
+    public void selectLockedBoard()
+        {
+        if ( state != LOCKED )
+            {
+            selectPreviousBoard();
             }
         }
 
 
     /**
-     * Link-key is touched
+     * Switch-key is touched
      * OTHER LAYOUT'S USE-KEY:
      * Immediately changes to the other layout (if new layout exists)
      * ACTIVE LAYOUT'S USE-KEY:
      * Touch is stored, but nothing happens until release.
      */
-    public void touch( Long id )
+    public void touch( long id )
         {
         // BACK key
         if ( isActive( id ) )
             {
             touchCounter++;
+            return;
             }
+
+        if ( id == Commands.TOKEN_BACK )
+            {
+            selectPreviousBoard();
+            return;
+            }
+
+        // NEW layout - if exist
+        BoardEntry boardEntry = boards.get(id);
+        if (boardEntry != null)
+            {
+
+            Scribe.debug(Debug.LINKSTATE, "New board was selected: " +
+                    Tokenizer.regenerateKeyword(id));
+
+            checkBoardStack();
+            pushBoard();
+
+            activeBoardId = id;
+            activeBoard = boardEntry;
+
+            touchCounter = 1; // previous touches are cleared
+            state = TOUCHED;  // it is only active because of TOUCHED
+            typeFlag = false;
+
+            // requestLayout is called by setLayout
+            softBoardListener.getLayoutView().setLayout( boardEntry.getLayout(orientation));
+            }
+        // NEW layout is missing - nothing happens
         else
             {
-            // NEW layout - if exist
-            Board boardEntry = boards.get(id);
-            if (board != null)
-                {
-                Scribe.debug(Debug.LINKSTATE, "New board was selected: " +
-                        Tokenizer.regenerateKeyword(id));
-                previousBoardId = visibleBoardId;
-                visibleBoardId = id;
-                touchCounter = 1; // previous touches are cleared
-                state = HIDDEN; // it is only active because of TOUCHED
-                typeFlag = false;
-
-                // requestLayout is called by setLayout
-                softBoardListener.getLayoutView().setLayout(board.layout[orientation]);
-                }
-            // NEW layout is missing - nothing happens
-            else
-                {
-                Scribe.error("Layout missing, it cannot be selected: " +
-                        Tokenizer.regenerateKeyword(id));
-                }
+            Scribe.error("Layout missing, it cannot be selected: " +
+                    Tokenizer.regenerateKeyword(id));
             }
         }
 
@@ -426,7 +482,7 @@ public class BoardTable
             }
         else if ( state == ACTIVE )
             {
-            activatePreviousBoard();
+            selectPreviousBoard();
 
             return true;
             }
@@ -444,7 +500,7 @@ public class BoardTable
      */
     public void release( Long id, boolean lockKey )
         {
-        // touchCounter can be 0 if use-key was continuously pressed,
+        // touchCounter can be 0 if switch-key was continuously pressed,
         // while selection/return happens
         if (isActive( id ) && touchCounter > 0)
             {
@@ -456,9 +512,9 @@ public class BoardTable
                 Scribe.debug( Debug.LINKSTATE, "BoardLinks: all button RELEASED." );
                 if ( !typeFlag )
                     {
-                    if (state == HIDDEN)
+                    if (state == TOUCHED)
                         {
-                        if (lockKey)
+                        if (lockKey || activeBoard.isLocked())
                             {
                             state = LOCKED;
                             Scribe.debug( Debug.LINKSTATE, "BoardLinks cycled to LOCKED by LOCK key." );
@@ -474,14 +530,14 @@ public class BoardTable
                         state = LOCKED;
                         Scribe.debug( Debug.LINKSTATE, "BoardLinks cycled to LOCKED." );
                         }
-                    else
+                    else // if (state == LOCKED)
                         {
-                        activatePreviousBoard();
+                        selectPreviousBoard();
                         }
                     }
                 else
                     {
-                    activatePreviousBoard();
+                    selectPreviousBoard();
                     }
                 }
             }

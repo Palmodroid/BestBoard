@@ -71,12 +71,16 @@ public class Commands
     public static final long TOKEN_ALIGN = 0x12f9733L;
     public static final long TOKEN_COLOR = 0x16b2be3L;
 
+    public static final long TOKEN_ASBOARD = 0x66e540fa6L;
+
     public static final long TOKEN_ADDBOARD = 0xe502ed0208L;
     // public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_LAYOUT = 0x5805f907L;
     public static final long TOKEN_LANDSCAPE = 0x44010ff937b3L;
     public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
-    public static final long TOKEN_MAIN = 0x123928L;
+    public static final long TOKEN_LOCK = 0x11bd48L;
+    public static final long TOKEN_ROOT = 0x16623bL;
+
 
 
     public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
@@ -137,8 +141,10 @@ public class Commands
     public static final long TOKEN_SHIFT = 0x32f4092L;
 
     public static final long TOKEN_SWITCH = 0x775d93d7L;
+    // !! BACK is used as textual token !!
+    public static final long TOKEN_BACK = 0x9b7c8L;
 
-    public static final long TOKEN_LOCK = 0x11bd48L;
+    // public static final long TOKEN_LOCK = 0x11bd48L;
 
     public static final long TOKEN_AUTOCAPS = 0xef6e451a57L;
     public static final long TOKEN_ON = 0x1038eL;
@@ -383,7 +389,9 @@ public class Commands
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
                 TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
                 TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT}, "addLayout" );
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_ASBOARD,
+                TOKEN_LOCK, TOKEN_ROOT }, "addLayout" );
 
         add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS}); // Useless parametercommand - just for clearer readability
@@ -399,16 +407,21 @@ public class Commands
         add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
         add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
 
+        add(TOKEN_ASBOARD, new long[]{PARAMETER_FLAG});
+        // If ASBOARD is given, then addBoard is called, so LOCK and ROOT can be used, too
+
         add(TOKEN_ADDBOARD, new long[]{
                 TOKEN_ID,
                 TOKEN_LAYOUT,
                 TOKEN_PORTRAIT, TOKEN_LANDSCAPE,
-                TOKEN_MAIN}, "addBoard");
+                TOKEN_LOCK,
+                TOKEN_ROOT }, "addBoard");
         // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_MAIN, new long[]{PARAMETER_FLAG});
+        add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ROOT, new long[]{PARAMETER_FLAG});
 
 
 
@@ -558,7 +571,7 @@ public class Commands
         add(TOKEN_META, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_SWITCH, new long[]{PARAMETER_KEYWORD});
 
-        add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
+        // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_AUTOCAPS, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_STRINGCAPS, new long[]{PARAMETER_FLAG});
