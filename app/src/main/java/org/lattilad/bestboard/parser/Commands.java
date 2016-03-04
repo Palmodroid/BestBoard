@@ -1208,7 +1208,7 @@ public class Commands
 
             try
                 {
-                // Parameter-command has COMPLEX parameters - forwardParamers
+                // Parameter-command has COMPLEX parameters - forwardParameters
                 if (getParameterType() >= Tokenizer.TOKEN_CODE_SHIFT || getParameterType() < 0x0L )
                     method = MethodsForCommands.class.getDeclaredMethod(methodName, ExtendedMap.class);
                 // Parameter-command has ONE parameter - result

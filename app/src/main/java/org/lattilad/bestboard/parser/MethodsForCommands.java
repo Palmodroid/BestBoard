@@ -435,11 +435,11 @@ public class MethodsForCommands
             // ASBOARD - a new board is defined, same id, only one layout
             if ( (boolean)parameters.remove( Commands.TOKEN_ASBOARD, false ) )
                 {
+                // !! check if non-wide !!
                 parameters.put( Commands.TOKEN_ID, id );
                 parameters.put( Commands.TOKEN_LAYOUT, id);
                 addBoard( parameters );
                 }
-
 
             }
         catch (ExternalDataException ede)
@@ -452,6 +452,12 @@ public class MethodsForCommands
 
     /**
      * Adds a new board - portrait-landscape layout pair
+     * ID (keyword) - obligatory board id
+     * LAYOUT (keyword) - layout to use in both modes OR
+     * PORTRAIT (keyword) - layout to use in portrait mode AND
+     * LANDSCAPE (keyword) - layout to use in landscape mode
+     * LOCK - (flag) board always starts as locked
+     * ROOT - (flag) set as root board (root board is always locked)
      */
     public void addBoard( ExtendedMap<Long, Object> parameters )
         {
@@ -536,6 +542,7 @@ public class MethodsForCommands
 
         if (root)
             {
+            // root remains always "root" and always locked
             softBoardData.boardTable.defineRootBoard( id );
             }
         }
