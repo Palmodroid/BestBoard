@@ -10,6 +10,28 @@ import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.SinglyLinkedList;
 
+/*
+ *  Button
+ *
+ *      ButtonMainTouch
+ *          ButtonPacket        - repeat
+ *          ButtonDouble        - second
+ *          ButtonList          - second
+ *          ButtonSpaceTravel
+ *          ButtonModify
+ *
+ *          ButtonMainTouchTitles
+ *              ButtonEnter     - repeat
+ *              ButtonAlternate - second (return to previous)? repeat?
+ *
+ *      ButtonMultiTouch
+ *          ButtonLink
+ *          ButtonMeta
+ *
+ *      ButtonForMaps
+ */
+
+
 /**
  * Base class for buttons.
  * The class itself defines an "empty" Button without any function
