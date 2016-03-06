@@ -56,10 +56,10 @@
     <string name="data_button_titles_extended">"EXTEND: The titles of the button are extended!"</string>
 
     <string name="data_board_no_id">"New board has no id!"</string>
-    <string name="data_addlink_id_overwritten">"Previously defined board is overwritten!"</string>
-    <string name="data_addlink_board_set">"Board id is set to a layout:"</string>
-    <string name="data_addlink">"Link parameter LANDSCAPE is missing!"</string>
-    <string name="data_addlink_portrait_missing">"Link parameter PORTRAIT is missing!"</string>
+    <string name="data_board_id_overwritten">"Previously defined board is overwritten!"</string>
+    <string name="data_board_id_set">"Board id is set to a layout:"</string>
+    <string name="data_board_landscape_missing">"Board parameter LANDSCAPE is missing!"</string>
+    <string name="data_board_portrait_missing">"Board parameter PORTRAIT is missing!"</string>
     <string name="data_modify_no_id">"New modify has no ID!"</string>
     <string name="data_modify_one_allowed">"Text and character rolls cannot be mixed! Character modify is used."</string>
     <string name="data_modify_no_rolls">"Modify has no valid rolls!"</string>

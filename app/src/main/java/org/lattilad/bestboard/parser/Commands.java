@@ -71,8 +71,6 @@ public class Commands
     public static final long TOKEN_ALIGN = 0x12f9733L;
     public static final long TOKEN_COLOR = 0x16b2be3L;
 
-    public static final long TOKEN_ASBOARD = 0x66e540fa6L;
-
     public static final long TOKEN_ADDBOARD = 0xe502ed0208L;
     // public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_LAYOUT = 0x5805f907L;
@@ -80,6 +78,10 @@ public class Commands
     public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
     public static final long TOKEN_LOCK = 0x11bd48L;
     public static final long TOKEN_ROOT = 0x16623bL;
+
+    // public static final long TOKEN_ADDLAYOUT = 0x211993f479afL;
+    public static final long TOKEN_ADDLANDSCAPE = 0x199541e855df90bbL;
+    public static final long TOKEN_ADDPORTRAIT = 0xb10228db2c89c8L;
 
 
 
@@ -119,7 +121,6 @@ public class Commands
 
     public static final long TOKEN_EXTEND = 0x3da4e6fdL;
 
-    public static final long TOKEN_SEND = 0x16f269L;
     public static final long TOKEN_SECOND = 0x7556168dL;
 
     public static final long TOKEN_TEXT = 0x17b9c8L;
@@ -176,8 +177,6 @@ public class Commands
     public static final long TOKEN_NONBOLD = 0xe232d779aL;
     public static final long TOKEN_NONITALICS = 0xaed49d766321dL;
     // public static final long TOKEN_COLOR = 0x16b2be3L;
-
-    public static final long TOKEN_INDEX = 0x215cf78L;
 
     public static final long TOKEN_ADDMODIFY = 0x211999969455L;
     // public static final long TOKEN_ID = 0x102a6L;
@@ -243,7 +242,6 @@ public class Commands
     public final static long[] ALLOWED_AS_LABEL = new long[]{
             TOKEN_ADDLAYOUT,
             TOKEN_BLOCK,
-            TOKEN_SEND,
             TOKEN_BUTTON,
             TOKEN_EXTEND,
             TOKEN_ADDTITLE };
@@ -251,7 +249,6 @@ public class Commands
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] ALLOWED_AS_DEFAULT = new long[]{
             TOKEN_ADDLAYOUT,
-            TOKEN_SEND,
             TOKEN_BUTTON,
             TOKEN_EXTEND,
             TOKEN_ADDTITLE };
@@ -389,9 +386,7 @@ public class Commands
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
                 TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
                 TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
-                TOKEN_ASBOARD,
-                TOKEN_LOCK, TOKEN_ROOT }, "addLayout" );
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
 
         add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS}); // Useless parametercommand - just for clearer readability
@@ -407,25 +402,33 @@ public class Commands
         add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
         add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
 
-        add(TOKEN_ASBOARD, new long[]{PARAMETER_FLAG});
-        // If ASBOARD is given, then addBoard is called, so LOCK and ROOT can be used, too
-
         add(TOKEN_ADDBOARD, new long[]{
                 TOKEN_ID,
                 TOKEN_LAYOUT,
                 TOKEN_PORTRAIT, TOKEN_LANDSCAPE,
+                TOKEN_ADDLAYOUT,
+                TOKEN_ADDPORTRAIT, TOKEN_ADDLANDSCAPE,
                 TOKEN_LOCK,
                 TOKEN_ROOT }, "addBoard");
         // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
+
         add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
         add(TOKEN_ROOT, new long[]{PARAMETER_FLAG});
 
+        add(TOKEN_ADDLANDSCAPE, new long[]{
+                TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
+                TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
+                TOKEN_ALIGN, TOKEN_COLOR,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
 
-
-
+        add(TOKEN_ADDPORTRAIT, new long[]{
+                TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
+                TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
+                TOKEN_ALIGN, TOKEN_COLOR,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
 
         add(TOKEN_BLOCK, new long[]{
                         TOKEN_LAYOUT,
@@ -462,14 +465,58 @@ public class Commands
         add(TOKEN_SKIP, TOKEN_BUTTON, new long[]{PARAMETER_INT});
         add(TOKEN_HOME, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
 
+
+
+        /*
+
+        BUTTON
+
+            (SIMPLE) (FIRST)
+            (DOUBLE) (FIRST) / SECOND
+            ALTERNATE (FIRST) / SECOND
+
+            META
+            SWITCH
+            SPACETRAVEL
+            MODIFY REVERSE
+            ENTER
+
+        First and Second:
+            TOKEN_TEXT, TOKEN_AUTOCAPS, TOKEN_STRINGCAPS, TOKEN_ERASESPACES, TOKEN_AUTOSPACE
+            TOKEN_KEY, TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT
+            TOKEN_DO
+
+
+
+    public static final long TOKEN_SINGLE = 0x75d0cfbfL;
+    public static final long TOKEN_DOUBLE = 0x38822138L;
+    public static final long TOKEN_ALTERNATE = 0x21d3dacd0f44L;
+    public static final long TOKEN_FIRST = 0x1bc7434L;
+    public static final long TOKEN_SECOND = 0x7556168dL;
+    public static final long TOKEN_ADDTEXT = 0x63091a2b0L;
+    public static final long TOKEN_LIST = 0x119f8bL;
+    public static final long TOKEN_ONSTAY = 0x65db8273L;
+    public static final long TOKEN_ONCIRCLE = 0x2206a350fc6L;
+    public static final long TOKEN_REPEAT = 0x713dd0a6L;
+
+
+
+
+
+
+         */
+
+
+
+
+
+
         add(TOKEN_BUTTON, TOKEN_BUTTON, new long[]{
                         TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
 
-                        TOKEN_TEXT,
-                        TOKEN_DO,
-
                         TOKEN_COLOR,
 
+                        TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
                         TOKEN_STRINGCAPS,
                         TOKEN_ERASESPACES,
@@ -477,6 +524,8 @@ public class Commands
 
                         TOKEN_KEY,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+
+                        TOKEN_DO,
 
                         TOKEN_REPEAT,
 
@@ -493,17 +542,12 @@ public class Commands
 
                         TOKEN_OVERWRITE,
 
-                        TOKEN_SECOND,
-                        TOKEN_SEND},
-                // SEND remains only because label's purposes,
-                // parameters could be given directly to BUTTON
+                        TOKEN_SECOND},
                 "setButton");
 
         add(TOKEN_EXTEND, TOKEN_BUTTON, new long[]{
                         TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
                         TOKEN_COLOR },
-                // SEND remains only because label's purposes,
-                // parameters could be given directly to BUTTON
                 "extendButton");
 
         add(TOKEN_ADDTITLE, new long[]{
@@ -525,7 +569,9 @@ public class Commands
 
         add(TOKEN_OVERWRITE, new long[]{PARAMETER_FLAG});
 
+/*
         add(TOKEN_SEND, new long[]{
+
                         TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
                         TOKEN_STRINGCAPS,
@@ -550,6 +596,7 @@ public class Commands
 
                         TOKEN_ENTER},
                 "createButtonFunction");
+*/
 
         add(TOKEN_SECOND, new long[]{
                         TOKEN_TEXT,
@@ -589,6 +636,13 @@ public class Commands
         add(TOKEN_REVERSE, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_ENTER, new long[]{PARAMETER_FLAG});
+
+
+
+
+
+
+
 
         add(TOKEN_ADDMODIFY, new long[]{
                 TOKEN_ID, TOKEN_ADDROLL, TOKEN_ROLLS,

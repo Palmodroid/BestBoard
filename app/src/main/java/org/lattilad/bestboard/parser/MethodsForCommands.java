@@ -317,6 +317,120 @@ public class MethodsForCommands
         tokenizer.note(R.string.data_unknowntitle, softBoardData.actionTitles[SoftBoardData.ACTION_UNSPECIFIED] );
         }
 
+
+    /**
+     * Adds a new board - portrait-landscape layout pair
+     * ID (keyword) - obligatory board id
+     * LAYOUT (keyword) - layout to use in both modes OR
+     * PORTRAIT (keyword) - layout to use in portrait mode AND
+     * LANDSCAPE (keyword) - layout to use in landscape mode
+     * LOCK - (flag) board always starts as locked
+     * ROOT - (flag) set as root board (root board is always locked)
+     */
+    public void addBoard( ExtendedMap<Long, Object> parameters )
+        {
+        Long id = (Long)parameters.remove( Commands.TOKEN_ID );
+        if (id == null)
+            {
+            tokenizer.error( "ADDBOARD", R.string.data_board_no_id);
+            return;
+            }
+
+        boolean locked = (boolean)parameters.remove( Commands.TOKEN_LOCK, false );
+        boolean root = (boolean)parameters.remove( Commands.TOKEN_ROOT, false );
+
+        // LAYOUT is given, no other parameters are checked
+        Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
+        if ( layoutId == null )
+            {
+            layoutId = (Long)parameters.remove( Commands.TOKEN_ADDLAYOUT );
+            }
+
+        if (layoutId != null)
+            {
+            Layout layout = layouts.get( layoutId );
+            if ( layout == null )
+                {
+                tokenizer.error( "LAYOUT", R.string.data_no_layout,
+                        Tokenizer.regenerateKeyword( (long)layoutId));
+                return;
+                }
+
+            if ( softBoardData.boardTable.addBoard(id, layout, locked) )
+                {
+                tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_board_id_overwritten);
+                }
+
+            tokenizer.note( Tokenizer.regenerateKeyword(id), R.string.data_board_id_set,
+                    Tokenizer.regenerateKeyword( (long)layoutId));
+            }
+
+        // no LAYOUT is given, so PORTRAIT AND LANDSCAPE is needed
+        // BOTH parameters are checked completely before
+        else
+            {
+            Long portraitId = (Long)parameters.remove( Commands.TOKEN_PORTRAIT );
+            if ( portraitId == null )
+                {
+                portraitId = (Long)parameters.remove( Commands.TOKEN_ADDPORTRAIT );
+                }
+
+            Layout portrait = null;
+
+            if ( portraitId != null )
+                {
+                portrait = layouts.get( portraitId );
+                if ( portrait == null )
+                    {
+                    tokenizer.error( "PORTRAIT", R.string.data_no_layout,
+                            Tokenizer.regenerateKeyword( (long)portraitId));
+                    }
+                }
+            else
+                {
+                tokenizer.error( Tokenizer.regenerateKeyword(id), R.string.data_board_portrait_missing);
+                }
+
+            Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
+            if ( landscapeId == null )
+                {
+                landscapeId = (Long)parameters.remove( Commands.TOKEN_ADDLANDSCAPE );
+                }
+
+            Layout landscape = null;
+
+            if ( landscapeId != null )
+                {
+                landscape = layouts.get( landscapeId );
+                if ( landscape == null )
+                    {
+                    tokenizer.error( "LANDSCAPE", R.string.data_no_layout,
+                            Tokenizer.regenerateKeyword( (long)landscapeId));
+                    }
+                }
+            else
+                {
+                tokenizer.error( Tokenizer.regenerateKeyword(id), R.string.data_board_landscape_missing);
+                }
+
+            // only if both parameters are ok
+            if ( portrait == null || landscape == null )
+                return;
+
+            if ( softBoardData.boardTable.addBoard(id, portrait, landscape, locked) )
+                {
+                tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_board_id_overwritten);
+                }
+            }
+
+        if (root)
+            {
+            // root remains always "root" and always locked
+            softBoardData.boardTable.defineRootBoard( id );
+            }
+        }
+
+
     /**
      * Adds a new layout
      * ID (keyword) - obligatory layout id
@@ -330,7 +444,7 @@ public class MethodsForCommands
      * Trilean values, default: not-given-value. Otherwise META state is forced on or off, depending on the value.
      * ASBOARD - new board is generated with this layout under the same id
      */
-    public void addLayout( ExtendedMap<Long, Object> parameters )
+    public Long addLayout( ExtendedMap<Long, Object> parameters )
         {
         Object temp;
 
@@ -347,7 +461,7 @@ public class MethodsForCommands
         if (id == null)
             {
             tokenizer.error( "ADDLAYOUT", R.string.data_layout_no_id);
-            return;
+            return null;
             }
 
         temp = parameters.remove( Commands.TOKEN_HALFCOLUMNS );
@@ -369,7 +483,7 @@ public class MethodsForCommands
                 {
                 tokenizer.error(Tokenizer.regenerateKeyword((long) id),
                         R.string.data_columns_missing);
-                return;
+                return null;
                 }
             }
 
@@ -378,7 +492,7 @@ public class MethodsForCommands
             {
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_rows_missing );
-            return;
+            return null;
             }
         rows = (int)temp;
 
@@ -432,14 +546,7 @@ public class MethodsForCommands
                 softBoardData.firstLayout = layout;
                 }
 
-            // ASBOARD - a new board is defined, same id, only one layout
-            if ( (boolean)parameters.remove( Commands.TOKEN_ASBOARD, false ) )
-                {
-                // !! check if non-wide !!
-                parameters.put( Commands.TOKEN_ID, id );
-                parameters.put( Commands.TOKEN_LAYOUT, id);
-                addBoard( parameters );
-                }
+            return id;
 
             }
         catch (ExternalDataException ede)
@@ -447,440 +554,8 @@ public class MethodsForCommands
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_layout_error);
             }
-        }
 
-
-    /**
-     * Adds a new board - portrait-landscape layout pair
-     * ID (keyword) - obligatory board id
-     * LAYOUT (keyword) - layout to use in both modes OR
-     * PORTRAIT (keyword) - layout to use in portrait mode AND
-     * LANDSCAPE (keyword) - layout to use in landscape mode
-     * LOCK - (flag) board always starts as locked
-     * ROOT - (flag) set as root board (root board is always locked)
-     */
-    public void addBoard( ExtendedMap<Long, Object> parameters )
-        {
-        Long id = (Long)parameters.remove( Commands.TOKEN_ID );
-        if (id == null)
-            {
-            tokenizer.error( "ADDBOARD", R.string.data_board_no_id);
-            return;
-            }
-
-        boolean locked = (boolean)parameters.remove( Commands.TOKEN_LOCK, false );
-        boolean root = (boolean)parameters.remove( Commands.TOKEN_ROOT, false );
-
-        // LAYOUT is given, no other parameters are checked
-        Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
-        if (layoutId != null)
-            {
-            Layout layout = layouts.get( layoutId );
-            if ( layout == null )
-                {
-                tokenizer.error( "LAYOUT", R.string.data_no_layout,
-                        Tokenizer.regenerateKeyword( (long)layoutId));
-                return;
-                }
-
-            if ( softBoardData.boardTable.addBoard(id, layout, locked) )
-                {
-                tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_addlink_id_overwritten );
-                }
-
-            tokenizer.note( Tokenizer.regenerateKeyword(id), R.string.data_addlink_board_set,
-                        Tokenizer.regenerateKeyword( (long)layoutId));
-            }
-
-        // no LAYOUT is given, so PORTRAIT AND LANDSCAPE is needed
-        // BOTH parameters are checked completely before
-        else
-            {
-            Long portraitId = (Long)parameters.remove( Commands.TOKEN_PORTRAIT );
-            Layout portrait = null;
-
-            if ( portraitId != null )
-                {
-                portrait = layouts.get( portraitId );
-                if ( portrait == null )
-                    {
-                    tokenizer.error( "PORTRAIT", R.string.data_no_layout,
-                            Tokenizer.regenerateKeyword( (long)portraitId));
-                    }
-                }
-            else
-                {
-                tokenizer.error( Tokenizer.regenerateKeyword(id), R.string.data_addlink_portrait_missing );
-                }
-
-            Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
-            Layout landscape = null;
-
-            if ( landscapeId != null )
-                {
-                landscape = layouts.get( landscapeId );
-                if ( landscape == null )
-                    {
-                    tokenizer.error( "LANDSCAPE", R.string.data_no_layout,
-                            Tokenizer.regenerateKeyword( (long)landscapeId));
-                    }
-                }
-            else
-                {
-                tokenizer.error( Tokenizer.regenerateKeyword(id), R.string.data_addlink );
-                }
-
-            // only if both parameters are ok
-            if ( portrait == null || landscape == null )
-                return;
-
-            if ( softBoardData.boardTable.addBoard(id, portrait, landscape, locked) )
-                {
-                tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_addlink_id_overwritten );
-                }
-            }
-
-        if (root)
-            {
-            // root remains always "root" and always locked
-            softBoardData.boardTable.defineRootBoard( id );
-            }
-        }
-
-
-    public Button createButtonFunction(ExtendedMap<Long, Object> parameters)
-        {
-        Button buttonFunction = null;
-        Object temp;
-
-        int counter = 0;
-
-        // SEND contains the parameters of a virtual PACKET command
-        Packet packet = packet( parameters );
-        if (packet != null )
-            {
-            Packet secondaryPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND );
-
-            if ( secondaryPacket != null )
-                {
-                buttonFunction = new ButtonDouble(packet, secondaryPacket);
-                Scribe.debug(Debug.DATA, "Double Packet is defined");
-                }
-            else
-                {
-                buttonFunction = new ButtonPacket(packet, parameters.containsKey(Commands.TOKEN_REPEAT));
-                Scribe.debug(Debug.DATA, "Simple Packet is defined");
-                }
-            counter++;
-            }
-
-        temp = parameters.remove( Commands.TOKEN_SWITCH );
-        if (temp != null)
-            {
-            counter++;
-            buttonFunction = new ButtonLink( (long)temp,
-                    parameters.containsKey(Commands.TOKEN_LOCK) );
-            // invalid index - (int)temp - means go back to previous layout
-            }
-
-        temp = parameters.remove( Commands.TOKEN_META );
-        if (temp != null)
-            {
-            counter++;
-            int meta = -1;
-
-            if ( (long)temp == Commands.TOKEN_CAPS )
-                meta = LayoutStates.META_CAPS;
-            else if ( (long)temp == Commands.TOKEN_SHIFT )
-                meta = LayoutStates.META_SHIFT;
-            else if ( (long)temp == Commands.TOKEN_CTRL )
-                meta = LayoutStates.META_CTRL;
-            else if ( (long)temp == Commands.TOKEN_ALT )
-                meta = LayoutStates.META_ALT;
-
-            // ButtonMeta constructor will not accept any non-valid parameter
-
-            try
-                {
-                buttonFunction = new ButtonMeta( meta,
-                        parameters.containsKey( Commands.TOKEN_LOCK) );
-                }
-            catch (ExternalDataException e)
-                {
-                tokenizer.error("META", R.string.data_meta_unknown_meta_state);
-                }
-            }
-
-        if ( parameters.containsKey( Commands.TOKEN_SPACETRAVEL ) )
-            {
-            counter++;
-            // Packet with default cannot be null!
-            buttonFunction = new ButtonSpaceTravel( packet(parameters, " ") );
-            }
-
-        temp = parameters.remove(Commands.TOKEN_MODIFY);
-        if (temp != null)
-            {
-            counter++;
-            buttonFunction = new ButtonModify( (long)temp,
-                    parameters.containsKey( Commands.TOKEN_REVERSE ));
-            }
-
-        if ( parameters.containsKey( Commands.TOKEN_ENTER ) )
-            {
-            counter++;
-
-            // Packet with default cannot be null!
-            PacketKey packetKey = packetKey( parameters, 0x10000 + KeyEvent.KEYCODE_ENTER ); // Or: '\n'
-            PacketText packetText = packetText( parameters, "\n" );
-
-            buttonFunction = new ButtonEnter( packetKey, packetText, parameters.containsKey( Commands.TOKEN_REPEAT) );
-            }
-
-        if ( counter > 1 )
-            {
-            tokenizer.error("SEND", R.string.data_send_one_allowed );
-            }
-        else if (buttonFunction == null )  // OR (counter == 0)
-            {
-            tokenizer.error("SEND", R.string.data_send_missing);
-            // Buttons function was not set - button will give an error message
-            // It will return null
-            }
-
-        return buttonFunction;
-        }
-
-    /**
-     * Creates packetKey from parameters.
-     * KEY parameter is used,
-     * defaultKey is used if KEY parameter is missing, (NO_DEFAULT_KEY)
-     * null is returned if both are missing.
-     * @param parameters Key packet parameters (KEY, SETSHIFT, SETCTRL, SETALT)
-     * @param defaultKey default key (if KEY is missing) or NO_DEFAULT_KEY
-     * @return Key packet or null
-     */
-    public PacketKey packetKey( ExtendedMap<Long, Object> parameters, int defaultKey )
-        {
-        PacketKey packet = null;
-        int temp;
-
-        temp = (int)parameters.remove(Commands.TOKEN_KEY, NO_DEFAULT_KEY);
-
-        if ( temp == NO_DEFAULT_KEY )             // KEY token is missing
-            {
-            temp = defaultKey;         // use default instead of KEY
-            }
-        else if ( defaultKey != NO_DEFAULT_KEY ) // both TEXT and default -> override default
-            {
-            tokenizer.error("PACKET", R.string.data_send_packet_key_override );
-            }
-
-        if ( temp != NO_DEFAULT_KEY )
-            {
-            // TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT feldolgozása
-            packet = new PacketKey( softBoardData, temp,
-                    LayoutStates.generateBinaryHardState(parameters));
-            }
-
-        return packet;
-        }
-
-
-    /**
-     * Creates packetText from parameters.
-     * TEXT parameter is used,
-     * defaultText is used if TEXT parameter is missing,
-     * null is returned if both are missing.
-     * @param parameters Text packet parameters
-     * (TEXT, AUTOCAPS ON, OFF, HOLD, WAIT, STRINGCAPS)
-     * @param defaultText default text (if TEXT is missing) or null
-     * @return Text packet or null
-     */
-    public PacketText packetText( ExtendedMap<Long, Object> parameters, String defaultText )
-        {
-        PacketText packet = null;
-        Object temp;
-
-        temp = parameters.remove(Commands.TOKEN_TEXT);
-
-        if ( temp == null )             // TEXT token is missing
-            {
-            temp = defaultText;         // use default instead of TEXT
-            }
-        else if ( defaultText != null ) // both TEXT and default -> override default
-            {
-            tokenizer.error("PACKET", R.string.data_send_packet_text_override );
-            }
-
-        if (temp != null)
-            {
-            long autoFlag;
-
-            int autoCaps = CapsState.AUTOCAPS_OFF;
-            int autoSpace = 0;
-
-            autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOCAPS, -1L);
-            if ( autoFlag == Commands.TOKEN_ON )
-                autoCaps = CapsState.AUTOCAPS_ON;
-            else if ( autoFlag == Commands.TOKEN_HOLD )
-                autoCaps = CapsState.AUTOCAPS_HOLD;
-            else if ( autoFlag == Commands.TOKEN_WAIT )
-                autoCaps = CapsState.AUTOCAPS_WAIT;
-            else if ( autoFlag == Commands.TOKEN_OFF )
-                ; // default remains
-            else if ( autoFlag != -1L )
-                tokenizer.error("PACKET", R.string.data_autocaps_bad_parameter );
-
-            autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOSPACE, -1L);
-            if ( autoFlag == Commands.TOKEN_BEFORE )
-                autoSpace = PacketText.AUTO_SPACE_BEFORE;
-            else if ( autoFlag == Commands.TOKEN_AFTER )
-                autoSpace = PacketText.AUTO_SPACE_AFTER;
-            else if ( autoFlag == Commands.TOKEN_AROUND )
-                autoSpace = PacketText.AUTO_SPACE_BEFORE | PacketText.AUTO_SPACE_AFTER;
-            else if ( autoFlag != -1L )
-                tokenizer.error("PACKET", R.string.data_autospace_bad_parameter );
-
-            autoFlag = (long)parameters.remove(Commands.TOKEN_ERASESPACES, -1L);
-            if ( autoFlag == Commands.TOKEN_BEFORE )
-                autoSpace |= PacketText.ERASE_SPACES_BEFORE;
-            else if ( autoFlag == Commands.TOKEN_AFTER )
-                autoSpace |= PacketText.ERASE_SPACES_AFTER;
-            else if ( autoFlag == Commands.TOKEN_AROUND )
-                autoSpace |= PacketText.ERASE_SPACES_BEFORE | PacketText.ERASE_SPACES_AFTER;
-            else if ( autoFlag != -1L )
-                tokenizer.error("PACKET", R.string.data_erasespaces_bad_parameter );
-
-            if (temp instanceof Character)
-                {
-                packet = new PacketText( softBoardData, (Character)temp, autoCaps,
-                        autoSpace );
-                }
-            else // if (temp instanceof String)
-                {
-                packet = new PacketText( softBoardData, (String)temp, autoCaps,
-                        (boolean)parameters.remove( Commands.TOKEN_STRINGCAPS, false), autoSpace );
-                }
-            }
-
-        return packet;
-        }
-
-
-    /**
-     * Creates packetFunction from parameters.
-     * DO parameter is used
-     * null is returned if DO is missing.
-     * PacketFunction has not got any default value!
-     * @param parameters Function packet parameters (DO)
-     * @return Function packet or null
-     */
-    public PacketFunction packetFunction( ExtendedMap<Long, Object> parameters )
-        {
-        PacketFunction packet = null;
-        long temp;
-
-        temp = (long)parameters.remove(Commands.TOKEN_DO, -1L);
-
-        if ( temp != -1L )
-            {
-            try
-                {
-                packet = new PacketFunction( softBoardData, temp );
-                }
-            catch ( ExternalDataException e )
-                {
-                tokenizer.error( "PACKET", R.string.data_send_function_invalid );
-                }
-            }
-
-        return packet;
-        }
-
-
-    /**
-     * Create text or key or function packet from parameters.
-     * @param parameters for text or key or function packet
-     * @return the created packet, or null if no TEXT or KEY or DO parameter is given
-     */
-    public Packet packet( ExtendedMap<Long, Object> parameters )
-        {
-        Packet packet;
-
-        packet = packetText(parameters, null);
-
-        if ( packet == null )
-            packet = packetKey( parameters, NO_DEFAULT_KEY );
-
-        if ( packet == null )
-            packet = packetFunction(parameters);
-
-        return packet;
-        }
-
-
-    /**
-     * Create text or key packet from parameters.
-     * @param parameters for text or key packet
-     * @param defaultKey is used if both TEXT and KEY parameters are missing
-     * @return the created packet, or null if both parameters and default key is missing
-     * returned packet is always valid, if defaultKey is not NO_DEFAULT_KEY
-     */
-    public Packet packet( ExtendedMap<Long, Object> parameters, int defaultKey )
-        {
-        Packet packet;
-
-        packet = packetText(parameters, null);
-
-        if ( packet == null )
-            packet = packetKey(parameters, defaultKey);
-
-        return packet;
-        }
-
-
-    /**
-     * Create key or text packet from parameters.
-     * @param parameters for key or text packet
-     * @param defaultText is used if both KEY and TEXT parameters are missing
-     * @return the created packet, or null if both parameters and default text is missing
-     * returned packet is always valid, if defaultText is not null
-     */
-    public Packet packet( ExtendedMap<Long, Object> parameters, String defaultText )
-        {
-        Packet packet;
-
-        packet = packetKey(parameters, NO_DEFAULT_KEY);
-
-        if ( packet == null )
-            packet = packetText(parameters, defaultText);
-
-        return packet;
-        }
-
-
-    public TitleDescriptor addTitle( ExtendedMap<Long, Object> parameters )
-        {
-        // !! http://stackoverflow.com/questions/509076/how-do-i-address-unchecked-cast-warnings
-        // Maybe better to avoid Unchecked cast warnings
-
-        // text is optional, if it is null, then button's getString() function will be used
-        String text = null;
-        Object temp = parameters.remove(Commands.TOKEN_TEXT);
-        if ( temp != null )
-            {
-            text = SoftBoardParser.stringFromText( temp );
-            }
-
-        int xOffset = (int)parameters.remove(Commands.TOKEN_XOFFSET, 0);
-        int yOffset = (int)parameters.remove(Commands.TOKEN_YOFFSET, 0);
-        int size = (int)parameters.remove(Commands.TOKEN_SIZE, 1000);
-        boolean bold = (boolean)parameters.remove(Commands.TOKEN_BOLD, false);
-        boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, false);
-        int color = (int)parameters.remove(Commands.TOKEN_COLOR, Color.BLACK);
-
-        return new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color );
+        return null;
         }
 
 
@@ -1097,6 +772,342 @@ public class MethodsForCommands
 
 
     /**
+     * Creates packetKey from parameters.
+     * KEY parameter is used,
+     * defaultKey is used if KEY parameter is missing, (NO_DEFAULT_KEY)
+     * null is returned if both are missing.
+     * @param parameters Key packet parameters (KEY, SETSHIFT, SETCTRL, SETALT)
+     * @param defaultKey default key (if KEY is missing) or NO_DEFAULT_KEY
+     * @return Key packet or null
+     */
+    public PacketKey packetKey( ExtendedMap<Long, Object> parameters, int defaultKey )
+        {
+        PacketKey packet = null;
+        int temp;
+
+        temp = (int)parameters.remove(Commands.TOKEN_KEY, NO_DEFAULT_KEY);
+
+        if ( temp == NO_DEFAULT_KEY )             // KEY token is missing
+            {
+            temp = defaultKey;         // use default instead of KEY
+            }
+        else if ( defaultKey != NO_DEFAULT_KEY ) // both TEXT and default -> override default
+            {
+            tokenizer.error("PACKET", R.string.data_send_packet_key_override );
+            }
+
+        if ( temp != NO_DEFAULT_KEY )
+            {
+            // TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT feldolgozása
+            packet = new PacketKey( softBoardData, temp,
+                    LayoutStates.generateBinaryHardState(parameters));
+            }
+
+        return packet;
+        }
+
+
+    /**
+     * Creates packetText from parameters.
+     * TEXT parameter is used,
+     * defaultText is used if TEXT parameter is missing,
+     * null is returned if both are missing.
+     * @param parameters Text packet parameters
+     * (TEXT, AUTOCAPS ON, OFF, HOLD, WAIT, STRINGCAPS)
+     * @param defaultText default text (if TEXT is missing) or null
+     * @return Text packet or null
+     */
+    public PacketText packetText( ExtendedMap<Long, Object> parameters, String defaultText )
+        {
+        PacketText packet = null;
+        Object temp;
+
+        temp = parameters.remove(Commands.TOKEN_TEXT);
+
+        if ( temp == null )             // TEXT token is missing
+            {
+            temp = defaultText;         // use default instead of TEXT
+            }
+        else if ( defaultText != null ) // both TEXT and default -> override default
+            {
+            tokenizer.error("PACKET", R.string.data_send_packet_text_override );
+            }
+
+        if (temp != null)
+            {
+            long autoFlag;
+
+            int autoCaps = CapsState.AUTOCAPS_OFF;
+            int autoSpace = 0;
+
+            autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOCAPS, -1L);
+            if ( autoFlag == Commands.TOKEN_ON )
+                autoCaps = CapsState.AUTOCAPS_ON;
+            else if ( autoFlag == Commands.TOKEN_HOLD )
+                autoCaps = CapsState.AUTOCAPS_HOLD;
+            else if ( autoFlag == Commands.TOKEN_WAIT )
+                autoCaps = CapsState.AUTOCAPS_WAIT;
+            else if ( autoFlag == Commands.TOKEN_OFF )
+                ; // default remains
+            else if ( autoFlag != -1L )
+                tokenizer.error("PACKET", R.string.data_autocaps_bad_parameter );
+
+            autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOSPACE, -1L);
+            if ( autoFlag == Commands.TOKEN_BEFORE )
+                autoSpace = PacketText.AUTO_SPACE_BEFORE;
+            else if ( autoFlag == Commands.TOKEN_AFTER )
+                autoSpace = PacketText.AUTO_SPACE_AFTER;
+            else if ( autoFlag == Commands.TOKEN_AROUND )
+                autoSpace = PacketText.AUTO_SPACE_BEFORE | PacketText.AUTO_SPACE_AFTER;
+            else if ( autoFlag != -1L )
+                tokenizer.error("PACKET", R.string.data_autospace_bad_parameter );
+
+            autoFlag = (long)parameters.remove(Commands.TOKEN_ERASESPACES, -1L);
+            if ( autoFlag == Commands.TOKEN_BEFORE )
+                autoSpace |= PacketText.ERASE_SPACES_BEFORE;
+            else if ( autoFlag == Commands.TOKEN_AFTER )
+                autoSpace |= PacketText.ERASE_SPACES_AFTER;
+            else if ( autoFlag == Commands.TOKEN_AROUND )
+                autoSpace |= PacketText.ERASE_SPACES_BEFORE | PacketText.ERASE_SPACES_AFTER;
+            else if ( autoFlag != -1L )
+                tokenizer.error("PACKET", R.string.data_erasespaces_bad_parameter );
+
+            if (temp instanceof Character)
+                {
+                packet = new PacketText( softBoardData, (Character)temp, autoCaps,
+                        autoSpace );
+                }
+            else // if (temp instanceof String)
+                {
+                packet = new PacketText( softBoardData, (String)temp, autoCaps,
+                        (boolean)parameters.remove( Commands.TOKEN_STRINGCAPS, false), autoSpace );
+                }
+            }
+
+        return packet;
+        }
+
+
+    /**
+     * Creates packetFunction from parameters.
+     * DO parameter is used
+     * null is returned if DO is missing.
+     * PacketFunction has not got any default value!
+     * @param parameters Function packet parameters (DO)
+     * @return Function packet or null
+     */
+    public PacketFunction packetFunction( ExtendedMap<Long, Object> parameters )
+        {
+        PacketFunction packet = null;
+        long temp;
+
+        temp = (long)parameters.remove(Commands.TOKEN_DO, -1L);
+
+        if ( temp != -1L )
+            {
+            try
+                {
+                packet = new PacketFunction( softBoardData, temp );
+                }
+            catch ( ExternalDataException e )
+                {
+                tokenizer.error( "PACKET", R.string.data_send_function_invalid );
+                }
+            }
+
+        return packet;
+        }
+
+
+    /**
+     * Create text or key or function packet from parameters.
+     * @param parameters for text or key or function packet
+     * @return the created packet, or null if no TEXT or KEY or DO parameter is given
+     */
+    public Packet packet( ExtendedMap<Long, Object> parameters )
+        {
+        Packet packet;
+
+        packet = packetText(parameters, null);
+
+        if ( packet == null )
+            packet = packetKey( parameters, NO_DEFAULT_KEY );
+
+        if ( packet == null )
+            packet = packetFunction(parameters);
+
+        return packet;
+        }
+
+
+    /**
+     * Create text or key packet from parameters.
+     * @param parameters for text or key packet
+     * @param defaultKey is used if both TEXT and KEY parameters are missing
+     * @return the created packet, or null if both parameters and default key is missing
+     * returned packet is always valid, if defaultKey is not NO_DEFAULT_KEY
+     */
+    public Packet packet( ExtendedMap<Long, Object> parameters, int defaultKey )
+        {
+        Packet packet;
+
+        packet = packetText(parameters, null);
+
+        if ( packet == null )
+            packet = packetKey(parameters, defaultKey);
+
+        return packet;
+        }
+
+
+    /**
+     * Create key or text packet from parameters.
+     * @param parameters for key or text packet
+     * @param defaultText is used if both KEY and TEXT parameters are missing
+     * @return the created packet, or null if both parameters and default text is missing
+     * returned packet is always valid, if defaultText is not null
+     */
+    public Packet packet( ExtendedMap<Long, Object> parameters, String defaultText )
+        {
+        Packet packet;
+
+        packet = packetKey(parameters, NO_DEFAULT_KEY);
+
+        if ( packet == null )
+            packet = packetText(parameters, defaultText);
+
+        return packet;
+        }
+
+
+    public Button createButtonFunction(ExtendedMap<Long, Object> parameters)
+        {
+        Button buttonFunction = null;
+        Object temp;
+
+        int counter = 0;
+
+        Packet packet = packet( parameters );
+        if (packet != null )
+            {
+            Packet secondaryPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND );
+
+            if ( secondaryPacket != null )
+                {
+                buttonFunction = new ButtonDouble(packet, secondaryPacket);
+                Scribe.debug(Debug.DATA, "Double Packet is defined");
+                }
+            else
+                {
+                buttonFunction = new ButtonPacket(packet, parameters.containsKey(Commands.TOKEN_REPEAT));
+                Scribe.debug(Debug.DATA, "Simple Packet is defined");
+                }
+            counter++;
+            }
+
+        temp = parameters.remove( Commands.TOKEN_SWITCH );
+        if (temp != null)
+            {
+            counter++;
+            buttonFunction = new ButtonLink( (long)temp,
+                    parameters.containsKey(Commands.TOKEN_LOCK) );
+            // invalid index - (int)temp - means go back to previous layout
+            }
+
+        temp = parameters.remove( Commands.TOKEN_META );
+        if (temp != null)
+            {
+            counter++;
+            int meta = -1;
+
+            if ( (long)temp == Commands.TOKEN_CAPS )
+                meta = LayoutStates.META_CAPS;
+            else if ( (long)temp == Commands.TOKEN_SHIFT )
+                meta = LayoutStates.META_SHIFT;
+            else if ( (long)temp == Commands.TOKEN_CTRL )
+                meta = LayoutStates.META_CTRL;
+            else if ( (long)temp == Commands.TOKEN_ALT )
+                meta = LayoutStates.META_ALT;
+
+            // ButtonMeta constructor will not accept any non-valid parameter
+
+            try
+                {
+                buttonFunction = new ButtonMeta( meta,
+                        parameters.containsKey( Commands.TOKEN_LOCK) );
+                }
+            catch (ExternalDataException e)
+                {
+                tokenizer.error("META", R.string.data_meta_unknown_meta_state);
+                }
+            }
+
+        if ( parameters.containsKey( Commands.TOKEN_SPACETRAVEL ) )
+            {
+            counter++;
+            // Packet with default cannot be null!
+            buttonFunction = new ButtonSpaceTravel( packet(parameters, " ") );
+            }
+
+        temp = parameters.remove(Commands.TOKEN_MODIFY);
+        if (temp != null)
+            {
+            counter++;
+            buttonFunction = new ButtonModify( (long)temp,
+                    parameters.containsKey( Commands.TOKEN_REVERSE ));
+            }
+
+        if ( parameters.containsKey( Commands.TOKEN_ENTER ) )
+            {
+            counter++;
+
+            // Packet with default cannot be null!
+            PacketKey packetKey = packetKey( parameters, 0x10000 + KeyEvent.KEYCODE_ENTER ); // Or: '\n'
+            PacketText packetText = packetText( parameters, "\n" );
+
+            buttonFunction = new ButtonEnter( packetKey, packetText, parameters.containsKey( Commands.TOKEN_REPEAT) );
+            }
+
+        if ( counter > 1 )
+            {
+            tokenizer.error("SEND", R.string.data_send_one_allowed );
+            }
+        else if (buttonFunction == null )  // OR (counter == 0)
+            {
+            tokenizer.error("SEND", R.string.data_send_missing);
+            // Buttons function was not set - button will give an error message
+            // It will return null
+            }
+
+        return buttonFunction;
+        }
+
+
+    public TitleDescriptor addTitle( ExtendedMap<Long, Object> parameters )
+        {
+        // !! http://stackoverflow.com/questions/509076/how-do-i-address-unchecked-cast-warnings
+        // Maybe better to avoid Unchecked cast warnings
+
+        // text is optional, if it is null, then button's getString() function will be used
+        String text = null;
+        Object temp = parameters.remove(Commands.TOKEN_TEXT);
+        if ( temp != null )
+            {
+            text = SoftBoardParser.stringFromText( temp );
+            }
+
+        int xOffset = (int)parameters.remove(Commands.TOKEN_XOFFSET, 0);
+        int yOffset = (int)parameters.remove(Commands.TOKEN_YOFFSET, 0);
+        int size = (int)parameters.remove(Commands.TOKEN_SIZE, 1000);
+        boolean bold = (boolean)parameters.remove(Commands.TOKEN_BOLD, false);
+        boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, false);
+        int color = (int)parameters.remove(Commands.TOKEN_COLOR, Color.BLACK);
+
+        return new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color );
+        }
+
+
+    /**
      * Creates temporary button data, which is copied into button position in setBlock
      * @param parameters
      * @return
@@ -1105,19 +1116,7 @@ public class MethodsForCommands
         {
         ButtonPlan buttonPlan = new ButtonPlan();
 
-        // "SEND" parameters could be found among "BUTTON"-s parameters
-        // For testing reasons SEND remains...
-        Object temp = parameters.remove( Commands.TOKEN_SEND );
-        if ( temp != null )
-            {
-            buttonPlan.button = (Button) temp;
-            }
-        // ...but if SEND is missing, then parameters are submitted directly
-        else
-            {
-            buttonPlan.button = createButtonFunction(parameters);
-            }
-
+        buttonPlan.button = createButtonFunction(parameters);
         if ( buttonPlan.button == null )
             {
             tokenizer.error( "BUTTON", R.string.data_button_function_missing);
