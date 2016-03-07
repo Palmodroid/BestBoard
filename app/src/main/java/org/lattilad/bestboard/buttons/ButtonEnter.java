@@ -22,6 +22,8 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
         this.packetKey = packetKey;
         this.packetText = packetText;
         this.repeat = repeat;
+        if ( repeat )
+            setOnStay();
         }
 
     @Override
@@ -40,12 +42,16 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
     public void mainTouchEnd( boolean isTouchUp )
         { }
 
+    /**
+     * Methods should implement secondary functionality here.
+     *
+     * @param type of the activation: ON_STAY (-1) ON_CIRCLE (1) or ON_HARD_PRESS (2)
+     * @return true if button could be repeated quickly (repeat)
+     * or false if button should wait for next "on stay" trigger
+     * (needed only if type is ON_STAY)
+     */
     @Override
-    public void mainTouchOnCircle( boolean isHardPress )
-        { }
-
-    @Override
-    public boolean mainTouchOnStay()
+    public boolean fireSecondary(int type)
         {
         if ( repeat )
             {

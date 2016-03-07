@@ -50,7 +50,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         }
 
     @Override
-    public void mainTouchOnCircle( boolean isHardPress )
+    public boolean fireSecondary(int type)
         {
         if ( layout.softBoardData.softBoardListener.undoLastString() )
             {
@@ -60,12 +60,6 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
 
             packets.get(counter).send();
             }
-        }
-
-    @Override
-    public boolean mainTouchOnStay()
-        {
         return false;
         }
-
     }

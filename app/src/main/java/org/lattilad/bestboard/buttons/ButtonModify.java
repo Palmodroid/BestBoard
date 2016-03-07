@@ -50,13 +50,8 @@ public class ButtonModify extends ButtonMainTouch implements Cloneable
         { }
 
     @Override
-    public void mainTouchOnCircle( boolean isHardPress )
-        { }
-
-    @Override
-    public boolean mainTouchOnStay()
+    public boolean fireSecondary(int type)
         {
         return false;
         }
-
     }

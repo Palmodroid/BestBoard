@@ -10,25 +10,27 @@ import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.SinglyLinkedList;
 
+
 /*
  *  Button
  *
  *      ButtonMainTouch
- *          ButtonPacket        - repeat
- *          ButtonDouble        - second
- *          ButtonList          - second
- *          ButtonSpaceTravel
- *          ButtonModify
+ *          ButtonSingle        - repeat (sets onStay)  - (SIMPLE) (FIRST)
+ *          ButtonDouble        - second                - (DOUBLE) (FIRST) SECOND
+ *          ButtonList          - second                - LIST
+ *          ButtonSpaceTravel                           - SPACETRAVEL
+ *          ButtonModify                                - MODIFY
  *
  *          ButtonMainTouchTitles
- *              ButtonEnter     - repeat
+ *              ButtonEnter     - repeat (sets onStay)  - ENTER
  *              ButtonAlternate - second (return to previous)? repeat?
- *
+ *                                                      - ALTERNATE
  *      ButtonMultiTouch
- *          ButtonLink
- *          ButtonMeta
+ *          ButtonSwitch                                - SWITCH
+ *          ButtonMeta                                  - META
  *
  *      ButtonForMaps
+ *
  */
 
 

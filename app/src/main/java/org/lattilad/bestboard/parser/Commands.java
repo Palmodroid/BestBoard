@@ -468,19 +468,6 @@ public class Commands
 
 
         /*
-
-        BUTTON
-
-            (SIMPLE) (FIRST)
-            (DOUBLE) (FIRST) / SECOND
-            ALTERNATE (FIRST) / SECOND
-
-            META
-            SWITCH
-            SPACETRAVEL
-            MODIFY REVERSE
-            ENTER
-
         First and Second:
             TOKEN_TEXT, TOKEN_AUTOCAPS, TOKEN_STRINGCAPS, TOKEN_ERASESPACES, TOKEN_AUTOSPACE
             TOKEN_KEY, TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT

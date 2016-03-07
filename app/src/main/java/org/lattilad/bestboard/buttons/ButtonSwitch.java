@@ -7,35 +7,32 @@ import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.states.BoardTable;
 
-public class ButtonLink extends ButtonMultiTouch implements
+public class ButtonSwitch extends ButtonMultiTouch implements
         Button.ChangingButton, Cloneable
     {
-    private Long layoutId;
+    private long layoutId;
     private boolean lockKey;
 
-    // USE table is filled up only after the definition of the boards
-    // At the time of the definition of the USE keys, no data is
+    // BOARD table is filled up only after the definition of the boards
+    // At the time of the definition of the SWITCH keys, no data is
     // available about the table, so index verification is not possible
-    // null layoutId means: GO BACK
-    public ButtonLink( Long layoutId, boolean lockKey )
+    // Special 'BACK' layoutId means: GO BACK
+    public ButtonSwitch(long layoutId, boolean lockKey)
         {
         this.layoutId = layoutId;
         this.lockKey = lockKey;
         }
 
     @Override
-    public ButtonLink clone()
+    public ButtonSwitch clone()
         {
-        return (ButtonLink)super.clone();
+        return (ButtonSwitch)super.clone();
         }
 
     @Override
     public String getString()
         {
-        if ( layoutId == null )
-            return "PREV";
-        else
-            return (lockKey ? "L" : "") + Tokenizer.regenerateKeyword(layoutId);
+        return (lockKey ? "L" : "") + Tokenizer.regenerateKeyword(layoutId);
         }
 
     @Override

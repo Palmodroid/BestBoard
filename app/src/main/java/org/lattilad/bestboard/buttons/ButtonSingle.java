@@ -3,21 +3,23 @@ package org.lattilad.bestboard.buttons;
 /**
  * Simple button with a single packet (Text(String) or Hard-key
  */
-public class ButtonPacket extends ButtonMainTouch implements Cloneable
+public class ButtonSingle extends ButtonMainTouch implements Cloneable
     {
     private Packet packet;
     private boolean repeat;
 
     @Override
-    public ButtonPacket clone()
+    public ButtonSingle clone()
         {
-        return (ButtonPacket)super.clone();
+        return (ButtonSingle)super.clone();
         }
 
-    public ButtonPacket( Packet packet, boolean repeat )
+    public ButtonSingle(Packet packet, boolean repeat)
         {
         this.packet = packet;
         this.repeat = repeat;
+        if ( repeat )
+            setOnStay();
         }
 
     public String getString()
@@ -41,21 +43,16 @@ public class ButtonPacket extends ButtonMainTouch implements Cloneable
         }
 
     @Override
-    public void mainTouchOnCircle( boolean isHardPress )
-        {
-        if ( !repeat )
-        	{
-        	packet.sendSecondary();
-        	}
-        }
-
-    @Override
-    public boolean mainTouchOnStay()
+    public boolean fireSecondary(int type)
         {
         if ( repeat )
             {
             packet.send();
             return true;
+            }
+        else
+            {
+            packet.sendSecondary();
             }
         return false;
         }

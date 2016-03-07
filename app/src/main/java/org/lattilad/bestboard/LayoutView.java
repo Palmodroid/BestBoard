@@ -341,7 +341,7 @@ public class LayoutView extends View
             {
             Scribe.debug( Debug.TOUCH, "REPEAT touch is detected." );
             repeatHandler.postDelayed( repeatRunnable,
-                    mainTouchBow.buttonMainTouch.mainTouchOnStay() ?
+                    mainTouchBow.buttonMainTouch.mainTouchSecondary( ButtonMainTouch.ON_STAY ) ?
                     layout.softBoardData.repeatTime : layout.softBoardData.stayBowTime );
             }
         };
@@ -891,8 +891,8 @@ public class LayoutView extends View
             // check bow's long
             if ( mainTouchBow.isLong() && mainTouchBow.buttonMainTouch != null)
                 {
-                Scribe.debug( Debug.TOUCH, "LONG touch is detected." );
-                mainTouchBow.buttonMainTouch.mainTouchOnCircle(false);
+                Scribe.debug(Debug.TOUCH, "LONG touch is detected.");
+                mainTouchBow.buttonMainTouch.mainTouchSecondary( ButtonMainTouch.ON_CIRCLE );
                 mainTouchBow.resetMoveAndPressureCounter();
                 }
 
@@ -900,7 +900,7 @@ public class LayoutView extends View
             if ( mainTouchBow.isPressed() && mainTouchBow.buttonMainTouch != null)
                 {
                 Scribe.debug( Debug.TOUCH, "PRESS touch is detected." );
-                mainTouchBow.buttonMainTouch.mainTouchOnCircle(true);
+                mainTouchBow.buttonMainTouch.mainTouchSecondary(ButtonMainTouch.ON_HARD_PRESS);
                 mainTouchBow.resetMoveAndPressureCounter();
                 }
 
