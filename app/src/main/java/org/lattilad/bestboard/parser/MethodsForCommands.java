@@ -1033,7 +1033,7 @@ public class MethodsForCommands
         return new ButtonEnter(
                 packetKey(parameters, 0x10000 + KeyEvent.KEYCODE_ENTER), // Or: '\n'
                 packetText( parameters, "\n" ),
-                parameters.remove( Commands.TOKEN_LOCK ) != null );
+                parameters.remove( Commands.TOKEN_REPEAT ) != null );
         }
 
 
@@ -1048,17 +1048,17 @@ public class MethodsForCommands
     private ButtonMainTouch createButtonList( ExtendedMap<Long, Object> parameters )
         {
         // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
-        ArrayList<Packet> packets = (ArrayList<Packet>)parameters.remove(
+        ArrayList<KeyValuePair> packetList = (ArrayList<KeyValuePair>)parameters.remove(
                 Bit.setSignedBitOn( Commands.TOKEN_ADDTEXT ) );
 
-        if ( packets.isEmpty() )
+        if ( packetList.isEmpty() )
             return null;
 
         ButtonList buttonList = new ButtonList();
 
-        for ( Packet packet: packets)
+        for ( KeyValuePair packet: packetList)
             {
-            buttonList.addPacket( packet );
+            buttonList.addPacket( (Packet)packet.getValue() );
             }
 
         return buttonList;
@@ -1101,18 +1101,18 @@ public class MethodsForCommands
         if ( parameters.remove(Commands.TOKEN_SINGLE) != null ||
                 (secondPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND )) == null )
             {
-            return createButtonSingle( firstPacket, parameters );
+            return createButtonSingle(firstPacket, parameters);
             }
 
         if ( parameters.remove( Commands.TOKEN_ALTERNATE) != null )
             {
-            return createButtonAlternate( firstPacket, secondPacket );
+            return createButtonAlternate(firstPacket, secondPacket);
             }
 
         // secondPacket != null, so it should be a double
         parameters.remove( Commands.TOKEN_DOUBLE);
 
-        return createButtonDouble( firstPacket, secondPacket );
+        return createButtonDouble(firstPacket, secondPacket);
         }
 
 
@@ -1210,7 +1210,7 @@ public class MethodsForCommands
         {
         ButtonPlan buttonPlan = new ButtonPlan();
 
-        buttonPlan.button = createButtonFunction(parameters);
+        buttonPlan.button = createButton(parameters);
         if ( buttonPlan.button == null )
             {
             tokenizer.error( "BUTTON", R.string.data_button_function_missing);

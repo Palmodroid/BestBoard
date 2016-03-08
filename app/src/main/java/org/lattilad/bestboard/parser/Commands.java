@@ -61,8 +61,19 @@ public class Commands
     public static final long TOKEN_NONETITLE = 0x4b9a25bff026L;
     public static final long TOKEN_UNKNOWNTITLE = 0x4ba5296e5766a85dL;
 
-    public static final long TOKEN_ADDLAYOUT = 0x211993f479afL;
+    public static final long TOKEN_ADDBOARD = 0xe502ed0208L;
     public static final long TOKEN_ID = 0x102a6L;
+    public static final long TOKEN_LAYOUT = 0x5805f907L;
+    public static final long TOKEN_LANDSCAPE = 0x44010ff937b3L;
+    public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
+    public static final long TOKEN_LOCK = 0x11bd48L;
+    public static final long TOKEN_ROOT = 0x16623bL;
+
+    public static final long TOKEN_ADDLAYOUT = 0x211993f479afL;
+    public static final long TOKEN_ADDLANDSCAPE = 0x199541e855df90bbL;
+    public static final long TOKEN_ADDPORTRAIT = 0xb10228db2c89c8L;
+
+    // public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_HEXAGONAL = 0x379824b9b62fL;
     public static final long TOKEN_WIDE = 0x1a1dd0L;
     public static final long TOKEN_HALFCOLUMNS = 0x1274de67161b456L;
@@ -71,26 +82,18 @@ public class Commands
     public static final long TOKEN_ALIGN = 0x12f9733L;
     public static final long TOKEN_COLOR = 0x16b2be3L;
 
-    public static final long TOKEN_ADDBOARD = 0xe502ed0208L;
-    // public static final long TOKEN_ID = 0x102a6L;
-    public static final long TOKEN_LAYOUT = 0x5805f907L;
-    public static final long TOKEN_LANDSCAPE = 0x44010ff937b3L;
-    public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
-    public static final long TOKEN_LOCK = 0x11bd48L;
-    public static final long TOKEN_ROOT = 0x16623bL;
+    public static final long TOKEN_ODDS = 0x13d439L;
+    public static final long TOKEN_EVENS = 0x1a9a13dL;
 
-    // public static final long TOKEN_ADDLAYOUT = 0x211993f479afL;
-    public static final long TOKEN_ADDLANDSCAPE = 0x199541e855df90bbL;
-    public static final long TOKEN_ADDPORTRAIT = 0xb10228db2c89c8L;
-
-
-
-    public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
-    public static final long TOKEN_YOFFSET = 0x14b484849aL;
-    public static final long TOKEN_SIZE = 0x17098aL;
+    public static final long TOKEN_FORCECAPS = 0x320dfec8a852L;
+    public static final long TOKEN_FORCESHIFT = 0x73c05d4ab24e6L;
+    public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
+    public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
 
     public static final long TOKEN_BLOCK = 0x14c4fa3L;
-
+    // public static final long TOKEN_LAYOUT = 0x5805f907L;
+    public static final long TOKEN_COLUMN = 0x34597767L;
+    public static final long TOKEN_ROW = 0x193faL;
     public static final long TOKEN_HOME = 0xea740L;
     public static final long TOKEN_SKIP = 0x1711d2L;
     public static final long TOKEN_CRL = 0x14427L;
@@ -103,72 +106,89 @@ public class Commands
     public static final long TOKEN_DR = 0x101fbL;
     public static final long TOKEN_FINDFREE = 0x156ad0179aeL;
 
-    public static final long TOKEN_ODDS = 0x13d439L;
-    public static final long TOKEN_EVENS = 0x1a9a13dL;
-
-    public static final long TOKEN_FORCECAPS = 0x320dfec8a852L;
-    public static final long TOKEN_FORCESHIFT = 0x73c05d4ab24e6L;
-    public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
-    public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
-
-    // public static final long TOKEN_BOARD = 0x14e5880L;
-    public static final long TOKEN_COLUMN = 0x34597767L;
-    public static final long TOKEN_ROW = 0x193faL;
-
-    public static final long TOKEN_OVERWRITE = 0x4f61843c6a0fL;
-
     public static final long TOKEN_BUTTON = 0x30e91c11L;
 
-    public static final long TOKEN_EXTEND = 0x3da4e6fdL;
+    public static final long TOKEN_ONSTAY = 0x65db8273L;
+    public static final long TOKEN_ONCIRCLE = 0x2206a350fc6L;
+    public static final long TOKEN_OVERWRITE = 0x4f61843c6a0fL;
 
+    public static final long TOKEN_FIRST = 0x1bc7434L;
     public static final long TOKEN_SECOND = 0x7556168dL;
 
     public static final long TOKEN_TEXT = 0x17b9c8L;
     public static final long TOKEN_KEY = 0x16d1bL;
     public static final long TOKEN_DO = 0x101f8L;
 
-    public static final long TOKEN_DELETE = 0x375d443cL;
-    public static final long TOKEN_BACKSPACE = 0x240879d29871L;
-
-    public static final long TOKEN_DRAFT = 0x189da4dL;
-
-    public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
-
-    public static final long TOKEN_META = 0x125016L;
-
-    public static final long TOKEN_CAPS = 0xa7f8eL;
-    public static final long TOKEN_CTRL = 0xae56cL;
-    public static final long TOKEN_ALT = 0x1389fL;
-    public static final long TOKEN_SHIFT = 0x32f4092L;
-
-    public static final long TOKEN_SWITCH = 0x775d93d7L;
-    // !! BACK is used as textual token !!
-    public static final long TOKEN_BACK = 0x9b7c8L;
-
-    // public static final long TOKEN_LOCK = 0x11bd48L;
-
     public static final long TOKEN_AUTOCAPS = 0xef6e451a57L;
+    public static final long TOKEN_STRINGCAPS = 0xd4c9a99e4004bL;
+    public static final long TOKEN_AUTOSPACE = 0x229af1ada341L;
+    public static final long TOKEN_ERASESPACES = 0xfbc52200a3a61dL;
+
     public static final long TOKEN_ON = 0x1038eL;
     public static final long TOKEN_OFF = 0x18291L;
     public static final long TOKEN_WAIT = 0x19f3d0L;
     public static final long TOKEN_HOLD = 0xea71aL;
 
-    public static final long TOKEN_STRINGCAPS = 0xd4c9a99e4004bL;
-
-    public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
-
-    public static final long TOKEN_AUTOSPACE = 0x229af1ada341L;
-    public static final long TOKEN_ERASESPACES = 0xfbc52200a3a61dL;
-
     public static final long TOKEN_AFTER = 0x12b2e92L;
     public static final long TOKEN_BEFORE = 0x2f14a094L;
     public static final long TOKEN_AROUND = 0x2c6d5e42L;
 
+    // public static final long TOKEN_FORCECAPS = 0x320dfec8a852L;
+    // public static final long TOKEN_FORCESHIFT = 0x73c05d4ab24e6L;
+    // public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
+    // public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
+
+    public static final long TOKEN_DELETE = 0x375d443cL;
+    public static final long TOKEN_BACKSPACE = 0x240879d29871L;
+    public static final long TOKEN_DRAFT = 0x189da4dL;
+    public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
+
+    public static final long TOKEN_SINGLE = 0x75d0cfbfL;
     public static final long TOKEN_REPEAT = 0x713dd0a6L;
 
-    public static final long TOKEN_MODIFY = 0x5da813adL;
+    public static final long TOKEN_DOUBLE = 0x38822138L;
+
+    public static final long TOKEN_ALTERNATE = 0x21d3dacd0f44L;
+
+    public static final long TOKEN_LIST = 0x119f8bL;
+    public static final long TOKEN_ADDTEXT = 0x63091a2b0L;
+
+    public static final long TOKEN_SWITCH = 0x775d93d7L;
+    // !! BACK is used as textual token !!
+    // public static final long TOKEN_LOCK = 0x11bd48L;
+    public static final long TOKEN_BACK = 0x9b7c8L;
+
+    public static final long TOKEN_META = 0x125016L;
+    public static final long TOKEN_CAPS = 0xa7f8eL;
+    public static final long TOKEN_CTRL = 0xae56cL;
+    public static final long TOKEN_ALT = 0x1389fL;
+    public static final long TOKEN_SHIFT = 0x32f4092L;
+    // public static final long TOKEN_LOCK = 0x11bd48L;
+
+    public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
 
     public static final long TOKEN_ENTER = 0x1a3c13eL;
+    // public static final long TOKEN_REPEAT = 0x713dd0a6L;
+
+    public static final long TOKEN_MODIFY = 0x5da813adL;
+    public static final long TOKEN_REVERSE = 0x105e77189aL;
+
+
+
+
+
+
+
+
+
+
+
+    public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
+    public static final long TOKEN_YOFFSET = 0x14b484849aL;
+    public static final long TOKEN_SIZE = 0x17098aL;
+
+    public static final long TOKEN_EXTEND = 0x3da4e6fdL;
+
 
     public static final long TOKEN_ADDTITLE = 0xe504eb848aL;
     // public static final long TOKEN_TEXT = 0x17b9c8L;
@@ -183,7 +203,7 @@ public class Commands
     public static final long TOKEN_ROLLS = 0x3182194L;
     public static final long TOKEN_ADDROLL = 0x630904aacL;
     public static final long TOKEN_IGNORESPACE = 0x13b2fae0bc2c2ceL;
-    public static final long TOKEN_REVERSE = 0x105e77189aL;
+    // public static final long TOKEN_REVERSE = 0x105e77189aL;
 
     public static final long TOKEN_STOP = 0x1742d1L;
 
@@ -240,6 +260,7 @@ public class Commands
 
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] ALLOWED_AS_LABEL = new long[]{
+            TOKEN_ADDBOARD,
             TOKEN_ADDLAYOUT,
             TOKEN_BLOCK,
             TOKEN_BUTTON,
@@ -248,6 +269,7 @@ public class Commands
 
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] ALLOWED_AS_DEFAULT = new long[]{
+            TOKEN_ADDBOARD,
             TOKEN_ADDLAYOUT,
             TOKEN_BUTTON,
             TOKEN_EXTEND,
@@ -337,8 +359,8 @@ public class Commands
                 TOKEN_NONETITLE,
                 TOKEN_UNKNOWNTITLE,
 
-                TOKEN_ADDLAYOUT,
                 TOKEN_ADDBOARD,
+                TOKEN_ADDLAYOUT,
 
                 TOKEN_BLOCK,
 
@@ -382,41 +404,26 @@ public class Commands
         add(TOKEN_NONETITLE, new long[]{PARAMETER_TEXT}, "setNoneTitle");
         add(TOKEN_UNKNOWNTITLE, new long[]{PARAMETER_TEXT}, "setUnknownTitle");
 
-        add(TOKEN_ADDLAYOUT, new long[]{
-                TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
-                TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
-                TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
-
-        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS}); // Useless parametercommand - just for clearer readability
-        add(TOKEN_WIDE, new long[]{PARAMETER_FLAG});
-        add(TOKEN_COLUMNS, new long[]{PARAMETER_INT});
-        add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT});
-        add(TOKEN_ROWS, new long[]{PARAMETER_INT});
-        add(TOKEN_ALIGN, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
-
-        add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
-
         add(TOKEN_ADDBOARD, new long[]{
                 TOKEN_ID,
                 TOKEN_LAYOUT,
                 TOKEN_PORTRAIT, TOKEN_LANDSCAPE,
                 TOKEN_ADDLAYOUT,
                 TOKEN_ADDPORTRAIT, TOKEN_ADDLANDSCAPE,
-                TOKEN_LOCK,
-                TOKEN_ROOT }, "addBoard");
-        // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
+                TOKEN_LOCK, TOKEN_ROOT }, "addBoard");
+
+        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
-
         add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
         add(TOKEN_ROOT, new long[]{PARAMETER_FLAG});
+
+        add(TOKEN_ADDLAYOUT, new long[]{
+                TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
+                TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
+                TOKEN_ALIGN, TOKEN_COLOR,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
 
         add(TOKEN_ADDLANDSCAPE, new long[]{
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
@@ -429,6 +436,20 @@ public class Commands
                 TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
                 TOKEN_ALIGN, TOKEN_COLOR,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
+
+        // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS}); // Useless parametercommand - just for clearer readability
+        add(TOKEN_WIDE, new long[]{PARAMETER_FLAG});
+        add(TOKEN_COLUMNS, new long[]{PARAMETER_INT});
+        add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT});
+        add(TOKEN_ROWS, new long[]{PARAMETER_INT});
+        add(TOKEN_ALIGN, new long[]{PARAMETER_KEYWORD} );
+        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
+
+        add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
 
         add(TOKEN_BLOCK, new long[]{
                         TOKEN_LAYOUT,
@@ -465,100 +486,56 @@ public class Commands
         add(TOKEN_SKIP, TOKEN_BUTTON, new long[]{PARAMETER_INT});
         add(TOKEN_HOME, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
 
-
-
-        /*
-        First and Second:
-            TOKEN_TEXT, TOKEN_AUTOCAPS, TOKEN_STRINGCAPS, TOKEN_ERASESPACES, TOKEN_AUTOSPACE
-            TOKEN_KEY, TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT
-            TOKEN_DO
-
-
-
-    public static final long TOKEN_SINGLE = 0x75d0cfbfL;
-    public static final long TOKEN_DOUBLE = 0x38822138L;
-    public static final long TOKEN_ALTERNATE = 0x21d3dacd0f44L;
-    public static final long TOKEN_FIRST = 0x1bc7434L;
-    public static final long TOKEN_SECOND = 0x7556168dL;
-    public static final long TOKEN_ADDTEXT = 0x63091a2b0L;
-    public static final long TOKEN_LIST = 0x119f8bL;
-    public static final long TOKEN_ONSTAY = 0x65db8273L;
-    public static final long TOKEN_ONCIRCLE = 0x2206a350fc6L;
-    public static final long TOKEN_REPEAT = 0x713dd0a6L;
-
-
-
-
-
-
-         */
-
-
-
-
-
+        // Button definitions
 
         add(TOKEN_BUTTON, TOKEN_BUTTON, new long[]{
+
+                        // First packet
+                        TOKEN_TEXT,
+                        TOKEN_AUTOCAPS,
+                        TOKEN_STRINGCAPS,
+                        TOKEN_ERASESPACES,
+                        TOKEN_AUTOSPACE,
+                        TOKEN_KEY,
+                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                        TOKEN_DO,
+
+                        TOKEN_FIRST,
+                        TOKEN_SECOND,
+
+                        TOKEN_SINGLE,
+                        TOKEN_REPEAT,
+                        TOKEN_DOUBLE,
+                        TOKEN_ALTERNATE,
+                        TOKEN_LIST,
+                        TOKEN_ADDTEXT | PARAMETER_MOD_MULTIPLE,
+
+                        TOKEN_META,
+                        // TOKEN_LOCK,
+                        TOKEN_SWITCH,
+                        // TOKEN_LOCK,
+
+                        TOKEN_SPACETRAVEL,
+                        TOKEN_MODIFY,
+                        TOKEN_REVERSE,
+                        TOKEN_ENTER,
+                        // TOKEN_REPEAT,
+
                         TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
 
                         TOKEN_COLOR,
 
-                        TOKEN_TEXT,
-                        TOKEN_AUTOCAPS,
-                        TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACES,
-                        TOKEN_AUTOSPACE,
-
-                        TOKEN_KEY,
-                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
-
-                        TOKEN_DO,
-
-                        TOKEN_REPEAT,
-
-                        TOKEN_META,
-                        TOKEN_SWITCH,
-                        TOKEN_SPACETRAVEL,
-
-                        TOKEN_LOCK,
-
-                        TOKEN_MODIFY,
-                        TOKEN_REVERSE,
-
-                        TOKEN_ENTER,
-
-                        TOKEN_OVERWRITE,
-
-                        TOKEN_SECOND},
+                        TOKEN_ONSTAY,
+                        TOKEN_ONCIRCLE,
+                        TOKEN_OVERWRITE },
                 "setButton");
 
-        add(TOKEN_EXTEND, TOKEN_BUTTON, new long[]{
-                        TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_COLOR },
-                "extendButton");
-
-        add(TOKEN_ADDTITLE, new long[]{
-                TOKEN_TEXT,
-                TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
-                TOKEN_BOLD, TOKEN_NONBOLD, TOKEN_ITALICS, TOKEN_NONITALICS,
-                TOKEN_COLOR }, "addTitle");
-        add(TOKEN_XOFFSET, new long[]{PARAMETER_INT} );
-        add(TOKEN_YOFFSET, new long[]{PARAMETER_INT} );
-        add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
-        add(TOKEN_BOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_NONBOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG_FALSE} );
-        add(TOKEN_ITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_NONITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG_FALSE} );
-        // COLOR
-
-
-
-
+        // add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
+        add(TOKEN_ONSTAY, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ONCIRCLE, new long[]{PARAMETER_FLAG});
         add(TOKEN_OVERWRITE, new long[]{PARAMETER_FLAG});
 
-/*
-        add(TOKEN_SEND, new long[]{
-
+        add(TOKEN_FIRST, new long[]{
                         TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
                         TOKEN_STRINGCAPS,
@@ -568,22 +545,8 @@ public class Commands
                         TOKEN_KEY,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                        TOKEN_DO,
-
-                        TOKEN_REPEAT,
-
-                        TOKEN_META,
-                        TOKEN_SWITCH,
-                        TOKEN_SPACETRAVEL,
-
-                        TOKEN_LOCK,
-
-                        TOKEN_MODIFY,
-                        TOKEN_REVERSE,
-
-                        TOKEN_ENTER},
-                "createButtonFunction");
-*/
+                        TOKEN_DO },
+                "packet");
 
         add(TOKEN_SECOND, new long[]{
                         TOKEN_TEXT,
@@ -602,34 +565,67 @@ public class Commands
         add(TOKEN_KEY, new long[]{PARAMETER_INT});
         add(TOKEN_DO, new long[]{PARAMETER_KEYWORD});
 
-        add(TOKEN_META, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_SWITCH, new long[]{PARAMETER_KEYWORD});
-
-        // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
-
         add(TOKEN_AUTOCAPS, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_STRINGCAPS, new long[]{PARAMETER_FLAG});
+        add(TOKEN_AUTOSPACE, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_ERASESPACES, new long[]{PARAMETER_KEYWORD});
 
+        // add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
+        // add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
+        // add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
+        // add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
+
+        add(TOKEN_SINGLE, new long[]{PARAMETER_FLAG});
         add(TOKEN_REPEAT, new long[]{PARAMETER_FLAG});
+        add(TOKEN_DOUBLE, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ALTERNATE, new long[]{PARAMETER_FLAG});
+        add(TOKEN_LIST, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ADDTEXT, new long[]{
+                        TOKEN_TEXT,
+                        TOKEN_AUTOCAPS,
+                        TOKEN_STRINGCAPS,
+                        TOKEN_ERASESPACES,
+                        TOKEN_AUTOSPACE,
+
+                        // Only Text-packet is allowed here
+                        /* TOKEN_KEY,
+                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                        TOKEN_DO */ },
+                "packet");
+
+        add(TOKEN_META, new long[]{PARAMETER_KEYWORD});
+        // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
+
+        add(TOKEN_SWITCH, new long[]{PARAMETER_KEYWORD});
+        // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_SPACETRAVEL, new long[]{PARAMETER_FLAG} );
 
-        // TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT are already defined
-
-        add(TOKEN_AUTOSPACE, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_ERASESPACES, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_ENTER, new long[]{PARAMETER_FLAG});
+        // add(TOKEN_REPEAT, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_MODIFY, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_REVERSE, new long[]{PARAMETER_FLAG});
 
-        add(TOKEN_ENTER, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ADDTITLE, new long[]{
+                TOKEN_TEXT,
+                TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
+                TOKEN_BOLD, TOKEN_NONBOLD, TOKEN_ITALICS, TOKEN_NONITALICS,
+                TOKEN_COLOR }, "addTitle");
+        // add(TOKEN_TEXT, new long[]{PARAMETER_TEXT});
+        add(TOKEN_XOFFSET, new long[]{PARAMETER_INT} );
+        add(TOKEN_YOFFSET, new long[]{PARAMETER_INT} );
+        add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
+        add(TOKEN_BOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_NONBOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG_FALSE} );
+        add(TOKEN_ITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_NONITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG_FALSE} );
+        // add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
 
-
-
-
-
-
-
+        add(TOKEN_EXTEND, TOKEN_BUTTON, new long[]{
+                        TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_COLOR },
+                "extendButton");
 
         add(TOKEN_ADDMODIFY, new long[]{
                 TOKEN_ID, TOKEN_ADDROLL, TOKEN_ROLLS,
