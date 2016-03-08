@@ -8,8 +8,10 @@ import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.buttons.Button;
+import org.lattilad.bestboard.buttons.ButtonAlternate;
 import org.lattilad.bestboard.buttons.ButtonDouble;
 import org.lattilad.bestboard.buttons.ButtonEnter;
+import org.lattilad.bestboard.buttons.ButtonList;
 import org.lattilad.bestboard.buttons.ButtonMainTouch;
 import org.lattilad.bestboard.buttons.ButtonSwitch;
 import org.lattilad.bestboard.buttons.ButtonMeta;
@@ -981,12 +983,14 @@ public class MethodsForCommands
         }
 
 
-    private Button createButtonSwitch( Long layoutId, ExtendedMap<Long, Object> parameters )
+    private Button createButtonSwitch( long layoutId, ExtendedMap<Long, Object> parameters )
         {
         // 'BACK' is a special token: go back to previous board
         return new ButtonSwitch( layoutId,
                 parameters.remove( Commands.TOKEN_LOCK ) != null );
+        // !! Check non-used SWITCH buttons !!
         }
+
 
     private Button createButtonMeta( long metaToken, ExtendedMap<Long, Object> parameters )
         {
@@ -1016,6 +1020,102 @@ public class MethodsForCommands
         }
 
 
+    private ButtonMainTouch createButtonSpaceTravel( ExtendedMap<Long, Object> parameters )
+        {
+        // Packet with default cannot be null!
+        return new ButtonSpaceTravel( packet(parameters, " ") );
+        }
+
+
+    private ButtonMainTouch createButtonEnter( ExtendedMap<Long, Object> parameters )
+        {
+        // Packet with default cannot be null!
+        return new ButtonEnter(
+                packetKey(parameters, 0x10000 + KeyEvent.KEYCODE_ENTER), // Or: '\n'
+                packetText( parameters, "\n" ),
+                parameters.remove( Commands.TOKEN_LOCK ) != null );
+        }
+
+
+    private ButtonMainTouch createButtonModify( long modifyId, ExtendedMap<Long, Object> parameters )
+        {
+        // !! Check available modify data at the end !!
+        return new ButtonModify( modifyId,
+                parameters.remove( Commands.TOKEN_REVERSE ) != null );
+        }
+
+
+    private ButtonMainTouch createButtonList( ExtendedMap<Long, Object> parameters )
+        {
+        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
+        ArrayList<Packet> packets = (ArrayList<Packet>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_ADDTEXT ) );
+
+        if ( packets.isEmpty() )
+            return null;
+
+        ButtonList buttonList = new ButtonList();
+
+        for ( Packet packet: packets)
+            {
+            buttonList.addPacket( packet );
+            }
+
+        return buttonList;
+        }
+
+
+    private ButtonMainTouch createButtonSingle( Packet packet, ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Simple Packet is defined");
+        return new ButtonSingle( packet,
+                parameters.remove( Commands.TOKEN_REPEAT ) != null );
+        }
+
+
+    private ButtonMainTouch createButtonAlternate( Packet firstPacket, Packet secondPacket )
+        {
+        Scribe.debug(Debug.DATA, "Alternate Packet is defined");
+        return new ButtonAlternate( firstPacket, secondPacket);
+        }
+
+
+    private ButtonMainTouch createButtonDouble( Packet firstPacket, Packet secondPacket )
+        {
+        Scribe.debug(Debug.DATA, "Double Packet is defined");
+        return new ButtonDouble( firstPacket, secondPacket);
+        }
+
+
+    public ButtonMainTouch createButtonFromPackets( ExtendedMap<Long, Object> parameters )
+        {
+        Packet firstPacket;
+        Packet secondPacket;
+
+        firstPacket = (Packet)parameters.remove( Commands.TOKEN_FIRST );
+        if ( firstPacket == null )
+            {
+            firstPacket = packet( parameters );
+            }
+
+        if ( parameters.remove(Commands.TOKEN_SINGLE) != null ||
+                (secondPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND )) == null )
+            {
+            return createButtonSingle( firstPacket, parameters );
+            }
+
+        if ( parameters.remove( Commands.TOKEN_ALTERNATE) != null )
+            {
+            return createButtonAlternate( firstPacket, secondPacket );
+            }
+
+        // secondPacket != null, so it should be a double
+        parameters.remove( Commands.TOKEN_DOUBLE);
+
+        return createButtonDouble( firstPacket, secondPacket );
+        }
+
+
     // return can be null, if there was an error
     public Button createButton( ExtendedMap<Long, Object> parameters )
         {
@@ -1024,29 +1124,29 @@ public class MethodsForCommands
         // Create MULTI TOUCH BUTTONS
         if ((temp = parameters.remove(Commands.TOKEN_SWITCH)) != null)
             {
-            return createButtonSwitch( (long)temp, parameters);
+            return createButtonSwitch((long) temp, parameters);
             }
 
         if ((temp = parameters.remove(Commands.TOKEN_META)) != null)
             {
-            return createButtonMeta( (long)temp, parameters);
+            return createButtonMeta((long) temp, parameters);
             }
 
         // Create MAIN TOUCH BUTTONS
         ButtonMainTouch buttonMainTouch;
-        if ((temp = parameters.remove(Commands.TOKEN_SPACETRAVEL)) != null)
+        if (parameters.remove(Commands.TOKEN_SPACETRAVEL) != null)
             {
             buttonMainTouch = createButtonSpaceTravel(parameters);
             }
 
-        else if ((temp = parameters.remove(Commands.TOKEN_ENTER)) != null)
+        else if (parameters.remove(Commands.TOKEN_ENTER) != null)
             {
             buttonMainTouch = createButtonEnter(parameters);
             }
 
         else if ((temp = parameters.remove(Commands.TOKEN_MODIFY)) != null)
             {
-            buttonMainTouch = createButtonModify(parameters);
+            buttonMainTouch = createButtonModify( (long)temp, parameters);
             }
 
         else if ((temp = parameters.remove(Commands.TOKEN_LIST)) != null)
@@ -1074,147 +1174,6 @@ public class MethodsForCommands
             }
 
         return buttonMainTouch;
-        }
-
-
-    public ButtonMainTouch createButtonFromPackets( ExtendedMap<Long, Object> parameters )
-        {
-        Packet firstPacket;
-        Packet secondPacket;
-
-        firstPacket = (Packet)parameters.remove( Commands.TOKEN_FIRST );
-        if ( firstPacket == null )
-            {
-            firstPacket = packet( parameters );
-            }
-
-        if ( (temp=parameters.remove( Commands.TOKEN_SINGLE)) != null)
-            {
-            return createButtonSingle( );
-            }
-
-        secondPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND );
-
-        if ( parameters.remove( Commands.TOKEN_DOUBLE) != null)
-            {
-            return createButtonDouble( );
-            }
-
-        if ( parameters.remove( Commands.TOKEN_ALTERNATE) != null )
-            {
-            return createButtonAlternate( );
-            }
-
-        if ( secondPacket != null )
-            {
-            return createButtonDouble( );
-            }
-
-        // second Packet == null
-        return createButtonSingle( );
-        }
-
-
-    public Button createButtonFunction(ExtendedMap<Long, Object> parameters)
-        {
-        Button buttonFunction = null;
-        Object temp;
-
-        int counter = 0;
-
-        Packet packet = packet( parameters );
-        if (packet != null )
-            {
-            Packet secondaryPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND );
-
-            if ( secondaryPacket != null )
-                {
-                buttonFunction = new ButtonDouble(packet, secondaryPacket);
-                Scribe.debug(Debug.DATA, "Double Packet is defined");
-                }
-            else
-                {
-                buttonFunction = new ButtonSingle(packet, parameters.containsKey(Commands.TOKEN_REPEAT));
-                Scribe.debug(Debug.DATA, "Simple Packet is defined");
-                }
-            counter++;
-            }
-
-        temp = parameters.remove( Commands.TOKEN_SWITCH );
-        if (temp != null)
-            {
-            counter++;
-            buttonFunction = new ButtonSwitch( (long)temp,
-                    parameters.containsKey(Commands.TOKEN_LOCK) );
-            // invalid index - (int)temp - means go back to previous layout
-            }
-
-        temp = parameters.remove( Commands.TOKEN_META );
-        if (temp != null)
-            {
-            counter++;
-            int meta = -1;
-
-            if ( (long)temp == Commands.TOKEN_CAPS )
-                meta = LayoutStates.META_CAPS;
-            else if ( (long)temp == Commands.TOKEN_SHIFT )
-                meta = LayoutStates.META_SHIFT;
-            else if ( (long)temp == Commands.TOKEN_CTRL )
-                meta = LayoutStates.META_CTRL;
-            else if ( (long)temp == Commands.TOKEN_ALT )
-                meta = LayoutStates.META_ALT;
-
-            // ButtonMeta constructor will not accept any non-valid parameter
-
-            try
-                {
-                buttonFunction = new ButtonMeta( meta,
-                        parameters.containsKey( Commands.TOKEN_LOCK) );
-                }
-            catch (ExternalDataException e)
-                {
-                tokenizer.error("META", R.string.data_meta_unknown_meta_state);
-                }
-            }
-
-        if ( parameters.containsKey( Commands.TOKEN_SPACETRAVEL ) )
-            {
-            counter++;
-            // Packet with default cannot be null!
-            buttonFunction = new ButtonSpaceTravel( packet(parameters, " ") );
-            }
-
-        temp = parameters.remove(Commands.TOKEN_MODIFY);
-        if (temp != null)
-            {
-            counter++;
-            buttonFunction = new ButtonModify( (long)temp,
-                    parameters.containsKey( Commands.TOKEN_REVERSE ));
-            }
-
-        if ( parameters.containsKey( Commands.TOKEN_ENTER ) )
-            {
-            counter++;
-
-            // Packet with default cannot be null!
-            PacketKey packetKey = packetKey( parameters, 0x10000 + KeyEvent.KEYCODE_ENTER ); // Or: '\n'
-            PacketText packetText = packetText( parameters, "\n" );
-
-            buttonFunction = new ButtonEnter( packetKey, packetText, parameters.containsKey( Commands.TOKEN_REPEAT) );
-            }
-
-        if ( counter > 1 )
-            {
-            tokenizer.error("SEND", R.string.data_send_one_allowed );
-            }
-        else if (buttonFunction == null )  // OR (counter == 0)
-            {
-            tokenizer.error("SEND", R.string.data_send_missing);
-            // Buttons function was not set - button will give an error message
-            // It will return null
-            }
-
-        return buttonFunction;
         }
 
 

@@ -17,7 +17,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         return (ButtonList)super.clone();
         }
 
-    public void AddPacket( Packet packet )
+    public void addPacket( Packet packet )
         {
         packets.add( packet );
         }
