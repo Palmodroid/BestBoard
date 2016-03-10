@@ -4,8 +4,6 @@ package org.lattilad.bestboard;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 
-import java.util.ArrayList;
-
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonForMaps;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
@@ -16,6 +14,8 @@ import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.ExternalDataException;
 import org.lattilad.bestboard.utils.Trilean;
+
+import java.util.ArrayList;
 
 public class Layout
     {
@@ -301,7 +301,7 @@ public class Layout
         // BUTTONS ARE COMING FROM COAT DESCRIPTOR FILE
         // Scribe.locus();
 
-        if ( checkPosition(arrayColumn, arrayRow) == POSITION_INVALID )
+        if ( checkPosition(arrayColumn, arrayRow) <= POSITION_LINE_ENDED )
             {
             throw new ExternalDataException("This button position is not valid! Button cannot be added!");
             }
@@ -503,8 +503,8 @@ public class Layout
         return true;
         }
 
-    public static final int POSITION_INVALID = -1;
-    public static final int POSITION_LINE_ENDED = 0;
+    public static final int POSITION_INVALID = -2;
+    public static final int POSITION_LINE_ENDED = -1;
     public static final int POSITION_HALF_HEXAGON = POSITION_LINE_ENDED + 1;
     public static final int POSITION_WHOLE_HEXAGON = POSITION_HALF_HEXAGON + 1;
     public static final int POSITION_OCCUPIED = 0x10;
@@ -546,7 +546,7 @@ public class Layout
         {
         int result = checkPosition( arrayColumn, arrayRow );
 
-        if ( result > POSITION_INVALID &&
+        if ( result > POSITION_LINE_ENDED &&
                 buttons[touchCodeFromPosition(arrayColumn, arrayRow)] != null )
             {
             result |= POSITION_OCCUPIED;

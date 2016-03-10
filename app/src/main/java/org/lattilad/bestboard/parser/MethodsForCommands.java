@@ -373,11 +373,6 @@ public class MethodsForCommands
         else
             {
             Long portraitId = (Long)parameters.remove( Commands.TOKEN_PORTRAIT );
-            if ( portraitId == null )
-                {
-                portraitId = (Long)parameters.remove( Commands.TOKEN_ADDPORTRAIT );
-                }
-
             Layout portrait = null;
 
             if ( portraitId != null )
@@ -395,11 +390,6 @@ public class MethodsForCommands
                 }
 
             Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
-            if ( landscapeId == null )
-                {
-                landscapeId = (Long)parameters.remove( Commands.TOKEN_ADDLANDSCAPE );
-                }
-
             Layout landscape = null;
 
             if ( landscapeId != null )
@@ -447,7 +437,7 @@ public class MethodsForCommands
      * Trilean values, default: not-given-value. Otherwise META state is forced on or off, depending on the value.
      * ASBOARD - new board is generated with this layout under the same id
      */
-    public Long addLayout( ExtendedMap<Long, Object> parameters )
+    public void addLayout( ExtendedMap<Long, Object> parameters )
         {
         Object temp;
 
@@ -464,7 +454,7 @@ public class MethodsForCommands
         if (id == null)
             {
             tokenizer.error( "ADDLAYOUT", R.string.data_layout_no_id);
-            return null;
+            return;
             }
 
         temp = parameters.remove( Commands.TOKEN_HALFCOLUMNS );
@@ -486,7 +476,7 @@ public class MethodsForCommands
                 {
                 tokenizer.error(Tokenizer.regenerateKeyword((long) id),
                         R.string.data_columns_missing);
-                return null;
+                return;
                 }
             }
 
@@ -495,7 +485,7 @@ public class MethodsForCommands
             {
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_rows_missing );
-            return null;
+            return;
             }
         rows = (int)temp;
 
@@ -549,7 +539,14 @@ public class MethodsForCommands
                 softBoardData.firstLayout = layout;
                 }
 
-            return id;
+            // ASBOARD - a new board is defined, same id, only one layout
+            if ( (boolean)parameters.remove( Commands.TOKEN_ASBOARD, false ) )
+                {
+                // !! check if non-wide !!
+                parameters.put( Commands.TOKEN_ID, id );
+                parameters.put( Commands.TOKEN_LAYOUT, id);
+                addBoard( parameters );
+                }
 
             }
         catch (ExternalDataException ede)
@@ -557,8 +554,6 @@ public class MethodsForCommands
             tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_layout_error);
             }
-
-        return null;
         }
 
 
@@ -575,9 +570,9 @@ public class MethodsForCommands
             return;
             }
 
-        // starting (HOME) positions
+        // starting (HOME) positions - rows should be adjusted after getting layout
         int homeArrayColumn = (int)parameters.remove(Commands.TOKEN_COLUMN, 1) -1;
-        int homeArrayRow = (int)parameters.remove(Commands.TOKEN_ROW, 1) -1;
+        int homeArrayRow = (int)parameters.remove(Commands.TOKEN_ROW, 1);
 
         // TOKEN_BUTTON is a group code
         // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
@@ -597,12 +592,24 @@ public class MethodsForCommands
             return;
             }
 
+        // ROW: negative values should be counted from the bottom
+        if ( homeArrayRow < 0 )
+            {
+            homeArrayRow = layout.layoutHeightInHexagons + homeArrayRow;
+            }
+        else
+            {
+            homeArrayRow--;
+            }
+
         // automatic movement
         boolean autoMove = false;
 
         // button positions
         int arrayColumn = homeArrayColumn;
         int arrayRow = homeArrayRow;
+
+        Scribe.debug( Debug.BLOCK, "Block starts at column: " + arrayColumn + ", row: " + arrayRow );
 
         // beginning of the line in the actual row
         int crArrayColumn = homeArrayColumn;
@@ -611,7 +618,13 @@ public class MethodsForCommands
             {
             if ( action.getKey() == Commands.TOKEN_BUTTON )
                 {
-                if ( autoMove ) arrayColumn ++;
+                if ( autoMove )
+                    {
+                    arrayColumn ++;
+                    Scribe.debug( Debug.BLOCK, "Automove to next column.");
+                    }
+
+                Scribe.debug( Debug.BLOCK, "BUTTON. Column: " + arrayColumn + ", row: " + arrayRow );
 
                 try
                     {
@@ -645,7 +658,13 @@ public class MethodsForCommands
                 }
             else if ( action.getKey() == Commands.TOKEN_EXTEND )
                 {
-                if ( autoMove ) arrayColumn ++;
+                if ( autoMove )
+                    {
+                    arrayColumn ++;
+                    Scribe.debug( Debug.BLOCK, "Automove to next column.");
+                    }
+
+                Scribe.debug( Debug.BLOCK, "EXTEND. Column: " + arrayColumn + ", row: " + arrayRow );
 
                 Button button = null;
                 try
@@ -692,6 +711,34 @@ public class MethodsForCommands
                 autoMove = true;
                 continue;
                 }
+            else if ( action.getKey() == Commands.TOKEN_FINDFREE )
+                {
+                if ( autoMove )
+                    {
+                    arrayColumn ++;
+                    Scribe.debug( Debug.BLOCK, "Automove to next column.");
+                    }
+
+                int occupied;
+                while ( ( occupied = layout.checkButton( arrayColumn, arrayRow )) != Layout.POSITION_WHOLE_HEXAGON
+                        && occupied != Layout.POSITION_INVALID )
+                    {
+                    if (occupied == Layout.POSITION_LINE_ENDED)
+                        {
+                        Scribe.debug( Debug.BLOCK, "Line ended. Column: " + arrayColumn + ", row: " + arrayRow );
+                        arrayRow++;
+                        arrayColumn = 0;
+                        }
+                    else
+                        {
+                        Scribe.debug( Debug.BLOCK, "Button occupied or half. Column: " + arrayColumn + ", row: " + arrayRow );
+                        arrayColumn++;
+                        }
+                    }
+                Scribe.debug( Debug.BLOCK, "Free at column: " + arrayColumn + ", row: " + arrayRow );
+                autoMove = false;
+                continue;
+                }
 
             // all others are moving commands, no autoMove is needed
             autoMove = false;
@@ -702,6 +749,7 @@ public class MethodsForCommands
                     crArrayColumn--;
                 arrayColumn = crArrayColumn;
                 arrayRow++;
+                Scribe.debug( Debug.BLOCK, "CRL. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             else if ( action.getKey() == Commands.TOKEN_CRR )
                 {
@@ -709,66 +757,58 @@ public class MethodsForCommands
                     crArrayColumn++;
                 arrayColumn = crArrayColumn;
                 arrayRow++;
+                Scribe.debug( Debug.BLOCK, "CRR. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             else if ( action.getKey() == Commands.TOKEN_HOME )
                 {
                 arrayColumn = homeArrayColumn;
                 arrayRow = homeArrayRow;
                 crArrayColumn = homeArrayColumn;
+                Scribe.debug( Debug.BLOCK, "HOME. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             else if ( action.getKey() == Commands.TOKEN_L )
                 {
                 arrayColumn--;
+                Scribe.debug( Debug.BLOCK, "L. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             else if ( action.getKey() == Commands.TOKEN_R )
                 {
                 arrayColumn++;
+                Scribe.debug( Debug.BLOCK, "R. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             else if ( action.getKey() == Commands.TOKEN_DL )
                 {
                 if ( (arrayRow + layout.rowsAlignOffset) % 2 == 0 )
                     arrayColumn--;
                 arrayRow++;
+                Scribe.debug( Debug.BLOCK, "DL. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             else if ( action.getKey() == Commands.TOKEN_DR )
                 {
                 if ( (arrayRow + layout.rowsAlignOffset) % 2 == 1 )
                     arrayColumn++;
                 arrayRow++;
+                Scribe.debug( Debug.BLOCK, "DR. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             else if ( action.getKey() == Commands.TOKEN_UL )
                 {
                 if ( (arrayRow + layout.rowsAlignOffset) % 2 == 0 )
                     arrayColumn--;
                 arrayRow--;
+                Scribe.debug( Debug.BLOCK, "UL. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             else if ( action.getKey() == Commands.TOKEN_UR )
                 {
                 if ( (arrayRow + layout.rowsAlignOffset) % 2 == 1 )
                     arrayColumn++;
                 arrayRow--;
-                }
-            else if ( action.getKey() == Commands.TOKEN_FINDFREE )
-                {
-                int occupied;
-                while ( ( occupied = layout.checkButton( arrayColumn, arrayRow )) != Layout.POSITION_WHOLE_HEXAGON
-                        && occupied != Layout.POSITION_INVALID )
-                    {
-                    if (occupied == Layout.POSITION_LINE_ENDED)
-                        {
-                        arrayRow++;
-                        arrayColumn = 0;
-                        }
-                    else
-                        {
-                        arrayColumn++;
-                        }
-                    }
+                Scribe.debug( Debug.BLOCK, "UR. Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             // this is a skip (int)
             else if (action.getKey() == Commands.TOKEN_SKIP )
                 {
                 arrayColumn += (int)action.getValue() + ( (int)action.getValue() < 0 ? -1 : 1 );
+                Scribe.debug( Debug.BLOCK, "Skip + " + (int)action.getValue() + ". Column: " + arrayColumn + ", row: " + arrayRow );
                 }
             }
         }
@@ -1049,7 +1089,7 @@ public class MethodsForCommands
         {
         // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
         ArrayList<KeyValuePair> packetList = (ArrayList<KeyValuePair>)parameters.remove(
-                Bit.setSignedBitOn( Commands.TOKEN_ADDTEXT ) );
+                Bit.setSignedBitOn( Commands.TOKEN_ADD ) );
 
         if ( packetList.isEmpty() )
             return null;
@@ -1092,10 +1132,23 @@ public class MethodsForCommands
         Packet firstPacket;
         Packet secondPacket;
 
+        /*
+            No packet is defined - it will be a LIST (if possible)
+            First packet is defined - it will be a SINGLE
+            Second packet is defined (and no SINGLE is given)   - it will be a DOUBLE (or ALTERNATE, if given)
+         */
+
         firstPacket = (Packet)parameters.remove( Commands.TOKEN_FIRST );
         if ( firstPacket == null )
             {
             firstPacket = packet( parameters );
+            }
+
+        // if no packet is defined, than it can be only a list
+        if ( firstPacket == null )
+            {
+            parameters.remove(Commands.TOKEN_LIST);
+            return createButtonList(parameters);
             }
 
         if ( parameters.remove(Commands.TOKEN_SINGLE) != null ||
@@ -1149,11 +1202,6 @@ public class MethodsForCommands
             buttonMainTouch = createButtonModify( (long)temp, parameters);
             }
 
-        else if ((temp = parameters.remove(Commands.TOKEN_LIST)) != null)
-            {
-            buttonMainTouch = createButtonList(parameters);
-            }
-
         // Create MAIN TOUCH BUTTONS depending on PACKETS
         else
             {
@@ -1197,7 +1245,7 @@ public class MethodsForCommands
         boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, false);
         int color = (int)parameters.remove(Commands.TOKEN_COLOR, Color.BLACK);
 
-        return new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color );
+        return new TitleDescriptor(text, xOffset, yOffset, size, bold, italics, color );
         }
 
 

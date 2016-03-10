@@ -70,9 +70,6 @@ public class Commands
     public static final long TOKEN_ROOT = 0x16623bL;
 
     public static final long TOKEN_ADDLAYOUT = 0x211993f479afL;
-    public static final long TOKEN_ADDLANDSCAPE = 0x199541e855df90bbL;
-    public static final long TOKEN_ADDPORTRAIT = 0xb10228db2c89c8L;
-
     // public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_HEXAGONAL = 0x379824b9b62fL;
     public static final long TOKEN_WIDE = 0x1a1dd0L;
@@ -89,6 +86,10 @@ public class Commands
     public static final long TOKEN_FORCESHIFT = 0x73c05d4ab24e6L;
     public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
     public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
+
+    public static final long TOKEN_ASBOARD = 0x66e540fa6L;
+    // public static final long TOKEN_LOCK = 0x11bd48L;
+    // public static final long TOKEN_ROOT = 0x16623bL;
 
     public static final long TOKEN_BLOCK = 0x14c4fa3L;
     // public static final long TOKEN_LAYOUT = 0x5805f907L;
@@ -151,7 +152,7 @@ public class Commands
     public static final long TOKEN_ALTERNATE = 0x21d3dacd0f44L;
 
     public static final long TOKEN_LIST = 0x119f8bL;
-    public static final long TOKEN_ADDTEXT = 0x63091a2b0L;
+    public static final long TOKEN_ADD = 0x13767L;
 
     public static final long TOKEN_SWITCH = 0x775d93d7L;
     // !! BACK is used as textual token !!
@@ -173,30 +174,18 @@ public class Commands
     public static final long TOKEN_MODIFY = 0x5da813adL;
     public static final long TOKEN_REVERSE = 0x105e77189aL;
 
-
-
-
-
-
-
-
-
-
-
+    public static final long TOKEN_ADDTITLE = 0xe504eb848aL;
+    // public static final long TOKEN_TEXT = 0x17b9c8L;
     public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
     public static final long TOKEN_YOFFSET = 0x14b484849aL;
     public static final long TOKEN_SIZE = 0x17098aL;
-
-    public static final long TOKEN_EXTEND = 0x3da4e6fdL;
-
-
-    public static final long TOKEN_ADDTITLE = 0xe504eb848aL;
-    // public static final long TOKEN_TEXT = 0x17b9c8L;
     public static final long TOKEN_BOLD = 0xa03ecL;
     public static final long TOKEN_ITALICS = 0xb39c66ee7L;
     public static final long TOKEN_NONBOLD = 0xe232d779aL;
     public static final long TOKEN_NONITALICS = 0xaed49d766321dL;
     // public static final long TOKEN_COLOR = 0x16b2be3L;
+
+    public static final long TOKEN_EXTEND = 0x3da4e6fdL;
 
     public static final long TOKEN_ADDMODIFY = 0x211999969455L;
     // public static final long TOKEN_ID = 0x102a6L;
@@ -409,7 +398,6 @@ public class Commands
                 TOKEN_LAYOUT,
                 TOKEN_PORTRAIT, TOKEN_LANDSCAPE,
                 TOKEN_ADDLAYOUT,
-                TOKEN_ADDPORTRAIT, TOKEN_ADDLANDSCAPE,
                 TOKEN_LOCK, TOKEN_ROOT }, "addBoard");
 
         add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
@@ -423,19 +411,9 @@ public class Commands
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
                 TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
                 TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
-
-        add(TOKEN_ADDLANDSCAPE, new long[]{
-                TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
-                TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
-                TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
-
-        add(TOKEN_ADDPORTRAIT, new long[]{
-                TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
-                TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
-                TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT }, "addLayout" );
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_ASBOARD,
+                TOKEN_LOCK, TOKEN_ROOT }, "addLayout" );
 
         // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS}); // Useless parametercommand - just for clearer readability
@@ -450,6 +428,11 @@ public class Commands
         add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
         add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
         add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
+
+        add(TOKEN_ASBOARD, new long[]{PARAMETER_FLAG});
+        // If ASBOARD is given, then addBoard is called, so LOCK and ROOT can be used, too
+        // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
+        // add(TOKEN_ROOT, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_BLOCK, new long[]{
                         TOKEN_LAYOUT,
@@ -508,10 +491,10 @@ public class Commands
                         TOKEN_DOUBLE,
                         TOKEN_ALTERNATE,
                         TOKEN_LIST,
-                        TOKEN_ADDTEXT | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
 
                         TOKEN_META,
-                        // TOKEN_LOCK,
+                        TOKEN_LOCK,
                         TOKEN_SWITCH,
                         // TOKEN_LOCK,
 
@@ -580,7 +563,7 @@ public class Commands
         add(TOKEN_DOUBLE, new long[]{PARAMETER_FLAG});
         add(TOKEN_ALTERNATE, new long[]{PARAMETER_FLAG});
         add(TOKEN_LIST, new long[]{PARAMETER_FLAG});
-        add(TOKEN_ADDTEXT, new long[]{
+        add(TOKEN_ADD, new long[]{
                         TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
                         TOKEN_STRINGCAPS,

@@ -7,7 +7,7 @@ package org.lattilad.bestboard.buttons;
  */
 public class ButtonAlternate extends ButtonMainTouchTitles implements Cloneable
     {
-    private static int counter = 0;
+    private int counter = 0;
     private Packet[] packets = new Packet[2];
 
     @Override

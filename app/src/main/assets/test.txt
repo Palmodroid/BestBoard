@@ -16,127 +16,147 @@ LET ( khaki 0cd4ddaa )
 LET ( magenta 0c800080 )
 LET ( red 0ca00 )
 
-LET ( def_lay ADDLAYOUT ( HEXAGONAL ALIGN odds ROWS 4 HALFCOLUMNS 12 ) )
+;
+; *** DEFINITIONS OF THE BOARDS AND LAYOUTS ***
+;
 
-ADDLAYOUT ( ID lay1 def_lay COLOR yellow ASBOARD ROOT LOCK )
-ADDLAYOUT ( ID lay2 def_lay COLOR rose ASBOARD LOCK)
-ADDLAYOUT ( ID lay3 def_lay COLOR khaki ASBOARD LOCK)
-ADDLAYOUT ( ID lay4 def_lay COLOR pink ASBOARD )
-ADDLAYOUT ( ID lay5 def_lay COLOR darkpink ASBOARD )
-ADDLAYOUT ( ID lay6 def_lay COLOR purple ASBOARD )
+; A default érték komplex paramétereknél használható. 
+; A komplex paraméter minden további előfordulásánál ezek az értékek lesznek először megadva,
+; amiket további paraméterek felülírhatnak.
+
+DEFAULT ( ADDLAYOUT ( HEXAGONAL ALIGN odds ROWS 5 HALFCOLUMNS 15 ) )
+
+; A let érték ezzel szemben egy label-t definiál. 
+; Az itt szereplő értékek a label helyett lesznek behelyettesítve, 
+; vagyis a korábban megadott paramétereket felülírhatják, 
+; míg a később megadott paraméterek a label paramétereit írhatják felül.
+LET ( landlay ADDLAYOUT ( ALIGN evens HALFCOLUMNS 25 ) )
+
+; A legegyszerűbb esetben a board (landscape/portrait pár) mindkét irányhoz 
+; ugyanazt a layout-ot használja. 
+; Ilyenkor a layout-ban elhelyezett ASBOARD jelzi, hogy ugyanezen a néven egy board is 
+; kerüljön létrehozásra. ROOT (legelső board) és LOCK (mindig lock-olt board) használható
+
+ADDLAYOUT ( ID lay1 COLOR yellow ASBOARD ROOT )
+
+; A két külön iránynak megfelelő layoutot külön kell definiálni
+ADDLAYOUT ( ID lay2 COLOR rose ) 
+ADDLAYOUT ( ID lay2w landlay ROWS 7 COLOR rose ) 
+ADDBOARD ( ID lay2 PORTRAIT lay2 LANDSCAPE lay2w LOCK ) 
+
+; A layoutok természetesen többször is használhatóak, pl. két non-wide mellett ugyanaz a wide
+ADDLAYOUT ( ID lay3 color green )
+ADDBOARD ( ID lay3 PORTRAIT lay3 LANDSCAPE lay2w LOCK)
+
+; Persze ez is megy. És itt is lehet azonos az azonosító
+ADDLAYOUT ( ID lay4 ALIGN evens COLOR pink )
+ADDBOARD ( ID lay4 LAYOUT lay4 ) 
+
+ADDLAYOUT ( ID lay5 COLOR darkpink ASBOARD )
+ADDLAYOUT ( ID lay6 COLOR purple ASBOARD )
 
 
+;
+; *** FILLING UP LAYOUTS WITH DATA ***
+;
+
+; A default érték minden további title-re vonatkozik
 DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 250 SIZE 1000 BOLD ITALICS )
 
+; A board-ok közötti ugrás a SWITCH utasítással történik
+; Ha a BOARD külön nem rendelkezik, akkor itt is beállíthatjuk a LOCK paramétert
+; A 'BACK' speciális érték, visszavisz a korábbi board-ra.
+; Ha az aktuális board lock-olt, akkor az előzőre, ami szintén lock-olt lesz.
+; Ha az aktuális nem lock-olt, akkor az utolsó lock-olt-ra.
+; FONTOS! Ha olyan board-ra váltunk, ami korábban már szerepelt, akkor arra térünk vissza -
+; vagyis mindig a legrövidebb út számít a root board irányában.
+
+; A 'váltosort' label-ként definiáljuk, mert minden boardra rákerül
 LET ( jump BLOCK (
   BUTTON ( SWITCH lay1 )
   BUTTON ( SWITCH lay2 )
   BUTTON ( SWITCH lay3 )
   BUTTON ( SWITCH lay4 )
   BUTTON ( SWITCH lay5 )
-  BUTTON ( SWITCH lay6 )
+  BUTTON ( SWITCH lay6 LOCK )
   BUTTON ( SWITCH BACK )
 ))
 
+; Mivel ez sokszor szerepel, itt is csinálunk label-t
+; Érdekes, hogy a draft token egyszerre lehet keyword és label is. Ennek az az oka,
+; hogy először mindig a keyword kerül kiértékelésre, s csak ha az nincs, akkor a label.
+LET ( draft BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) )
+
 BLOCK ( LAYOUT lay1 COLUMN 1 ROW 1
     BUTTON ( TEXT "Lay1" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) 
+    BUTTON ( draft )
       )
 BLOCK ( LAYOUT lay2 COLUMN 1 ROW 1
     BUTTON ( TEXT "Lay2" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) 
+    BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS)) 
+    ; BUTTON ( draft )
+      )
+BLOCK ( LAYOUT lay2w COLUMN 1 ROW 1
+    BUTTON ( TEXT "Lay2w" ADDTITLE (NONBOLD NONITALICS))
+    BUTTON ( draft )
       )
 BLOCK ( LAYOUT lay3 COLUMN 1 ROW 1
     BUTTON ( TEXT "Lay3" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) 
+    BUTTON ( draft )
       )
 BLOCK ( LAYOUT lay4 COLUMN 1 ROW 1
     BUTTON ( TEXT "Lay4" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) 
+    BUTTON ( draft )
       )
 BLOCK ( LAYOUT lay5 COLUMN 1 ROW 1
     BUTTON ( TEXT "Lay5" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) 
+    BUTTON ( draft )
       )
 BLOCK ( LAYOUT lay6 COLUMN 1 ROW 1
     BUTTON ( TEXT "Lay6" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) 
+    BUTTON ( draft )
       )
 
-BLOCK ( LAYOUT lay1 COLUMN 1 ROW 2 jump )
-BLOCK ( LAYOUT lay2 COLUMN 1 ROW 2 jump )
-BLOCK ( LAYOUT lay3 COLUMN 1 ROW 2 jump )
-BLOCK ( LAYOUT lay4 COLUMN 1 ROW 2 jump )
-BLOCK ( LAYOUT lay5 COLUMN 1 ROW 2 jump )
-BLOCK ( LAYOUT lay6 COLUMN 1 ROW 2 jump )
+; Ha a ROW paraméter negatív, akkor a legalsó sortól kezdi a számítást
+BLOCK ( LAYOUT lay1 COLUMN 1 ROW -1 jump )
+BLOCK ( LAYOUT lay2 COLUMN 1 ROW -1 jump )
+BLOCK ( LAYOUT lay2w COLUMN 1 ROW -1 jump )
+BLOCK ( LAYOUT lay3 COLUMN 1 ROW -1 jump )
+BLOCK ( LAYOUT lay4 COLUMN 1 ROW -1 jump )
+BLOCK ( LAYOUT lay5 COLUMN 1 ROW -1 jump )
+BLOCK ( LAYOUT lay6 COLUMN 1 ROW -1 jump )
 
-STOP
-      
-DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 500 SIZE 1200 )
-	
-LET ( abc BLOCK ( 
-	FINDFREE
-	BUTTON ( TEXT "A") 
-	BUTTON ( TEXT "B") 
-	BUTTON ( TEXT "C") 
-))
+BLOCK ( LAYOUT lay1 COLUMN 1 ROW 2
+    R
+    BUTTON ( SINGLE FIRST ( TEXT "Single" ) )
+    BUTTON ( SINGLE FIRST ( TEXT "Repeat" ) REPEAT )
+    BUTTON ( DOUBLE FIRST ( TEXT "double" ) SECOND ( TEXT "DOUBLE" ) )
+    BUTTON ( ALTERNATE FIRST ( TEXT "alt" ) SECOND ( TEXT "ALT" ) )
+    BUTTON ( LIST ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") )
+      )
 
-LET ( def BLOCK ( 
-	BUTTON ( TEXT "d") 
-	BUTTON ( TEXT "e") 
-	BUTTON ( TEXT "f") ))
+BLOCK ( LAYOUT lay1 COLUMN 1 ROW 3
+    BUTTON ( TEXT "Single" ONSTAY )
+    BUTTON ( TEXT "Repeat" REPEAT ONCIRCLE )
+    BUTTON ( DOUBLE TEXT "double" SECOND ( TEXT "DOUBLE" ) ONSTAY )
+    BUTTON ( ALTERNATE TEXT "alt" SECOND ( TEXT "ALT" ) ONSTAY )
+    BUTTON ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") ONSTAY )
+      )
 
-DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET -250 SIZE 1200 BOLD ITALICS)
+BLOCK ( LAYOUT lay1 COLUMN 3 ROW 1
+    BUTTON ( ENTER REPEAT )
+    BUTTON ( SPACETRAVEL )
+    BUTTON ( DO BACKSPACE REPEAT)
+    BUTTON ( DO DELETE REPEAT)
+    BUTTON ( DO SETTINGS)
+      )
 
-LET ( _abc BLOCK ( 
-	EXTEND ( COLOR green ADDTITLE ( TEXT "Hi" COLOR red )) 
-	EXTEND ( COLOR magenta ADDTITLE () ) 
-	EXTEND ( COLOR yellow ADDTITLE (NONBOLD NONITALICS COLOR magenta )) ))
-
-
-BLOCK ( LAYOUT lay1 COLUMN 1 ROW 2 abc )
-BLOCK ( LAYOUT lay1 COLUMN 1 ROW 2 abc )
-BLOCK ( LAYOUT lay1 COLUMN 1 ROW 2 abc )
-
-STOP
-	
-BLOCK ( BOARD teszt COLUMN 5 ROW 1 abc )
-BLOCK ( BOARD teszt COLUMN 5 ROW 1 _abc )
-
-BLOCK ( BOARD teszt COLUMN 5 ROW 3 def )
-BLOCK ( BOARD teszt COLUMN 5 ROW 3 _abc )
-
-DEFAULT BUTTON (color green)
-
-DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 250 SIZE 1200 )
-LET ( fel ADDTITLE ( XOFFSET 0 YOFFSET -250 SIZE 800 COLOR red ))
-	
-CHANGE ( abc BLOCK ( 
-	BUTTON ( TEXT "A" ADDTITLE() ADDTITLE (fel TEXT "H")) 
-	BUTTON ( TEXT "B" ADDTITLE() ADDTITLE (fel TEXT "H")) 
-	BUTTON ( TEXT "C" ADDTITLE() ADDTITLE (fel TEXT "H")) ))
-
-BLOCK ( BOARD teszt COLUMN 5 ROW 5 abc )
-      
-      
-STOP
-      
-LET ( green 0c8e8 )
-LET ( yellow 0cee4 )
-LET ( magenta 0c800080 )
-LET ( white 0cffe )
-LET ( red 0ca00 )
+; A landscape lay2-n a korábbi pozícionálások kipróbálása van
 
 DEFAULT BUTTON ( COLOR green )
 
 LET ( zold BUTTON ( COLOR green ) )
 LET ( piros BUTTON ( COLOR red ) )
-
-BLOCK ( BOARD teszt COLUMN 1 ROW 1
-    BUTTON ( TEXT "Teszt" COLOR white )
-    BUTTON ( DO DRAFT COLOR RED ) 
-      )
-
 
 LET ( abc BLOCK ( 
 	BUTTON ( TEXT "A") 
@@ -158,12 +178,12 @@ LET ( ghi BLOCK (
 	BUTTON ( TEXT "I") ))
 
 
-BLOCK ( BOARD teszt COLUMN 1 ROW 4
+BLOCK ( LAYOUT lay2w COLUMN 1 ROW 4
     BUTTON ( TEXT "->" ) crl Button ( text "crl" ) home crr Button ( text "crr" ) skip (2) abc r def r ghi crr Button ( text "crr" )
       )
 
 
-BLOCK ( BOARD teszt COLUMN 5 ROW 2
+BLOCK ( LAYOUT lay2w COLUMN 5 ROW 2
     BUTTON ( TEXT "1" zold )
     SKIP 2
     BUTTON ( TEXT "N" zold )
@@ -187,7 +207,7 @@ BLOCK ( BOARD teszt COLUMN 5 ROW 2
     BUTTON ( TEXT "L" piros )
       )
     
-BLOCK ( BOARD teszt COLUMN 11 ROW 2
+BLOCK ( LAYOUT lay2w COLUMN 11 ROW 2
     BUTTON ( TEXT "0" zold )
     UL
     BUTTON ( TEXT "1" piros )
@@ -202,214 +222,100 @@ BLOCK ( BOARD teszt COLUMN 11 ROW 2
     UL
     BUTTON ( TEXT "6" piros )
       )
-
       
+; lay4 findfree pozícionálás. Van benne valami gond, de nem tudom, mi az
+
+DEFAULT ( BUTTON ( COLOR yellow ))
+BLOCK ( LAYOUT lay4 COLUMN 3 ROW 1
+	BUTTON ( TEXT "a")
+	SKIP 1
+	BUTTON ( TEXT "b")
+	SKIP 1
+	BUTTON ( TEXT "c")
+	HOME
+	FINDFREE
+	BUTTON ( TEXT "f" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "g" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "h" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "i" COLOR gray)
+	; itt miért hagy ki egy lyukat?
+	FINDFREE
+	BUTTON ( TEXT "j" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "k" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "l" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "m" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "n" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "o" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "p" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "q" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "r" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "f" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "g" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "h" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "i" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "j" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "k" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "l" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "m" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "n" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "o" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "p" COLOR gray)
+	FINDFREE
+	BUTTON ( TEXT "q" COLOR gray)
+	)
+	
+; lay5 - extend
+DEFAULT ( BUTTON ( COLOR rose ))
+
+BLOCK ( LAYOUT lay5 COLUMN 2 ROW 2
+	BUTTON ( TEXT "a")
+	BUTTON ( TEXT "b")
+	BUTTON ( TEXT "c")
+		)
+BLOCK ( LAYOUT lay5 COLUMN 2 ROW 2
+	R
+	EXTEND ( COLOR green )
+	EXTEND ( COLOR red )
+		)
+				
+BLOCK ( LAYOUT lay5 COLUMN 2 ROW 3
+	BUTTON ( TEXT "a")
+	BUTTON ( TEXT "b")
+	BUTTON ( TEXT "c")
+	BUTTON ( TEXT "d")
+	BUTTON ( TEXT "e")
+		)
+
+DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET -250 SIZE 750 )
+
+BLOCK ( LAYOUT lay5 COLUMN 2 ROW 3
+	EXTEND ( ADDTITLE (TEXT "1"))
+	EXTEND ( ADDTITLE (TEXT "2"))
+	EXTEND ( ADDTITLE (TEXT "3") COLOR yellow)
+	EXTEND ( ADDTITLE (TEXT "4") COLOR green )
+	EXTEND ( ADDTITLE (TEXT "5") COLOR red )
+		)
+		
 STOP
-
-LET ( black 0c0 )
-LET ( blue 0c99e )
-LET ( rose 0ce6b2ab )
-LET ( brown 0ccb2 )
-LET ( pink 0cfcf )
-LET ( darkpink 0ce99 )
-LET ( purple 0cc673d9 )
-LET ( gray 0c9 )
-LET ( orange 0cf84 )
-LET ( khaki 0cd4ddaa )
-
-
-
-
-
-
-
-
-
-; NEXT  
-; NEXTROW
-; SKIP num
-; SKIPROW num
-; BUTTON (
-; 	TEXT "text" 
-; 	AUTOCAPS ON / OFF / WAIT / HOLD
-; 	STRINGCAPS 
-; 	ERASESPACES BEFORE / AFTER / AROUND 
-; 	AUTOSPACE BEFORE / AFTER / AROUND 
-; 	REPEAT
-; 	
-; 	KEY num	FORCECAPS FORCESHIFT FORCECTRL FORCEALT REPEAT
-; 	
-; 	DO DELETE / BACKSPACE REPEAT
-; 
-; 	SPACETRAVEL
-; 
-; 	ENTER REPEAT
-; 
-; 	META CAPS / SHIFT / CTRL / ALT LOCK
-; 
-; 	LINK num LOCK
-; 
-; 	MODIFY keyword REVERSE
-; 
-; 	ADDTITLE ( TEXT "text " BOLD ITALICS COLOR color SLOT keyword )
-; 
-; 	COLOR color )
-
-NAME "Tesztboard"
-VERSION 2
-AUTHOR "thon"
-
-; LOCALE ( LANGUAGE "string" COUNTRY "string" VARIANT "string" )
-
-LET ( black 0c0 )
-LET ( green 0c8e8 )
-LET ( yellow 0cee4 )
-LET ( blue 0c99e )
-LET ( rose 0ce6b2ab )
-LET ( brown 0ccb2 )
-LET ( pink 0cfcf )
-LET ( darkpink 0ce99 )
-LET ( purple 0cc673d9 )
-LET ( gray 0c9 )
-LET ( white 0cffe )
-LET ( orange 0cf84 )
-LET ( khaki 0cd4ddaa )
-LET ( magenta 0c800080 )
-LET ( red 0ca00 )
-
-; ADDSLOT ( ID keyword XOFFSET milli YOFFSET milli SIZE milli BOLD ITALICS COLOR color)
-
-ADDSLOT ( ID center SIZE 1900 )
-ADDSLOT ( ID script YOFFSET +300 SIZE 1400 BOLD COLOR magenta)
-ADDSLOT ( ID link YOFFSET +300 SIZE 1400 BOLD COLOR white)
-ADDSLOT ( ID north YOFFSET -350 SIZE 1400 COLOR red )
-ADDSLOT ( ID south YOFFSET +400 SIZE 1800 )
-
-DEFAULT (
-;	BOARDCOLOR color
-;	BUTTONCOLOR color
-	SLOT center )
-
-; METACOLOR color
-; LOCKCOLOR color
-; AUTOCOLOR color
-; TOUCHCOLOR color
-; STROKECOLOR color
-TITLEFONT "font2.ttf"
-
-ENTERTITLE "E"
-GOTITLE "G"
-SEARCHTITLE "H"
-SENDTITLE "S"
-NEXTTITLE 'N'
-DONETITLE 'D'
-PREVTITLE 'P'
-NONETITLE "NONE"
-UNKNOWNTITLE "UN"
-
-ADDMODIFY ( ID textmod ADDROLL ( "le" "el" "sem" "mes" "ezt" "tze" ) ADDROLL ( "aki" "abc" "def" "ghi" ) IGNORESPACE )
-ADDMODIFY ( ID mod ROLLS (  "hpud" "1234567890" ".,-+=;!@" ) IGNORESPACE )
-
-
-ADDBOARD ( ID teszt HEXAGONAL ALIGN evens HALFCOLUMNS 20 ROWS 5)
-
-BUTTON ( TEXT "Teszt" COLOR purple )
-
-BUTTON ( TEXT " v      " SECOND ( TEXT "vakond" ) COLOR blue ) 
-BUTTON ( TEXT 'c' SECOND ( TEXT '&' ) COLOR blue AUTOSPACE around ERASESPACES before AUTOCAPS ON) 
-BUTTON ( KEY KEYZ COLOR green ) 
-BUTTON ( KEY KEYM COLOR green ) 
-
-BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" SLOT script ) COLOR white )
-BUTTON ( DO BACKSPACE REPEAT
-	ADDTITLE ( SLOT script ) COLOR white )
-BUTTON ( DO DELETE REPEAT
-	ADDTITLE ( SLOT script ) COLOR white )
-
-NEXTROW
-
-BUTTON ( TEXT 'b' COLOR blue ) 
-BUTTON ( TEXT "le" COLOR green ) 
-BUTTON ( TEXT "sem" COLOR yellow ) 
-BUTTON ( TEXT "ezt" COLOR yellow ) 
-BUTTON ( TEXT "te" COLOR green ) 
-
-BUTTON ( ENTER REPEAT ADDTITLE ( SLOT script ) COLOR white )
-
-NEXTROW
-
-BUTTON ( TEXT 'f' COLOR blue )
-BUTTON ( TEXT 'r' COLOR green ) 
-BUTTON ( TEXT "AKI" COLOR yellow ) 
-BUTTON ( SPACETRAVEL 
-  ERASESPACES AROUND
-  AUTOCAPS HOLD
-  COLOR darkpink ) 
-BUTTON ( TEXT 'n' COLOR yellow ) 
-BUTTON ( TEXT 'y' COLOR green ) 
-NEXTROW
-
-BUTTON ( TEXT 'j' COLOR blue ) 
-BUTTON ( TEXT 'o' COLOR green ) 
-BUTTON ( TEXT "Kié" COLOR yellow ) 
-BUTTON ( TEXT 'i' COLOR yellow ) 
-BUTTON ( TEXT 'g' COLOR green ) 
-
-BUTTON ( TEXT '.' COLOR orange
-	ERASESPACES AROUND 
-	AUTOSPACE AFTER 
-	AUTOCAPS ON )
-BUTTON ( TEXT ',' COLOR orange
-	ERASESPACES AROUND 
-	AUTOSPACE AFTER ) 
-
-
-NEXTROW
-
-BUTTON ( MODIFY mod ADDTITLE ( TEXT '↺' SLOT script SIZE 2000 ) COLOR white )
-
-BUTTON ( TEXT 'a' COLOR blue AUTOCAPS OFF ) 
-BUTTON ( TEXT 'o' COLOR green AUTOCAPS ON ) 
-BUTTON ( TEXT 'w' COLOR green AUTOCAPS WAIT ) 
-BUTTON ( TEXT 'h' COLOR green AUTOCAPS HOLD ) 
-
-BUTTON ( MODIFY textmod ADDTITLE ( TEXT "a↺z" SLOT script SIZE 2000 ) COLOR white )
-
-BUTTON ( TEXT "🚀" COLOR rose ) 
-BUTTON ( TEXT "🚢" COLOR rose ) 
-BUTTON ( TEXT "o🚲🚲o" COLOR rose ) 
-BUTTON ( TEXT "Hop 🚃" COLOR rose ) 
-BUTTON ( TEXT "🛀" COLOR rose autospace around ) 
-
-
-CURSOR ( BOARD teszt COLUMN  7 TRANSFORM)
-
-BUTTON ( KEY 'C' FORCECTRL ON FORCESHIFT OFF 
-	ADDTITLE ( TEXT "COPY" SLOT script COLOR white ) COLOR blue )
-BUTTON ( KEY 'V' FORCECTRL ON FORCESHIFT OFF 
-	ADDTITLE ( TEXT "PASTE" SLOT script COLOR white ) COLOR blue )
-BUTTON ( META CAPS ADDTITLE ( SLOT script ) COLOR white )
-
-CURSOR ( BOARD teszt COLUMN 6 ROW 1)
-
-SKIP 2
-BUTTON ( KEY KEYDPADUP REPEAT
-	ADDTITLE ( TEXT '▲' SLOT script COLOR black ) COLOR gray )
-NEXTROW
-
-BUTTON ( META SHIFT LOCK ADDTITLE ( SLOT script ) COLOR white )
-
-BUTTON ( DO SETTINGS
-	ADDTITLE ( SLOT script ) COLOR red )
-
-BUTTON ( KEY KEYDPADLEFT REPEAT
-	ADDTITLE ( TEXT '◀' SLOT script COLOR black ) COLOR gray )
-BUTTON ( KEY KEYDPADRIGHT REPEAT 
-	ADDTITLE ( TEXT '▶' SLOT script COLOR black ) COLOR gray ) 
-NEXTROW
-
-SKIP 2
-BUTTON ( KEY KEYDPADDOWN REPEAT 
-	ADDTITLE ( TEXT '▼' SLOT script COLOR black ) COLOR gray )
-
-ADDLINK (INDEX 0 BOARD teszt) ; zero
