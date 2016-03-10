@@ -397,7 +397,6 @@ public class Commands
                 TOKEN_ID,
                 TOKEN_LAYOUT,
                 TOKEN_PORTRAIT, TOKEN_LANDSCAPE,
-                TOKEN_ADDLAYOUT,
                 TOKEN_LOCK, TOKEN_ROOT }, "addBoard");
 
         add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
