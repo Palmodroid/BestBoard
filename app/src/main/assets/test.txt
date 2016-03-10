@@ -46,7 +46,7 @@ ADDBOARD ( ID lay2 PORTRAIT lay2 LANDSCAPE lay2w LOCK )
 
 ; A layoutok természetesen többször is használhatóak, pl. két non-wide mellett ugyanaz a wide
 ADDLAYOUT ( ID lay3 color green )
-ADDBOARD ( ID lay3 PORTRAIT lay3 LANDSCAPE lay2w LOCK)
+ADDBOARD ( ID lay3 PORTRAIT lay3 LANDSCAPE lay2w LOCK ROOT)
 
 ; Persze ez is megy. És itt is lehet azonos az azonosító
 ADDLAYOUT ( ID lay4 ALIGN evens COLOR pink )
@@ -223,7 +223,42 @@ BLOCK ( LAYOUT lay2w COLUMN 11 ROW 2
     BUTTON ( TEXT "6" piros )
       )
       
-; lay4 findfree pozícionálás. Van benne valami gond, de nem tudom, mi az
+; lay3 skip teszt
+
+LET ( bl BLOCK ( 
+	SKIP 1
+	BUTTON ( TEXT "BL" COLOR red)
+	SKIP 1
+	))
+ 
+
+BLOCK ( LAYOUT lay3 COLUMN 3 ROW 2 BUTTON ( TEXT '>' ) )
+
+BLOCK ( LAYOUT lay3 COLUMN 4 ROW 2 
+	BUTTON ( TEXT '1' COLOR yellow)
+	bl
+	BUTTON ( TEXT '2' COLOR yellow) 
+	)
+
+BLOCK ( LAYOUT lay3 COLUMN 3 ROW 3 BUTTON ( TEXT '>' ) )
+
+BLOCK ( LAYOUT lay3 COLUMN 4 ROW 3 
+	BUTTON ( TEXT '1' COLOR yellow) 
+	R
+	SKIP 2
+	BUTTON ( TEXT '2' COLOR yellow) 
+	)
+
+BLOCK ( LAYOUT lay3 COLUMN 3 ROW 4 BUTTON ( TEXT '>' ) )
+
+BLOCK ( LAYOUT lay3 COLUMN 4 ROW 4 
+	SKIP 1
+	BUTTON ( TEXT '1' COLOR yellow) 
+	SKIP 1
+	BUTTON ( TEXT '2' COLOR yellow) 
+	)
+
+; lay4 findfree pozícionálás.
 
 DEFAULT ( BUTTON ( COLOR yellow ))
 BLOCK ( LAYOUT lay4 COLUMN 3 ROW 1
@@ -241,7 +276,6 @@ BLOCK ( LAYOUT lay4 COLUMN 3 ROW 1
 	BUTTON ( TEXT "h" COLOR gray)
 	FINDFREE
 	BUTTON ( TEXT "i" COLOR gray)
-	; itt miért hagy ki egy lyukat?
 	FINDFREE
 	BUTTON ( TEXT "j" COLOR gray)
 	FINDFREE

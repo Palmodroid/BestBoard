@@ -736,14 +736,8 @@ public class MethodsForCommands
                         }
                     }
                 Scribe.debug( Debug.BLOCK, "Free at column: " + arrayColumn + ", row: " + arrayRow );
-                autoMove = false;
-                continue;
                 }
-
-            // all others are moving commands, no autoMove is needed
-            autoMove = false;
-
-            if ( action.getKey() == Commands.TOKEN_CRL )
+            else if ( action.getKey() == Commands.TOKEN_CRL )
                 {
                 if ( (arrayRow + layout.rowsAlignOffset) % 2 == 0 )
                     crArrayColumn--;
@@ -807,9 +801,17 @@ public class MethodsForCommands
             // this is a skip (int)
             else if (action.getKey() == Commands.TOKEN_SKIP )
                 {
-                arrayColumn += (int)action.getValue() + ( (int)action.getValue() < 0 ? -1 : 1 );
+                // if autoMove==true, then button was set in this position.
+                // if autoMove==false, then this position is still empty
+                arrayColumn += (int)action.getValue();
+                if ( autoMove )
+                    arrayColumn += ( (int)action.getValue() < 0 ? -1 : 1 );
                 Scribe.debug( Debug.BLOCK, "Skip + " + (int)action.getValue() + ". Column: " + arrayColumn + ", row: " + arrayRow );
                 }
+
+            // BUTTON and EXTEND set autoMove = true and CONTINUE to the next command
+            // but all others are moving commands, no autoMove is needed
+            autoMove = false;
             }
         }
 
