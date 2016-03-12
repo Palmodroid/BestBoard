@@ -1,7 +1,6 @@
 package org.lattilad.bestboard.buttons;
 
 import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.utils.HardKey;
 
 
@@ -69,7 +68,7 @@ public class PacketKey extends Packet
             softBoardData.layoutStates.forceBinaryHardState( binaryHardState );
 
         // If no meta is set or forced, then android meta state remains 0
-        if ( anyMeta || softBoardData.layoutStates.getAndroidMetaState() != LayoutStates.ANDROID_META_STATE_OFF )
+        if ( anyMeta || softBoardData.layoutStates.isAnyHardMetaActive() )
             {
             softBoardData.softBoardListener.sendKeyDownUp( hardKeyCode );
             sent = true;

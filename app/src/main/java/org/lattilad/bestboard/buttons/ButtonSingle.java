@@ -22,6 +22,47 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
             setOnStay();
         }
 
+
+    public ButtonDouble extendToDouble( Packet packetSecond )
+        {
+        ButtonDouble buttonDouble;
+
+        buttonDouble = new ButtonDouble( packet, packetSecond );
+        buttonDouble.setTitles( getTitles() );
+        buttonDouble.setColor( color );
+        // onCircle cannot be checked because of repeat
+
+        return buttonDouble;
+        }
+
+
+    public ButtonAlternate extendToAlternate( Packet packetSecond )
+        {
+        ButtonAlternate buttonAlternate;
+
+        buttonAlternate = new ButtonAlternate( packet, packetSecond );
+        buttonAlternate.setTitles(getTitles());
+        buttonAlternate.setColor(color);
+        // onCircle cannot be checked because of repeat
+
+        return buttonAlternate;
+        }
+
+
+    public ButtonList extendToList()
+        {
+        ButtonList buttonList;
+
+        buttonList = new ButtonList();
+        buttonList.addPacket( packet ); // Packet of the Single Button becomes the first element
+        buttonList.setTitles(getTitles());
+        buttonList.setColor(color);
+        // onCircle cannot be checked because of repeat
+
+        return buttonList;
+        }
+
+
     public String getString()
         {
         return packet.getString();

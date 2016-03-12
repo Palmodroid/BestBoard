@@ -1,6 +1,9 @@
 package org.lattilad.bestboard;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.inputmethodservice.InputMethodService;
 import android.os.Environment;
@@ -33,6 +36,8 @@ import org.lattilad.bestboard.states.LayoutStates;
 
 import java.io.File;
 
+import static android.os.Environment.getExternalStorageState;
+
 
 public class SoftBoardService extends InputMethodService implements
         SoftBoardParserListener,
@@ -57,6 +62,9 @@ public class SoftBoardService extends InputMethodService implements
 
     /** Data structure for the whole softBoard */
     private SoftBoardData softBoardData = null;
+
+    /** Receives MEDIA_MOUNTED broadcast, if SD_CARD is not ready */
+    private BroadcastReceiver receiver = null;
 
     /** There is only ONE boardView for the whole softBoard, generated in softBoardParserFinished() */
     private LayoutView layoutView;
@@ -218,6 +226,11 @@ public class SoftBoardService extends InputMethodService implements
 
         // Stop any ongoing parsing
         if ( softBoardParser != null)   softBoardParser.cancel(false);
+
+        // Release receiver
+        if ( receiver != null ) unregisterReceiver(receiver);
+
+        // Service finishes here, no need to null these pointers
         }
 
 
@@ -227,6 +240,41 @@ public class SoftBoardService extends InputMethodService implements
      */
     public void startSoftBoardParser()
         {
+        // sd-card is not ready, waiting for MEDIA_MOUNTED broadcast
+        if ( !Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
+            {
+            Scribe.note( Debug.SERVICE, "Waiting for sd-card..." );
+
+            warning = "Be patient! SD_CARD is not ready yet!";
+
+            if ( receiver == null )
+                {
+                IntentFilter filter = new IntentFilter();
+                filter.addAction(Intent.ACTION_MEDIA_MOUNTED);
+                filter.addDataScheme("file");
+
+                receiver = new BroadcastReceiver()
+                {
+                @Override
+                public void onReceive(Context context, Intent intent)
+                    {
+                    SoftBoardService.this.startSoftBoardParser();
+                    }
+                };
+
+                registerReceiver(receiver, filter);
+                }
+
+            return;
+            }
+
+        // sd-card is ready - release receiver if started
+        if ( receiver != null )
+            {
+            unregisterReceiver(receiver);
+            receiver = null;
+            }
+
         Scribe.note( Debug.SERVICE, "Parsing has started." );
 
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);

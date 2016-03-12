@@ -119,6 +119,7 @@ public class Commands
     public static final long TOKEN_TEXT = 0x17b9c8L;
     public static final long TOKEN_KEY = 0x16d1bL;
     public static final long TOKEN_DO = 0x101f8L;
+    public static final long TOKEN_COMBINE = 0x790d8163bL;
 
     public static final long TOKEN_AUTOCAPS = 0xef6e451a57L;
     public static final long TOKEN_STRINGCAPS = 0xd4c9a99e4004bL;
@@ -481,6 +482,7 @@ public class Commands
                         TOKEN_KEY,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                         TOKEN_DO,
+                        TOKEN_COMBINE,
 
                         TOKEN_FIRST,
                         TOKEN_SECOND,
@@ -527,7 +529,9 @@ public class Commands
                         TOKEN_KEY,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                        TOKEN_DO },
+                        TOKEN_DO,
+
+                        TOKEN_COMBINE },
                 "packet");
 
         add(TOKEN_SECOND, new long[]{
@@ -540,12 +544,15 @@ public class Commands
                         TOKEN_KEY,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                        TOKEN_DO },
+                        TOKEN_DO,
+
+                        TOKEN_COMBINE },
                 "packet");
 
         add(TOKEN_TEXT, new long[]{PARAMETER_TEXT});
         add(TOKEN_KEY, new long[]{PARAMETER_INT});
         add(TOKEN_DO, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_COMBINE, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_AUTOCAPS, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_STRINGCAPS, new long[]{PARAMETER_FLAG});
@@ -569,7 +576,7 @@ public class Commands
                         TOKEN_ERASESPACES,
                         TOKEN_AUTOSPACE,
 
-                        // Only Text-packet is allowed here
+                        // If only Text-packet is allowed here, then rem next rows!!
                         /* TOKEN_KEY,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                         TOKEN_DO */ },
@@ -606,8 +613,16 @@ public class Commands
 
         add(TOKEN_EXTEND, TOKEN_BUTTON, new long[]{
                         TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_COLOR },
-                "extendButton");
+
+                        TOKEN_COLOR,
+
+                        TOKEN_SECOND,
+                        TOKEN_DOUBLE,
+                        TOKEN_ALTERNATE,
+                        TOKEN_LIST,
+                        TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
+                        TOKEN_ONSTAY,
+                        TOKEN_ONCIRCLE }, "extendButton");
 
         add(TOKEN_ADDMODIFY, new long[]{
                 TOKEN_ID, TOKEN_ADDROLL, TOKEN_ROLLS,

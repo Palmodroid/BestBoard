@@ -19,6 +19,7 @@ import org.lattilad.bestboard.buttons.ButtonModify;
 import org.lattilad.bestboard.buttons.ButtonSingle;
 import org.lattilad.bestboard.buttons.ButtonSpaceTravel;
 import org.lattilad.bestboard.buttons.Packet;
+import org.lattilad.bestboard.buttons.PacketCombine;
 import org.lattilad.bestboard.buttons.PacketFunction;
 import org.lattilad.bestboard.buttons.PacketKey;
 import org.lattilad.bestboard.buttons.PacketText;
@@ -93,7 +94,17 @@ public class MethodsForCommands
     private class ButtonExtension
         {
         private Integer color = null;
+
         private ArrayList<KeyValuePair> titleList = null;
+
+        // Can be TOKEN_DOUBLE TOKEN_ALTERNATE OR TOKEN_LIST
+        private Long type = null;
+        // SECONDARY packet (DOUBLE OR ALTERNATE)
+        // List of ADD packets (LIST)
+        private Object data = null;
+
+        private boolean onCircle = false;
+        private boolean onStay = false;
         }
 
 
@@ -678,16 +689,61 @@ public class MethodsForCommands
 
                 if ( button == null )
                     {
-                    tokenizer.error( R.string.data_button_not_exist );
+                    tokenizer.error( "EXTEND", R.string.data_button_not_exist );
                     }
                 else
                     {
                     ButtonExtension buttonExtension = (ButtonExtension)action.getValue();
 
+                    //
+                    if ( buttonExtension.type != null )
+                        {
+                        boolean error = true;
+
+                        if (button instanceof ButtonSingle)
+                            {
+                            if (buttonExtension.type == Commands.TOKEN_DOUBLE)
+                                {
+                                button = ((ButtonSingle) button).extendToDouble((Packet) buttonExtension.data);
+                                }
+                            else if (buttonExtension.type == Commands.TOKEN_ALTERNATE)
+                                {
+                                button = ((ButtonSingle) button).extendToAlternate((Packet) buttonExtension.data);
+                                }
+                            else if (buttonExtension.type == Commands.TOKEN_LIST)
+                                {
+                                button = ((ButtonSingle) button).extendToList();
+                                }
+                            // button should be written back
+                            try
+                                {
+                                layout.addButton(arrayColumn, arrayRow, button);
+                                error = false;
+                                } catch (ExternalDataException e)
+                                {
+                                ; // positions cannot be invalid
+                                }
+                            }
+
+                        if (buttonExtension.type == Commands.TOKEN_LIST && button instanceof ButtonList)
+                            {
+                            for (KeyValuePair packet : (ArrayList<KeyValuePair>) buttonExtension.data)
+                                {
+                                ((ButtonList) button).addPacket((Packet) packet.getValue());
+                                }
+                            error = false;
+                            }
+
+                        if (error)
+                            {
+                            tokenizer.error("EXTEND", R.string.data_button_extended_invalid);
+                            }
+                        }
+
                     if ( buttonExtension.color != null )
                         {
                         button.setColor( buttonExtension.color );
-                        tokenizer.note( R.string.data_button_color_changed );
+                        tokenizer.note("EXTEND", R.string.data_button_color_changed);
                         }
 
                     if ( buttonExtension.titleList != null )
@@ -704,7 +760,21 @@ public class MethodsForCommands
                             }
 
                         button.setTitles(titles);
-                        tokenizer.note(R.string.data_button_color_changed);
+                        tokenizer.note( "EXTEND", R.string.data_button_titles_extended);
+                        }
+
+                    if ( button instanceof ButtonMainTouch )
+                        {
+                        if ( buttonExtension.onStay )
+                            {
+                            ((ButtonMainTouch) button).setOnStay();
+                            tokenizer.note("EXTEND", R.string.data_button_extended_onstay);
+                            }
+                        else if ( buttonExtension.onCircle )
+                            {
+                            ((ButtonMainTouch) button).setOnCircle();
+                            tokenizer.note("EXTEND", R.string.data_button_extended_oncircle);
+                            }
                         }
                     }
 
@@ -843,7 +913,7 @@ public class MethodsForCommands
 
         if ( temp != NO_DEFAULT_KEY )
             {
-            // TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT feldolgozása
+            // TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT
             packet = new PacketKey( softBoardData, temp,
                     LayoutStates.generateBinaryHardState(parameters));
             }
@@ -976,10 +1046,26 @@ public class MethodsForCommands
         packet = packetText(parameters, null);
 
         if ( packet == null )
-            packet = packetKey( parameters, NO_DEFAULT_KEY );
-
-        if ( packet == null )
+            {
             packet = packetFunction(parameters);
+            }
+        if ( packet == null )
+            {
+            packet = packetKey(parameters, NO_DEFAULT_KEY);
+            }
+        else if ( parameters.remove(Commands.TOKEN_COMBINE) != null )
+            {
+            PacketKey packetKey;
+
+            if ( (packetKey = packetKey(parameters, NO_DEFAULT_KEY)) != null )
+                {
+                packet = new PacketCombine( softBoardData, packet, packetKey);
+                }
+            else
+                {
+                tokenizer.error("COMBINE", R.string.data_packet_combine_missing );
+                }
+            }
 
         return packet;
         }
@@ -1159,20 +1245,21 @@ public class MethodsForCommands
             return createButtonSingle(firstPacket, parameters);
             }
 
-        if ( parameters.remove( Commands.TOKEN_ALTERNATE) != null )
+        // if DOUBLE exists (with or without ALTERNATE)
+        // or DOUBLE NOT exists (and NO ALTERNATE)
+        if ( parameters.remove( Commands.TOKEN_DOUBLE) != null ||
+                parameters.remove( Commands.TOKEN_ALTERNATE) == null )
             {
-            return createButtonAlternate(firstPacket, secondPacket);
+            return createButtonDouble(firstPacket, secondPacket);
             }
 
-        // secondPacket != null, so it should be a double
-        parameters.remove( Commands.TOKEN_DOUBLE);
-
-        return createButtonDouble(firstPacket, secondPacket);
+        // if DOUBLE NOT exists BUT ALTERNATE exists
+        return createButtonAlternate(firstPacket, secondPacket);
         }
 
 
     // return can be null, if there was an error
-    public Button createButton( ExtendedMap<Long, Object> parameters )
+    public Button createButtonFunction(ExtendedMap<Long, Object> parameters)
         {
         Object temp;
 
@@ -1260,7 +1347,7 @@ public class MethodsForCommands
         {
         ButtonPlan buttonPlan = new ButtonPlan();
 
-        buttonPlan.button = createButton(parameters);
+        buttonPlan.button = createButtonFunction(parameters);
         if ( buttonPlan.button == null )
             {
             tokenizer.error( "BUTTON", R.string.data_button_function_missing);
@@ -1324,6 +1411,37 @@ public class MethodsForCommands
 
         buttonExtension.titleList = (ArrayList<KeyValuePair>) parameters
                 .remove(Bit.setSignedBitOn(Commands.TOKEN_ADDTITLE));
+
+        // SECOND can be ALTERNATE or (DOUBLE), where DOUBLE is not obligatory
+        if ( (buttonExtension.data = parameters.remove( Commands.TOKEN_SECOND )) != null )
+            {
+            // if DOUBLE exists (with or without ALTERNATE)
+            // or DOUBLE NOT exists (and NO ALTERNATE)
+            if (parameters.remove(Commands.TOKEN_DOUBLE) != null ||
+                    parameters.remove(Commands.TOKEN_ALTERNATE) == null)
+                {
+                buttonExtension.type = Commands.TOKEN_DOUBLE;
+                }
+            else
+                {
+                buttonExtension.type = Commands.TOKEN_ALTERNATE;
+                }
+            }
+        // ADD can be (LIST), where LIST is not obligatory
+        else if ( (buttonExtension.data = parameters.remove( Bit.setSignedBitOn(Commands.TOKEN_ADD) )) != null )
+            {
+            parameters.remove( Commands.TOKEN_LIST );
+            buttonExtension.type = Commands.TOKEN_LIST;
+            }
+
+        if ( (parameters.remove( Commands.TOKEN_ONSTAY )) != null )
+            {
+            buttonExtension.onStay = true;
+            }
+        else if ( (parameters.remove( Commands.TOKEN_ONCIRCLE )) != null )
+            {
+            buttonExtension.onCircle = true;
+            }
 
         return buttonExtension;
         }

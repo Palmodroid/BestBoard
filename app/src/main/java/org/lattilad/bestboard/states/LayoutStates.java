@@ -143,6 +143,18 @@ public class LayoutStates
 
 
     /**
+     * Is any of the hard meta states (ctr, alt or shift) active?
+     * Same as isHardKeyForced(), but it is easier to check androidMetaState,
+     * then three different members
+     * @return true if any hard meta is active
+     */
+    public boolean isAnyHardMetaActive()
+        {
+        return androidMetaState != ANDROID_META_STATE_OFF;
+        }
+
+
+    /**
      * Returns true if simulated meta-button press is active for this hard-state
      */
     public boolean isSimulatedMetaButtonPressed( int hardState )

@@ -263,6 +263,7 @@ public class SoftBoardData
         // THIS IS NOT NEEDED (MAYBE) IF LAYOUT and BOARDVIEW IS DIVIDED
         // UseState.checkOrientation() needs context
         // readPreferences() need context
+        // vibration needs context
 
         boolean sendKeyDown( long downTime, int keyEventCode );
         boolean sendKeyUp( long downTime, long eventTime, int keyEventCode );
@@ -288,8 +289,7 @@ public class SoftBoardData
 
         boolean sendDefaultEditorAction(boolean fromEnterKey);
 
-        // JUST A DRAFT !! DO NOT USE IT !!
-        public void startSoftBoardParser();
+        void startSoftBoardParser();
         }
 
     public SoftBoardListener softBoardListener;
