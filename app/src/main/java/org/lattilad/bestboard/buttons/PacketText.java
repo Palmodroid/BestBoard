@@ -122,7 +122,7 @@ public class PacketText extends Packet
             {
             if ( string.length() == 1 )
                 {
-                softBoardData.softBoardListener.sendKeyDownUp( HardKey.convertFromAscii( string.charAt( 0 ) ));
+                softBoardData.softBoardListener.sendKeyDownUp(HardKey.convertFromAscii(string.charAt(0)));
                 }
             }
 

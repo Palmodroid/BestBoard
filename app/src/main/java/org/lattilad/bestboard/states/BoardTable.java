@@ -2,11 +2,6 @@ package org.lattilad.bestboard.states;
 
 import android.content.res.Configuration;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.debug.Debug;
@@ -14,20 +9,22 @@ import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 /**
  * Boards consist of two layouts (however the two can be tha same):
  * one for portrait and one for landscape mode.
  * Boards identified by their keyword token id.
  * BoardTable stores all these Boards, and switches between them by switch buttons.
- * <p>
+ * <p/>
  * PARSING PHASE:
  * BoardTable should be filled up with boards: addBoard() methods.
  * First (root) board should be selected: defineRootBoard().
  * Root board could be changed during the process,
  * but it should be checked at the end: isRootBoardDefined().
- *
- *
- *
  */
 public class BoardTable
     {
@@ -37,14 +34,18 @@ public class BoardTable
     // - SoftBoardService.onCreateInputView()
     // - LayoutView.setLayout()??
 
-    /** Connection to service */
+    /**
+     * Connection to service
+     */
     private SoftBoardData.SoftBoardListener softBoardListener;
 
 
     public static final int ORIENTATION_PORTRAIT = 0;
     public static final int ORIENTATION_LANDSCAPE = 1;
 
-    /** Orientation: can be Board.ORIENTATION_PORTRAIT or Board.ORIENTATION_LANDSCAPE */
+    /**
+     * Orientation: can be Board.ORIENTATION_PORTRAIT or Board.ORIENTATION_LANDSCAPE
+     */
     private int orientation = ORIENTATION_PORTRAIT;
 
 
@@ -71,13 +72,15 @@ public class BoardTable
             return locked;
             }
 
-        Layout getLayout( int orientation )
+        Layout getLayout(int orientation)
             {
-            return layout[ orientation ];
+            return layout[orientation];
             }
         }
 
-    /** All boards are listed here as board-id/board-entry pairs */
+    /**
+     * All boards are listed here as board-id/board-entry pairs
+     */
     private Map<Long, BoardEntry> boards = new HashMap<>();
 
     /**
@@ -97,8 +100,8 @@ public class BoardTable
      */
     public boolean addBoard(Long id, Layout portrait, Layout landscape, boolean locked)
         {
-        BoardEntry boardEntry = new BoardEntry( portrait, landscape, locked );
-        return ( boards.put( id, boardEntry ) != null );
+        BoardEntry boardEntry = new BoardEntry(portrait, landscape, locked);
+        return (boards.put(id, boardEntry) != null);
         }
 
 
@@ -122,9 +125,24 @@ public class BoardTable
             }
         }
 
-    /** Previous boards without the active one */
+    /**
+     * Previous boards without the active one
+     */
     private ArrayList<BoardStackEntry> boardStackEntries = new ArrayList<>();
 
+
+    private void debugBoardStack()
+        {
+        for ( BoardStackEntry entry : boardStackEntries )
+            {
+            Scribe.debug( Debug.LINKSTATE, "  - " +
+                    Tokenizer.regenerateKeyword(entry.boardId) +
+                    (entry.locked ? " - lock" : "") );
+            }
+        Scribe.debug( Debug.LINKSTATE, "  * " +
+                Tokenizer.regenerateKeyword(activeBoardId) +
+                (state == LOCKED ? " - lock" : "") );
+        }
 
     /**
      * If active board can be found in the stack,
@@ -156,6 +174,7 @@ public class BoardTable
      */
     private void pushBoard( )
         {
+        Scribe.locus( Debug.LINKSTATE );
         boardStackEntries.add(new BoardStackEntry(activeBoardId, activeBoard, state == LOCKED ));
         }
 
@@ -169,6 +188,8 @@ public class BoardTable
      */
     private boolean popBoard( boolean currentlyLocked )
         {
+        Scribe.locus(Debug.LINKSTATE);
+
         if ( boardStackEntries.isEmpty() )
             return false;
 
@@ -194,6 +215,7 @@ public class BoardTable
         touchCounter = 0;
 
         boardStackEntries.remove( boardStackEntries.size()-1 );
+
         return true;
         }
 
@@ -382,6 +404,8 @@ public class BoardTable
             {
             Scribe.debug( Debug.LINKSTATE, "Returning to board: " +
                     Tokenizer.regenerateKeyword( activeBoardId ));
+
+            debugBoardStack();
             softBoardListener.getLayoutView().setLayout(getActiveLayout());
             }
         else
@@ -440,6 +464,7 @@ public class BoardTable
             state = TOUCHED;  // it is only active because of TOUCHED
             typeFlag = false;
 
+            debugBoardStack();
             // requestLayout is called by setLayout
             softBoardListener.getLayoutView().setLayout( boardEntry.getLayout(orientation));
             }

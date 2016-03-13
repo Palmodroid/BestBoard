@@ -36,20 +36,20 @@ public class Debug
     public static final int COMMANDS = 40;
     public static final int IGNITION = 50;
     public static final int DATA = 60;
-    public static final int PARSER = 770;
-    public static final int BLOCK = 770;
+    public static final int PARSER = 70;
+    public static final int BLOCK = 70;
     public static final int SERVICE = 80;
     public static final int TEXT = 90;
     public static final int CURSOR = 90;
 
 
-    public static final int BOARDSTATE = 100;
-    public static final int CAPSSTATE = 100;
-    public static final int HARDSTATE = 100;
+    public static final int BOARDSTATE = 60;
+    public static final int CAPSSTATE = 60;
+    public static final int HARDSTATE = 60;
     public static final int LINKSTATE = 600;
-    public static final int METASTATE = 600;
+    public static final int METASTATE = 60;
 
-    public static final int BUTTON = 110;
+    public static final int BUTTON = 60;
 
     // Other settings
 

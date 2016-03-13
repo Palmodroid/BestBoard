@@ -267,7 +267,7 @@ public class SoftBoardData
 
         boolean sendKeyDown( long downTime, int keyEventCode );
         boolean sendKeyUp( long downTime, long eventTime, int keyEventCode );
-        void sendKeyDownUp( int keyEventCode );
+        void sendKeyDownUp(int keyEventCode);
 
         void sendString( String string, int autoSpace );
         // UseState needs this to change layout

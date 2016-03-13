@@ -3,13 +3,13 @@ package org.lattilad.bestboard.states;
 import android.os.SystemClock;
 import android.view.KeyEvent;
 
-import java.util.Arrays;
-
-import org.lattilad.bestboard.parser.Commands;
-import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.debug.Debug;
+import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.ExtendedMap;
+
+import java.util.Arrays;
 
 /**
  * Summary of the states
@@ -56,6 +56,8 @@ public class LayoutStates
     /**
      * Down-time of simulated hard-state buttons.
      * RELEASED (-1L) for non-active state.
+     * PLANNED (0L) for planned active state, it will eventually pressed before any keystroke,
+     * and released after it.
      */
     private long hardStateTimes[] = new long[ LayoutStates.HARD_STATES_SIZE];
 
@@ -167,16 +169,16 @@ public class LayoutStates
      * Simulates meta-button press.
      * Sets and calculates android meta-state and the sent meta-buttons store.
      */
-    public void pressSimulatedMetaButton( int hardState )
+    public void pressMetaButton(int hardState)
         {
-        hardStateTimes[hardState] = SystemClock.uptimeMillis();
-
+        hardStateTimes[hardState] = 0L;
         // android meta-state is needed for the simulated press ??
         calculateAndroidMetaState();
 
+        // NOT NEEDED IN INSTANTSIMULATE
         softBoardListener.sendKeyDown(
                 hardStateTimes[hardState],
-                hardStateAndroidCodes[hardState] );
+                hardStateAndroidCodes[hardState]);
         }
 
 
@@ -184,16 +186,50 @@ public class LayoutStates
      * Simulates meta-button release.
      * Sets and calculates android meta-state and the sent meta-buttons store.
      */
-    public void releaseSimulatedMetaButton( int hardState )
+    public void releaseMetaButton(int hardState)
         {
+        // NOT NEEDED IN INSTANTSIMULATE
         softBoardListener.sendKeyUp(
                 hardStateTimes[hardState], SystemClock.uptimeMillis(), hardStateAndroidCodes[hardState] );
-        hardStateTimes[hardState] = RELEASED;
 
+        hardStateTimes[hardState] = RELEASED;
         calculateAndroidMetaState();
         }
 
-    public void resetSimulatedMetaButtons()
+
+    /**
+     * simulateMetaPress and simulateMetaRelease should always be called together!
+     * it simulates press and release around a key-send
+     */
+    // INSTANTSIMULATE
+    public void simulateMetaPress()
+        {
+        for ( int m = 0; m < HARD_STATES_SIZE; m++ )
+            {
+            if (hardStateTimes[m] != RELEASED)
+                {
+                hardStateTimes[m] = SystemClock.uptimeMillis();
+                softBoardListener.sendKeyDown(
+                        hardStateTimes[m], hardStateAndroidCodes[m]);
+                }
+            }
+        }
+
+    // INSTANTSIMULATE
+    public void simulateMetaRelease()
+        {
+        for ( int m = 0; m < HARD_STATES_SIZE; m++ )
+            {
+            if (hardStateTimes[m] != RELEASED)
+                {
+                softBoardListener.sendKeyUp(
+                        hardStateTimes[m], SystemClock.uptimeMillis(), hardStateAndroidCodes[m]);
+                }
+            }
+        }
+
+    // NOT NEEDED IN INSTANTSIMULATE
+    public void resetMetaButtons()
         {
         for ( int m = 0; m < HARD_STATES_SIZE; m++ )
             {

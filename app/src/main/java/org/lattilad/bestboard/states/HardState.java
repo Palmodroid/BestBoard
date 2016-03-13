@@ -62,7 +62,7 @@ public class HardState extends MetaState
             if ( !layoutStates.isSimulatedMetaButtonPressed( selfMetaState ) )
                 {
                 Scribe.debug( Debug.HARDSTATE, selfMetaState + " hard state's button is pressed! " );
-                layoutStates.pressSimulatedMetaButton( selfMetaState );
+                layoutStates.pressMetaButton(selfMetaState);
                 }
             }
         else
@@ -70,7 +70,7 @@ public class HardState extends MetaState
             if ( layoutStates.isSimulatedMetaButtonPressed( selfMetaState) )
                 {
                 Scribe.debug( Debug.HARDSTATE, selfMetaState + " hard state's button is released! ");
-                layoutStates.releaseSimulatedMetaButton( selfMetaState );
+                layoutStates.releaseMetaButton(selfMetaState);
                 }
             }
         }

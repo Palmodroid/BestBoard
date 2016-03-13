@@ -160,11 +160,16 @@ public class Commands
     // public static final long TOKEN_LOCK = 0x11bd48L;
     public static final long TOKEN_BACK = 0x9b7c8L;
 
-    public static final long TOKEN_META = 0x125016L;
-    public static final long TOKEN_CAPS = 0xa7f8eL;
-    public static final long TOKEN_CTRL = 0xae56cL;
-    public static final long TOKEN_ALT = 0x1389fL;
-    public static final long TOKEN_SHIFT = 0x32f4092L;
+    // public static final long TOKEN_META = 0x125016L;
+    // public static final long TOKEN_CAPS = 0xa7f8eL;
+    // public static final long TOKEN_CTRL = 0xae56cL;
+    // public static final long TOKEN_ALT = 0x1389fL;
+    // public static final long TOKEN_SHIFT = 0x32f4092L;
+    public static final long TOKEN_METACAPS = 0x1ef1a688d35L;
+    public static final long TOKEN_METASHIFT = 0x478ed2c739b5L;
+    public static final long TOKEN_METACTRL = 0x1ef1a68f313L;
+    public static final long TOKEN_METAALT = 0xd61950f7aL;
+
     // public static final long TOKEN_LOCK = 0x11bd48L;
 
     public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
@@ -494,7 +499,10 @@ public class Commands
                         TOKEN_LIST,
                         TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
 
-                        TOKEN_META,
+                        TOKEN_METACAPS,
+                        TOKEN_METASHIFT,
+                        TOKEN_METACTRL,
+                        TOKEN_METAALT,
                         TOKEN_LOCK,
                         TOKEN_SWITCH,
                         // TOKEN_LOCK,
@@ -582,7 +590,10 @@ public class Commands
                         TOKEN_DO */ },
                 "packet");
 
-        add(TOKEN_META, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_METACAPS, new long[]{PARAMETER_FLAG});
+        add(TOKEN_METASHIFT, new long[]{PARAMETER_FLAG});
+        add(TOKEN_METACTRL, new long[]{PARAMETER_FLAG});
+        add(TOKEN_METAALT, new long[]{PARAMETER_FLAG});
         // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_SWITCH, new long[]{PARAMETER_KEYWORD});

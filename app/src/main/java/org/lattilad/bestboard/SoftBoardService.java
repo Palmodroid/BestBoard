@@ -36,8 +36,6 @@ import org.lattilad.bestboard.states.LayoutStates;
 
 import java.io.File;
 
-import static android.os.Environment.getExternalStorageState;
-
 
 public class SoftBoardService extends InputMethodService implements
         SoftBoardParserListener,
@@ -525,7 +523,7 @@ textAfterCursor. ;
      * Initializes a new text session.
      * This happens at each EditText start, and at each uncontrolled cursor movements
      */
-    private void initTextSession()
+    private void initTextSession( )
         {
         // no undo at start
         undoString = null;
@@ -533,14 +531,6 @@ textAfterCursor. ;
         // surrounding text is changed
         textBeforeCursor.invalidate();
         textAfterCursor.invalidate();
-
-        if ( softBoardData != null && softBoardData.textSessionSetsMetastates )
-            {
-            layoutView.type();
-            ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
-                    .setAutoCapsState(CapsState.AUTOCAPS_OFF);
-            layoutView.invalidate();
-            }
 
         }
 
@@ -623,12 +613,21 @@ textAfterCursor. ;
                 }
 
             // pressed hard-keys are released
-            softBoardData.layoutStates.resetSimulatedMetaButtons();
+            // NOT NEEDED IN INSTANTSIMULATE
+            softBoardData.layoutStates.resetMetaButtons();
 
             // enter's title is set
             softBoardData.setAction(editorInfo.imeOptions);
 
             initTextSession();
+            // Meta reset needed only in new input box
+            if ( softBoardData.textSessionSetsMetastates )
+                {
+                layoutView.type();
+                ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
+                        .setAutoCapsState(CapsState.AUTOCAPS_OFF);
+                layoutView.invalidate();
+                }
 
             // set autocaps state depending on field behavior and cursor position
             if ( calculatedCursorPosition == 0 && editorInfo.initialCapsMode != 0 )
@@ -655,6 +654,12 @@ textAfterCursor. ;
         super.onUpdateSelection(oldSelStart, oldSelEnd, newSelStart, newSelEnd,
                 candidatesStart, candidatesEnd);
         Scribe.locus(Debug.TEXT);
+
+        Scribe.debug(Debug.TEXT,
+                "OldStart: " + oldSelStart +
+                " OldEnd: " + oldSelEnd +
+                " NewStart: " + newSelStart +
+                " NewEnd: " + newSelEnd );
 
         // Cursor movement checking is independent from selection.
         // Cursor position is the start of the selection.
@@ -981,7 +986,7 @@ textAfterCursor. ;
                 Scribe.debug(Debug.TEXT, "No more text to delete, hard DEL is sent!");
 
                 softBoardData.layoutStates.forceBinaryHardState( 0x15 );
-                sendKeyDownUp( KeyEvent.KEYCODE_DEL );
+                sendKeyDownUp(KeyEvent.KEYCODE_DEL);
                 softBoardData.layoutStates.clearBinaryHardState();
 
                 return;
@@ -1033,7 +1038,7 @@ textAfterCursor. ;
                 Scribe.debug(Debug.TEXT, "No more text to delete, hard FORWARD_DEL is sent!");
 
                 softBoardData.layoutStates.forceBinaryHardState( 0x15 );
-                sendKeyDownUp( KeyEvent.KEYCODE_FORWARD_DEL );
+                sendKeyDownUp(KeyEvent.KEYCODE_FORWARD_DEL);
                 softBoardData.layoutStates.clearBinaryHardState();
 
                 return;
@@ -1125,14 +1130,18 @@ textAfterCursor. ;
      * Input-connection availability is not returned!
      * @param keyEventCode android keyCode
      */
-    public void sendKeyDownUp( int keyEventCode )
+    public void sendKeyDownUp(int keyEventCode)
         {
-        Scribe.debug( Debug.SERVICE, keyEventCode + " hard button is down-up!");
+        Scribe.debug(Debug.SERVICE, keyEventCode + " hard button is down-up!");
+
+        // INSTANTSIMULATE softBoardData.layoutStates.simulateMetaPress();
 
         long downTime = SystemClock.uptimeMillis();
         if (sendKeyDown( downTime, keyEventCode ))
             sendKeyUp( downTime, SystemClock.uptimeMillis(), keyEventCode );
         // ACTION_UP will be sent only, if ACTION_DOWN was successfully sent
+
+        // INSTANTSIMULATE softBoardData.layoutStates.simulateMetaRelease();
         }
 
 

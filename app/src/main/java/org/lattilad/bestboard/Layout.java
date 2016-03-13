@@ -268,20 +268,38 @@ public class Layout
         this.metaStates = metaStates;
         }
 
-
+    boolean[] storedMetaStates = new boolean[ LayoutStates.META_STATES_SIZE ];
     /**
      * Force meta-states, as defined by setForcedMeta()
      * This method is called when layout is chosen.
+     * revertForcedMetaStates should be called when exiting layout.
      */
     public void forceMetaStates()
         {
         for (int m = 0; m < metaStates.length; m++)
             {
+            // LOCKed and non-LOCKed state will be restored (but TOUCH and ON not!)
+            storedMetaStates[m] =
+                    (softBoardData.layoutStates.metaStates[m].getState() == MetaState.META_LOCK);
+
             if ( metaStates[m].isTrue() )
                 softBoardData.layoutStates.metaStates[m].setState( MetaState.META_LOCK );
             else if ( metaStates[m].isFalse() )
                 softBoardData.layoutStates.metaStates[m].setState( MetaState.META_OFF );
             // IGNORE -> no change
+            }
+        }
+
+    public void revertForcedMetaStates()
+        {
+        for (int m = 0; m < metaStates.length; m++)
+            {
+            // LOCKED and OFF state are reverted for forced metas.
+            if ( !metaStates[m].isIgnored() )
+                {
+                softBoardData.layoutStates.metaStates[m].setState(
+                        storedMetaStates[m] ? MetaState.META_LOCK : MetaState.META_OFF );
+                }
             }
         }
 

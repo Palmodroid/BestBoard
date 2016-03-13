@@ -10,18 +10,18 @@ import android.view.InflateException;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonMainTouch;
 import org.lattilad.bestboard.buttons.ButtonMultiTouch;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.states.MetaState;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 public class LayoutView extends View
     {
@@ -86,6 +86,10 @@ public class LayoutView extends View
             if ( this.layout != null )
                 {
                 Scribe.debug(Debug.VIEW, "Layout request is called");
+
+                // any forced meta-state should be reverted
+                this.layout.revertForcedMetaStates();
+
                 requestLayout(); // it should be called later
                 }
             

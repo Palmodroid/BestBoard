@@ -350,8 +350,8 @@ public class MethodsForCommands
             return;
             }
 
-        boolean locked = (boolean)parameters.remove( Commands.TOKEN_LOCK, false );
         boolean root = (boolean)parameters.remove( Commands.TOKEN_ROOT, false );
+        boolean locked = (boolean)parameters.remove( Commands.TOKEN_LOCK, root );
 
         // LAYOUT is given, no other parameters are checked
         Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
@@ -1120,18 +1120,9 @@ public class MethodsForCommands
         }
 
 
-    private Button createButtonMeta( long metaToken, ExtendedMap<Long, Object> parameters )
+    private Button createButtonMeta( int meta, ExtendedMap<Long, Object> parameters )
         {
-        int meta = -1;
-
-        if ( metaToken == Commands.TOKEN_CAPS )
-            meta = LayoutStates.META_CAPS;
-        else if ( metaToken == Commands.TOKEN_SHIFT )
-            meta = LayoutStates.META_SHIFT;
-        else if ( metaToken == Commands.TOKEN_CTRL )
-            meta = LayoutStates.META_CTRL;
-        else if ( metaToken == Commands.TOKEN_ALT )
-            meta = LayoutStates.META_ALT;
+        // meta is from LayoutStates.META_...
 
         // ButtonMeta constructor will not accept any non-valid parameter
         try
@@ -1269,9 +1260,24 @@ public class MethodsForCommands
             return createButtonSwitch((long) temp, parameters);
             }
 
-        if ((temp = parameters.remove(Commands.TOKEN_META)) != null)
+        if ( parameters.remove(Commands.TOKEN_METACAPS) != null)
             {
-            return createButtonMeta((long) temp, parameters);
+            return createButtonMeta(LayoutStates.META_CAPS, parameters);
+            }
+
+        if ( parameters.remove(Commands.TOKEN_METASHIFT) != null)
+            {
+            return createButtonMeta(LayoutStates.META_SHIFT, parameters);
+            }
+
+        if ( parameters.remove(Commands.TOKEN_METACTRL) != null)
+            {
+            return createButtonMeta(LayoutStates.META_CTRL, parameters);
+            }
+
+        if ( parameters.remove(Commands.TOKEN_METAALT) != null)
+            {
+            return createButtonMeta(LayoutStates.META_ALT, parameters);
             }
 
         // Create MAIN TOUCH BUTTONS

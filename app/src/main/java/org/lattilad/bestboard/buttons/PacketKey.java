@@ -70,7 +70,7 @@ public class PacketKey extends Packet
         // If no meta is set or forced, then android meta state remains 0
         if ( anyMeta || softBoardData.layoutStates.isAnyHardMetaActive() )
             {
-            softBoardData.softBoardListener.sendKeyDownUp( hardKeyCode );
+            softBoardData.softBoardListener.sendKeyDownUp(hardKeyCode);
             sent = true;
             }
 
