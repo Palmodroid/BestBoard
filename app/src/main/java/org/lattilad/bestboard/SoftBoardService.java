@@ -752,7 +752,6 @@ textAfterCursor. ;
         {
         Scribe.debug(Debug.TEXT, "String to send: [" + string + "], length: " + string.length());
 
-
         undoString = string;
         calculatedCursorPosition += string.length();
         checkEnabledAfter = NEVER;
@@ -763,6 +762,10 @@ textAfterCursor. ;
             textAfterCursor.invalidate();
             }
         inputConnection.commitText(string, 1);
+
+        // TIMING EVENT
+        softBoardData.characterCounter.measure(string.length());
+        softBoardData.showTiming();
 
         Scribe.debug(Debug.CURSOR, "String. Calculated cursor position: " + calculatedCursorPosition);
         }

@@ -57,8 +57,8 @@ public class LayoutView extends View
      */
     public LayoutView(Context context)
         {
-        super( context );
-        Scribe.locus( Debug.VIEW );
+        super(context);
+        Scribe.locus(Debug.VIEW);
 
         strokePaint = new Paint();
         strokePaint.setStyle(Paint.Style.FILL);
@@ -844,6 +844,10 @@ public class LayoutView extends View
 
                     // new MAIN bow created, evaluation is finished
 
+                    // TIMING EVENT; could be in mainTouchStart
+                    layout.softBoardData.buttonCounter.measure(1);
+                    layout.softBoardData.showTiming();
+
                     return;
                     }
 
@@ -882,8 +886,12 @@ public class LayoutView extends View
             if ( mainTouchBow.isLong() && mainTouchBow.buttonMainTouch != null)
                 {
                 Scribe.debug(Debug.TOUCH, "LONG touch is detected.");
-                mainTouchBow.buttonMainTouch.mainTouchSecondary( ButtonMainTouch.ON_CIRCLE );
+                mainTouchBow.buttonMainTouch.mainTouchSecondary(ButtonMainTouch.ON_CIRCLE);
                 mainTouchBow.resetMoveAndPressureCounter();
+
+                // TIMING EVENT - could be in mainTouchSecondary
+                layout.softBoardData.buttonCounter.measure(1);
+                layout.softBoardData.showTiming();
                 }
 
             // check bow's press
@@ -892,9 +900,14 @@ public class LayoutView extends View
                 Scribe.debug( Debug.TOUCH, "PRESS touch is detected." );
                 mainTouchBow.buttonMainTouch.mainTouchSecondary(ButtonMainTouch.ON_HARD_PRESS);
                 mainTouchBow.resetMoveAndPressureCounter();
+
+                // TIMING EVENT - could be in mainTouchSecondary
+                layout.softBoardData.buttonCounter.measure(1);
+                layout.softBoardData.showTiming();
                 }
 
             // bow's repeat - is checked by the repeat-handler
+            // no timing for repeated buttons
             }
         }
 

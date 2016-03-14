@@ -15,6 +15,7 @@ import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.server.TextBeforeCursor;
 import org.lattilad.bestboard.states.BoardTable;
 import org.lattilad.bestboard.states.LayoutStates;
+import org.lattilad.bestboard.utils.TimeCounter;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,65 +36,91 @@ public class SoftBoardData
      */
     public Layout firstLayout = null;
 
-    /** Softboard's name */
+    /**
+     * Softboard's name
+     */
     public String name = "";
 
-    /** Softboard's version */
+    /**
+     * Softboard's version
+     */
     public int version = 1;
 
-    /** Softboard's author */
+    /**
+     * Softboard's author
+     */
     public String author = "";
 
-    /** Softboard's tags */
+    /**
+     * Softboard's tags
+     */
     public List<String> tags = new ArrayList<>();
 
-    /** Softboard's short description */
+    /**
+     * Softboard's short description
+     */
     public String description = "";
 
-    /** File name of softboard's document (should be in the same directory) - if available */
+    /**
+     * File name of softboard's document (should be in the same directory) - if available
+     */
     public File docFile = null;
 
-    /** Full URI of softboard's document - if available */
+    /**
+     * Full URI of softboard's document - if available
+     */
     public String docUri = "";
 
-    /** Locale */
+    /**
+     * Locale
+     */
     public Locale locale = Locale.getDefault(); // or Locale.US - which is always available
 
-    /** Color of pressed meta-keys */
+    /**
+     * Color of pressed meta-keys
+     */
     public int metaColor = Color.CYAN;
 
-    /** Color of locked meta-keys */
+    /**
+     * Color of locked meta-keys
+     */
     public int lockColor = Color.BLUE;
 
-    /** Color of autocaps */
+    /**
+     * Color of autocaps
+     */
     public int autoColor = Color.MAGENTA;
 
-    /** Color of touched keys */
+    /**
+     * Color of touched keys
+     */
     public int touchColor = Color.RED;
 
-    /** Color of stroke */
+    /**
+     * Color of stroke
+     */
     public int strokeColor = Color.MAGENTA & 0x77FFFFFF;
 
 
     /**
-     ** PREFERENCES - stored in softBoardData, because these variables affect all boards
-     ** Preferences are read by readPreferences() at start and at change, because:
-     ** - some of them needed frequently
-     ** - numeric preferences are stored as string
+     * * PREFERENCES - stored in softBoardData, because these variables affect all boards
+     * * Preferences are read by readPreferences() at start and at change, because:
+     * * - some of them needed frequently
+     * * - numeric preferences are stored as string
      **/
     public void readPreferences()
         {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( softBoardListener.getApplicationContext() );
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(softBoardListener.getApplicationContext());
 
-        hideTop = ( sharedPrefs.getBoolean( softBoardListener.getApplicationContext().getString( R.string.drawing_hide_upper_key ), false)) ? 1 : 0;
+        hideTop = (sharedPrefs.getBoolean(softBoardListener.getApplicationContext().getString(R.string.drawing_hide_upper_key), false)) ? 1 : 0;
 
-        hideBottom = ( sharedPrefs.getBoolean( softBoardListener.getApplicationContext().getString( R.string.drawing_hide_lower_key ), false)) ? 1 : 0;
+        hideBottom = (sharedPrefs.getBoolean(softBoardListener.getApplicationContext().getString(R.string.drawing_hide_lower_key), false)) ? 1 : 0;
 
-        heightRatioPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_HEIGHT_RATIO_INT_KEY, 0);
+        heightRatioPermil = sharedPrefs.getInt(PrefsFragment.DRAWING_HEIGHT_RATIO_INT_KEY, 0);
 
-        landscapeOffsetPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_LANDSCAPE_OFFSET_INT_KEY, 0);
+        landscapeOffsetPermil = sharedPrefs.getInt(PrefsFragment.DRAWING_LANDSCAPE_OFFSET_INT_KEY, 0);
 
-        outerRimPermil = sharedPrefs.getInt( PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0 );
+        outerRimPermil = sharedPrefs.getInt(PrefsFragment.DRAWING_OUTER_RIM_INT_KEY, 0);
 
         monitorRow = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString(R.string.drawing_monitor_row_key),
@@ -101,24 +128,24 @@ public class SoftBoardData
 
         longBowCount = sharedPrefs.getInt(PrefsFragment.TOUCH_LONG_COUNT_INT_KEY, 0);
 
-        pressBowCount = sharedPrefs.getInt( PrefsFragment.TOUCH_PRESS_COUNT_INT_KEY, 0 );
+        pressBowCount = sharedPrefs.getInt(PrefsFragment.TOUCH_PRESS_COUNT_INT_KEY, 0);
 
-        pressBowThreshold = (float)sharedPrefs.getInt( PrefsFragment.TOUCH_PRESS_THRESHOLD_INT_KEY, 0 ) / 1000f;
+        pressBowThreshold = (float) sharedPrefs.getInt(PrefsFragment.TOUCH_PRESS_THRESHOLD_INT_KEY, 0) / 1000f;
 
-        stayBowTime = sharedPrefs.getInt( PrefsFragment.TOUCH_STAY_TIME_INT_KEY, 0 ); // * 1000000;
+        stayBowTime = sharedPrefs.getInt(PrefsFragment.TOUCH_STAY_TIME_INT_KEY, 0); // * 1000000;
 
-        repeatTime = sharedPrefs.getInt( PrefsFragment.TOUCH_REPEAT_TIME_INT_KEY, 0 ); //  * 1000000;
+        repeatTime = sharedPrefs.getInt(PrefsFragment.TOUCH_REPEAT_TIME_INT_KEY, 0); //  * 1000000;
 
         displayTouch = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString(R.string.cursor_touch_allow_key),
                 true);
 
         displayStroke = sharedPrefs.getBoolean(
-                softBoardListener.getApplicationContext().getString( R.string.cursor_stroke_allow_key ),
+                softBoardListener.getApplicationContext().getString(R.string.cursor_stroke_allow_key),
                 true);
 
         textSessionSetsMetastates = sharedPrefs.getBoolean(
-                softBoardListener.getApplicationContext().getString( R.string.editing_text_session_key ),
+                softBoardListener.getApplicationContext().getString(R.string.editing_text_session_key),
                 true);
         }
 
@@ -203,7 +230,7 @@ public class SoftBoardData
 
 
     /**
-     ** STATES NEEDED BY THE SOFTBOARD
+     * * STATES NEEDED BY THE SOFTBOARD
      **/
 
     public LayoutStates layoutStates;
@@ -228,7 +255,9 @@ public class SoftBoardData
     public static final int ACTION_MULTILINE = 8;
 
 
-    /** Action-titles displayed by the enter-key */
+    /**
+     * Action-titles displayed by the enter-key
+     */
     // Number of actionTitles should be ACTION_TITLES!
     public String[] actionTitles = {
             "???",
@@ -239,10 +268,18 @@ public class SoftBoardData
             "NEXT",
             "DONE",
             "PREV",
-            "CR" };
+            "CR"};
 
-    /** Text of the monitor row */
+    /**
+     * Text of the monitor row
+     */
     private String monitorString = "MONITOR";
+
+    /**
+     * Counters of sent characters and buttons
+     */
+    public TimeCounter characterCounter = new TimeCounter();
+    public TimeCounter buttonCounter = new TimeCounter();
 
     /**
      * DATA NEEDED BY MODIFY
@@ -405,5 +442,32 @@ public class SoftBoardData
     public String getMonitorString()
         {
         return monitorString;
+        }
+
+
+    public void showTiming()
+        {
+        int characterVelocity = characterCounter.getVelocity();
+        int buttonVelocity = buttonCounter.getVelocity();
+
+        StringBuilder builder = new StringBuilder();
+        if ( characterVelocity > 0 )
+            {
+            builder.append(characterVelocity).append(" c/m, ");
+            }
+        else
+            {
+            builder.append("- ");
+            }
+
+        if ( buttonVelocity > 0 )
+            {
+            builder.append(buttonVelocity).append(" b/m");
+            }
+        else
+            {
+            builder.append("-");
+            }
+        setMonitorString( builder.toString() );
         }
     }

@@ -49,7 +49,7 @@ public class Commands
     public static final long TOKEN_AUTOCOLOR = 0x229aefe38af0L;
     public static final long TOKEN_TOUCHCOLOR = 0xdb3133d220b23L;
     public static final long TOKEN_STROKECOLOR = 0x1ec12db0915dd7dL;
-    public static final long TOKEN_TITLEFONT = 0x5e4418d4118dL;
+    public static final long TOKEN_FONT = 0xd1bbaL;
 
     public static final long TOKEN_ENTERTITLE = 0x6c2ce8db60a6dL;
     public static final long TOKEN_GOTITLE = 0x9f55d6b8aL;
@@ -353,7 +353,7 @@ public class Commands
                 TOKEN_AUTOCOLOR,
                 TOKEN_TOUCHCOLOR,
                 TOKEN_STROKECOLOR,
-                TOKEN_TITLEFONT,
+                TOKEN_FONT,
 
                 TOKEN_ENTERTITLE,
                 TOKEN_GOTITLE,
@@ -400,7 +400,7 @@ public class Commands
         add(TOKEN_AUTOCOLOR, new long[]{PARAMETER_COLOR}, "setAutoColor");
         add(TOKEN_TOUCHCOLOR, new long[]{PARAMETER_COLOR}, "setTouchColor");
         add(TOKEN_STROKECOLOR, new long[]{PARAMETER_COLOR}, "setStrokeColor");
-        add(TOKEN_TITLEFONT, new long[]{PARAMETER_FILE}, "setTypeface");
+        add(TOKEN_FONT, new long[]{PARAMETER_FILE}, "setTypeface");
 
         add(TOKEN_ENTERTITLE, new long[]{PARAMETER_TEXT}, "setEnterTitle");
         add(TOKEN_GOTITLE, new long[]{PARAMETER_TEXT}, "setGoTitle");
@@ -670,13 +670,6 @@ public class Commands
         // add(TOKEN_ITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
         // add(TOKEN_NONITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG_FALSE} );
         // add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
-
-
-
-
-
-
-
 
         add(TOKEN_STOP, new long[]{MESSAGE_STOP} );
 
