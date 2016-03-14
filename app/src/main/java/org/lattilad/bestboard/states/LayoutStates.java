@@ -261,7 +261,7 @@ public class LayoutStates
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 
-        Scribe.debug( Debug.BOARDSTATE,  "Binary Hard state ALT added: " + Integer.toBinaryString( binaryHardState ) );
+        Scribe.debug( Debug.LAYOUTSTATE,  "Binary Hard state ALT added: " + Integer.toBinaryString( binaryHardState ) );
 
         binaryHardState <<= HardState.FORCE_BITS;
 
@@ -269,7 +269,7 @@ public class LayoutStates
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 
-        Scribe.debug( Debug.BOARDSTATE,  "Binary Hard state CTRL added: " + Integer.toBinaryString( binaryHardState ) );
+        Scribe.debug( Debug.LAYOUTSTATE,  "Binary Hard state CTRL added: " + Integer.toBinaryString( binaryHardState ) );
 
         binaryHardState <<= HardState.FORCE_BITS;
 
@@ -277,7 +277,7 @@ public class LayoutStates
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 
-        Scribe.debug( Debug.BOARDSTATE,  "Binary Hard state SHIFT added, ready: " + Integer.toBinaryString( binaryHardState ) );
+        Scribe.debug( Debug.LAYOUTSTATE,  "Binary Hard state SHIFT added, ready: " + Integer.toBinaryString( binaryHardState ) );
 
         return binaryHardState;
         }
