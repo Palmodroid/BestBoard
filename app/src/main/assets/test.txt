@@ -35,9 +35,9 @@ LET ( landlay ADDLAYOUT ( ALIGN evens HALFCOLUMNS 25 ) )
 ; A legegyszerűbb esetben a board (landscape/portrait pár) mindkét irányhoz 
 ; ugyanazt a layout-ot használja. 
 ; Ilyenkor a layout-ban elhelyezett ASBOARD jelzi, hogy ugyanezen a néven egy board is 
-; kerüljön létrehozásra. ROOT (legelső board) és LOCK (mindig lock-olt board) használható
+; kerüljön létrehozásra. START (legelső board) és LOCK (mindig lock-olt board) használható
 
-ADDLAYOUT ( ID lay1 COLOR yellow ASBOARD ROOT )
+ADDLAYOUT ( ID lay1 COLOR yellow ASBOARD START )
 
 ; A két külön iránynak megfelelő layoutot külön kell definiálni
 ADDLAYOUT ( ID lay2 COLOR rose ) 
@@ -46,7 +46,7 @@ ADDBOARD ( ID lay2 PORTRAIT lay2 LANDSCAPE lay2w LOCK )
 
 ; A layoutok természetesen többször is használhatóak, pl. két non-wide mellett ugyanaz a wide
 ADDLAYOUT ( ID lay3 color green )
-ADDBOARD ( ID lay3 PORTRAIT lay3 LANDSCAPE lay2w LOCK ROOT)
+ADDBOARD ( ID lay3 PORTRAIT lay3 LANDSCAPE lay2w LOCK START)
 
 ; Persze ez is megy. És itt is lehet azonos az azonosító
 ADDLAYOUT ( ID lay4 ALIGN evens COLOR pink )
@@ -69,7 +69,7 @@ DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 250 SIZE 1000 BOLD ITALICS )
 ; Ha az aktuális board lock-olt, akkor az előzőre, ami szintén lock-olt lesz.
 ; Ha az aktuális nem lock-olt, akkor az utolsó lock-olt-ra.
 ; FONTOS! Ha olyan board-ra váltunk, ami korábban már szerepelt, akkor arra térünk vissza -
-; vagyis mindig a legrövidebb út számít a root board irányában.
+; vagyis mindig a legrövidebb út számít a START board irányában.
 
 ; A 'váltosort' label-ként definiáljuk, mert minden boardra rákerül
 LET ( jump BLOCK (
@@ -369,13 +369,13 @@ BLOCK ( LAYOUT lay5 COLUMN 2 ROW 4
 ; lay6 - combined packets
 
 BLOCK ( LAYOUT lay6 COLUMN 2 ROW 2
-	BUTTON ( META SHIFT )
+	BUTTON ( METASHIFT )
 	BUTTON ( TEXT "text")
-	BUTTON ( KEY 'K')
-	BUTTON ( COMBINE TEXT "text" KEY 'K')
-	BUTTON ( COMBINE DO BACKSPACE KEY KEYDEL )
-	BUTTON ( COMBINE DO DELETE KEY KEYFWDEL)
-	BUTTON ( COMBINE TEXT '\t' KEY KEYTAB ADDTITLE ( TEXT "TAB" ) )
+	BUTTON ( SEND 'K')
+	BUTTON ( COMBINE TEXT "text" SEND 'K')
+	BUTTON ( COMBINE DO BACKSPACE SEND KEYDEL )
+	BUTTON ( COMBINE DO DELETE SEND KEYFWDEL)
+	BUTTON ( COMBINE TEXT '\t' SEND KEYTAB ADDTITLE ( TEXT "TAB" ) )
 		)
 
 STOP

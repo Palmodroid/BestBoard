@@ -1,5 +1,7 @@
 package org.lattilad.bestboard.buttons;
 
+import org.lattilad.bestboard.SoftBoardData;
+
 /**
  * Double button with double packet
  * First packet should be undo-able (Text),
@@ -37,6 +39,7 @@ public class ButtonDouble extends ButtonMainTouch implements Cloneable
     public void mainTouchStart( boolean isTouchDown )
         {
         packetFirst.send();
+        layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         counter = 1;
         }
 
@@ -57,11 +60,13 @@ public class ButtonDouble extends ButtonMainTouch implements Cloneable
             if ( counter == 1 )
                 {
                 packetSecond.send();
+                layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
                 counter = 2;
                 }
             else // counter == 2
                 {
                 packetFirst.send();
+                layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
                 counter = 1;
                 }
             }

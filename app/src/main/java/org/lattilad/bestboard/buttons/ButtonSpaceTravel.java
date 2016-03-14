@@ -1,5 +1,7 @@
 package org.lattilad.bestboard.buttons;
 
+import org.lattilad.bestboard.SoftBoardData;
+
 /**
  * Simple button with traveller-space
  * This class doesn't use the Packet sending mechanism, it will send space directly
@@ -31,6 +33,7 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
         if ( isTouchDown )
             {
             packet.send();
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
             done = true;
             }
         else
@@ -45,6 +48,7 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
         if ( isTouchUp && !done )
             {
             packet.send();
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
             done = true;
             }
 

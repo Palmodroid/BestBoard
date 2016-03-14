@@ -2,6 +2,7 @@ package org.lattilad.bestboard.buttons;
 
 import android.graphics.Canvas;
 
+import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.states.LayoutStates;
@@ -96,6 +97,7 @@ public class ButtonMeta extends ButtonMultiTouch implements
             {
             Scribe.debug( Debug.BUTTON, "Type " + type + " META Button TOUCH.");
             layout.softBoardData.layoutStates.metaStates[type].touch();
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
             }
         else if ( phase == META_RELEASE )
             {

@@ -2,6 +2,7 @@ package org.lattilad.bestboard.buttons;
 
 import android.graphics.Canvas;
 
+import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -59,6 +60,7 @@ public class ButtonSwitch extends ButtonMultiTouch implements
             {
             Scribe.debug( Debug.BUTTON, "Board " + Tokenizer.regenerateKeyword(layoutId) + " LINK Button TOUCH.");
             layout.softBoardData.boardTable.touch(layoutId);
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
             }
         else if ( phase == ButtonMultiTouch.META_RELEASE )
             {

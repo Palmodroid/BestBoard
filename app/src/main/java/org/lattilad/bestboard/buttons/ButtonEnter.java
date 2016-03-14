@@ -36,6 +36,7 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
     public void mainTouchStart( boolean isTouchDown )
         {
         fire();
+        layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }
 
     @Override
@@ -56,6 +57,7 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
         if ( repeat )
             {
             fire();
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_REPETED);
             return true;
             }
         return false;

@@ -1,5 +1,7 @@
 package org.lattilad.bestboard.buttons;
 
+import org.lattilad.bestboard.SoftBoardData;
+
 /**
  * Simple button with a single packet (Text(String) or Hard-key
  */
@@ -75,6 +77,7 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
     public void mainTouchStart( boolean isTouchDown )
         {
         packet.send();
+        layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }
 
     @Override
@@ -89,11 +92,13 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
         if ( repeat )
             {
             packet.send();
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_REPETED);
             return true;
             }
         else
             {
             packet.sendSecondary();
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
             }
         return false;
         }

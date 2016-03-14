@@ -182,6 +182,42 @@
 			android:dialogMessage="@string/cursor_stroke_color_dialog_message"
 			android:defaultValue="@string/cursor_stroke_color_default" /-->
 
+		<CheckBoxPreference
+			android:key="@string/cursor_vibration_allow_key"
+			android:title="@string/cursor_vibration_allow_title"
+			android:summary="@string/cursor_vibration_allow_summary"
+			android:defaultValue="@bool/cursor_vibration_allow_key" />
+
+        <EditTextPreference
+            android:key="@string/cursor_vibration_first_key"
+            android:inputType="number"
+            android:title="@string/cursor_vibration_first_title"
+            android:summary="@string/cursor_vibration_first_summary"
+            android:dialogTitle="@string/cursor_vibration_first_dialog_title"
+            android:dialogMessage="@string/cursor_vibration_first_dialog_message"
+            android:defaultValue="@string/cursor_vibration_first_default"
+            android:dependency="@string/cursor_vibration_allow_key"/>
+
+        <EditTextPreference
+            android:key="@string/cursor_vibration_second_key"
+            android:inputType="number"
+            android:title="@string/cursor_vibration_second_title"
+            android:summary="@string/cursor_vibration_second_summary"
+            android:dialogTitle="@string/cursor_vibration_second_dialog_title"
+            android:dialogMessage="@string/cursor_vibration_second_dialog_message"
+            android:defaultValue="@string/cursor_vibration_second_default"
+            android:dependency="@string/cursor_vibration_allow_key"/>
+
+        <EditTextPreference
+            android:key="@string/cursor_vibration_repeat_key"
+            android:inputType="number"
+            android:title="@string/cursor_vibration_repeat_title"
+            android:summary="@string/cursor_vibration_repeat_summary"
+            android:dialogTitle="@string/cursor_vibration_repeat_dialog_title"
+            android:dialogMessage="@string/cursor_vibration_repeat_dialog_message"
+            android:defaultValue="@string/cursor_vibration_repeat_default"
+            android:dependency="@string/cursor_vibration_allow_key"/>
+
     </PreferenceCategory>
 
     <PreferenceCategory
@@ -228,18 +264,6 @@
 			android:summary="@string/debug_summary"
 			android:defaultValue="@bool/debug_default" />
 
-	</PreferenceCategory>
-
-
-   	<PreferenceCategory
-		android:title="@string/prefs_vibration">
-
-		<CheckBoxPreference
-			android:key="@string/vibration_key"
-			android:title="@string/vibration_title"
-			android:summary="@string/vibration_summary" 
-			android:defaultValue="true" />
-	
 	</PreferenceCategory>
 
 </PreferenceScreen>

@@ -1,5 +1,7 @@
 package org.lattilad.bestboard.buttons;
 
+import org.lattilad.bestboard.SoftBoardData;
+
 import java.util.ArrayList;
 
 /**
@@ -41,6 +43,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         {
         counter = 0;
         packets.get(0).send();
+        layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }
 
     @Override
@@ -59,6 +62,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
                 counter = 0;
 
             packets.get(counter).send();
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
             }
         return false;
         }

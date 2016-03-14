@@ -74,7 +74,7 @@ public class PrefsFragment extends PreferenceFragment
     public static String DRAWING_OUTER_RIM_INT_KEY = "intouterrim";
 
     /** Limit of the speed measurement */
-    public static String DRAWING_SPEDOMETER_LIMIT_INT_KEY = "intouterrim";
+    public static String DRAWING_SPEDOMETER_LIMIT_INT_KEY = "intspedolimit";
 
     /** Length of circular movements */
     public static String TOUCH_LONG_COUNT_INT_KEY = "intlongcount";
@@ -90,6 +90,15 @@ public class PrefsFragment extends PreferenceFragment
 
     /** Time of repeat */
     public static String TOUCH_REPEAT_TIME_INT_KEY = "intrepeattime";
+
+    /** Length of primary vibration */
+    public static String CURSOR_VIBRATION_FIRST_INT_KEY = "intvibrationfirst";
+
+    /** Length of secondary vibration */
+    public static String CURSOR_VIBRATION_SECOND_INT_KEY = "intvibrationsecond";
+
+    /** Length of repeated vibration */
+    public static String CURSOR_VIBRATION_REPEAT_INT_KEY = "intvibrationrepeat";
 
     /** Elongation period */
     public static String EDITING_ELONGATION_PERIOD_INT_KEY = "intelongationperiod";
@@ -155,7 +164,11 @@ public class PrefsFragment extends PreferenceFragment
             checkAndStoreStayTimePref(context);
             checkAndStoreRepeatTimePref(context);
 
-            checkAndStoreElongationPeriod(context);
+            checkAndStoreVibrationFirstPref(context);
+            checkAndStoreVibrationSecondPref(context);
+            checkAndStoreVibrationRepeatPref(context);
+
+            checkAndStoreElongationPeriodPref(context);
 
             // -- NEW INTEGER PREFERENCE CALLS SHOULD COME HERE -- //
 
@@ -306,11 +319,56 @@ public class PrefsFragment extends PreferenceFragment
         }
 
     /**
+     * Checks and sets primary vibration integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStoreVibrationFirstPref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.cursor_vibration_first_key,
+                CURSOR_VIBRATION_FIRST_INT_KEY,
+                R.string.cursor_vibration_first_default,
+                R.integer.cursor_vibration_first_min,
+                R.integer.cursor_vibration_first_max );
+        }
+
+    /**
+     * Checks and sets secondary vibration integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStoreVibrationSecondPref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.cursor_vibration_second_key,
+                CURSOR_VIBRATION_SECOND_INT_KEY,
+                R.string.cursor_vibration_second_default,
+                R.integer.cursor_vibration_second_min,
+                R.integer.cursor_vibration_second_max );
+        }
+
+    /**
+     * Checks and sets repeated vibration integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStoreVibrationRepeatPref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.cursor_vibration_repeat_key,
+                CURSOR_VIBRATION_REPEAT_INT_KEY,
+                R.string.cursor_vibration_repeat_default,
+                R.integer.cursor_vibration_repeat_min,
+                R.integer.cursor_vibration_repeat_max );
+        }
+
+    /**
      * Checks and sets elongation period integer preference
      * @param context context
      * @return integer value of the preference
      */
-    private static int checkAndStoreElongationPeriod( Context context )
+    private static int checkAndStoreElongationPeriodPref(Context context)
         {
         return _checkAndStoreIntPref( context,
                 R.string.editing_elongation_period_key,
@@ -439,6 +497,21 @@ public class PrefsFragment extends PreferenceFragment
                 R.string.touch_repeat_time_dialog_message,
                 R.integer.touch_repeat_time_min,
                 R.integer.touch_repeat_time_max );
+
+        _prepareDialogMessage( R.string.cursor_vibration_first_key,
+                R.string.cursor_vibration_first_dialog_message,
+                R.integer.cursor_vibration_first_min,
+                R.integer.cursor_vibration_first_max );
+
+        _prepareDialogMessage( R.string.cursor_vibration_second_key,
+                R.string.cursor_vibration_second_dialog_message,
+                R.integer.cursor_vibration_second_min,
+                R.integer.cursor_vibration_second_max );
+
+        _prepareDialogMessage( R.string.cursor_vibration_repeat_key,
+                R.string.cursor_vibration_repeat_dialog_message,
+                R.integer.cursor_vibration_repeat_min,
+                R.integer.cursor_vibration_repeat_max );
 
         _prepareDialogMessage( R.string.editing_elongation_period_key,
                 R.string.editing_elongation_period_dialog_message,
@@ -684,6 +757,50 @@ public class PrefsFragment extends PreferenceFragment
             if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
             }
 
+        // Cursor / Vibration allow
+        if ( key.equals( getString( R.string.cursor_vibration_allow_key )) || allKeys )
+            {
+            Scribe.note( Debug.PREF,  "PREFERENCES: Cursor vibration has changed!" );
+
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
+        // Cursor / Primary vibration
+        if ( key.equals( getString( R.string.cursor_vibration_first_key )) || allKeys )
+            {
+            int vibrationFirst = checkAndStoreVibrationFirstPref(getActivity());
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.cursor_vibration_first_key ) );
+            preference.setSummary(getString(R.string.cursor_vibration_first_summary) + " " +
+                    Integer.toString(vibrationFirst));
+            Scribe.note( Debug.PREF, "PREFERENCES: Primary vibration has changed!" + vibrationFirst);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
+        // Cursor / Secondary vibration
+        if ( key.equals( getString( R.string.cursor_vibration_second_key )) || allKeys )
+            {
+            int vibrationSecond = checkAndStoreVibrationSecondPref(getActivity());
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.cursor_vibration_second_key ) );
+            preference.setSummary(getString(R.string.cursor_vibration_second_summary) + " " +
+                    Integer.toString(vibrationSecond));
+            Scribe.note( Debug.PREF, "PREFERENCES: Secondary vibration has changed!" + vibrationSecond);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
+        // Cursor / Repeated vibration
+        if ( key.equals( getString( R.string.cursor_vibration_repeat_key )) || allKeys )
+            {
+            int vibrationRepeat = checkAndStoreVibrationRepeatPref(getActivity());
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.cursor_vibration_repeat_key ) );
+            preference.setSummary(getString(R.string.cursor_vibration_repeat_summary) + " " +
+                    Integer.toString(vibrationRepeat));
+            Scribe.note( Debug.PREF, "PREFERENCES: Repeated vibration has changed!" + vibrationRepeat);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
         // Most editing preferences do not need any refresh, because initInput reads them
         // Editing / Text sesion is read out by softboarddata
 
@@ -726,7 +843,7 @@ public class PrefsFragment extends PreferenceFragment
         // Editing / elongation period
         if ( key.equals( getString( R.string.editing_elongation_period_key )) || allKeys )
             {
-            int elongationPeriod = checkAndStoreElongationPeriod(getActivity());
+            int elongationPeriod = checkAndStoreElongationPeriodPref(getActivity());
             // Cannot be null, if prefs.xml is valid
             Preference preference = findPreference(getString(R.string.editing_elongation_period_key));
             preference.setSummary(getString(R.string.editing_elongation_period_summary) + " " +

@@ -107,7 +107,7 @@
     <string name="touch_repeat_time_dialog_message">Enter time of repeat (in ms)! Repeat rate can be set with this value. </string>
 
 
-    <string name="prefs_cursor">Touch feedback</string>
+    <string name="prefs_cursor">Visual and tactile feedback</string>
 
     <string name="cursor_touch_allow_key">touch</string>
     <string name="cursor_touch_allow_title">Show touched keys</string>
@@ -130,6 +130,28 @@
     <string name="cursor_stroke_color_dialog_title">Color of stroke</string>
     <string name="cursor_stroke_color_dialog_message">Color in hexadecimal AARRGGBB format:</string>
     <string name="cursor_stroke_color_default">100</string>
+
+    <string name="cursor_vibration_allow_key">vibration</string>
+    <string name="cursor_vibration_allow_title">Vibrate on event</string>
+    <string name="cursor_vibration_allow_summary">Primary touches, secondary events and repeats give tactile feedback</string>
+
+    <string name="cursor_vibration_first_key">vibrationfirst</string>
+    <string name="cursor_vibration_first_title">Vibration on primary events </string>
+    <string name="cursor_vibration_first_summary">Vibration length: </string>
+    <string name="cursor_vibration_first_dialog_title">Vibration on primary events </string>
+    <string name="cursor_vibration_first_dialog_message">Enter length of the vibration period (in ms)! Zero value disables vibration. </string>
+
+    <string name="cursor_vibration_second_key">vibrationsecond</string>
+    <string name="cursor_vibration_second_title">Vibration on secondary events </string>
+    <string name="cursor_vibration_second_summary">Vibration length: </string>
+    <string name="cursor_vibration_second_dialog_title">Vibration on secondary events </string>
+    <string name="cursor_vibration_second_dialog_message">Enter length of the vibration period (in ms)! Zero value disables vibration. </string>
+
+    <string name="cursor_vibration_repeat_key">vibrationrepeat</string>
+    <string name="cursor_vibration_repeat_title">Vibration on repeated events </string>
+    <string name="cursor_vibration_repeat_summary">Vibration length: </string>
+    <string name="cursor_vibration_repeat_dialog_title">Vibration on repeated events </string>
+    <string name="cursor_vibration_repeat_dialog_message">Enter length of the vibration period (in ms)! Zero value disables vibration. </string>
 
 
     <string name="prefs_editing">Editing control</string>
@@ -176,13 +198,5 @@
     <string name="debug_key">debug</string>
     <string name="debug_title">Enable developer log</string>
     <string name="debug_summary">Detailed developer log can be enabled for debugging</string>
-
-
-
-    <string name="prefs_vibration">Tactile feedback NOT IMPLEMENTED</string>
-    <string name="vibration_key">vibration</string>
-    <string name="vibration_title">Allow vibration</string>
-    <string name="vibration_summary">Vibration is used for tactile feedback</string>
-
 
 </resources>

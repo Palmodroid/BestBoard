@@ -1,6 +1,7 @@
 package org.lattilad.bestboard.buttons;
 
 import org.lattilad.bestboard.R;
+import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.modify.Modify;
 import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -34,6 +35,7 @@ public class ButtonModify extends ButtonMainTouch implements Cloneable
         if ( modify != null )
             {
             modify.change( reverse );
+            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
             }
         else
             {

@@ -47,6 +47,19 @@
 
     <bool name="cursor_touch_allow_default">true</bool>
     <bool name="cursor_stroke_allow_key">true</bool>
+    <bool name="cursor_vibration_allow_key">false</bool>
+
+    <string name="cursor_vibration_first_default">25</string>
+    <integer name="cursor_vibration_first_min">0</integer>
+    <integer name="cursor_vibration_first_max">1000</integer>
+
+    <string name="cursor_vibration_second_default">50</string>
+    <integer name="cursor_vibration_second_min">0</integer>
+    <integer name="cursor_vibration_second_max">1000</integer>
+
+    <string name="cursor_vibration_repeat_default">10</string>
+    <integer name="cursor_vibration_repeat_min">0</integer>
+    <integer name="cursor_vibration_repeat_max">1000</integer>
 
     <string name="editing_retrieve_text_default">A</string>
     <string name="editing_store_text_default">A</string>

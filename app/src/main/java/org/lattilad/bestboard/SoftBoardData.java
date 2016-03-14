@@ -3,6 +3,7 @@ package org.lattilad.bestboard;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.LongSparseArray;
 import android.view.inputmethod.EditorInfo;
@@ -128,8 +129,8 @@ public class SoftBoardData
 
         // limit is not stored, it is set immediately
         int limit = sharedPrefs.getInt(PrefsFragment.DRAWING_SPEDOMETER_LIMIT_INT_KEY, 3000);
-        characterCounter.setPeriodLimit( limit );
-        buttonCounter.setPeriodLimit( limit );
+        characterCounter.setPeriodLimit(limit);
+        buttonCounter.setPeriodLimit(limit);
 
         longBowCount = sharedPrefs.getInt(PrefsFragment.TOUCH_LONG_COUNT_INT_KEY, 0);
 
@@ -148,6 +149,16 @@ public class SoftBoardData
         displayStroke = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString(R.string.cursor_stroke_allow_key),
                 true);
+
+        vibrationAllowed = sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString(R.string.cursor_vibration_allow_key),
+                true);
+
+        vibrationFirst = sharedPrefs.getInt(PrefsFragment.CURSOR_VIBRATION_FIRST_INT_KEY, 0);
+
+        vibrationSecond = sharedPrefs.getInt(PrefsFragment.CURSOR_VIBRATION_SECOND_INT_KEY, 0);
+
+        vibrationRepeat = sharedPrefs.getInt(PrefsFragment.CURSOR_VIBRATION_REPEAT_INT_KEY, 0);
 
         textSessionSetsMetastates = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString(R.string.editing_text_session_key),
@@ -229,6 +240,26 @@ public class SoftBoardData
     public boolean displayStroke = true;
 
     /**
+     * Vibration is allowed or not
+     */
+    public boolean vibrationAllowed = true;
+
+    /**
+     * Vibration length for primary events
+     */
+    public int vibrationFirst;
+
+    /**
+     * Vibration length for secondary events
+     */
+    public int vibrationSecond;
+
+    /**
+     * Vibration length for repeated events
+     */
+    public int vibrationRepeat;
+
+    /**
      * New text session behaves as a key stroke, and sets meta states accordingly (or not)
      */
     public boolean textSessionSetsMetastates = true;
@@ -285,6 +316,15 @@ public class SoftBoardData
      */
     public TimeCounter characterCounter = new TimeCounter();
     public TimeCounter buttonCounter = new TimeCounter();
+
+    /**
+     * Connection to the system vibrator
+     */
+    private final Vibrator vibrator;
+
+    public final static int VIBRATE_PRIMARY = 1;
+    public final static int VIBRATE_SECONDARY = 2;
+    public final static int VIBRATE_REPETED = 3;
 
     /**
      * DATA NEEDED BY MODIFY
@@ -358,6 +398,9 @@ public class SoftBoardData
         layoutStates = new LayoutStates( softBoardListener );
 
         boardTable = new BoardTable( softBoardListener );
+
+        // Get instance of Vibrator from current Context
+        vibrator = (Vibrator) softBoardListener.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);
 
         // This could go into parsingFinished()
         readPreferences();
@@ -475,4 +518,35 @@ public class SoftBoardData
             }
         setMonitorString( builder.toString() );
         }
+
+
+    public void vibrate( int type )
+        {
+        if ( vibrationAllowed )
+            {
+            int length;
+
+            switch (type)
+                {
+                case VIBRATE_PRIMARY:
+                    length = vibrationFirst;
+                    break;
+
+                case VIBRATE_SECONDARY:
+                    length = vibrationSecond;
+                    break;
+
+                case VIBRATE_REPETED:
+                    length = vibrationRepeat;
+                    break;
+
+                default:
+                    return;
+                }
+
+            vibrator.vibrate((long) length);
+            }
+
+        }
+
     }
