@@ -56,6 +56,9 @@ public class PrefsFragment extends PreferenceFragment
     /** Refresh preference variables, layouts are not affected */
     public static final int PREFS_ACTION_REFRESH = 4;
 
+    /** Clears spedometer data */
+    public static final int PREFS_ACTION_CLEAR_SPEDOMETER = 5;
+
 
     /**
      ** INTEGER PREFERENCE KEYS
@@ -69,6 +72,9 @@ public class PrefsFragment extends PreferenceFragment
 
     /** Ratio of the outer rim */
     public static String DRAWING_OUTER_RIM_INT_KEY = "intouterrim";
+
+    /** Limit of the speed measurement */
+    public static String DRAWING_SPEDOMETER_LIMIT_INT_KEY = "intouterrim";
 
     /** Length of circular movements */
     public static String TOUCH_LONG_COUNT_INT_KEY = "intlongcount";
@@ -141,6 +147,7 @@ public class PrefsFragment extends PreferenceFragment
             checkAndStoreHeightRatioPref(context);
             checkAndStoreLandscapeOffsetPref(context);
             checkAndStoreOuterRimPref(context);
+            checkAndStoreSpedometerLimitPref(context);
 
             checkAndStoreLongCountPref(context);
             checkAndStorePressCountPref(context);
@@ -206,6 +213,21 @@ public class PrefsFragment extends PreferenceFragment
                 R.string.drawing_outer_rim_default,
                 R.integer.drawing_outer_rim_min,
                 R.integer.drawing_outer_rim_max );
+        }
+
+    /**
+     * Checks and sets spedometer limit integer preference
+     * @param context context
+     * @return integer value of the preference
+     */
+    private static int checkAndStoreSpedometerLimitPref( Context context )
+        {
+        return _checkAndStoreIntPref( context,
+                R.string.drawing_spedometer_limit_key,
+                DRAWING_SPEDOMETER_LIMIT_INT_KEY,
+                R.string.drawing_spedometer_limit_default,
+                R.integer.drawing_spedometer_limit_min,
+                R.integer.drawing_spedometer_limit_max );
         }
 
     /**
@@ -388,6 +410,11 @@ public class PrefsFragment extends PreferenceFragment
                 R.integer.drawing_outer_rim_min,
                 R.integer.drawing_outer_rim_max );
 
+        _prepareDialogMessage( R.string.drawing_spedometer_limit_key,
+                R.string.drawing_spedometer_limit_dialog_message,
+                R.integer.drawing_spedometer_limit_min,
+                R.integer.drawing_spedometer_limit_max );
+
         _prepareDialogMessage( R.string.touch_long_count_key,
                 R.string.touch_long_count_dialog_message,
                 R.integer.touch_long_count_min,
@@ -553,6 +580,18 @@ public class PrefsFragment extends PreferenceFragment
                     Integer.toString(outerRim));
             Scribe.note( Debug.PREF, "PREFERENCES: Outer rim ratio has changed!" + outerRim);
             if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
+            }
+
+        // Drawing / Spedometer limit
+        if ( key.equals( getString( R.string.drawing_spedometer_limit_key )) || allKeys )
+            {
+            int spedoLimit = checkAndStoreSpedometerLimitPref(getActivity());
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.drawing_spedometer_limit_key ) );
+            preference.setSummary(getString(R.string.drawing_spedometer_limit_summary) + " " +
+                    Integer.toString(spedoLimit));
+            Scribe.note( Debug.PREF, "PREFERENCES: Spedometer limit has changed!" + spedoLimit);
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
             }
 
         // Drawing / Monitor row
@@ -821,6 +860,10 @@ public class PrefsFragment extends PreferenceFragment
                 Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to refresh preferences." );
                 break;
 
+            case PREFS_ACTION_CLEAR_SPEDOMETER:
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to clear spedometer data." );
+                break;
+
             default:
                 Scribe.error( "PREFERENCE: preference action type is invalid!");
             }
@@ -874,7 +917,19 @@ public class PrefsFragment extends PreferenceFragment
                             (EditTextPreference)findPreference( getString(R.string.descriptor_file_key) );
                     descriptorFilePreference.setText( getString( R.string.descriptor_file_default ) );
 
-                    Scribe.debug( Debug.PREF, "Directory and descriptor file are reset to their default values. ");
+                    Scribe.debug(Debug.PREF, "Directory and descriptor file are reset to their default values. ");
+                    return true;
+                    }
+                });
+
+        findPreference(getString(R.string.drawing_spedometer_clear_key)).
+                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                    {
+                    // getActivity() cannot be null, when button is displayed
+                    performAction(PREFS_ACTION_CLEAR_SPEDOMETER);
                     return true;
                     }
                 });

@@ -77,6 +77,22 @@
 			android:title="@string/drawing_monitor_row_title"
 			android:defaultValue="@bool/drawing_monitor_row_default" />
 
+		<Preference
+			android:key="@string/drawing_spedometer_clear_key"
+			android:title="@string/drawing_spedometer_clear_title"
+			android:summary="@string/drawing_spedometer_clear_summary"
+			android:dependency="@string/drawing_monitor_row_key"/>
+
+		<EditTextPreference
+			android:key="@string/drawing_spedometer_limit_key"
+			android:inputType="number"
+			android:title="@string/drawing_spedometer_limit_title"
+			android:summary="@string/drawing_spedometer_limit_summary"
+			android:dialogTitle="@string/drawing_spedometer_limit_dialog_title"
+			android:dialogMessage="@string/drawing_spedometer_limit_dialog_message"
+			android:defaultValue="@string/drawing_spedometer_limit_default"
+			android:dependency="@string/drawing_monitor_row_key"/>
+
 	</PreferenceCategory>
 
 	<PreferenceCategory

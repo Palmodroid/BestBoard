@@ -126,6 +126,11 @@ public class SoftBoardData
                 softBoardListener.getApplicationContext().getString(R.string.drawing_monitor_row_key),
                 false);
 
+        // limit is not stored, it is set immediately
+        int limit = sharedPrefs.getInt(PrefsFragment.DRAWING_SPEDOMETER_LIMIT_INT_KEY, 3000);
+        characterCounter.setPeriodLimit( limit );
+        buttonCounter.setPeriodLimit( limit );
+
         longBowCount = sharedPrefs.getInt(PrefsFragment.TOUCH_LONG_COUNT_INT_KEY, 0);
 
         pressBowCount = sharedPrefs.getInt(PrefsFragment.TOUCH_PRESS_COUNT_INT_KEY, 0);

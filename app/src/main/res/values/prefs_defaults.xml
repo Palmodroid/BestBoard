@@ -21,6 +21,10 @@
 
     <bool name="drawing_monitor_row_default">false</bool>
 
+    <string name="drawing_spedometer_limit_default">3000</string>
+    <integer name="drawing_spedometer_limit_min">0</integer>
+    <integer name="drawing_spedometer_limit_max">60000</integer>
+
     <string name="touch_long_count_default">80</string>
     <integer name="touch_long_count_min">0</integer>
     <integer name="touch_long_count_max">1000</integer>

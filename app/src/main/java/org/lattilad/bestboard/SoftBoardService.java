@@ -102,7 +102,7 @@ public class SoftBoardService extends InputMethodService implements
                     break;
 
                 case PrefsFragment.PREFS_ACTION_RECALCULATE:
-                    Scribe.note( Debug.SERVICE, "SERVICE: get notification to recalculate descriptor." );
+                    Scribe.note(Debug.SERVICE, "SERVICE: get notification to recalculate descriptor.");
                     if ( softBoardData != null)
                         {
                         softBoardData.readPreferences();
@@ -126,6 +126,16 @@ public class SoftBoardService extends InputMethodService implements
                     if ( softBoardData != null)
                         {
                         softBoardData.readPreferences();
+                        }
+                    break;
+
+                case PrefsFragment.PREFS_ACTION_CLEAR_SPEDOMETER:
+                    Scribe.note( Debug.SERVICE,  "SERVICE: get notification to clear spedometer data." );
+                    if ( softBoardData != null)
+                        {
+                        softBoardData.characterCounter.clear();
+                        softBoardData.buttonCounter.clear();
+                        softBoardData.showTiming();
                         }
                     break;
 

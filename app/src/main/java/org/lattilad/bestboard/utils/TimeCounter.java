@@ -8,29 +8,30 @@ public class TimeCounter
     private final int PERIOD_LIMIT_MS = 3000; // 3 sec
     private final int EVENT_COUNT_LIMIT = 6;
 
-    private long measuredPeriod;
-    private int measuredCounts;
-    private long lastTime;
+    private long measuredPeriod = 0L;
+    private int measuredCounts = 0;
+    private long lastTime = 0L;
 
-    private long periodLimit;
+    private long periodLimit = PERIOD_LIMIT_MS;
 
-    private int velocity;
-
-
-    public TimeCounter()
-        {
-        clear( PERIOD_LIMIT_MS );
-        }
 
     /**
-     * Clears this counter, and sets perid limit
-     * @param periodLimitMs no measurement can be than above this limit (millisecs)
+     * Clears this counter
      */
-    public void clear( int periodLimitMs )
+    public void clear()
         {
         measuredPeriod = 0L;
         measuredCounts = 0;
         lastTime = 0L;
+        }
+
+
+    /**
+     * Sets period limit
+     * @param periodLimitMs no measurement can be than above this limit (millisecs)
+     */
+    public void setPeriodLimit( int periodLimitMs )
+        {
         periodLimit = (long)periodLimitMs * 1000000L;
         }
 
@@ -56,18 +57,6 @@ public class TimeCounter
 
         // period of new event starts at this time
         lastTime = now;
-
-        // no result below EVENT_COUNT_LIMIT events
-        if ( measuredCounts < EVENT_COUNT_LIMIT )
-            {
-            velocity = 0;
-            }
-        else
-            {
-            // velocity: events / time
-            // time was measured in nanos, but we need to calculate with minutes (60 sec)
-            velocity = (int)(measuredCounts * 60L * 1000000000L / measuredPeriod);
-            }
         }
 
     /**
@@ -77,6 +66,16 @@ public class TimeCounter
      */
     public int getVelocity()
         {
-        return velocity;
+        // no result below EVENT_COUNT_LIMIT events
+        if ( measuredCounts < EVENT_COUNT_LIMIT )
+            {
+            return 0;
+            }
+        else
+            {
+            // velocity: events / time
+            // time was measured in nanos, but we need to calculate with minutes (60 sec)
+            return (int)(measuredCounts * 60L * 1000000000L / measuredPeriod);
+            }
         }
     }

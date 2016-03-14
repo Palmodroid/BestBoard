@@ -60,8 +60,18 @@
 
     <string name="drawing_monitor_row_key">monitorrow</string>
     <string name="drawing_monitor_row_title">Monitor row</string>
-    <string name="drawing_monitor_row_on">Monitor row is visible below the layout</string>
+    <string name="drawing_monitor_row_on">Monitor row shows measured speed in characters, and in touched buttons per min</string>
     <string name="drawing_monitor_row_off">Monitor row is switched off</string>
+
+    <string name="drawing_spedometer_clear_key">spedoclear</string>
+    <string name="drawing_spedometer_clear_title">Clears spedometer data</string>
+    <string name="drawing_spedometer_clear_summary">Touch to start a new measurement!</string>
+
+    <string name="drawing_spedometer_limit_key">spedolimit</string>
+    <string name="drawing_spedometer_limit_title">Spedometer limit </string>
+    <string name="drawing_spedometer_limit_summary">Maximal length of period: </string>
+    <string name="drawing_spedometer_limit_dialog_title">Spedometer limit </string>
+    <string name="drawing_spedometer_limit_dialog_message">Enter length of the longest period to measure (in ms)! Events occurring after this period are not included in measurement.</string>
 
 
     <string name="prefs_touch">Touch fine-tuning</string>
@@ -97,7 +107,7 @@
     <string name="touch_repeat_time_dialog_message">Enter time of repeat (in ms)! Repeat rate can be set with this value. </string>
 
 
-    <string name="prefs_cursor">Visible touch control</string>
+    <string name="prefs_cursor">Touch feedback</string>
 
     <string name="cursor_touch_allow_key">touch</string>
     <string name="cursor_touch_allow_title">Show touched keys</string>
