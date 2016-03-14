@@ -3,6 +3,9 @@ package org.lattilad.bestboard;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Typeface;
 
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonForMaps;
@@ -196,6 +199,31 @@ public class Layout
 
 
     /**
+     * Paint for monitor row background
+     */
+    private Paint monitorBackground = new Paint();
+
+
+    /**
+     * Paint for monitor row text
+     */
+    private Paint monitorText = new Paint();
+
+
+    /**
+     * Ratio of monitor text (permil)
+     * Actual size should be calculated in calculateScreenData
+     */
+    private int monitorSizePermil = 1000;
+
+
+    /**
+     * Size of monitor row - calculated in calculateScreenData
+     */
+    private int monitorSize = 0;
+
+
+    /**
      ** CONSTRUCTION OF THE LAYOUT
      ** Parsing phase:
      **   1. Constructor - adds non screen-specific data
@@ -256,6 +284,15 @@ public class Layout
         this.wide = wide;
 
         this.layoutColor = color;
+
+        // INITIALIZE MONITOR ROW
+        // These data can be overridden later,
+        // Size will be set later
+        setMonitorText( 1000, false, false, Color.BLACK);
+
+        monitorBackground.setStyle(Paint.Style.FILL_AND_STROKE);
+        monitorBackground.setColor( layoutColor );
+
 
         // INITIALIZE BUTTONS' ARRAY
         // this two-dimensional array will be populated later
@@ -464,6 +501,9 @@ public class Layout
         int quarterHexagonHeightInPixels = layoutHeightInPixels / layoutHeightInGrids;
         halfHexagonHeightInPixels = 2 * quarterHexagonHeightInPixels;
 
+        // MONITOR ROW size set here - a quoter of a hexagon is needed (and a little bit more, this is the extra 20%)
+        monitorSize = (softBoardData.monitorRow ? halfHexagonHeightInPixels * monitorSizePermil / 1800 : 0);
+
         // Area is one hexagon wider, then layout width
         layoutXOffset -= halfHexagonWidthInPixels;
         layoutWidthInPixels = areaWidthInPixels + 2* halfHexagonWidthInPixels;
@@ -472,12 +512,13 @@ public class Layout
         areaHeightInPixels = layoutHeightInPixels
                 - softBoardData.hideTop * quarterHexagonHeightInPixels
                 - softBoardData.hideBottom * quarterHexagonHeightInPixels
-                + (softBoardData.monitorRow ? halfHexagonHeightInPixels : 0);
-
-        // Monitor is only set by onMeasure
+                + monitorSize;
 
         // CALCULATE FONT PARAMETERS
         textSize = TitleDescriptor.calculateTextSize(this);
+
+        // Monitor text size can be calculated only after general text size
+        monitorText.setTextSize(textSize * monitorSizePermil / 1000);
         }
 
 
@@ -754,6 +795,52 @@ public class Layout
         return skin;
         }
 
+
+    public void setMonitorTypeface( Typeface typeface )
+        {
+        monitorText.setTypeface(typeface);
+        }
+
+
+    public void setMonitorText( int size, boolean bold, boolean italics, int color )
+        {
+        // What about typeface? It should be set for all layouts OR
+        // general (static) paint should be used for all layouts (as in title-descriptor
+        monitorSizePermil = size;
+        // actual size should be set in calculateScreenData
+
+        monitorText.setColor(color);
+        monitorText.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
+                Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG |
+                (bold ? Paint.FAKE_BOLD_TEXT_FLAG : 0));
+        monitorText.setTextSkewX(italics ? -0.25f : 0);
+        }
+
+
+    public void drawMonitorRow( Canvas canvas )
+        {
+        if ( softBoardData.monitorRow )
+            {
+            canvas.drawRect(
+                    layoutXOffset,
+                    areaHeightInPixels - monitorSize,
+                    layoutXOffset + layoutWidthInPixels,
+                    areaHeightInPixels,
+                    monitorBackground);
+
+            // takes text from softBoardData.monitorText
+            canvas.drawText( softBoardData.getMonitorString(),
+                    layoutXOffset + halfHexagonWidthInPixels + halfHexagonWidthInPixels / 5, // +20% as well
+                    //(float)(layout.layoutHeightInPixels + layout.halfHexagonHeightInPixels),
+                    // layout.layoutHeightInPixels - probe.descent(),
+                    // layout.layoutHeightInPixels - probe.ascent(),
+                    areaHeightInPixels - monitorText.descent(),
+                    monitorText);
+            }
+
+        }
+
+
     public static String StringPrelude(String string, int prelude)
         {
         if (string == null)
@@ -764,6 +851,8 @@ public class Layout
             return "";
         return string.substring(0, prelude);
         }
+
+
 
     // id is needed only for debug
     private long layoutId;

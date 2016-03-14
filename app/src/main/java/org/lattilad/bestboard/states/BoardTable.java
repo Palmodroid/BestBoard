@@ -174,8 +174,8 @@ public class BoardTable
      */
     private void pushBoard( )
         {
-        Scribe.locus( Debug.LINKSTATE );
-        boardStackEntries.add(new BoardStackEntry(activeBoardId, activeBoard, state == LOCKED ));
+        Scribe.locus(Debug.LINKSTATE);
+        boardStackEntries.add(new BoardStackEntry(activeBoardId, activeBoard, state == LOCKED));
         }
 
     /**
@@ -214,7 +214,7 @@ public class BoardTable
         // touchCounter is 0 in most cases. In case of SWITCH BACK, it should be 0
         touchCounter = 0;
 
-        boardStackEntries.remove( boardStackEntries.size()-1 );
+        boardStackEntries.remove(boardStackEntries.size() - 1);
 
         return true;
         }
@@ -450,11 +450,9 @@ public class BoardTable
         BoardEntry boardEntry = boards.get(id);
         if (boardEntry != null)
             {
-
             Scribe.debug(Debug.LINKSTATE, "New board was selected: " +
                     Tokenizer.regenerateKeyword(id));
 
-            checkBoardStack();
             pushBoard();
 
             activeBoardId = id;
@@ -463,6 +461,8 @@ public class BoardTable
             touchCounter = 1; // previous touches are cleared
             state = TOUCHED;  // it is only active because of TOUCHED
             typeFlag = false;
+
+            checkBoardStack();
 
             debugBoardStack();
             // requestLayout is called by setLayout

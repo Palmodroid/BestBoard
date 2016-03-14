@@ -2,13 +2,16 @@ package org.lattilad.bestboard.parser;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 
+import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.SoftBoardData.SoftBoardListener;
+import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.Bit;
@@ -296,7 +299,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
     private void parseSoftBoard()
             throws TaskCancelledException, IOException, InvalidCoatFileException, ExternalDataException
         {
-        Scribe.locus( Debug.PARSER );
+        Scribe.locus(Debug.PARSER);
 
         Object temp;
         // COAT 2 - MUST BE the first parameter-command!
@@ -337,6 +340,28 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
         // This was originally the SoftBoardData.parserFinished();
 
+        // Typeface should be set for TitleDescriptor and all layouts
+        if ( methodsForCommands.typefaceFile != null )
+            {
+            try
+                {
+                Typeface typeface = Typeface.createFromFile(methodsForCommands.typefaceFile);
+                tokenizer.note(R.string.data_typeface, typeface.toString());
+                TitleDescriptor.setTypeface(typeface);
+
+                for (Layout layout : methodsForCommands.layouts.values())
+                    {
+                    layout.setMonitorTypeface(typeface);
+                    }
+                }
+            catch (Exception e)
+                {
+                tokenizer.error(R.string.data_typeface_missing, methodsForCommands.typefaceFile.toString());
+                }
+            }
+        // if no file is given, then softBoardData constructor will delete static typeface,
+        // so no need to set default null values
+
         if ( softBoardData.firstLayout == null )
             {
             throw new ExternalDataException("No layout!");
@@ -374,7 +399,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                                                              ExtendedMap< Long, Object> defaultParameters )
             throws IOException
         {
-        Scribe.debug( Debug.PARSER, "Parsing of parameters of [" + Tokenizer.regenerateKeyword(parsedCommandCode) + "] complex command has started.");
+        Scribe.debug(Debug.PARSER, "Parsing of parameters of [" + Tokenizer.regenerateKeyword(parsedCommandCode) + "] complex command has started.");
 
         int tokenType;
         
@@ -615,15 +640,15 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             // Parameter-command has LABEL parameter
             else if ( commandData.getParameterType() == Commands.PARAMETER_LABEL )
                 {
-                Scribe.debug( Debug.PARSER, "[" + commandString + "] creates label." );
+                Scribe.debug(Debug.PARSER, "[" + commandString + "] creates label.");
 
-                parseLabelParameter(true);
+                parseLabelParameter(true); // Label change is not detected any more, parameter is not used!!
                 continue;
 
                 // no method to call; no result to return
                 }
 
-            // Parameter-command has CHANGE_LABEL parameter
+/*            // Parameter-command has CHANGE_LABEL parameter
             else if ( commandData.getParameterType() == Commands.PARAMETER_CHANGE_LABEL )
                 {
                 Scribe.debug( Debug.PARSER, "[" + commandString + "] creates label." );
@@ -633,7 +658,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                 // no method to call; no result to return
                 }
-
+*/
             // Parameter-command has FLAG (true) parameter
             else if ( commandData.getParameterType() == Commands.PARAMETER_FLAG )
                 {
@@ -686,11 +711,14 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                         if ( forwardParameters.size() > 0 )
                             {
-                            Scribe.error(Debug.PARSER, "Remaining items in forwarded parameters after method call: " + forwardParameters.size());
+                            StringBuilder builder = new StringBuilder();
                             for (Map.Entry<Long, Object> entry : forwardParameters.entrySet())
                                 {
-                                Scribe.error(Debug.PARSER, " - " + Tokenizer.regenerateKeyword(entry.getKey()));
+                                builder.append( Tokenizer.regenerateKeyword(entry.getKey() ));
+                                builder.append(" ");
                                 }
+
+                            tokenizer.error( commandString, R.string.parser_parameter_remains , builder.toString());
                             }
                         }
                     // Parameter-command has ONE parameter - result
@@ -1276,10 +1304,12 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 keyString + "[" + Long.toHexString(key) + "], " + valueString);
 
         // This label key was previously set!
-        if ( error && denyOverwrite )
+        // THIS WAS USED BY CHANGE! This part is not used anymore, Change after LET is allowed
+/*        if ( error && denyOverwrite )
             {
             tokenizer.error( keyString, R.string.parser_label_overwritten );
             }
+*/
         }
 
 

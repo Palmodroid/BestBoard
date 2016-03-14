@@ -1,7 +1,6 @@
 package org.lattilad.bestboard.parser;
 
 import android.graphics.Color;
-import android.graphics.Typeface;
 import android.view.KeyEvent;
 
 import org.lattilad.bestboard.Layout;
@@ -13,11 +12,11 @@ import org.lattilad.bestboard.buttons.ButtonDouble;
 import org.lattilad.bestboard.buttons.ButtonEnter;
 import org.lattilad.bestboard.buttons.ButtonList;
 import org.lattilad.bestboard.buttons.ButtonMainTouch;
-import org.lattilad.bestboard.buttons.ButtonSwitch;
 import org.lattilad.bestboard.buttons.ButtonMeta;
 import org.lattilad.bestboard.buttons.ButtonModify;
 import org.lattilad.bestboard.buttons.ButtonSingle;
 import org.lattilad.bestboard.buttons.ButtonSpaceTravel;
+import org.lattilad.bestboard.buttons.ButtonSwitch;
 import org.lattilad.bestboard.buttons.Packet;
 import org.lattilad.bestboard.buttons.PacketCombine;
 import org.lattilad.bestboard.buttons.PacketFunction;
@@ -123,10 +122,8 @@ public class MethodsForCommands
      ** TEMPORARY VARIABLES NEEDED ONLY BY THE PARSING PHASE
      **/
 
-
     /** if no default key is given for packetKey */
     public static final int NO_DEFAULT_KEY = -1;
-
 
     /** Layout's default background */
     public static final int DEFAULT_LAYOUT_COLOR = Color.LTGRAY;
@@ -136,6 +133,9 @@ public class MethodsForCommands
 
     /** Map of temporary layouts, identified by code of keywords */
     public Map<Long, Layout> layouts = new HashMap<>();
+
+    /** Typeface will be set at the and of parseSoftBoard, both for titledescriptor and layouts */
+    public File typefaceFile = null;
 
 
     /**
@@ -256,6 +256,8 @@ public class MethodsForCommands
     /** Set typeface of title font from file * TITLEFONT (file) */
     public void setTypeface( Object fileParameter )
         {
+        typefaceFile = (File)fileParameter;
+        /* This should be performed at the end of the parsing process - softBoardParser
         try
             {
             Typeface typeface = Typeface.createFromFile( (File)fileParameter );
@@ -266,6 +268,7 @@ public class MethodsForCommands
             {
             tokenizer.error(R.string.data_typeface_missing, fileParameter.toString());
             }
+        */
         }
 
     /** Set entertitle * ENTERTITLE (text) */
@@ -350,15 +353,11 @@ public class MethodsForCommands
             return;
             }
 
-        boolean root = (boolean)parameters.remove( Commands.TOKEN_ROOT, false );
+        boolean root = (boolean)parameters.remove( Commands.TOKEN_START, false );
         boolean locked = (boolean)parameters.remove( Commands.TOKEN_LOCK, root );
 
         // LAYOUT is given, no other parameters are checked
         Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
-        if ( layoutId == null )
-            {
-            layoutId = (Long)parameters.remove( Commands.TOKEN_ADDLAYOUT );
-            }
 
         if (layoutId != null)
             {
@@ -900,7 +899,7 @@ public class MethodsForCommands
         PacketKey packet = null;
         int temp;
 
-        temp = (int)parameters.remove(Commands.TOKEN_KEY, NO_DEFAULT_KEY);
+        temp = (int)parameters.remove(Commands.TOKEN_SEND, NO_DEFAULT_KEY);
 
         if ( temp == NO_DEFAULT_KEY )             // KEY token is missing
             {
@@ -977,7 +976,7 @@ public class MethodsForCommands
             else if ( autoFlag != -1L )
                 tokenizer.error("PACKET", R.string.data_autospace_bad_parameter );
 
-            autoFlag = (long)parameters.remove(Commands.TOKEN_ERASESPACES, -1L);
+            autoFlag = (long)parameters.remove(Commands.TOKEN_ERASESPACE, -1L);
             if ( autoFlag == Commands.TOKEN_BEFORE )
                 autoSpace |= PacketText.ERASE_SPACES_BEFORE;
             else if ( autoFlag == Commands.TOKEN_AFTER )
@@ -1170,7 +1169,7 @@ public class MethodsForCommands
         ArrayList<KeyValuePair> packetList = (ArrayList<KeyValuePair>)parameters.remove(
                 Bit.setSignedBitOn( Commands.TOKEN_ADD ) );
 
-        if ( packetList.isEmpty() )
+        if ( packetList == null || packetList.isEmpty() )
             return null;
 
         ButtonList buttonList = new ButtonList();
@@ -1542,6 +1541,31 @@ public class MethodsForCommands
 
         tokenizer.note( Tokenizer.regenerateKeyword( id ),
                 R.string.data_modify_added );
+        }
+
+
+    public void setMonitor( ExtendedMap<Long, Object> parameters )
+        {
+        Long layoutId;
+
+        // layout id is obligatory
+        if ( (layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT )) == null )
+            return;
+
+        Layout layout = layouts.get( layoutId );
+        if ( layout == null )
+            {
+            tokenizer.error( "LAYOUT", R.string.data_no_layout,
+                    Tokenizer.regenerateKeyword( (long)layoutId));
+            return;
+            }
+
+        int size = (int)parameters.remove(Commands.TOKEN_SIZE, 1000);
+        boolean bold = (boolean)parameters.remove(Commands.TOKEN_BOLD, false);
+        boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, false);
+        int color = (int)parameters.remove(Commands.TOKEN_COLOR, Color.BLACK);
+
+        layout.setMonitorText( size, bold, italics, color );
         }
 
     }

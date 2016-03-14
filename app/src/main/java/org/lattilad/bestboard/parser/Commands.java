@@ -67,7 +67,7 @@ public class Commands
     public static final long TOKEN_LANDSCAPE = 0x44010ff937b3L;
     public static final long TOKEN_PORTRAIT = 0x2375cbe8760L;
     public static final long TOKEN_LOCK = 0x11bd48L;
-    public static final long TOKEN_ROOT = 0x16623bL;
+    public static final long TOKEN_START = 0x3385de2L;
 
     public static final long TOKEN_ADDLAYOUT = 0x211993f479afL;
     // public static final long TOKEN_ID = 0x102a6L;
@@ -89,7 +89,7 @@ public class Commands
 
     public static final long TOKEN_ASBOARD = 0x66e540fa6L;
     // public static final long TOKEN_LOCK = 0x11bd48L;
-    // public static final long TOKEN_ROOT = 0x16623bL;
+    // public static final long TOKEN_START = 0x3385de2L;
 
     public static final long TOKEN_BLOCK = 0x14c4fa3L;
     // public static final long TOKEN_LAYOUT = 0x5805f907L;
@@ -117,14 +117,14 @@ public class Commands
     public static final long TOKEN_SECOND = 0x7556168dL;
 
     public static final long TOKEN_TEXT = 0x17b9c8L;
-    public static final long TOKEN_KEY = 0x16d1bL;
+    public static final long TOKEN_SEND = 0x16f269L;
     public static final long TOKEN_DO = 0x101f8L;
     public static final long TOKEN_COMBINE = 0x790d8163bL;
 
     public static final long TOKEN_AUTOCAPS = 0xef6e451a57L;
     public static final long TOKEN_STRINGCAPS = 0xd4c9a99e4004bL;
     public static final long TOKEN_AUTOSPACE = 0x229af1ada341L;
-    public static final long TOKEN_ERASESPACES = 0xfbc52200a3a61dL;
+    public static final long TOKEN_ERASESPACE = 0x6cdfa00056559L;
 
     public static final long TOKEN_ON = 0x1038eL;
     public static final long TOKEN_OFF = 0x18291L;
@@ -200,6 +200,15 @@ public class Commands
     public static final long TOKEN_IGNORESPACE = 0x13b2fae0bc2c2ceL;
     // public static final long TOKEN_REVERSE = 0x105e77189aL;
 
+    public static final long TOKEN_MONITOR = 0xd8a451b16L;
+    // public static final long TOKEN_LAYOUT = 0x5805f907L;
+    // public static final long TOKEN_SIZE = 0x17098aL;
+    // public static final long TOKEN_BOLD = 0xa03ecL;
+    // public static final long TOKEN_ITALICS = 0xb39c66ee7L;
+    // public static final long TOKEN_NONBOLD = 0xe232d779aL;
+    // public static final long TOKEN_NONITALICS = 0xaed49d766321dL;
+    // public static final long TOKEN_COLOR = 0x16b2be3L;
+
     public static final long TOKEN_STOP = 0x1742d1L;
 
 
@@ -244,7 +253,7 @@ public class Commands
 
     // Label parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
     // Same as label, but change existing label without error
-    public final static long PARAMETER_CHANGE_LABEL = 0x43L;
+//    public final static long PARAMETER_CHANGE_LABEL = 0x43L;
 
     // Special "messages" are not real parameters, but messages to the parser
     // Messages - POSITIVE VALUES, ABOVE ONE AND BELOW NO-PARAMETER TYPES !!
@@ -260,7 +269,8 @@ public class Commands
             TOKEN_BLOCK,
             TOKEN_BUTTON,
             TOKEN_EXTEND,
-            TOKEN_ADDTITLE };
+            TOKEN_ADDTITLE,
+            TOKEN_MONITOR };
 
     // These tokens (parameter-commands) can be defined as labels
     public final static long[] ALLOWED_AS_DEFAULT = new long[]{
@@ -268,7 +278,8 @@ public class Commands
             TOKEN_ADDLAYOUT,
             TOKEN_BUTTON,
             TOKEN_EXTEND,
-            TOKEN_ADDTITLE };
+            TOKEN_ADDTITLE,
+            TOKEN_MONITOR };
 
     /**
      * Parameter-commands are stored in an unmodifiable hash-HashMap (LIST)
@@ -327,7 +338,7 @@ public class Commands
         add(ADDSOFTBOARD, new long[]{
                 TOKEN_DEFAULT,
                 TOKEN_LET,
-                TOKEN_CHANGE,
+//                TOKEN_CHANGE,
 
                 TOKEN_NAME,
                 TOKEN_VERSION,
@@ -361,12 +372,14 @@ public class Commands
 
                 TOKEN_ADDMODIFY,
 
+                TOKEN_MONITOR,
+
                 TOKEN_STOP
         });
 
         add(TOKEN_DEFAULT, new long[]{PARAMETER_DEFAULT});
         add(TOKEN_LET, new long[]{PARAMETER_LABEL});
-        add(TOKEN_CHANGE, new long[]{PARAMETER_CHANGE_LABEL});
+//        add(TOKEN_CHANGE, new long[]{PARAMETER_CHANGE_LABEL});
 
         add(TOKEN_NAME, new long[]{PARAMETER_STRING}, "setName");
         add(TOKEN_VERSION, new long[]{PARAMETER_INT}, "setVersion");
@@ -403,14 +416,14 @@ public class Commands
                 TOKEN_ID,
                 TOKEN_LAYOUT,
                 TOKEN_PORTRAIT, TOKEN_LANDSCAPE,
-                TOKEN_LOCK, TOKEN_ROOT }, "addBoard");
+                TOKEN_LOCK, TOKEN_START}, "addBoard");
 
         add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
-        add(TOKEN_ROOT, new long[]{PARAMETER_FLAG});
+        add(TOKEN_START, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_ADDLAYOUT, new long[]{
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
@@ -418,7 +431,7 @@ public class Commands
                 TOKEN_ALIGN, TOKEN_COLOR,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                 TOKEN_ASBOARD,
-                TOKEN_LOCK, TOKEN_ROOT }, "addLayout" );
+                TOKEN_LOCK, TOKEN_START}, "addLayout" );
 
         // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS}); // Useless parametercommand - just for clearer readability
@@ -437,7 +450,7 @@ public class Commands
         add(TOKEN_ASBOARD, new long[]{PARAMETER_FLAG});
         // If ASBOARD is given, then addBoard is called, so LOCK and ROOT can be used, too
         // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
-        // add(TOKEN_ROOT, new long[]{PARAMETER_FLAG});
+        // add(TOKEN_START, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_BLOCK, new long[]{
                         TOKEN_LAYOUT,
@@ -482,9 +495,9 @@ public class Commands
                         TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
                         TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACES,
+                        TOKEN_ERASESPACE,
                         TOKEN_AUTOSPACE,
-                        TOKEN_KEY,
+                        TOKEN_SEND,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                         TOKEN_DO,
                         TOKEN_COMBINE,
@@ -531,10 +544,10 @@ public class Commands
                         TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
                         TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACES,
+                        TOKEN_ERASESPACE,
                         TOKEN_AUTOSPACE,
 
-                        TOKEN_KEY,
+                        TOKEN_SEND,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
                         TOKEN_DO,
@@ -546,10 +559,10 @@ public class Commands
                         TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
                         TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACES,
+                        TOKEN_ERASESPACE,
                         TOKEN_AUTOSPACE,
 
-                        TOKEN_KEY,
+                        TOKEN_SEND,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
                         TOKEN_DO,
@@ -558,14 +571,14 @@ public class Commands
                 "packet");
 
         add(TOKEN_TEXT, new long[]{PARAMETER_TEXT});
-        add(TOKEN_KEY, new long[]{PARAMETER_INT});
+        add(TOKEN_SEND, new long[]{PARAMETER_INT});
         add(TOKEN_DO, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_COMBINE, new long[]{PARAMETER_FLAG});
 
         add(TOKEN_AUTOCAPS, new long[]{PARAMETER_KEYWORD});
         add(TOKEN_STRINGCAPS, new long[]{PARAMETER_FLAG});
         add(TOKEN_AUTOSPACE, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_ERASESPACES, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_ERASESPACE, new long[]{PARAMETER_KEYWORD});
 
         // add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
         // add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
@@ -581,11 +594,11 @@ public class Commands
                         TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
                         TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACES,
+                        TOKEN_ERASESPACE,
                         TOKEN_AUTOSPACE,
 
                         // If only Text-packet is allowed here, then rem next rows!!
-                        /* TOKEN_KEY,
+                        /* TOKEN_SEND,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                         TOKEN_DO */ },
                 "packet");
@@ -644,6 +657,26 @@ public class Commands
         add(TOKEN_ADDROLL, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST) }, "addRollHelper");
         add(TOKEN_ROLLS, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)});
         add(TOKEN_IGNORESPACE, new long[]{PARAMETER_FLAG});
+
+        add(TOKEN_MONITOR, new long[]{
+                TOKEN_LAYOUT,
+                TOKEN_SIZE,
+                TOKEN_BOLD, TOKEN_NONBOLD, TOKEN_ITALICS, TOKEN_NONITALICS,
+                TOKEN_COLOR }, "setMonitor");
+        // add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
+        // add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
+        // add(TOKEN_BOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
+        // add(TOKEN_NONBOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG_FALSE} );
+        // add(TOKEN_ITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
+        // add(TOKEN_NONITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG_FALSE} );
+        // add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
+
+
+
+
+
+
+
 
         add(TOKEN_STOP, new long[]{MESSAGE_STOP} );
 

@@ -3,7 +3,6 @@ package org.lattilad.bestboard;
 
 import android.content.Context;
 import android.graphics.Canvas;
-import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Handler;
 import android.view.InflateException;
@@ -40,7 +39,6 @@ public class LayoutView extends View
      * requestLayout will invalidate it
      */
     private int validatedWidthInPixels = -1;
-
 
     /**
      ** CONSTRUCTION OF THE LAYOUT
@@ -188,18 +186,6 @@ public class LayoutView extends View
             Scribe.debug( Debug.VIEW, "CONSECUTIVE Calculations");
             Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
             }
-
-
-
-        // !!!!!!!!!!! JUST PROBING !!!!!!!!!!!
-
-        probe.setTextSize( layout.textSize * 2 );
-        probe.setColor(Color.CYAN);
-        probe.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
-                Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
-
-        probeBackground.setStyle(Paint.Style.FILL_AND_STROKE);
-        probeBackground.setColor( Color.BLUE );
 
         // calculateScreen data has calculated height of the area
         setMeasuredDimension(widthSize, layout.areaHeightInPixels);
@@ -944,25 +930,8 @@ public class LayoutView extends View
                 }
             }
 
-        if ( layout.softBoardData.monitorRow )
-            {
-            canvas.drawRect(
-                    0f,
-                    layout.areaHeightInPixels - layout.halfHexagonHeightInPixels,
-                    layout.validatedWidthInPixels,
-                    layout.areaHeightInPixels,
-                    probeBackground);
-
-            canvas.drawText(layout.softBoardData.softBoardListener.getTextBeforeCursor().toString(),
-                    layout.halfHexagonWidthInPixels,
-                    //(float)(layout.layoutHeightInPixels + layout.halfHexagonHeightInPixels),
-                    // layout.layoutHeightInPixels - probe.descent(),
-                    // layout.layoutHeightInPixels - probe.ascent(),
-                    layout.areaHeightInPixels - probe.descent(),
-                    probe);
-            }
+        // Monitor row to write out speed data
+        layout.drawMonitorRow( canvas );
         }
 
-    Paint probe = new Paint();
-    Paint probeBackground = new Paint();
     }

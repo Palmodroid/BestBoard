@@ -241,6 +241,8 @@ public class SoftBoardData
             "PREV",
             "CR" };
 
+    /** Text of the monitor row */
+    private String monitorString = "MONITOR";
 
     /**
      * DATA NEEDED BY MODIFY
@@ -309,9 +311,8 @@ public class SoftBoardData
         this.softBoardListener = softBoardListener;
 
         // static variables should be deleted!!
-        TitleDescriptor.setTypeface( null );
+        TitleDescriptor.setTypeface(null);
 
-        
         layoutStates = new LayoutStates( softBoardListener );
 
         boardTable = new BoardTable( softBoardListener );
@@ -395,5 +396,14 @@ public class SoftBoardData
         }
 
 
+    public void setMonitorString( String string )
+        {
+        monitorString = string;
+        }
 
+
+    public String getMonitorString()
+        {
+        return monitorString;
+        }
     }
