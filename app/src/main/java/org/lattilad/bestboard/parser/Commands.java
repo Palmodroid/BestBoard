@@ -276,6 +276,7 @@ public class Commands
     public final static long[] ALLOWED_AS_DEFAULT = new long[]{
             TOKEN_ADDBOARD,
             TOKEN_ADDLAYOUT,
+            TOKEN_BLOCK,
             TOKEN_BUTTON,
             TOKEN_EXTEND,
             TOKEN_ADDTITLE,

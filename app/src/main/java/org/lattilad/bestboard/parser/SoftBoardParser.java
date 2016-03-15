@@ -1251,6 +1251,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     {
                     // !! Error was already signed !!
                     tokenizer.error(keyString, R.string.parser_label_complex_invalid);
+                    error = true;
                     }
                 else
                     {
@@ -1262,6 +1263,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 tokenizer.error( typeString, R.string.parser_label_complex_not_allowed );
                 // next block should be skipped
                 tokenizer.skipBlock();
+                error = true;
                 }
             }
         // 3rd token is MISSING, closing-bracket is consumed

@@ -109,12 +109,14 @@ public class MethodsForCommands
 
     public void createDefaults()
         {
+        /*
         ExtendedMap<Long, Object> defaultTitle = new ExtendedMap<>();
         defaultTitle.put( Commands.TOKEN_YOFFSET, 250 ); // PARAMETER_INT
         defaultTitle.put( Commands.TOKEN_SIZE, 1200 ); // PARAMETER_INT
         defaultTitle.put( Commands.TOKEN_COLOR, Color.BLACK ); // PARAMETER_COLOR (int)
 
         defaults.put( Commands.TOKEN_ADDTITLE, defaultTitle );
+        */
         }
 
 
@@ -750,11 +752,15 @@ public class MethodsForCommands
                         SinglyLinkedList<TitleDescriptor> titles =
                                 new SinglyLinkedList<>( button.getTitles() );
 
+                        TitleDescriptor titleDescriptor;
                         for ( KeyValuePair title : buttonExtension.titleList )
                             {
-                            TitleDescriptor titleDescriptor =
-                                    ((TitleDescriptor)title.getValue()).copy();
-                            titleDescriptor.checkText( button.getString() );
+                            titleDescriptor = ((TitleDescriptor)title.getValue());
+                            if ( titleDescriptor.getText() == null )
+                                {
+                                titleDescriptor = titleDescriptor.copy();
+                                titleDescriptor.checkText( button.getString());
+                                }
                             titles.add( titleDescriptor );
                             }
 
@@ -1366,13 +1372,23 @@ public class MethodsForCommands
         ArrayList<KeyValuePair> titleList = (ArrayList<KeyValuePair>)parameters.remove(
                 Bit.setSignedBitOn( Commands.TOKEN_ADDTITLE ) );
 
+        // !! This part after this point could be nicer !!
         SinglyLinkedList<TitleDescriptor> titles = new SinglyLinkedList<>();
+        TitleDescriptor titleDescriptor;
 
         if ( titleList != null )
             {
             for (KeyValuePair title : titleList)
                 {
-                titles.add((TitleDescriptor) title.getValue());
+                titleDescriptor = (TitleDescriptor) title.getValue();
+                if ( titleDescriptor.getText() == null )
+                    {
+                    // TitleDescriptor is not completed, depends on the value of the buttons
+                    titleDescriptor = titleDescriptor.copy();
+                    titleDescriptor.checkText( buttonPlan.button.getString() );
+                    }
+                // Completed titleDescriptor, so one instance is enough for all buttons
+                titles.add(titleDescriptor);
                 }
             }
         else
@@ -1388,7 +1404,9 @@ public class MethodsForCommands
                 {
                 defaultTitle = new ExtendedMap<Long, Object>(0);
                 }
-            titles.add(addTitle(defaultTitle));
+            titleDescriptor = addTitle(defaultTitle);
+            titleDescriptor.checkText( buttonPlan.button.getString() );
+            titles.add( titleDescriptor );
             }
 
         // if title text is null, code should be used
@@ -1396,7 +1414,6 @@ public class MethodsForCommands
         StringBuilder buttonNameBuilder = new StringBuilder();
         for ( TitleDescriptor title : titles )
             {
-            title.checkText(buttonPlan.button.getString());
             buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
             }
         buttonNameBuilder.setCharAt(0, '\"');
@@ -1479,6 +1496,7 @@ public class MethodsForCommands
         Modify mod = null;
         boolean empty = true;
         int counter = 0;
+        boolean ignorespace = (parameters.remove( Commands.TOKEN_IGNORESPACE ) != null);
 
         // ADDROLL-s are used!
         if ( tempRolls.size() > 0)
@@ -1486,8 +1504,7 @@ public class MethodsForCommands
             empty = true;
             counter ++;
 
-            mod = new ModifyText( softBoardData.softBoardListener,
-                    parameters.containsKey( Commands.TOKEN_IGNORESPACE ) );
+            mod = new ModifyText( softBoardData.softBoardListener, ignorespace );
 
             for ( List<Object> roll : tempRolls )
                 {
@@ -1506,8 +1523,7 @@ public class MethodsForCommands
             empty = true;
             counter++;
 
-            mod = new ModifyChar( softBoardData.softBoardListener,
-                    parameters.containsKey( Commands.TOKEN_IGNORESPACE ) );
+            mod = new ModifyChar( softBoardData.softBoardListener, ignorespace );
 
             // PARAMETER_STRING_LIST gives only non-null String items
             for ( Object roll : rolls )

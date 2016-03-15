@@ -135,11 +135,11 @@ public class BoardTable
         {
         for ( BoardStackEntry entry : boardStackEntries )
             {
-            Scribe.debug( Debug.LINKSTATE, "  - " +
+            Scribe.debug( Debug.BOARDTABLE, "  - " +
                     Tokenizer.regenerateKeyword(entry.boardId) +
                     (entry.locked ? " - lock" : "") );
             }
-        Scribe.debug( Debug.LINKSTATE, "  * " +
+        Scribe.debug( Debug.BOARDTABLE, "  * " +
                 Tokenizer.regenerateKeyword(activeBoardId) +
                 (state == LOCKED ? " - lock" : "") );
         }
@@ -174,7 +174,7 @@ public class BoardTable
      */
     private void pushBoard( )
         {
-        Scribe.locus(Debug.LINKSTATE);
+        Scribe.locus(Debug.BOARDTABLE);
         boardStackEntries.add(new BoardStackEntry(activeBoardId, activeBoard, state == LOCKED));
         }
 
@@ -188,7 +188,7 @@ public class BoardTable
      */
     private boolean popBoard( boolean currentlyLocked )
         {
-        Scribe.locus(Debug.LINKSTATE);
+        Scribe.locus(Debug.BOARDTABLE);
 
         if ( boardStackEntries.isEmpty() )
             return false;
@@ -322,7 +322,7 @@ public class BoardTable
                 ORIENTATION_PORTRAIT : ORIENTATION_LANDSCAPE);
         // Theoretically it could be undefined, but then it will be treated as landscape
 
-        Scribe.debug( Debug.LINKSTATE, "Orientation is " +
+        Scribe.debug( Debug.BOARDTABLE, "Orientation is " +
                 ( orientation == ORIENTATION_PORTRAIT ? "PORTRAIT" : "LANDSCAPE" ) );
         }
 
@@ -402,7 +402,7 @@ public class BoardTable
         {
         if ( popBoard(state == LOCKED) )
             {
-            Scribe.debug( Debug.LINKSTATE, "Returning to board: " +
+            Scribe.debug( Debug.BOARDTABLE, "Returning to board: " +
                     Tokenizer.regenerateKeyword( activeBoardId ));
 
             debugBoardStack();
@@ -450,7 +450,7 @@ public class BoardTable
         BoardEntry boardEntry = boards.get(id);
         if (boardEntry != null)
             {
-            Scribe.debug(Debug.LINKSTATE, "New board was selected: " +
+            Scribe.debug(Debug.BOARDTABLE, "New board was selected: " +
                     Tokenizer.regenerateKeyword(id));
 
             pushBoard();
@@ -530,11 +530,11 @@ public class BoardTable
         if (isActive( id ) && touchCounter > 0)
             {
             touchCounter--;
-            Scribe.debug( Debug.LINKSTATE, "BoardLinks RELEASE, touch-counter: " + touchCounter );
+            Scribe.debug( Debug.BOARDTABLE, "BoardLinks RELEASE, touch-counter: " + touchCounter );
 
             if (touchCounter == 0)
                 {
-                Scribe.debug( Debug.LINKSTATE, "BoardLinks: all button RELEASED." );
+                Scribe.debug( Debug.BOARDTABLE, "BoardLinks: all button RELEASED." );
                 if ( !typeFlag )
                     {
                     if (state == TOUCHED)
@@ -542,18 +542,18 @@ public class BoardTable
                         if (lockKey || activeBoard.isLocked())
                             {
                             state = LOCKED;
-                            Scribe.debug( Debug.LINKSTATE, "BoardLinks cycled to LOCKED by LOCK key." );
+                            Scribe.debug( Debug.BOARDTABLE, "BoardLinks cycled to LOCKED by LOCK key." );
                             }
                         else
                             {
                             state = ACTIVE;
-                            Scribe.debug( Debug.LINKSTATE, "BoardLinks cycled to ACTIVE." );
+                            Scribe.debug( Debug.BOARDTABLE, "BoardLinks cycled to ACTIVE." );
                             }
                         }
                     else if (state == ACTIVE)
                         {
                         state = LOCKED;
-                        Scribe.debug( Debug.LINKSTATE, "BoardLinks cycled to LOCKED." );
+                        Scribe.debug( Debug.BOARDTABLE, "BoardLinks cycled to LOCKED." );
                         }
                     else // if (state == LOCKED)
                         {
@@ -580,7 +580,7 @@ public class BoardTable
             typeFlag = false;
             touchCounter = 0;
             state = LOCKED;
-            Scribe.debug( Debug.LINKSTATE, "BoardLinks cancelled to META_LOCK." );
+            Scribe.debug( Debug.BOARDTABLE, "BoardLinks cancelled to META_LOCK." );
             }
         }
     }

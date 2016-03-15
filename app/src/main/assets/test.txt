@@ -16,6 +16,7 @@ LET ( khaki 0cd4ddaa )
 LET ( magenta 0c800080 )
 LET ( red 0ca00 )
 
+
 ;
 ; *** DEFINITIONS OF THE BOARDS AND LAYOUTS ***
 ;
@@ -46,7 +47,7 @@ ADDBOARD ( ID lay2 PORTRAIT lay2 LANDSCAPE lay2w LOCK )
 
 ; A layoutok természetesen többször is használhatóak, pl. két non-wide mellett ugyanaz a wide
 ADDLAYOUT ( ID lay3 color green )
-ADDBOARD ( ID lay3 PORTRAIT lay3 LANDSCAPE lay2w LOCK START)
+ADDBOARD ( ID lay3 PORTRAIT lay3 LANDSCAPE lay2w LOCK)
 
 ; Persze ez is megy. És itt is lehet azonos az azonosító
 ADDLAYOUT ( ID lay4 ALIGN evens COLOR pink )
@@ -150,7 +151,15 @@ BLOCK ( LAYOUT lay1 COLUMN 3 ROW 1
     BUTTON ( DO DELETE REPEAT)
     BUTTON ( DO SETTINGS)
       )
-
+      
+LET ( valami BUTTON ( COLOR YELLOW ADDTITLE ( YOFFSET 800 ) ))      
+BLOCK ( LAYOUT lay1 COLUMN 2 ROW 4
+    BUTTON ( TEXT "A" )
+    BUTTON ( TEXT "B" ADDTITLE () ADDTITLE ( YOFFSET 500 ) )
+    BUTTON ( TEXT "C" ADDTITLE () valami)
+    BUTTON ( TEXT "D" valami ADDTITLE () )
+    )
+    
 ; A landscape lay2-n a korábbi pozícionálások kipróbálása van
 
 DEFAULT BUTTON ( COLOR green )
