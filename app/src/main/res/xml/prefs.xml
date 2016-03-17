@@ -264,6 +264,12 @@
 			android:summary="@string/debug_summary"
 			android:defaultValue="@bool/debug_default" />
 
+		<CheckBoxPreference
+			android:key="@string/debug_grid_title_key"
+			android:title="@string/debug_grid_title_title"
+			android:summary="@string/debug_grid_title_summary"
+			android:defaultValue="@bool/debug_grid_title_default" />
+
 	</PreferenceCategory>
 
 </PreferenceScreen>

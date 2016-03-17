@@ -70,6 +70,7 @@
 
     <bool name="editing_text_session_default">true</bool>
 
-    <bool name="debug_default">true</bool>
+    <bool name="debug_default">false</bool>
+    <bool name="debug_grid_title_default">false</bool>
 
 </resources>

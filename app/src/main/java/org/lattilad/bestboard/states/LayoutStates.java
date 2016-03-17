@@ -257,7 +257,7 @@ public class LayoutStates
         int binaryHardState = 0;
         Boolean temp;
 
-        temp = (Boolean) parameters.get( Commands.TOKEN_FORCEALT );
+        temp = (Boolean) parameters.remove( Commands.TOKEN_FORCEALT );
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 
@@ -265,7 +265,7 @@ public class LayoutStates
 
         binaryHardState <<= HardState.FORCE_BITS;
 
-        temp = (Boolean) parameters.get( Commands.TOKEN_FORCECTRL );
+        temp = (Boolean) parameters.remove( Commands.TOKEN_FORCECTRL );
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 
@@ -273,7 +273,7 @@ public class LayoutStates
 
         binaryHardState <<= HardState.FORCE_BITS;
 
-        temp = (Boolean) parameters.get( Commands.TOKEN_FORCESHIFT );
+        temp = (Boolean) parameters.remove( Commands.TOKEN_FORCESHIFT );
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
 

@@ -792,6 +792,22 @@ public class Layout
                 }
             }
 
+        if ( softBoardData.gridTitle)
+            {
+            // Cannot be created before setting screen specific data
+            Button buttonForGridTitle = new Button();
+
+            // hexagon rows
+            for (int row = 0; row < layoutHeightInHexagons; row++)
+                {
+                // hexagon columns
+                for (int col = 0; col < layoutWidthInHexagons; col++)
+                    {
+                    buttonForGridTitle.drawGridTitle(canvas, this, col, row);
+                    }
+                }
+            }
+
         return skin;
         }
 

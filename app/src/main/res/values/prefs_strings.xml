@@ -193,10 +193,14 @@
     <string name="editing_text_session_on">New text session acts like a key-press on meta-states</string>
     <string name="editing_text_session_off">New text session do not set meta-states</string>
 
-    <string name="prefs_debug">Log files</string>
+    <string name="prefs_debug">Debug</string>
 
     <string name="debug_key">debug</string>
     <string name="debug_title">Enable developer log</string>
     <string name="debug_summary">Detailed developer log can be enabled for debugging</string>
+
+    <string name="debug_grid_title_key">gridtitle</string>
+    <string name="debug_grid_title_title">Numbers on hexagons</string>
+    <string name="debug_grid_title_summary">Helping column numbers can be displayed on each hexagon. Row is displayed only in the 2nd column.</string>
 
 </resources>

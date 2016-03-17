@@ -110,8 +110,8 @@ public class Button implements Cloneable
     public void setPosition( Layout layout, int arrayColumn, int arrayRow )
         {
         this.layout = layout;
-        this.columnInGrids = getGridX( arrayColumn, arrayRow );
-        this.rowInGrids = getGridY( arrayRow );
+        this.columnInGrids = getGridX(arrayColumn, arrayRow);
+        this.rowInGrids = getGridY(arrayRow);
         }
 
 
@@ -268,7 +268,7 @@ public class Button implements Cloneable
      */
     public void drawButton( Canvas canvas )
         {
-        drawButton( canvas, color, 0, 0 );
+        drawButton(canvas, color, 0, 0);
         }
 
 
@@ -284,10 +284,10 @@ public class Button implements Cloneable
     protected void drawButton( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
         // draw the background
-        drawButtonBackground( canvas, color, xOffsetInPixel, yOffsetInPixel );
+        drawButtonBackground(canvas, color, xOffsetInPixel, yOffsetInPixel);
 
         // draw the titles
-        drawButtonTitles(canvas, xOffsetInPixel, yOffsetInPixel );
+        drawButtonTitles(canvas, xOffsetInPixel, yOffsetInPixel);
         }
 
 
@@ -305,7 +305,7 @@ public class Button implements Cloneable
         {
         hexagonFillPaint.setColor( color );
 
-        Path hexagonPath = hexagonPath( xOffsetInPixel, yOffsetInPixel );
+        Path hexagonPath = hexagonPath(xOffsetInPixel, yOffsetInPixel);
         canvas.drawPath(hexagonPath, hexagonFillPaint);
         canvas.drawPath(hexagonPath, hexagonStrokePaint);
         }
@@ -328,11 +328,43 @@ public class Button implements Cloneable
         // BUT this is NOT obligatory!! So the buttons will store their position.
 
         int centerX = getPixelX( columnInGrids, xOffsetInPixel);
-        int centerY = getPixelY( rowInGrids, yOffsetInPixel );
+        int centerY = getPixelY(rowInGrids, yOffsetInPixel);
 
         for ( TitleDescriptor title : titles )
             {
-            title.drawTitle(canvas, layout, centerX, centerY);
+            title.drawTitle(canvas, layout, centerX, centerY );
             }
         }
+
+
+    /**
+     * Grid numbers are written for all buttons (even for non-existing ones) by layout creator
+     * Calculations of the button class, and the static textPaint of TitleDescriptor are used
+     * Grid text is the USERCOLUMN, or USERROW : USERCOLUMN for the 2nd column
+     * @param canvas canvas
+     * @param layout layout
+     * @param columnInHexagons arrayColumn
+     * @param rowInHexagons arrayRow
+     */
+    public void drawGridTitle( Canvas canvas, Layout layout, int columnInHexagons, int rowInHexagons )
+        {
+        setPosition( layout, columnInHexagons, rowInHexagons );
+
+        TitleDescriptor.textPaint.setTextSize(layout.textSize);
+        TitleDescriptor.textPaint.setColor(Color.BLACK);
+        TitleDescriptor.textPaint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
+                Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
+        TitleDescriptor.textPaint.setTextSkewX(0);
+
+        columnInHexagons++; // back from arrayColumn
+        rowInHexagons++;    // back from arrayRow
+
+        canvas.drawText(
+                columnInHexagons == 2 ? rowInHexagons + ":" + columnInHexagons : Integer.toString(columnInHexagons),
+                getPixelX( columnInGrids, 0), // + layout.halfHexagonWidthInPixels / 1000,
+                getPixelY( rowInGrids, - layout.halfHexagonHeightInPixels / 2),
+                TitleDescriptor.textPaint);
+        }
+
+
     }

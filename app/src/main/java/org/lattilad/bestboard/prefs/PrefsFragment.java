@@ -881,6 +881,14 @@ public class PrefsFragment extends PreferenceFragment
                 }
             }
 
+        // Debug / Grid title
+        if ( key.equals( getString( R.string.debug_grid_title_key )) || allKeys )
+            {
+            Scribe.note( Debug.PREF,  "PREFERENCES: Grid title has changed!" );
+
+            if ( !allKeys )     performAction(PREFS_ACTION_REDRAW);
+            }
+
         }
 
     /**

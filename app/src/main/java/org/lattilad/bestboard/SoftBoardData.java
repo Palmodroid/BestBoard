@@ -163,6 +163,11 @@ public class SoftBoardData
         textSessionSetsMetastates = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString(R.string.editing_text_session_key),
                 true);
+
+        gridTitle = sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString(R.string.debug_grid_title_key),
+                false);
+
         }
 
 
@@ -263,6 +268,11 @@ public class SoftBoardData
      * New text session behaves as a key stroke, and sets meta states accordingly (or not)
      */
     public boolean textSessionSetsMetastates = true;
+
+    /**
+     * Draws debug grid onto the layout
+     */
+    public boolean gridTitle = true;
 
 
     /**

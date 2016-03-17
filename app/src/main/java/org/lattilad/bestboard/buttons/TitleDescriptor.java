@@ -17,8 +17,11 @@ public class TitleDescriptor
      ** COMMON SETTINGS FOR ALL TITLES
      **/
 
-    /** Paint for text, set before drawing each title */
-    private static Paint textPaint = new Paint();
+    /**
+     * Paint for text, set before drawing each title
+     * Button can use it as well, because data is written before each draw
+     */
+    public static Paint textPaint = new Paint();
 
     /** Common paint settings for all titles */
     static
@@ -153,7 +156,7 @@ public class TitleDescriptor
         textPaint.setTextSkewX(italics ? -0.25f : 0);
 
         canvas.drawText(
-                layout.isCapsForced() ? text.toUpperCase( layout.softBoardData.locale ) : text,
+                layout.isCapsForced() ? text.toUpperCase(layout.softBoardData.locale) : text,
                 centerX + xOffset * layout.halfHexagonWidthInPixels / 1000,
                 centerY + yOffset * layout.halfHexagonHeightInPixels / 1000,
                 textPaint);
