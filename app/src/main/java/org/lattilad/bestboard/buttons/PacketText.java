@@ -45,7 +45,7 @@ public class PacketText extends Packet
      * 2 - all caps
      */
     private static int capsState = 0;
-
+    private static boolean twinState = false;
 
     // String cannot be null from coat.descriptor (only from direct definition)
     // If string is not valid in coat.descriptor, then no OneParameter is set
@@ -93,28 +93,39 @@ public class PacketText extends Packet
         return string;
         }
 
-    private void sendString()
-    	{
+    private void sendString( )
+        {
+        String stringToSend;
+
+        if ( twinState && string.length() == 1 )
+            {
+            stringToSend = new StringBuilder().append(string).append(string).toString();
+            }
+        else
+            {
+            stringToSend = string;
+            }
+
         switch ( capsState )
-        	{
+            {
             case 0:
-         		softBoardData.softBoardListener.sendString(
-            		string, autoSpace );
+                softBoardData.softBoardListener.sendString(
+                        stringToSend, autoSpace );
                 break;
 
             case 1:
                 softBoardData.softBoardListener.sendString(
-                        StringUtils.toUpperFirst( string, softBoardData.locale ), autoSpace );
+                        StringUtils.toUpperFirst( stringToSend, softBoardData.locale ), autoSpace );
                 break;
-                
+
             default: // case 2:
                 // http://stackoverflow.com/questions/4052840/most-efficient-way-to-make-the-first-character-of-a-string-lower-case
                 // http://stackoverflow.com/questions/26515060/why-java-character-touppercase-tolowercase-has-no-locale-parameter-like-string-t
                 softBoardData.softBoardListener.sendString(
-                        string.toUpperCase( softBoardData.locale ), autoSpace );
+                        stringToSend.toUpperCase( softBoardData.locale ), autoSpace );
             }
-		}
-    
+        }
+
     @Override
     public void send()
         {
@@ -128,6 +139,8 @@ public class PacketText extends Packet
 
         else
             {
+            twinState = false;
+
             // state can be: META_OFF (no upper) IN_TOUCH META_ON AUTOCAPS_ON (first upper) META_LOCK (all upper)
             int state = softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS].getState();
             if ( state == CapsState.META_OFF )
@@ -146,7 +159,7 @@ public class PacketText extends Packet
 
                 }
 
-            sendString();
+            sendString( );
             }
         }
 
@@ -155,6 +168,7 @@ public class PacketText extends Packet
     	{
         if ( softBoardData.softBoardListener.undoLastString() )
         	{
+            /*
             capsState++;
 
             if ( capsState == 1 && stringCaps )
@@ -165,7 +179,9 @@ public class PacketText extends Packet
             	{
                 capsState = 0;
                 }
-            sendString();
+            */
+            twinState = !twinState;
+            sendString( );
             }
         }
     
