@@ -172,7 +172,7 @@ public class Layout
      * Text with this size:
      * 5 chars can fit in one hexagon width AND text can fit in one grid height
      */
-    public int textSize;
+    public TitleDescriptor.FontData fontData;
     // TITLE DESCRIPTOR needs this data !!
 
     /**
@@ -515,10 +515,10 @@ public class Layout
                 + monitorSize;
 
         // CALCULATE FONT PARAMETERS
-        textSize = TitleDescriptor.calculateTextSize(this);
+        fontData = TitleDescriptor.calculateTextSize(this);
 
         // Monitor text size can be calculated only after general text size
-        monitorText.setTextSize(textSize * monitorSizePermil / 1000);
+        monitorText.setTextSize(fontData.textSize * monitorSizePermil / 1000);
         }
 
 

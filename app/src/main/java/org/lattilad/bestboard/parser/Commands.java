@@ -120,7 +120,9 @@ public class Commands
     public static final long TOKEN_SEND = 0x16f269L;
     public static final long TOKEN_DO = 0x101f8L;
     public static final long TOKEN_COMBINE = 0x790d8163bL;
-
+    public static final long TOKEN_TIME = 0x17cd86L;
+    public static final long TOKEN_FORMAT = 0x40c43e96L;
+    
     public static final long TOKEN_AUTOCAPS = 0xef6e451a57L;
     public static final long TOKEN_STRINGCAPS = 0xd4c9a99e4004bL;
     public static final long TOKEN_AUTOSPACE = 0x229af1ada341L;
@@ -502,6 +504,7 @@ public class Commands
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                         TOKEN_DO,
                         TOKEN_COMBINE,
+                    	TOKEN_TIME, TOKEN_FORMAT, 
 
                         TOKEN_FIRST,
                         TOKEN_SECOND,
@@ -553,7 +556,8 @@ public class Commands
 
                         TOKEN_DO,
 
-                        TOKEN_COMBINE },
+                        TOKEN_COMBINE,
+                        TOKEN_TIME, TOKEN_FORMAT },
                 "packet");
 
         add(TOKEN_SECOND, new long[]{
@@ -568,7 +572,8 @@ public class Commands
 
                         TOKEN_DO,
 
-                        TOKEN_COMBINE },
+                        TOKEN_COMBINE,
+                        TOKEN_TIME, TOKEN_FORMAT },
                 "packet");
 
         add(TOKEN_TEXT, new long[]{PARAMETER_TEXT});
@@ -586,6 +591,9 @@ public class Commands
         // add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
         // add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
 
+        add(TOKEN_TIME, new long[]{PARAMETER_FLAG});
+        add(TOKEN_FORMAT, new long[]{PARAMETER_TEXT});
+        
         add(TOKEN_SINGLE, new long[]{PARAMETER_FLAG});
         add(TOKEN_REPEAT, new long[]{PARAMETER_FLAG});
         add(TOKEN_DOUBLE, new long[]{PARAMETER_FLAG});
@@ -597,7 +605,9 @@ public class Commands
                         TOKEN_STRINGCAPS,
                         TOKEN_ERASESPACE,
                         TOKEN_AUTOSPACE,
-
+                        
+                    	TOKEN_TIME, TOKEN_FORMAT,
+                        
                         // If only Text-packet is allowed here, then rem next rows!!
                         /* TOKEN_SEND,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,

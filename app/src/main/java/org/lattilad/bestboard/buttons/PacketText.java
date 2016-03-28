@@ -15,7 +15,7 @@ public class PacketText extends Packet
     {
     /** String of the key. Characters are defined as Strings,
      because only String can be sent */
-    private String string;
+    protected String string;
 
     /** Autocaps command, delivered after data was sent */
     private int autoCaps = CapsState.AUTOCAPS_OFF;
@@ -189,7 +189,8 @@ public class PacketText extends Packet
     public void release()
     	{
         // If needed, this could be a standalone method, called when touch releases the button
-        ( (CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS] ).setAutoCapsState( autoCaps );
+        if (softBoardData.autoEnabled)
+        	( (CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS] ).setAutoCapsState( autoCaps );
         Scribe.debug(Debug.TEXT, "PacketText released, autocaps state is set.");
         }
     }

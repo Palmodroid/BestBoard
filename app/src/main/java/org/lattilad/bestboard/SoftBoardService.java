@@ -901,17 +901,17 @@ textAfterCursor. ;
             {
             ic.beginBatchEdit();
 
-            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 )
+            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 && softBoardData.autoEnabled)
                 {
                 sendDeleteSpacesBeforeCursor( ic );
                 }
-            if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 )
+                if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 && softBoardData.autoEnabled )
                 {
                 sendDeleteSpacesAfterCursor( ic );
                 }
 
             sendBuilder.setLength(0);
-            if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 )
+                if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoEnabled )
                 {
                 textBeforeCursor.reset();
                 if ( !isWhiteSpace( textBeforeCursor.read()) )
@@ -920,7 +920,7 @@ textAfterCursor. ;
 
             sendBuilder.append(string);
 
-            if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 )
+                if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 && softBoardData.autoEnabled )
                 {
                 textAfterCursor.reset();
                 if ( !isSpace( textAfterCursor.read()) )

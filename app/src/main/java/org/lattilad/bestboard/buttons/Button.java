@@ -350,7 +350,7 @@ public class Button implements Cloneable
         {
         setPosition( layout, columnInHexagons, rowInHexagons );
 
-        TitleDescriptor.textPaint.setTextSize(layout.textSize);
+        TitleDescriptor.textPaint.setTextSize(layout.fontData.textSize);
         TitleDescriptor.textPaint.setColor(Color.BLACK);
         TitleDescriptor.textPaint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
                 Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);

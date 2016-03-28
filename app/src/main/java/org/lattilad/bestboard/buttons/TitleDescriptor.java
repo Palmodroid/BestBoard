@@ -6,6 +6,7 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 
 import org.lattilad.bestboard.Layout;
+import org.lattilad.bestboard.scribe.*;
 
 /**
  * Describes titles (formatted strings) on buttons.
@@ -38,6 +39,12 @@ public class TitleDescriptor
         textPaint.setTypeface( typeface );
         }
 
+    public static class FontData
+        {
+        public int textSize;
+        public int yAdjust;
+        }
+
     /**
      * Calculates text size for each layout.
      * All TitleDescriptor instances use the same paint and the same typeface.
@@ -47,34 +54,52 @@ public class TitleDescriptor
      * @param layout calculate text size for this layout
      * @return text size for this layout
      */
-    public static int calculateTextSize( Layout layout)
+    public static FontData calculateTextSize( Layout layout)
         {
         Rect bounds = new Rect();
+        FontData fontData = new FontData();
 
         // Typeface was set previously by SoftBoardData
 
-        textPaint.setTextSize( 1000f );
+        textPaint.setTextSize(1000f);
 
-        textPaint.getTextBounds("MMMMM", 0, 5, bounds);
+        textPaint.getTextBounds("MMM", 0, 3, bounds);
         int textWidth = bounds.width();
 
-        textPaint.getTextBounds("ly", 0, 2, bounds);
-        int textHeight = bounds.height();
+        textPaint.getTextBounds("Ly", 0, 2, bounds);
+        // Scribe.debug( "1000 size MMM width: " + textWidth +
+        //         " Ly height: " + bounds.height() +
+        //         " Ly ascent: " + bounds.top + " pixels");
 
-        // Calculate font size from the height of "ly" characters
-        // intendedHeightInPixels is one grid (1/4 hexagon) == layoutHeightInPixels / layoutHeightInGrids
+
+        // TEXT SIZE for 1000 virtual points
+
+        // Calculate font size from the height of "Ly" characters
+        // intendedHeightInPixels is half hexagon == 2 * layoutHeightInPixels / layoutHeightInGrids
         // Ratio => SIZE : intendedHeightInPixels = 1000f : bounds.height()
-        int textSizeFromHeight = 1000 * layout.layoutHeightInPixels / (layout.layoutHeightInGrids * textHeight) ;
+        int textSizeFromHeight = 2 * 1000 * layout.layoutHeightInPixels /
+                (layout.layoutHeightInGrids * bounds.height()) ;
 
-        // Calculate font size from the width of "MMMMM" characters
+        // Calculate font size from the width of "MMM" characters
         // intendedWidthInPixels is one hexagon (2 grids) == 2 * areaWidthInPixels / areaWidthInGrids
         // Ratio => SIZE : intendedWidthInPixels = 1000f : bounds.width()
-        int textSizeFromWidth = 2 * 1000 * layout.areaWidthInPixels / (layout.areaWidthInGrids * textWidth);
+        int textSizeFromWidth = 2 * 1000 * layout.areaWidthInPixels /
+                (layout.areaWidthInGrids * textWidth);
+
+        // Scribe.debug( "Size for 1000 points from width: " + textSizeFromWidth +
+        //         " from height: " + textSizeFromHeight );
 
         // In most cases textSizeFromWidth is smaller
-        // Now text with max. 5 characters can fit in the width of a hexagon
-        // AND can fit in one grid (1/4 hexagon) height
-        return  Math.min(textSizeFromWidth, textSizeFromHeight);
+        // Now text with max. 3 characters can fit in the width of a hexagon
+        // AND can fit in one half hexagon height
+        fontData.textSize = Math.min(textSizeFromWidth, textSizeFromHeight);
+
+        fontData.yAdjust = (- bounds.top - bounds.height()/2) * fontData.textSize / 1000;
+
+        // Scribe.debug( "Y adjust for 1000 points from height: " + fontData.yAdjust );
+
+        return fontData;
+        // Actually the "normal" text size is 600: 5M/hexagon width and 3Ly/hexagon height (1800)
         }
 
 
@@ -146,7 +171,7 @@ public class TitleDescriptor
      */
     public void drawTitle( Canvas canvas, Layout layout, String text, int centerX, int centerY )
         {
-        textPaint.setTextSize(layout.textSize * size / 1000);
+        textPaint.setTextSize(layout.fontData.textSize * size / 1000);
         textPaint.setColor(color);
 
         textPaint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
@@ -155,10 +180,13 @@ public class TitleDescriptor
 
         textPaint.setTextSkewX(italics ? -0.25f : 0);
 
+        int adjust = layout.fontData.yAdjust * size / 1000;
+        // Scribe.debug("Size: " + size + " Adjust: " + adjust);
+
         canvas.drawText(
                 layout.isCapsForced() ? text.toUpperCase(layout.softBoardData.locale) : text,
-                centerX + xOffset * layout.halfHexagonWidthInPixels / 1000,
-                centerY + yOffset * layout.halfHexagonHeightInPixels / 1000,
+                centerX + xOffset * layout.halfHexagonWidthInPixels / 1500,
+                centerY + yOffset * layout.halfHexagonHeightInPixels / 1000 + adjust,
                 textPaint);
         }
 

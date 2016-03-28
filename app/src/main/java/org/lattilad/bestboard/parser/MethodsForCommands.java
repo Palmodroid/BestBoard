@@ -1,48 +1,16 @@
 package org.lattilad.bestboard.parser;
 
-import android.graphics.Color;
-import android.view.KeyEvent;
-
-import org.lattilad.bestboard.Layout;
-import org.lattilad.bestboard.R;
-import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.buttons.Button;
-import org.lattilad.bestboard.buttons.ButtonAlternate;
-import org.lattilad.bestboard.buttons.ButtonDouble;
-import org.lattilad.bestboard.buttons.ButtonEnter;
-import org.lattilad.bestboard.buttons.ButtonList;
-import org.lattilad.bestboard.buttons.ButtonMainTouch;
-import org.lattilad.bestboard.buttons.ButtonMeta;
-import org.lattilad.bestboard.buttons.ButtonModify;
-import org.lattilad.bestboard.buttons.ButtonSingle;
-import org.lattilad.bestboard.buttons.ButtonSpaceTravel;
-import org.lattilad.bestboard.buttons.ButtonSwitch;
-import org.lattilad.bestboard.buttons.Packet;
-import org.lattilad.bestboard.buttons.PacketCombine;
-import org.lattilad.bestboard.buttons.PacketFunction;
-import org.lattilad.bestboard.buttons.PacketKey;
-import org.lattilad.bestboard.buttons.PacketText;
-import org.lattilad.bestboard.buttons.TitleDescriptor;
-import org.lattilad.bestboard.debug.Debug;
-import org.lattilad.bestboard.modify.Modify;
-import org.lattilad.bestboard.modify.ModifyChar;
-import org.lattilad.bestboard.modify.ModifyText;
-import org.lattilad.bestboard.scribe.Scribe;
-import org.lattilad.bestboard.states.CapsState;
-import org.lattilad.bestboard.states.LayoutStates;
-import org.lattilad.bestboard.utils.Bit;
-import org.lattilad.bestboard.utils.ExtendedMap;
-import org.lattilad.bestboard.utils.ExternalDataException;
-import org.lattilad.bestboard.utils.KeyValuePair;
-import org.lattilad.bestboard.utils.SinglyLinkedList;
-import org.lattilad.bestboard.utils.Trilean;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import android.graphics.*;
+import android.view.*;
+import java.io.*;
+import java.util.*;
+import org.lattilad.bestboard.*;
+import org.lattilad.bestboard.buttons.*;
+import org.lattilad.bestboard.debug.*;
+import org.lattilad.bestboard.modify.*;
+import org.lattilad.bestboard.scribe.*;
+import org.lattilad.bestboard.states.*;
+import org.lattilad.bestboard.utils.*;
 
 /**
  * Methods to create SoftBoardData from coat descriptor
@@ -946,6 +914,11 @@ public class MethodsForCommands
 
         if ( temp == null )             // TEXT token is missing
             {
+            temp = parameters.remove( Commands.TOKEN_TIME );
+            }
+          
+        if ( temp == null )             // TEXT and TIME token is missing
+            {
             temp = defaultText;         // use default instead of TEXT
             }
         else if ( defaultText != null ) // both TEXT and default -> override default
@@ -992,16 +965,22 @@ public class MethodsForCommands
             else if ( autoFlag != -1L )
                 tokenizer.error("PACKET", R.string.data_erasespaces_bad_parameter );
 
-            if (temp instanceof Character)
+            if (temp instanceof String)
+                {
+                packet = new PacketText( softBoardData, (String)temp, autoCaps,
+                (boolean)parameters.remove( Commands.TOKEN_STRINGCAPS, false), autoSpace );
+                }
+            else if (temp instanceof Character)
                 {
                 packet = new PacketText( softBoardData, (Character)temp, autoCaps,
                         autoSpace );
                 }
-            else // if (temp instanceof String)
-                {
-                packet = new PacketText( softBoardData, (String)temp, autoCaps,
-                        (boolean)parameters.remove( Commands.TOKEN_STRINGCAPS, false), autoSpace );
-                }
+            else // if (temp instanceof Boolean )
+            	{
+                packet = new PacketTextTime( softBoardData, 
+                		(String)parameters.remove(Commands.TOKEN_FORMAT), 
+                        autoCaps, autoSpace );
+				}
             }
 
         return packet;

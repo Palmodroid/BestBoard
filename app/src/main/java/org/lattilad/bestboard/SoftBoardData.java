@@ -283,6 +283,11 @@ public class SoftBoardData
 
     // defined in constructor, because SoftBoardDataListener is needed
     public BoardTable boardTable;
+    
+    /*
+     * If auto-space, auto-caps are enabled
+     */
+    public boolean autoEnabled = true;
 
     /**
      * Action of the enter key defined by imeOptions of onStartInput's EditorInfo
