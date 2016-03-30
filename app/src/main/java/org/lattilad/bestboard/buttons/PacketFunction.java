@@ -95,7 +95,7 @@ public class PacketFunction extends Packet
 
         else if (functionCode == Commands.TOKEN_SETTINGS )
             {
-            // The whole part is copied from Best's Layout ver 1.
+            // The whole part is copied from Best's Board ver 1.
 
             // Original idea: http://stackoverflow.com/a/3607934
             // but it doesn't work without Single_top - BACK went back to an other instance

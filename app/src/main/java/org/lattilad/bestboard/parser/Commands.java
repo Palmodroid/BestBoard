@@ -2,6 +2,7 @@ package org.lattilad.bestboard.parser;
 
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.utils.ArrayUtils;
 import org.lattilad.bestboard.utils.ExtendedMap;
 
 import java.lang.reflect.Method;
@@ -1245,6 +1246,9 @@ public class Commands
      */
     public static class Data
         {
+        private long tokenCode;
+        private long allowedLabelTypes[] = null;
+
         private long groupCode;
         private long params[];
         private Method method = null;
@@ -1253,6 +1257,7 @@ public class Commands
 
         private Data( long tokenCode, long[] params )
             {
+            this.tokenCode = tokenCode;
             this.groupCode = tokenCode;
             this.params = params;
             }
@@ -1305,6 +1310,12 @@ public class Commands
         private Data allowAsDefault()
             {
             allowedAsDefault = true;
+            return this;
+            }
+
+        private Data labels( long[] allowedLabelTypes ) // extendAllowedLabelTypes
+            {
+            this.allowedLabelTypes = allowedLabelTypes;
             return this;
             }
 
@@ -1366,6 +1377,15 @@ public class Commands
         public boolean isAllowedAsDefault()
             {
             return allowedAsDefault;
+            }
+
+        public boolean isLabelTypeAllowed( long labelType )
+            {
+            if ( labelType == tokenCode )
+                return true;
+            if ( allowedLabelTypes == null )
+                return false;
+            return ArrayUtils.contains( allowedLabelTypes, labelType );
             }
         }
 

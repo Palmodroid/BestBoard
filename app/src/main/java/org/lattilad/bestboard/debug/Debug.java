@@ -41,6 +41,7 @@ public class Debug
     public static final int SERVICE = 80;
     public static final int TEXT = 90;
     public static final int CURSOR = 90;
+    public static final int TIMER = 990;
 
 
     public static final int LAYOUTSTATE = 60;

@@ -14,6 +14,7 @@ import org.lattilad.bestboard.SoftBoardData.SoftBoardListener;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.utils.ArrayUtils;
 import org.lattilad.bestboard.utils.Bit;
 import org.lattilad.bestboard.utils.ExtendedMap;
 import org.lattilad.bestboard.utils.ExternalDataException;
@@ -263,7 +264,13 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             reader = new BufferedReader( new InputStreamReader( new FileInputStream( descriptorFile ), "UTF-8" ) );
             tokenizer = new Tokenizer( caller.getApplicationContext(), reader );
 
-            parseSoftBoard( );
+            long startTime = System.nanoTime();
+            parseSoftBoard();
+            long endTime = System.nanoTime();
+
+            Scribe.note( Debug.TIMER, "Time for parsing: " +
+                    ((endTime - startTime) / 1000000) + " msec");
+
             }
 
         // TaskCancelledException, IOException, InvalidCoatFileException are not cached,
@@ -327,7 +334,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         try
             {
             tokenizer.note( R.string.parser_file_parsing_started );
-            parseComplexParameter( Commands.ADDSOFTBOARD, Commands.get( Commands.ADDSOFTBOARD).getAllowedParameters(), null );
+            parseComplexParameter( Commands.ADDSOFTBOARD, Commands.get(Commands.ADDSOFTBOARD), false );
             if ( tokenizer.getTokenType() == Tokenizer.TYPE_EOF )
                 tokenizer.note( R.string.parser_file_parsing_finished );
             else
@@ -387,16 +394,16 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * Returns the return-values of each parameter-command
      * identified by the token-code of its command.
      * @param parsedCommandCode parameters of this command are evaluated
-     * @param allowedParameterCommands allowed parameters for this command
-     * @param defaultParameters default parameters can be given, if this is not label/default evaluation
+     * @param parsedCommandData data for command, which contains allowed parameters
+     * @param useDefaults default parameters can be given, if this is not label/default evaluation
      * Usually code determines allowed parameters (through the data class),
      * but this is not obligatory. Code is used only if a complex label is given.
      * @return return-values of the parameters in the list
      * @throws IOException (coat) file reading fails
      */
     private ExtendedMap<Long, Object> parseComplexParameter( long parsedCommandCode,
-                                                             long[] allowedParameterCommands,
-                                                             ExtendedMap< Long, Object> defaultParameters )
+                                                             Commands.Data parsedCommandData,
+                                                             boolean useDefaults )
             throws IOException
         {
         Scribe.debug(Debug.PARSER, "Parsing of parameters of [" + Tokenizer.regenerateKeyword(parsedCommandCode) + "] complex command has started.");
@@ -424,12 +431,12 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         ExtendedMap<Long, Object> returnParameters = new ExtendedMap<>();
 
         // Before the cycles DEFAULT VALUES populates returnParameters
-        if ( defaultParameters != null )
-            {
-            returnParameters.putAll( defaultParameters );
-            Scribe.debug(Debug.PARSER, "Default values (label) for [" + Tokenizer.regenerateKeyword(parsedCommandCode) +
-                    "] is found: [" + returnParameters + "]");
-            }
+        if ( useDefaults && defaults.containsKey( parsedCommandCode ) )
+                {
+                returnParameters.putAll( (ExtendedMap<Long, Object>)(defaults.get(parsedCommandCode)).clone() );
+                Scribe.debug(Debug.PARSER, "Default values (label) for [" + Tokenizer.regenerateKeyword(parsedCommandCode) +
+                        "] are found: [" + returnParameters + "]");
+                }
 
         // iterate the parameter-commands of the caller
         while (true)
@@ -448,37 +455,47 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                         Tokenizer.regenerateKeyword( parsedCommandCode ) + "] has started.");
 
                 // Valid keyword, but not allowed parameter-command - this can be a LABEL
-                if ( ( commandMultiple = containsWithoutSignedBit(allowedParameterCommands, commandCode)) == 0 )
+                if ( ( commandMultiple = ArrayUtils.containsWithoutSignedBit(parsedCommandData.getAllowedParameters(), commandCode)) == 0 )
                     {
                     try
                         {
-                        // label key is given as commandCode, while type is the parsed commandCode
-                        forwardParameters = (ExtendedMap<Long, Object>) labels
-                                .get( commandCode, parsedCommandCode );
+                        labels.select( commandCode );
 
-                        Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as a label. Value: [" +
-                                forwardParameters + "]");
-
-                        // All elements are copied into returnedParameters
-                        // each entry should be checked if multiple or not
-                        for (Map.Entry<Long, Object> entry : forwardParameters.entrySet())
+                        if ( parsedCommandData.isLabelTypeAllowed( labels.getTypeOfSelected() ))
                             {
-                            if ( entry.getKey() > 0L ) // SINGLE
-                                {
-                                returnParameters.put(entry.getKey(), entry.getValue());
-                                }
-                            else // MULTIPLE
-                                {
-                                ArrayList<KeyValuePair> list =
-                                        (ArrayList<KeyValuePair>) returnParameters.get( entry.getKey() );
+                            // label key is given as commandCode, while type is the parsed commandCode
+                            forwardParameters = (ExtendedMap<Long, Object>) labels.getValueOfSelected(); // .get( commandCode, parsedCommandCode );
 
-                                if (list == null)
+                            Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as a label. Value: [" +
+                                    forwardParameters + "]");
+
+                            // All elements are copied into returnedParameters
+                            // each entry should be checked if multiple or not
+                            for (Map.Entry<Long, Object> entry : forwardParameters.entrySet())
+                                {
+                                if (entry.getKey() > 0L) // SINGLE
                                     {
-                                    list = new ArrayList<KeyValuePair>();
-                                    returnParameters.put( entry.getKey(), list) ;
+                                    returnParameters.put(entry.getKey(), entry.getValue());
                                     }
-                                list.addAll((ArrayList<KeyValuePair>) (entry.getValue()));
+                                else // MULTIPLE
+                                    {
+                                    ArrayList<KeyValuePair> list =
+                                            (ArrayList<KeyValuePair>) returnParameters.get(entry.getKey());
+
+                                    if (list == null)
+                                        {
+                                        list = new ArrayList<KeyValuePair>();
+                                        returnParameters.put(entry.getKey(), list);
+                                        }
+                                    list.addAll((ArrayList<KeyValuePair>) (entry.getValue()));
+                                    }
                                 }
+                            }
+                        else // This label is not allowed here
+                            {
+                            tokenizer.error(commandString, R.string.parser_parameter_invalid,
+                                    Tokenizer.regenerateKeyword( commandCode ));
+                            // parameter-block (if any) will be skipped as unexpected block
                             }
                         }
                     catch (InvalidKeyException e)
@@ -564,16 +581,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     continue;
                     }
 
-                ExtendedMap<Long, Object> forwardedDefaults = null;
-                if ( defaults.containsKey(commandCode) )
-                    {
-                    forwardedDefaults = (ExtendedMap<Long, Object>)(defaults.get(commandCode)).clone();
-                    }
-
                 // tokenizer.note( commandString, R.string.parser_complex_started);
-                forwardParameters = parseComplexParameter(commandCode,
-                        commandData.getAllowedParameters(),
-                        forwardedDefaults );
+                forwardParameters = parseComplexParameter(commandCode, commandData, true );
 
                 // forward results of previous parameter-commands with the same code to method
                 // forwarded value can be null
@@ -1380,14 +1389,14 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     }
                 else
                     {
-                    tokenizer.error( typeString, R.string.parser_default_complex_not_allowed );
+                    tokenizer.error(typeString, R.string.parser_default_complex_not_allowed);
                     // next block should be skipped
                     tokenizer.skipBlock();
                     }
                 }
             catch (InvalidKeyException e)
                 {
-                tokenizer.error( typeString, R.string.parser_data_missing);
+                tokenizer.error(typeString, R.string.parser_data_missing);
                 // next block should be skipped
                 tokenizer.skipBlock();
                 }
@@ -1475,7 +1484,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         else
             {
             // tokenizer.note( commandString, R.string.parser_complex_started);
-            result = parseComplexParameter( commandCode, commandData.getAllowedParameters(), null );
+            result = parseComplexParameter( commandCode, commandData, false );
 
             // END and EOF can be returned, but evaluation can be performed normally
             if ( tokenizer.nextToken() != Tokenizer.TYPE_END )
@@ -1501,49 +1510,6 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             return String.valueOf( (char)text );
         else // if ( temp instanceof String )
             return (String)text;
-        }
-
-
-    /**
-     * Simple utility to check whether array contains item.
-     * As generics don't support primitives, it is an extra method for long.
-     * ((http://stackoverflow.com/questions/2721546/why-dont-java-generics-support-primitive-types ;
-     * http://stackoverflow.com/a/12635769 a nice algorithm with generics ;
-     * http://stackoverflow.com/questions/2250031/null-check-in-an-enhanced-for-loop))
-     */
-    private boolean contains(final long[] array, final long item)
-        {
-        for (final long i : array)
-            {
-            // Scribe.debug( Tokenizer.regenerateKeyword(i) );
-            if (  i == item)
-                {
-                // Scribe.debug( " * ITEM WAS FOUND! " + Tokenizer.regenerateKeyword(item) );
-                return true;
-                }
-            }
-        return false;
-        }
-
-    /**
-     * Method was developed to distinguish between on and off signed bit in the array
-     * @param array to check (cannot be null!)
-     * @param item to look for
-     * @return 0 if item cannot be found in the array, 1 if item can be found in the array,
-     * -1 if item can be found, but array's item signed bit is ON
-     */
-    private int containsWithoutSignedBit(final long[] array, final long item)
-        {
-        for (final long i : array)
-            {
-            // Scribe.debug( Tokenizer.regenerateKeyword(i) );
-            if ( Bit.setSignedBitOff( i ) == item)
-                {
-                // Scribe.debug( " * ITEM WAS FOUND! " + Tokenizer.regenerateKeyword(item) );
-                return i < 0 ? -1 : +1;
-                }
-            }
-        return 0;
         }
 
     }

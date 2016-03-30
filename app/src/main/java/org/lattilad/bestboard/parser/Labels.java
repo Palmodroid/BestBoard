@@ -170,7 +170,7 @@ public class Labels
         }
 
     /**
-     * Helper method to check wether type of selected label is numeric
+     * Helper method to check whether type of selected label is numeric
      * @return true if selected label is numeric
      * @throws InvalidKeyException if no label was selected
      */
