@@ -264,26 +264,6 @@ public class Commands
     // No parameters - MOST POSITIVE!!
     public final static long NO_PARAMETERS = 0xFFL;
 
-    // These tokens (parameter-commands) can be defined as labels
-    public final static long[] ALLOWED_AS_LABEL = new long[]{
-            TOKEN_ADDBOARD,
-            TOKEN_ADDLAYOUT,
-            TOKEN_BLOCK,
-            TOKEN_BUTTON,
-            TOKEN_EXTEND,
-            TOKEN_ADDTITLE,
-            TOKEN_MONITOR };
-
-    // These tokens (parameter-commands) can be defined as labels
-    public final static long[] ALLOWED_AS_DEFAULT = new long[]{
-            TOKEN_ADDBOARD,
-            TOKEN_ADDLAYOUT,
-            TOKEN_BLOCK,
-            TOKEN_BUTTON,
-            TOKEN_EXTEND,
-            TOKEN_ADDTITLE,
-            TOKEN_MONITOR };
-
     /**
      * Parameter-commands are stored in an unmodifiable hash-HashMap (LIST)
      * as long token-code key (the command itself) and as Data value (command's data) pairs.
@@ -291,29 +271,24 @@ public class Commands
     private static Map<Long, Data> LIST = createDataMap();
 
 
-    private static void add( long tokenCode, long groupCode, long[] params, String methodName )
+    private static Data add( long tokenCode, long[] params )
         {
-        if ( LIST.put( tokenCode, new Data(groupCode, params, methodName )) != null )
+        Data data = new Data(tokenCode, params );
+        if ( LIST.put( tokenCode, data) != null )
             {
             Scribe.error("Please, check COMMANDS! " + tokenCode +
                     " [" + Tokenizer.regenerateKeyword(tokenCode) + "] has multiple definitions!");
             }
+        return data;
         }
 
-    private static void add( long tokenCode, long[] params, String methodName )
+    private static Data add( long tokenCode, long param )
         {
-        add(tokenCode, tokenCode, params, methodName);
+        long[] params = new long[1];
+        params[0] = param;
+        return add(tokenCode, params);
         }
 
-    private static void add( long tokenCode, long groupCode, long[] params)
-        {
-        add( tokenCode, groupCode, params, null );
-        }
-
-    private static void add( long tokenCode, long[] params )
-        {
-        add( tokenCode, tokenCode, params, null );
-        }
 
     /**
      * Static map initialization is done as suggested by http://stackoverflow.com/a/509016
@@ -384,49 +359,50 @@ public class Commands
         add(TOKEN_LET, new long[]{PARAMETER_LABEL});
 //        add(TOKEN_CHANGE, new long[]{PARAMETER_CHANGE_LABEL});
 
-        add(TOKEN_NAME, new long[]{PARAMETER_STRING}, "setName");
-        add(TOKEN_VERSION, new long[]{PARAMETER_INT}, "setVersion");
-        add(TOKEN_AUTHOR, new long[]{PARAMETER_STRING}, "setAuthor");
-        add(TOKEN_ADDTAGS, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)}, "addTags");
-        add(TOKEN_DESCRIPTION, new long[]{PARAMETER_STRING}, "setDescription");
-        add(TOKEN_DOCFILE, new long[]{PARAMETER_FILE}, "setDocFile");
-        add(TOKEN_DOCURI, new long[]{PARAMETER_STRING}, "setDocUri");
+        add(TOKEN_NAME, PARAMETER_STRING).method("setName");
+        add(TOKEN_VERSION, PARAMETER_INT).method("setVersion");
+        add(TOKEN_AUTHOR, PARAMETER_STRING).method("setAuthor");
+        add(TOKEN_ADDTAGS, (PARAMETER_STRING | PARAMETER_MOD_LIST)).method("addTags");
+        add(TOKEN_DESCRIPTION, PARAMETER_STRING).method("setDescription");
+        add(TOKEN_DOCFILE, PARAMETER_FILE).method("setDocFile");
+        add(TOKEN_DOCURI, PARAMETER_STRING).method("setDocUri");
 
         add(TOKEN_LOCALE, new long[]{
-                TOKEN_LANGUAGE, TOKEN_COUNTRY, TOKEN_VARIANT}, "setLocale");
-        add(TOKEN_LANGUAGE, new long[]{PARAMETER_STRING});
-        add(TOKEN_COUNTRY, new long[]{PARAMETER_STRING});
-        add(TOKEN_VARIANT, new long[]{PARAMETER_STRING});
+                TOKEN_LANGUAGE, TOKEN_COUNTRY, TOKEN_VARIANT}).method("setLocale");
+        add(TOKEN_LANGUAGE, PARAMETER_STRING);
+        add(TOKEN_COUNTRY, PARAMETER_STRING);
+        add(TOKEN_VARIANT, PARAMETER_STRING);
 
-        add(TOKEN_METACOLOR, new long[]{PARAMETER_COLOR}, "setMetaColor");
-        add(TOKEN_LOCKCOLOR, new long[]{PARAMETER_COLOR}, "setLockColor");
-        add(TOKEN_AUTOCOLOR, new long[]{PARAMETER_COLOR}, "setAutoColor");
-        add(TOKEN_TOUCHCOLOR, new long[]{PARAMETER_COLOR}, "setTouchColor");
-        add(TOKEN_STROKECOLOR, new long[]{PARAMETER_COLOR}, "setStrokeColor");
-        add(TOKEN_FONT, new long[]{PARAMETER_FILE}, "setTypeface");
+        add(TOKEN_METACOLOR, PARAMETER_COLOR).method("setMetaColor");
+        add(TOKEN_LOCKCOLOR, PARAMETER_COLOR).method("setLockColor");
+        add(TOKEN_AUTOCOLOR, PARAMETER_COLOR).method("setAutoColor");
+        add(TOKEN_TOUCHCOLOR, PARAMETER_COLOR).method("setTouchColor");
+        add(TOKEN_STROKECOLOR, PARAMETER_COLOR).method("setStrokeColor");
+        add(TOKEN_FONT, PARAMETER_FILE).method("setTypeface");
 
-        add(TOKEN_ENTERTITLE, new long[]{PARAMETER_TEXT}, "setEnterTitle");
-        add(TOKEN_GOTITLE, new long[]{PARAMETER_TEXT}, "setGoTitle");
-        add(TOKEN_SEARCHTITLE, new long[]{PARAMETER_TEXT}, "setSearchTitle");
-        add(TOKEN_SENDTITLE, new long[]{PARAMETER_TEXT}, "setSendTitle");
-        add(TOKEN_NEXTTITLE, new long[]{PARAMETER_TEXT}, "setNextTitle");
-        add(TOKEN_DONETITLE, new long[]{PARAMETER_TEXT}, "setDoneTitle");
-        add(TOKEN_PREVTITLE, new long[]{PARAMETER_TEXT}, "setPrevTitle");
-        add(TOKEN_NONETITLE, new long[]{PARAMETER_TEXT}, "setNoneTitle");
-        add(TOKEN_UNKNOWNTITLE, new long[]{PARAMETER_TEXT}, "setUnknownTitle");
+        add(TOKEN_ENTERTITLE, PARAMETER_TEXT).method("setEnterTitle");
+        add(TOKEN_GOTITLE, PARAMETER_TEXT).method("setGoTitle");
+        add(TOKEN_SEARCHTITLE, PARAMETER_TEXT).method("setSearchTitle");
+        add(TOKEN_SENDTITLE, PARAMETER_TEXT).method("setSendTitle");
+        add(TOKEN_NEXTTITLE, PARAMETER_TEXT).method("setNextTitle");
+        add(TOKEN_DONETITLE, PARAMETER_TEXT).method("setDoneTitle");
+        add(TOKEN_PREVTITLE, PARAMETER_TEXT).method("setPrevTitle");
+        add(TOKEN_NONETITLE, PARAMETER_TEXT).method("setNoneTitle");
+        add(TOKEN_UNKNOWNTITLE, PARAMETER_TEXT).method("setUnknownTitle");
 
         add(TOKEN_ADDBOARD, new long[]{
                 TOKEN_ID,
                 TOKEN_LAYOUT,
                 TOKEN_PORTRAIT, TOKEN_LANDSCAPE,
-                TOKEN_LOCK, TOKEN_START}, "addBoard");
+                TOKEN_LOCK, TOKEN_START})
+                .method("addBoard").allowAsLabel().allowAsDefault();
 
-        add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_PORTRAIT, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_LANDSCAPE, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
-        add(TOKEN_START, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ID, PARAMETER_KEYWORD);
+        add(TOKEN_LAYOUT, PARAMETER_KEYWORD);
+        add(TOKEN_PORTRAIT, PARAMETER_KEYWORD);
+        add(TOKEN_LANDSCAPE, PARAMETER_KEYWORD);
+        add(TOKEN_LOCK, PARAMETER_FLAG);
+        add(TOKEN_START, PARAMETER_FLAG);
 
         add(TOKEN_ADDLAYOUT, new long[]{
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
@@ -434,26 +410,27 @@ public class Commands
                 TOKEN_ALIGN, TOKEN_COLOR,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                 TOKEN_ASBOARD,
-                TOKEN_LOCK, TOKEN_START}, "addLayout" );
+                TOKEN_LOCK, TOKEN_START})
+                .method("addLayout").allowAsLabel().allowAsDefault();
 
-        // add(TOKEN_ID, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_HEXAGONAL, new long[]{NO_PARAMETERS}); // Useless parametercommand - just for clearer readability
-        add(TOKEN_WIDE, new long[]{PARAMETER_FLAG});
-        add(TOKEN_COLUMNS, new long[]{PARAMETER_INT});
-        add(TOKEN_HALFCOLUMNS, new long[]{PARAMETER_INT});
-        add(TOKEN_ROWS, new long[]{PARAMETER_INT});
-        add(TOKEN_ALIGN, new long[]{PARAMETER_KEYWORD} );
-        add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
+        // add(TOKEN_ID, PARAMETER_KEYWORD);
+        add(TOKEN_HEXAGONAL, NO_PARAMETERS); // Useless parametercommand - just for clearer readability
+        add(TOKEN_WIDE, PARAMETER_FLAG);
+        add(TOKEN_COLUMNS, PARAMETER_INT);
+        add(TOKEN_HALFCOLUMNS, PARAMETER_INT);
+        add(TOKEN_ROWS, PARAMETER_INT);
+        add(TOKEN_ALIGN, PARAMETER_KEYWORD );
+        add(TOKEN_COLOR, PARAMETER_COLOR);
 
-        add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
-        add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
+        add(TOKEN_FORCECAPS, PARAMETER_BOOLEAN);
+        add(TOKEN_FORCESHIFT, PARAMETER_BOOLEAN);
+        add(TOKEN_FORCECTRL, PARAMETER_BOOLEAN);
+        add(TOKEN_FORCEALT, PARAMETER_BOOLEAN);
 
-        add(TOKEN_ASBOARD, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ASBOARD, PARAMETER_FLAG);
         // If ASBOARD is given, then addBoard is called, so LOCK and ROOT can be used, too
-        // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
-        // add(TOKEN_START, new long[]{PARAMETER_FLAG});
+        // add(TOKEN_LOCK, PARAMETER_FLAG);
+        // add(TOKEN_START, PARAMETER_FLAG);
 
         add(TOKEN_BLOCK, new long[]{
                         TOKEN_LAYOUT,
@@ -471,28 +448,28 @@ public class Commands
                         TOKEN_FINDFREE | PARAMETER_MOD_MULTIPLE,
                         TOKEN_SKIP | PARAMETER_MOD_MULTIPLE,
                         TOKEN_HOME | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_EXTEND | PARAMETER_MOD_MULTIPLE },
-                "setBlock");
+                        TOKEN_EXTEND | PARAMETER_MOD_MULTIPLE })
+                .method("setBlock").allowAsLabel().allowAsDefault();
 
-        // add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_COLUMN, new long[]{PARAMETER_INT});
-        add(TOKEN_ROW, new long[]{PARAMETER_INT});
+        // add(TOKEN_LAYOUT, PARAMETER_KEYWORD);
+        add(TOKEN_COLUMN, PARAMETER_INT);
+        add(TOKEN_ROW, PARAMETER_INT);
 
-        add(TOKEN_L, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_R, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_DL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_DR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_UL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_UR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_CRL, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_CRR, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_FINDFREE, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
-        add(TOKEN_SKIP, TOKEN_BUTTON, new long[]{PARAMETER_INT});
-        add(TOKEN_HOME, TOKEN_BUTTON, new long[]{PARAMETER_FLAG});
+        add(TOKEN_L, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_R, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_DL, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_DR, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_UL, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_UR, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_CRL, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_CRR, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_FINDFREE, PARAMETER_FLAG).group(TOKEN_BUTTON);
+        add(TOKEN_SKIP, PARAMETER_INT).group(TOKEN_BUTTON);
+        add(TOKEN_HOME, PARAMETER_FLAG).group(TOKEN_BUTTON);
 
         // Button definitions
 
-        add(TOKEN_BUTTON, TOKEN_BUTTON, new long[]{
+        add(TOKEN_BUTTON, new long[]{
 
                         // First packet
                         TOKEN_TEXT,
@@ -536,13 +513,13 @@ public class Commands
 
                         TOKEN_ONSTAY,
                         TOKEN_ONCIRCLE,
-                        TOKEN_OVERWRITE },
-                "setButton");
+                        TOKEN_OVERWRITE })
+                .method("setButton").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault();
 
-        // add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
-        add(TOKEN_ONSTAY, new long[]{PARAMETER_FLAG});
-        add(TOKEN_ONCIRCLE, new long[]{PARAMETER_FLAG});
-        add(TOKEN_OVERWRITE, new long[]{PARAMETER_FLAG});
+        // add(TOKEN_COLOR, PARAMETER_COLOR);
+        add(TOKEN_ONSTAY, PARAMETER_FLAG);
+        add(TOKEN_ONCIRCLE, PARAMETER_FLAG);
+        add(TOKEN_OVERWRITE, PARAMETER_FLAG);
 
         add(TOKEN_FIRST, new long[]{
                         TOKEN_TEXT,
@@ -557,8 +534,7 @@ public class Commands
                         TOKEN_DO,
 
                         TOKEN_COMBINE,
-                        TOKEN_TIME, TOKEN_FORMAT },
-                "packet");
+                        TOKEN_TIME, TOKEN_FORMAT }).method("packet");
 
         add(TOKEN_SECOND, new long[]{
                         TOKEN_TEXT,
@@ -573,32 +549,31 @@ public class Commands
                         TOKEN_DO,
 
                         TOKEN_COMBINE,
-                        TOKEN_TIME, TOKEN_FORMAT },
-                "packet");
+                        TOKEN_TIME, TOKEN_FORMAT }).method("packet");
 
-        add(TOKEN_TEXT, new long[]{PARAMETER_TEXT});
-        add(TOKEN_SEND, new long[]{PARAMETER_INT});
-        add(TOKEN_DO, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_COMBINE, new long[]{PARAMETER_FLAG});
+        add(TOKEN_TEXT, PARAMETER_TEXT);
+        add(TOKEN_SEND, PARAMETER_INT);
+        add(TOKEN_DO, PARAMETER_KEYWORD);
+        add(TOKEN_COMBINE, PARAMETER_FLAG);
 
-        add(TOKEN_AUTOCAPS, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_STRINGCAPS, new long[]{PARAMETER_FLAG});
-        add(TOKEN_AUTOSPACE, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_ERASESPACE, new long[]{PARAMETER_KEYWORD});
+        add(TOKEN_AUTOCAPS, PARAMETER_KEYWORD);
+        add(TOKEN_STRINGCAPS, PARAMETER_FLAG);
+        add(TOKEN_AUTOSPACE, PARAMETER_KEYWORD);
+        add(TOKEN_ERASESPACE, PARAMETER_KEYWORD);
 
-        // add(TOKEN_FORCECAPS, new long[]{PARAMETER_BOOLEAN});
-        // add(TOKEN_FORCESHIFT, new long[]{PARAMETER_BOOLEAN});
-        // add(TOKEN_FORCECTRL, new long[]{PARAMETER_BOOLEAN});
-        // add(TOKEN_FORCEALT, new long[]{PARAMETER_BOOLEAN});
+        // add(TOKEN_FORCECAPS, PARAMETER_BOOLEAN);
+        // add(TOKEN_FORCESHIFT, PARAMETER_BOOLEAN);
+        // add(TOKEN_FORCECTRL, PARAMETER_BOOLEAN);
+        // add(TOKEN_FORCEALT, PARAMETER_BOOLEAN);
 
-        add(TOKEN_TIME, new long[]{PARAMETER_FLAG});
-        add(TOKEN_FORMAT, new long[]{PARAMETER_TEXT});
+        add(TOKEN_TIME, PARAMETER_FLAG);
+        add(TOKEN_FORMAT, PARAMETER_TEXT);
         
-        add(TOKEN_SINGLE, new long[]{PARAMETER_FLAG});
-        add(TOKEN_REPEAT, new long[]{PARAMETER_FLAG});
-        add(TOKEN_DOUBLE, new long[]{PARAMETER_FLAG});
-        add(TOKEN_ALTERNATE, new long[]{PARAMETER_FLAG});
-        add(TOKEN_LIST, new long[]{PARAMETER_FLAG});
+        add(TOKEN_SINGLE, PARAMETER_FLAG);
+        add(TOKEN_REPEAT, PARAMETER_FLAG);
+        add(TOKEN_DOUBLE, PARAMETER_FLAG);
+        add(TOKEN_ALTERNATE, PARAMETER_FLAG);
+        add(TOKEN_LIST, PARAMETER_FLAG);
         add(TOKEN_ADD, new long[]{
                         TOKEN_TEXT,
                         TOKEN_AUTOCAPS,
@@ -611,80 +586,82 @@ public class Commands
                         // If only Text-packet is allowed here, then rem next rows!!
                         /* TOKEN_SEND,
                         TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
-                        TOKEN_DO */ },
-                "packet");
+                        TOKEN_DO */ }).method("packet");
 
-        add(TOKEN_METACAPS, new long[]{PARAMETER_FLAG});
-        add(TOKEN_METASHIFT, new long[]{PARAMETER_FLAG});
-        add(TOKEN_METACTRL, new long[]{PARAMETER_FLAG});
-        add(TOKEN_METAALT, new long[]{PARAMETER_FLAG});
-        // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
+        add(TOKEN_METACAPS, PARAMETER_FLAG);
+        add(TOKEN_METASHIFT, PARAMETER_FLAG);
+        add(TOKEN_METACTRL, PARAMETER_FLAG);
+        add(TOKEN_METAALT, PARAMETER_FLAG);
+        // add(TOKEN_LOCK, PARAMETER_FLAG);
 
-        add(TOKEN_SWITCH, new long[]{PARAMETER_KEYWORD});
-        // add(TOKEN_LOCK, new long[]{PARAMETER_FLAG});
+        add(TOKEN_SWITCH, PARAMETER_KEYWORD);
+        // add(TOKEN_LOCK, PARAMETER_FLAG);
 
-        add(TOKEN_SPACETRAVEL, new long[]{PARAMETER_FLAG} );
+        add(TOKEN_SPACETRAVEL, PARAMETER_FLAG);
 
-        add(TOKEN_ENTER, new long[]{PARAMETER_FLAG});
-        // add(TOKEN_REPEAT, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ENTER, PARAMETER_FLAG);
+        // add(TOKEN_REPEAT, PARAMETER_FLAG);
 
-        add(TOKEN_MODIFY, new long[]{PARAMETER_KEYWORD});
-        add(TOKEN_REVERSE, new long[]{PARAMETER_FLAG});
+        add(TOKEN_MODIFY, PARAMETER_KEYWORD);
+        add(TOKEN_REVERSE, PARAMETER_FLAG);
 
         add(TOKEN_ADDTITLE, new long[]{
                 TOKEN_TEXT,
                 TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
                 TOKEN_BOLD, TOKEN_NONBOLD, TOKEN_ITALICS, TOKEN_NONITALICS,
-                TOKEN_COLOR }, "addTitle");
-        // add(TOKEN_TEXT, new long[]{PARAMETER_TEXT});
-        add(TOKEN_XOFFSET, new long[]{PARAMETER_INT} );
-        add(TOKEN_YOFFSET, new long[]{PARAMETER_INT} );
-        add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
-        add(TOKEN_BOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_NONBOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG_FALSE} );
-        add(TOKEN_ITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
-        add(TOKEN_NONITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG_FALSE} );
-        // add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
+                TOKEN_COLOR })
+                .method("addTitle").allowAsLabel().allowAsDefault();
+        // add(TOKEN_TEXT, PARAMETER_TEXT);
+        add(TOKEN_XOFFSET, PARAMETER_INT );
+        add(TOKEN_YOFFSET, PARAMETER_INT );
+        add(TOKEN_SIZE, PARAMETER_INT );
+        add(TOKEN_BOLD, PARAMETER_FLAG ).group(TOKEN_BOLD);
+        add(TOKEN_NONBOLD, PARAMETER_FLAG_FALSE ).group(TOKEN_BOLD);
+        add(TOKEN_ITALICS, PARAMETER_FLAG ).group(TOKEN_ITALICS);
+        add(TOKEN_NONITALICS, PARAMETER_FLAG_FALSE ).group(TOKEN_ITALICS);
+        // add(TOKEN_COLOR, PARAMETER_COLOR);
 
-        add(TOKEN_EXTEND, TOKEN_BUTTON, new long[]{
-                        TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+        add(TOKEN_EXTEND, new long[]{
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
 
-                        TOKEN_COLOR,
+                TOKEN_COLOR,
 
-                        TOKEN_SECOND,
-                        TOKEN_DOUBLE,
-                        TOKEN_ALTERNATE,
-                        TOKEN_LIST,
-                        TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_ONSTAY,
-                        TOKEN_ONCIRCLE }, "extendButton");
+                TOKEN_SECOND,
+                TOKEN_DOUBLE,
+                TOKEN_ALTERNATE,
+                TOKEN_LIST,
+                TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE })
+                .method("extendButton").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault();
 
         add(TOKEN_ADDMODIFY, new long[]{
                 TOKEN_ID, TOKEN_ADDROLL, TOKEN_ROLLS,
-                TOKEN_IGNORESPACE }, "addModify" );
+                TOKEN_IGNORESPACE }).method("addModify" );
         // TOKEN_ID is already defined
         // !! addRollHelper functionality should be avoided !!
         // "Multiple" type parameters are needed
-        add(TOKEN_ADDROLL, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST) }, "addRollHelper");
-        add(TOKEN_ROLLS, new long[]{(PARAMETER_STRING | PARAMETER_MOD_LIST)});
-        add(TOKEN_IGNORESPACE, new long[]{PARAMETER_FLAG});
+        add(TOKEN_ADDROLL, (PARAMETER_STRING | PARAMETER_MOD_LIST)).method("addRollHelper");
+        add(TOKEN_ROLLS, (PARAMETER_STRING | PARAMETER_MOD_LIST));
+        add(TOKEN_IGNORESPACE, PARAMETER_FLAG);
 
         add(TOKEN_MONITOR, new long[]{
                 TOKEN_LAYOUT,
                 TOKEN_SIZE,
                 TOKEN_BOLD, TOKEN_NONBOLD, TOKEN_ITALICS, TOKEN_NONITALICS,
-                TOKEN_COLOR }, "setMonitor");
-        // add(TOKEN_LAYOUT, new long[]{PARAMETER_KEYWORD});
-        // add(TOKEN_SIZE, new long[]{PARAMETER_INT} );
-        // add(TOKEN_BOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG} );
-        // add(TOKEN_NONBOLD, TOKEN_BOLD, new long[]{PARAMETER_FLAG_FALSE} );
-        // add(TOKEN_ITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG} );
-        // add(TOKEN_NONITALICS, TOKEN_ITALICS, new long[]{PARAMETER_FLAG_FALSE} );
-        // add(TOKEN_COLOR, new long[]{PARAMETER_COLOR});
+                TOKEN_COLOR })
+                .method("setMonitor").allowAsLabel().allowAsDefault();
+        // add(TOKEN_LAYOUT, PARAMETER_KEYWORD);
+        // add(TOKEN_SIZE, PARAMETER_INT );
+        // add(TOKEN_BOLD, TOKEN_BOLD, PARAMETER_FLAG );
+        // add(TOKEN_NONBOLD, TOKEN_BOLD, PARAMETER_FLAG_FALSE );
+        // add(TOKEN_ITALICS, TOKEN_ITALICS, PARAMETER_FLAG );
+        // add(TOKEN_NONITALICS, TOKEN_ITALICS, PARAMETER_FLAG_FALSE );
+        // add(TOKEN_COLOR, PARAMETER_COLOR);
 
-        add(TOKEN_STOP, new long[]{MESSAGE_STOP} );
+        add(TOKEN_STOP, MESSAGE_STOP );
 
-//        add(TOKEN_, new long[]{ }, "" );
+//        add(TOKEN_, new long[]{ }.method("" );
 
         return Collections.unmodifiableMap( LIST );
         }
@@ -1270,20 +1247,24 @@ public class Commands
         {
         private long groupCode;
         private long params[];
-        private Method method;
+        private Method method = null;
+        private boolean allowedAsLabel = false;
+        private boolean allowedAsDefault = false;
 
-        private Data( long groupCode, long[] params, String methodName )
+        private Data( long tokenCode, long[] params )
+            {
+            this.groupCode = tokenCode;
+            this.params = params;
+            }
+
+        private Data group( long groupCode )
             {
             this.groupCode = groupCode;
-            this.params = params;
+            return this;
+            }
 
-            // if no method to call;
-            if ( methodName == null )
-                {
-                method = null;
-                return;
-                }
-
+        private Data method( String methodName )
+            {
             // Different types of methods should be called - according to parameter type
             // Check SoftBoardParser.parseComplexParameter, third part!
             // ?? Some kind of is...Type() or getMainType() methods could be helpful ??
@@ -1311,6 +1292,20 @@ public class Commands
                 method = null;
                 Scribe.error("Method " + methodName + " is missing in MethodsForCommands!");
                 }
+
+            return this;
+            }
+
+        private Data allowAsLabel()
+            {
+            allowedAsLabel = true;
+            return this;
+            }
+
+        private Data allowAsDefault()
+            {
+            allowedAsDefault = true;
+            return this;
             }
 
         /**
@@ -1361,6 +1356,16 @@ public class Commands
         public long getGroupCode()
             {
             return groupCode;
+            }
+
+        public boolean isAllowedAsLabel()
+            {
+            return allowedAsLabel;
+            }
+
+        public boolean isAllowedAsDefault()
+            {
+            return allowedAsDefault;
             }
         }
 

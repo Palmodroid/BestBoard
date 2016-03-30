@@ -63,28 +63,30 @@ public class TitleDescriptor
 
         textPaint.setTextSize(1000f);
 
+        textPaint.getTextBounds("y", 0, 1, bounds);
+        int textDescents = 2 * bounds.bottom;
+
         textPaint.getTextBounds("MMM", 0, 3, bounds);
-        int textWidth = bounds.width();
 
-        textPaint.getTextBounds("Ly", 0, 2, bounds);
-        // Scribe.debug( "1000 size MMM width: " + textWidth +
-        //         " Ly height: " + bounds.height() +
-        //         " Ly ascent: " + bounds.top + " pixels");
-
+        Scribe.debug( "1000 size MMM width: " + bounds.width() +
+                 " height: " + bounds.height() +
+                 " bounds: " + bounds +
+                 " y 2*descent: " + textDescents + " pixels");
 
         // TEXT SIZE for 1000 virtual points
 
-        // Calculate font size from the height of "Ly" characters
+        // Calculate font size from the height of "MMM" and descent of "y" characters
+        // (Descent is needed twice, because center is the middle of the "MMM"-s)
         // intendedHeightInPixels is half hexagon == 2 * layoutHeightInPixels / layoutHeightInGrids
-        // Ratio => SIZE : intendedHeightInPixels = 1000f : bounds.height()
+        // Ratio => SIZE : intendedHeightInPixels = 1000f : (bounds.height() + textDescents)
         int textSizeFromHeight = 2 * 1000 * layout.layoutHeightInPixels /
-                (layout.layoutHeightInGrids * bounds.height()) ;
+                (layout.layoutHeightInGrids * (bounds.height() + textDescents)) ;
 
         // Calculate font size from the width of "MMM" characters
         // intendedWidthInPixels is one hexagon (2 grids) == 2 * areaWidthInPixels / areaWidthInGrids
         // Ratio => SIZE : intendedWidthInPixels = 1000f : bounds.width()
         int textSizeFromWidth = 2 * 1000 * layout.areaWidthInPixels /
-                (layout.areaWidthInGrids * textWidth);
+                (layout.areaWidthInGrids * bounds.width());
 
         // Scribe.debug( "Size for 1000 points from width: " + textSizeFromWidth +
         //         " from height: " + textSizeFromHeight );
@@ -94,7 +96,7 @@ public class TitleDescriptor
         // AND can fit in one half hexagon height
         fontData.textSize = Math.min(textSizeFromWidth, textSizeFromHeight);
 
-        fontData.yAdjust = (- bounds.top - bounds.height()/2) * fontData.textSize / 1000;
+        fontData.yAdjust = bounds.height() * fontData.textSize / 2000;
 
         // Scribe.debug( "Y adjust for 1000 points from height: " + fontData.yAdjust );
 

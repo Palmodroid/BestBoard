@@ -1240,27 +1240,34 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             type = tokenizer.getIntegerToken();
             String typeString = tokenizer.getStringToken();
 
-            // is command allowed?
-            // '0' - NOT allowed
-            // '-1' - multiple parameters allowed (this is not an option here!)
-            // '1' - single allowed
-            if ( containsWithoutSignedBit(Commands.ALLOWED_AS_LABEL, type) == 1 )
+            try
                 {
-                value = parseComplexValue(type, typeString);
-                if (value == null)
+                Commands.Data data = Commands.get( type );
+                if ( data.isAllowedAsLabel() )
                     {
-                    // !! Error was already signed !!
-                    tokenizer.error(keyString, R.string.parser_label_complex_invalid);
-                    error = true;
+                    value = parseComplexValue(type, typeString);
+                    if (value == null)
+                        {
+                        // !! Error was already signed !!
+                        tokenizer.error(keyString, R.string.parser_label_complex_invalid);
+                        error = true;
+                        }
+                    else
+                        {
+                        valueString = typeString + ":" + value;
+                        }
                     }
                 else
                     {
-                    valueString = typeString + ":" + value;
+                    tokenizer.error( typeString, R.string.parser_label_complex_not_allowed );
+                    // next block should be skipped
+                    tokenizer.skipBlock();
+                    error = true;
                     }
                 }
-            else
+            catch (InvalidKeyException e)
                 {
-                tokenizer.error( typeString, R.string.parser_label_complex_not_allowed );
+                tokenizer.error( typeString, R.string.parser_data_missing);
                 // next block should be skipped
                 tokenizer.skipBlock();
                 error = true;
@@ -1355,26 +1362,32 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             type = tokenizer.getIntegerToken();
             typeString = tokenizer.getStringToken();
 
-            // is command allowed?
-            // '0' - NOT allowed
-            // '-1' - multiple parameters allowed (this is not an option here!)
-            // '1' - single allowed
-            if ( containsWithoutSignedBit(Commands.ALLOWED_AS_DEFAULT, type) == 1 )
+            try
                 {
-                value = parseComplexValue(type, typeString);
-                if (value == null)
+                Commands.Data data = Commands.get( type );
+                if ( data.isAllowedAsDefault() )
                     {
-                    // !! Error was already signed !!
-                    tokenizer.error(typeString, R.string.parser_default_value_invalid);
+                    value = parseComplexValue(type, typeString);
+                    if (value == null)
+                        {
+                        // !! Error was already signed !!
+                        tokenizer.error(typeString, R.string.parser_default_value_invalid);
+                        }
+                    else
+                        {
+                        valueString = typeString + ":" + value;
+                        }
                     }
                 else
                     {
-                    valueString = typeString + ":" + value;
+                    tokenizer.error( typeString, R.string.parser_default_complex_not_allowed );
+                    // next block should be skipped
+                    tokenizer.skipBlock();
                     }
                 }
-            else
+            catch (InvalidKeyException e)
                 {
-                tokenizer.error( typeString, R.string.parser_default_complex_not_allowed );
+                tokenizer.error( typeString, R.string.parser_data_missing);
                 // next block should be skipped
                 tokenizer.skipBlock();
                 }
@@ -1497,7 +1510,22 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * ((http://stackoverflow.com/questions/2721546/why-dont-java-generics-support-primitive-types ;
      * http://stackoverflow.com/a/12635769 a nice algorithm with generics ;
      * http://stackoverflow.com/questions/2250031/null-check-in-an-enhanced-for-loop))
-     *
+     */
+    private boolean contains(final long[] array, final long item)
+        {
+        for (final long i : array)
+            {
+            // Scribe.debug( Tokenizer.regenerateKeyword(i) );
+            if (  i == item)
+                {
+                // Scribe.debug( " * ITEM WAS FOUND! " + Tokenizer.regenerateKeyword(item) );
+                return true;
+                }
+            }
+        return false;
+        }
+
+    /**
      * Method was developed to distinguish between on and off signed bit in the array
      * @param array to check (cannot be null!)
      * @param item to look for
