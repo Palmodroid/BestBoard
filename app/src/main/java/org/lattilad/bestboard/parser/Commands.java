@@ -315,9 +315,16 @@ public class Commands
         //      AT LEAST FIRST ITEM IS NEEDED (NO_PARAMETERS if there are no parameters allowed)
         // - method to call in SoftBoardClass (method should have a map parameter)
         add(ADDSOFTBOARD, new long[]{
-                TOKEN_DEFAULT,
+                TOKEN_BLOCK,
+                TOKEN_ADDLAYOUT,
+                TOKEN_ADDBOARD,
+
                 TOKEN_LET,
 //                TOKEN_CHANGE,
+                TOKEN_DEFAULT,
+
+                TOKEN_ADDMODIFY,
+                TOKEN_MONITOR,
 
                 TOKEN_NAME,
                 TOKEN_VERSION,
@@ -343,15 +350,6 @@ public class Commands
                 TOKEN_PREVTITLE,
                 TOKEN_NONETITLE,
                 TOKEN_UNKNOWNTITLE,
-
-                TOKEN_ADDBOARD,
-                TOKEN_ADDLAYOUT,
-
-                TOKEN_BLOCK,
-
-                TOKEN_ADDMODIFY,
-
-                TOKEN_MONITOR,
 
                 TOKEN_STOP
         });
@@ -434,22 +432,23 @@ public class Commands
         // add(TOKEN_START, PARAMETER_FLAG);
 
         add(TOKEN_BLOCK, new long[]{
-                        TOKEN_LAYOUT,
-                        TOKEN_COLUMN,
-                        TOKEN_ROW,
-                        TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_L | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_R | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_DL | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_DR | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_UL | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_UR | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_CRL | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_CRR | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_FINDFREE | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_SKIP | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_HOME | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_EXTEND | PARAMETER_MOD_MULTIPLE })
+                TOKEN_SINGLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE,
+                TOKEN_SKIP | PARAMETER_MOD_MULTIPLE,
+                TOKEN_DL | PARAMETER_MOD_MULTIPLE,
+                TOKEN_DR | PARAMETER_MOD_MULTIPLE,
+                TOKEN_CRL | PARAMETER_MOD_MULTIPLE,
+                TOKEN_CRR | PARAMETER_MOD_MULTIPLE,
+                TOKEN_L | PARAMETER_MOD_MULTIPLE,
+                TOKEN_R | PARAMETER_MOD_MULTIPLE,
+                TOKEN_UL | PARAMETER_MOD_MULTIPLE,
+                TOKEN_UR | PARAMETER_MOD_MULTIPLE,
+                TOKEN_FINDFREE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_HOME | PARAMETER_MOD_MULTIPLE,
+                TOKEN_EXTEND | PARAMETER_MOD_MULTIPLE,
+                TOKEN_LAYOUT,
+                TOKEN_COLUMN,
+                TOKEN_ROW })
                 .method("setBlock").allowAsLabel().allowAsDefault();
 
         // add(TOKEN_LAYOUT, PARAMETER_KEYWORD);
@@ -469,6 +468,68 @@ public class Commands
         add(TOKEN_HOME, PARAMETER_FLAG).group(TOKEN_BUTTON);
 
         // Button definitions
+
+
+        add(TOKEN_SINGLE, new long[]{
+
+                // First packet
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_DO,
+                TOKEN_COMBINE,
+                TOKEN_TIME, TOKEN_FORMAT,
+
+                TOKEN_FIRST,
+
+                TOKEN_REPEAT,
+
+                TOKEN_METACAPS,
+                TOKEN_METASHIFT,
+                TOKEN_METACTRL,
+                TOKEN_METAALT,
+                TOKEN_LOCK,
+                TOKEN_SWITCH,
+                // TOKEN_LOCK,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+
+                TOKEN_COLOR,
+
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE })
+                .method("setSingle").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
         add(TOKEN_BUTTON, new long[]{
 
@@ -570,7 +631,7 @@ public class Commands
         add(TOKEN_TIME, PARAMETER_FLAG);
         add(TOKEN_FORMAT, PARAMETER_TEXT);
         
-        add(TOKEN_SINGLE, PARAMETER_FLAG);
+        // add(TOKEN_SINGLE, PARAMETER_FLAG);
         add(TOKEN_REPEAT, PARAMETER_FLAG);
         add(TOKEN_DOUBLE, PARAMETER_FLAG);
         add(TOKEN_ALTERNATE, PARAMETER_FLAG);

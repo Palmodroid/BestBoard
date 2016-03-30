@@ -596,7 +596,8 @@ public class MethodsForCommands
 
         for ( KeyValuePair action : actionList )
             {
-            if ( action.getKey() == Commands.TOKEN_BUTTON )
+            if ( action.getKey() == Commands.TOKEN_BUTTON ||
+                    action.getKey() == Commands.TOKEN_SINGLE )
                 {
                 if ( autoMove )
                     {
@@ -1327,6 +1328,112 @@ public class MethodsForCommands
         return new TitleDescriptor(text, xOffset, yOffset, size, bold, italics, color );
         }
 
+
+    public ButtonPlan setSingle( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Simple Button is defined");
+
+        ButtonPlan buttonPlan = new ButtonPlan();
+
+        Packet packet = (Packet)parameters.remove( Commands.TOKEN_FIRST );
+        if ( packet == null )
+            {
+            packet = packet( parameters );
+            }
+
+        if ( packet == null )
+            {
+            buttonPlan.button = new Button();
+            completeButton(buttonPlan, parameters);
+            }
+        else
+            {
+            buttonPlan.button = new ButtonSingle(packet,
+                    parameters.remove(Commands.TOKEN_REPEAT) != null);
+            completeMainTouchButton(buttonPlan, parameters);
+            }
+
+        return buttonPlan;
+        }
+
+    public void completeMainTouchButton( ButtonPlan buttonPlan, ExtendedMap<Long, Object> parameters )
+        {
+        if (parameters.remove(Commands.TOKEN_ONCIRCLE) != null)
+            {
+            ((ButtonMainTouch)buttonPlan.button).setOnCircle();
+            }
+        else if (parameters.remove(Commands.TOKEN_ONSTAY) != null)
+            {
+            ((ButtonMainTouch)buttonPlan.button).setOnCircle();
+            }
+
+        completeButton( buttonPlan, parameters);
+        }
+
+    public void completeButton( ButtonPlan buttonPlan, ExtendedMap<Long, Object> parameters )
+        {
+        if ( buttonPlan.button == null )
+            {
+            tokenizer.error( "BUTTON", R.string.data_button_function_missing);
+            buttonPlan.button = new Button();
+            }
+
+        buttonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
+
+        // TOKEN_ADDTITLE is a group code
+        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
+        ArrayList<KeyValuePair> titleList = (ArrayList<KeyValuePair>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_ADDTITLE ) );
+
+        // !! This part after this point could be nicer !!
+        SinglyLinkedList<TitleDescriptor> titles = new SinglyLinkedList<>();
+        TitleDescriptor titleDescriptor;
+
+        if ( titleList != null )
+            {
+            for (KeyValuePair title : titleList)
+                {
+                titleDescriptor = (TitleDescriptor) title.getValue();
+                if ( titleDescriptor.getText() == null )
+                    {
+                    // TitleDescriptor is not completed, depends on the value of the buttons
+                    titleDescriptor = titleDescriptor.copy();
+                    titleDescriptor.checkText( buttonPlan.button.getString() );
+                    }
+                // Completed titleDescriptor, so one instance is enough for all buttons
+                titles.add(titleDescriptor);
+                }
+            }
+        else
+            {
+            // if no titles are added, then addTitle will add one based on default titleSlot
+            // if no default exist (impossible situation!) then an empty parameter list is needed
+            ExtendedMap<Long, Object> defaultTitle;
+            if (defaults.containsKey(Commands.TOKEN_ADDTITLE))
+                {
+                defaultTitle = (ExtendedMap<Long, Object>) (defaults.get(Commands.TOKEN_ADDTITLE)).clone();
+                }
+            else
+                {
+                defaultTitle = new ExtendedMap<Long, Object>(0);
+                }
+            titleDescriptor = addTitle(defaultTitle);
+            titleDescriptor.checkText( buttonPlan.button.getString() );
+            titles.add( titleDescriptor );
+            }
+
+        // if title text is null, code should be used
+        // button id can be created from the titles (and from the code)
+        StringBuilder buttonNameBuilder = new StringBuilder();
+        for ( TitleDescriptor title : titles )
+            {
+            buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
+            }
+        buttonNameBuilder.setCharAt(0, '\"');
+        buttonPlan.buttonName = buttonNameBuilder.append('\"').toString();
+
+        buttonPlan.button.setTitles(titles);
+        }
 
     /**
      * Creates temporary button data, which is copied into button position in setBlock
