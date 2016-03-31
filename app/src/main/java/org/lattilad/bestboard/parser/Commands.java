@@ -108,12 +108,7 @@ public class Commands
     public static final long TOKEN_DR = 0x101fbL;
     public static final long TOKEN_FINDFREE = 0x156ad0179aeL;
 
-    public static final long TOKEN_BUTTON = 0x30e91c11L;
-
-    public static final long TOKEN_ONSTAY = 0x65db8273L;
-    public static final long TOKEN_ONCIRCLE = 0x2206a350fc6L;
-    public static final long TOKEN_OVERWRITE = 0x4f61843c6a0fL;
-
+    public static final long TOKEN_PACKET = 0x687d4ba9L;
     public static final long TOKEN_FIRST = 0x1bc7434L;
     public static final long TOKEN_SECOND = 0x7556168dL;
 
@@ -143,6 +138,12 @@ public class Commands
     // public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
     // public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
 
+    public static final long TOKEN_BUTTON = 0x30e91c11L;
+
+    public static final long TOKEN_ONSTAY = 0x65db8273L;
+    public static final long TOKEN_ONCIRCLE = 0x2206a350fc6L;
+    public static final long TOKEN_OVERWRITE = 0x4f61843c6a0fL;
+
     public static final long TOKEN_DELETE = 0x375d443cL;
     public static final long TOKEN_BACKSPACE = 0x240879d29871L;
     public static final long TOKEN_DRAFT = 0x189da4dL;
@@ -159,19 +160,20 @@ public class Commands
     public static final long TOKEN_ADD = 0x13767L;
 
     public static final long TOKEN_SWITCH = 0x775d93d7L;
-    // !! BACK is used as textual token !!
+    public static final long TOKEN_BOARD = 0x14e5880L;
     // public static final long TOKEN_LOCK = 0x11bd48L;
+    // !! BACK is used as textual token !!
     public static final long TOKEN_BACK = 0x9b7c8L;
 
-    // public static final long TOKEN_META = 0x125016L;
-    // public static final long TOKEN_CAPS = 0xa7f8eL;
-    // public static final long TOKEN_CTRL = 0xae56cL;
-    // public static final long TOKEN_ALT = 0x1389fL;
-    // public static final long TOKEN_SHIFT = 0x32f4092L;
-    public static final long TOKEN_METACAPS = 0x1ef1a688d35L;
-    public static final long TOKEN_METASHIFT = 0x478ed2c739b5L;
-    public static final long TOKEN_METACTRL = 0x1ef1a68f313L;
-    public static final long TOKEN_METAALT = 0xd61950f7aL;
+    public static final long TOKEN_META = 0x125016L;
+    public static final long TOKEN_CAPS = 0xa7f8eL;
+    public static final long TOKEN_CTRL = 0xae56cL;
+    public static final long TOKEN_ALT = 0x1389fL;
+    public static final long TOKEN_SHIFT = 0x32f4092L;
+    // public static final long TOKEN_METACAPS = 0x1ef1a688d35L;
+    // public static final long TOKEN_METASHIFT = 0x478ed2c739b5L;
+    // public static final long TOKEN_METACTRL = 0x1ef1a68f313L;
+    // public static final long TOKEN_METAALT = 0xd61950f7aL;
 
     // public static final long TOKEN_LOCK = 0x11bd48L;
 
@@ -182,6 +184,7 @@ public class Commands
 
     public static final long TOKEN_MODIFY = 0x5da813adL;
     public static final long TOKEN_REVERSE = 0x105e77189aL;
+    public static final long TOKEN_ROLL = 0x1661c4L;
 
     public static final long TOKEN_ADDTITLE = 0xe504eb848aL;
     // public static final long TOKEN_TEXT = 0x17b9c8L;
@@ -432,8 +435,16 @@ public class Commands
         // add(TOKEN_START, PARAMETER_FLAG);
 
         add(TOKEN_BLOCK, new long[]{
-                TOKEN_SINGLE | PARAMETER_MOD_MULTIPLE,
                 TOKEN_BUTTON | PARAMETER_MOD_MULTIPLE,
+                TOKEN_SINGLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_DOUBLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_ALTERNATE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_LIST | PARAMETER_MOD_MULTIPLE,
+                TOKEN_MODIFY | PARAMETER_MOD_MULTIPLE,
+                TOKEN_SPACETRAVEL | PARAMETER_MOD_MULTIPLE,
+                TOKEN_ENTER | PARAMETER_MOD_MULTIPLE,
+                TOKEN_META | PARAMETER_MOD_MULTIPLE,
+                TOKEN_SWITCH | PARAMETER_MOD_MULTIPLE,
                 TOKEN_SKIP | PARAMETER_MOD_MULTIPLE,
                 TOKEN_DL | PARAMETER_MOD_MULTIPLE,
                 TOKEN_DR | PARAMETER_MOD_MULTIPLE,
@@ -467,151 +478,59 @@ public class Commands
         add(TOKEN_SKIP, PARAMETER_INT).group(TOKEN_BUTTON);
         add(TOKEN_HOME, PARAMETER_FLAG).group(TOKEN_BUTTON);
 
-        // Button definitions
+        // Packet definitions
+        // ***************************************
 
-
-        add(TOKEN_SINGLE, new long[]{
-
-                // First packet
+        add(TOKEN_PACKET, new long[]{
                 TOKEN_TEXT,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
                 TOKEN_AUTOSPACE,
+
                 TOKEN_SEND,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+
                 TOKEN_DO,
+
                 TOKEN_COMBINE,
-                TOKEN_TIME, TOKEN_FORMAT,
-
-                TOKEN_FIRST,
-
-                TOKEN_REPEAT,
-
-                TOKEN_METACAPS,
-                TOKEN_METASHIFT,
-                TOKEN_METACTRL,
-                TOKEN_METAALT,
-                TOKEN_LOCK,
-                TOKEN_SWITCH,
-                // TOKEN_LOCK,
-
-                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
-
-                TOKEN_COLOR,
-
-                TOKEN_ONSTAY,
-                TOKEN_ONCIRCLE,
-                TOKEN_OVERWRITE })
-                .method("setSingle").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        add(TOKEN_BUTTON, new long[]{
-
-                        // First packet
-                        TOKEN_TEXT,
-                        TOKEN_AUTOCAPS,
-                        TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACE,
-                        TOKEN_AUTOSPACE,
-                        TOKEN_SEND,
-                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
-                        TOKEN_DO,
-                        TOKEN_COMBINE,
-                    	TOKEN_TIME, TOKEN_FORMAT, 
-
-                        TOKEN_FIRST,
-                        TOKEN_SECOND,
-
-                        TOKEN_SINGLE,
-                        TOKEN_REPEAT,
-                        TOKEN_DOUBLE,
-                        TOKEN_ALTERNATE,
-                        TOKEN_LIST,
-                        TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
-
-                        TOKEN_METACAPS,
-                        TOKEN_METASHIFT,
-                        TOKEN_METACTRL,
-                        TOKEN_METAALT,
-                        TOKEN_LOCK,
-                        TOKEN_SWITCH,
-                        // TOKEN_LOCK,
-
-                        TOKEN_SPACETRAVEL,
-                        TOKEN_MODIFY,
-                        TOKEN_REVERSE,
-                        TOKEN_ENTER,
-                        // TOKEN_REPEAT,
-
-                        TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
-
-                        TOKEN_COLOR,
-
-                        TOKEN_ONSTAY,
-                        TOKEN_ONCIRCLE,
-                        TOKEN_OVERWRITE })
-                .method("setButton").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault();
-
-        // add(TOKEN_COLOR, PARAMETER_COLOR);
-        add(TOKEN_ONSTAY, PARAMETER_FLAG);
-        add(TOKEN_ONCIRCLE, PARAMETER_FLAG);
-        add(TOKEN_OVERWRITE, PARAMETER_FLAG);
+                TOKEN_TIME, TOKEN_FORMAT})
+                .allowAsLabel().allowAsDefault()
+                .method("packet");
 
         add(TOKEN_FIRST, new long[]{
-                        TOKEN_TEXT,
-                        TOKEN_AUTOCAPS,
-                        TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACE,
-                        TOKEN_AUTOSPACE,
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
 
-                        TOKEN_SEND,
-                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                        TOKEN_DO,
+                TOKEN_DO,
 
-                        TOKEN_COMBINE,
-                        TOKEN_TIME, TOKEN_FORMAT }).method("packet");
+                TOKEN_COMBINE,
+                TOKEN_TIME, TOKEN_FORMAT })
+                .allowAsLabel().allowAsDefault().labels(new long[]{TOKEN_PACKET})
+                .method("packet");
 
         add(TOKEN_SECOND, new long[]{
-                        TOKEN_TEXT,
-                        TOKEN_AUTOCAPS,
-                        TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACE,
-                        TOKEN_AUTOSPACE,
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
 
-                        TOKEN_SEND,
-                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                        TOKEN_DO,
+                TOKEN_DO,
 
-                        TOKEN_COMBINE,
-                        TOKEN_TIME, TOKEN_FORMAT }).method("packet");
+                TOKEN_COMBINE,
+                TOKEN_TIME, TOKEN_FORMAT })
+                .allowAsLabel().allowAsDefault().labels(new long[]{TOKEN_PACKET})
+                .method("packet");
 
         add(TOKEN_TEXT, PARAMETER_TEXT);
         add(TOKEN_SEND, PARAMETER_INT);
@@ -630,42 +549,221 @@ public class Commands
 
         add(TOKEN_TIME, PARAMETER_FLAG);
         add(TOKEN_FORMAT, PARAMETER_TEXT);
-        
-        // add(TOKEN_SINGLE, PARAMETER_FLAG);
+
+        // Button definitions
+        // ***************************************
+
+        add(TOKEN_BUTTON, new long[]{
+                // First packet
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_DO,
+                TOKEN_COMBINE,
+                TOKEN_TIME, TOKEN_FORMAT,
+
+                TOKEN_FIRST,
+                TOKEN_SECOND,
+
+                TOKEN_REPEAT,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE})
+                .method("setButton").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_PACKET, TOKEN_FIRST, TOKEN_SECOND});
+
+        add(TOKEN_SINGLE, new long[]{
+                // First packet
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_DO,
+                TOKEN_COMBINE,
+                TOKEN_TIME, TOKEN_FORMAT,
+                TOKEN_FIRST,
+
+                TOKEN_REPEAT,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE})
+                .method("setSingle").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET, TOKEN_FIRST, TOKEN_SECOND});
+
         add(TOKEN_REPEAT, PARAMETER_FLAG);
-        add(TOKEN_DOUBLE, PARAMETER_FLAG);
-        add(TOKEN_ALTERNATE, PARAMETER_FLAG);
-        add(TOKEN_LIST, PARAMETER_FLAG);
+
+        add(TOKEN_DOUBLE, new long[]{
+                // First packet
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_DO,
+                TOKEN_COMBINE,
+                TOKEN_TIME, TOKEN_FORMAT,
+                TOKEN_FIRST,
+                TOKEN_SECOND,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE})
+                .method("setDouble").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET, TOKEN_FIRST, TOKEN_SECOND});
+
+        add(TOKEN_ALTERNATE, new long[]{
+                // First packet
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_DO,
+                TOKEN_COMBINE,
+                TOKEN_TIME, TOKEN_FORMAT,
+                TOKEN_FIRST,
+                TOKEN_SECOND,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE })
+                .method("setAlternate").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET, TOKEN_FIRST, TOKEN_SECOND});
+
+        add(TOKEN_LIST, new long[]{
+                TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE })
+                .method("setList").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON});
+
         add(TOKEN_ADD, new long[]{
-                        TOKEN_TEXT,
-                        TOKEN_AUTOCAPS,
-                        TOKEN_STRINGCAPS,
-                        TOKEN_ERASESPACE,
-                        TOKEN_AUTOSPACE,
-                        
-                    	TOKEN_TIME, TOKEN_FORMAT,
-                        
-                        // If only Text-packet is allowed here, then rem next rows!!
-                        /* TOKEN_SEND,
-                        TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
-                        TOKEN_DO */ }).method("packet");
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
 
-        add(TOKEN_METACAPS, PARAMETER_FLAG);
-        add(TOKEN_METASHIFT, PARAMETER_FLAG);
-        add(TOKEN_METACTRL, PARAMETER_FLAG);
-        add(TOKEN_METAALT, PARAMETER_FLAG);
-        // add(TOKEN_LOCK, PARAMETER_FLAG);
+                TOKEN_TIME, TOKEN_FORMAT,
 
-        add(TOKEN_SWITCH, PARAMETER_KEYWORD);
-        // add(TOKEN_LOCK, PARAMETER_FLAG);
+                // If only Text-packet is allowed here, then rem next rows!!
+                /* TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_DO */}).method("packet").allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_PACKET});;
 
-        add(TOKEN_SPACETRAVEL, PARAMETER_FLAG);
+        add(TOKEN_MODIFY, new long[]{
+                TOKEN_ROLL,
+                TOKEN_REVERSE,
 
-        add(TOKEN_ENTER, PARAMETER_FLAG);
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                // TOKEN_ONSTAY,
+                // TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE})
+                .method("setModify").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault().labels(new long[]{TOKEN_BUTTON});
+
+        add(TOKEN_ROLL, PARAMETER_KEYWORD);
+        add(TOKEN_REVERSE, PARAMETER_FLAG);
+
+        add(TOKEN_ENTER, new long[]{
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+
+                TOKEN_REPEAT,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE})
+                .method("setEnter").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
+
         // add(TOKEN_REPEAT, PARAMETER_FLAG);
 
-        add(TOKEN_MODIFY, PARAMETER_KEYWORD);
-        add(TOKEN_REVERSE, PARAMETER_FLAG);
+        add(TOKEN_SPACETRAVEL, new long[]{
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
+
+                TOKEN_SEND,
+                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+
+                TOKEN_DO,
+
+                TOKEN_COMBINE,
+                TOKEN_TIME, TOKEN_FORMAT,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_ONSTAY,
+                TOKEN_ONCIRCLE,
+                TOKEN_OVERWRITE})
+                .method("setSpaceTravel").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
+
+        add(TOKEN_META, new long[]{
+                TOKEN_CAPS,
+                TOKEN_SHIFT,
+                TOKEN_CTRL,
+                TOKEN_ALT,
+                TOKEN_LOCK,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_OVERWRITE})
+                .method("setMeta").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault().labels(new long[]{TOKEN_BUTTON});
+
+        add(TOKEN_CAPS, PARAMETER_FLAG);
+        add(TOKEN_SHIFT, PARAMETER_FLAG);
+        add(TOKEN_CTRL, PARAMETER_FLAG);
+        add(TOKEN_ALT, PARAMETER_FLAG);
+        // add(TOKEN_LOCK, PARAMETER_FLAG);
+
+        add(TOKEN_SWITCH, new long[]{
+                TOKEN_BOARD,
+                TOKEN_LOCK,
+
+                TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
+                TOKEN_COLOR,
+                TOKEN_OVERWRITE})
+                .method("setSwitch").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault().labels(new long[]{TOKEN_BUTTON});
+
+        add(TOKEN_BOARD, PARAMETER_KEYWORD);
+        // add(TOKEN_LOCK, PARAMETER_FLAG);
 
         add(TOKEN_ADDTITLE, new long[]{
                 TOKEN_TEXT,
@@ -682,6 +780,11 @@ public class Commands
         add(TOKEN_ITALICS, PARAMETER_FLAG ).group(TOKEN_ITALICS);
         add(TOKEN_NONITALICS, PARAMETER_FLAG_FALSE ).group(TOKEN_ITALICS);
         // add(TOKEN_COLOR, PARAMETER_COLOR);
+
+        // add(TOKEN_COLOR, PARAMETER_COLOR);
+        add(TOKEN_ONSTAY, PARAMETER_FLAG);
+        add(TOKEN_ONCIRCLE, PARAMETER_FLAG);
+        add(TOKEN_OVERWRITE, PARAMETER_FLAG);
 
         add(TOKEN_EXTEND, new long[]{
                 TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
