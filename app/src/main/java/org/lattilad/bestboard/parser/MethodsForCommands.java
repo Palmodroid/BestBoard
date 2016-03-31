@@ -1,16 +1,49 @@
 package org.lattilad.bestboard.parser;
 
-import android.graphics.*;
-import android.view.*;
-import java.io.*;
-import java.util.*;
-import org.lattilad.bestboard.*;
-import org.lattilad.bestboard.buttons.*;
-import org.lattilad.bestboard.debug.*;
-import org.lattilad.bestboard.modify.*;
-import org.lattilad.bestboard.scribe.*;
-import org.lattilad.bestboard.states.*;
-import org.lattilad.bestboard.utils.*;
+import android.graphics.Color;
+import android.view.KeyEvent;
+
+import org.lattilad.bestboard.Layout;
+import org.lattilad.bestboard.R;
+import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.buttons.Button;
+import org.lattilad.bestboard.buttons.ButtonAlternate;
+import org.lattilad.bestboard.buttons.ButtonDouble;
+import org.lattilad.bestboard.buttons.ButtonEnter;
+import org.lattilad.bestboard.buttons.ButtonList;
+import org.lattilad.bestboard.buttons.ButtonMainTouch;
+import org.lattilad.bestboard.buttons.ButtonMeta;
+import org.lattilad.bestboard.buttons.ButtonModify;
+import org.lattilad.bestboard.buttons.ButtonSingle;
+import org.lattilad.bestboard.buttons.ButtonSpaceTravel;
+import org.lattilad.bestboard.buttons.ButtonSwitch;
+import org.lattilad.bestboard.buttons.Packet;
+import org.lattilad.bestboard.buttons.PacketCombine;
+import org.lattilad.bestboard.buttons.PacketFunction;
+import org.lattilad.bestboard.buttons.PacketKey;
+import org.lattilad.bestboard.buttons.PacketText;
+import org.lattilad.bestboard.buttons.PacketTextTime;
+import org.lattilad.bestboard.buttons.TitleDescriptor;
+import org.lattilad.bestboard.debug.Debug;
+import org.lattilad.bestboard.modify.Modify;
+import org.lattilad.bestboard.modify.ModifyChar;
+import org.lattilad.bestboard.modify.ModifyText;
+import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.states.CapsState;
+import org.lattilad.bestboard.states.LayoutStates;
+import org.lattilad.bestboard.utils.Bit;
+import org.lattilad.bestboard.utils.ExtendedMap;
+import org.lattilad.bestboard.utils.ExternalDataException;
+import org.lattilad.bestboard.utils.KeyValuePair;
+import org.lattilad.bestboard.utils.SinglyLinkedList;
+import org.lattilad.bestboard.utils.Trilean;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 /**
  * Methods to create SoftBoardData from coat descriptor
@@ -42,16 +75,6 @@ public class MethodsForCommands
         this.softBoardData = softBoardData;
         this.tokenizer = softBoardParser.getTokenizer();
         this.defaults = softBoardParser.getDefaults();
-        }
-
-
-    /**
-     * Temporary data to create buttons
-     */
-    private class ButtonPlan
-        {
-        private String buttonName;
-        private Button button;
         }
 
 
@@ -596,8 +619,8 @@ public class MethodsForCommands
 
         for ( KeyValuePair action : actionList )
             {
-            if ( action.getKey() == Commands.TOKEN_BUTTON ||
-                    action.getKey() == Commands.TOKEN_SINGLE )
+            // Every type of button contains the same Button type value
+            if ( action.getValue() instanceof Button )
                 {
                 if ( autoMove )
                     {
@@ -612,7 +635,7 @@ public class MethodsForCommands
                     if (layout.addButton(
                             arrayColumn,
                             arrayRow,
-                            ((ButtonPlan) action.getValue()).button.clone()))
+                            ((Button) action.getValue()).clone()))
                         {
                         if ((boolean)parameters.remove(Commands.TOKEN_OVERWRITE, false))
                             {
@@ -625,12 +648,12 @@ public class MethodsForCommands
                                     layout.toString());
                             }
                         }
-                    tokenizer.note( ((ButtonPlan)action.getValue()).buttonName, R.string.data_button_added,
+                    tokenizer.note( ((Button)action.getValue()).name, R.string.data_button_added,
                             layout.toString());
                     }
                 catch (ExternalDataException ede)
                     {
-                    tokenizer.error( ((ButtonPlan)action.getValue()).buttonName, R.string.data_button_error,
+                    tokenizer.error( ((Button)action.getValue()).name, R.string.data_button_error,
                             layout.toString());
                     }
 
@@ -1095,213 +1118,10 @@ public class MethodsForCommands
         return packet;
         }
 
-
-    private Button createButtonSwitch( long layoutId, ExtendedMap<Long, Object> parameters )
+    public Packet firstPacket( ExtendedMap<Long, Object> parameters )
         {
-        // 'BACK' is a special token: go back to previous board
-        return new ButtonSwitch( layoutId,
-                parameters.remove( Commands.TOKEN_LOCK ) != null );
-        // !! Check non-used SWITCH buttons !!
-        }
-
-
-    private Button createButtonMeta( int meta, ExtendedMap<Long, Object> parameters )
-        {
-        // meta is from LayoutStates.META_...
-
-        // ButtonMeta constructor will not accept any non-valid parameter
-        try
-            {
-            return new ButtonMeta( meta,
-                    parameters.remove( Commands.TOKEN_LOCK ) != null );
-            }
-        catch (ExternalDataException e)
-            {
-            tokenizer.error("META", R.string.data_meta_unknown_meta_state);
-            }
-
-        return null;
-        }
-
-
-    private ButtonMainTouch createButtonSpaceTravel( ExtendedMap<Long, Object> parameters )
-        {
-        // Packet with default cannot be null!
-        return new ButtonSpaceTravel( packet(parameters, " ") );
-        }
-
-
-    private ButtonMainTouch createButtonEnter( ExtendedMap<Long, Object> parameters )
-        {
-        // Packet with default cannot be null!
-        return new ButtonEnter(
-                packetKey(parameters, 0x10000 + KeyEvent.KEYCODE_ENTER), // Or: '\n'
-                packetText( parameters, "\n" ),
-                parameters.remove( Commands.TOKEN_REPEAT ) != null );
-        }
-
-
-    private ButtonMainTouch createButtonModify( long modifyId, ExtendedMap<Long, Object> parameters )
-        {
-        // !! Check available modify data at the end !!
-        return new ButtonModify( modifyId,
-                parameters.remove( Commands.TOKEN_REVERSE ) != null );
-        }
-
-
-    private ButtonMainTouch createButtonList( ExtendedMap<Long, Object> parameters )
-        {
-        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
-        ArrayList<KeyValuePair> packetList = (ArrayList<KeyValuePair>)parameters.remove(
-                Bit.setSignedBitOn( Commands.TOKEN_ADD ) );
-
-        if ( packetList == null || packetList.isEmpty() )
-            return null;
-
-        ButtonList buttonList = new ButtonList();
-
-        for ( KeyValuePair packet: packetList)
-            {
-            buttonList.addPacket( (Packet)packet.getValue() );
-            }
-
-        return buttonList;
-        }
-
-
-    private ButtonMainTouch createButtonSingle( Packet packet, ExtendedMap<Long, Object> parameters )
-        {
-        Scribe.debug(Debug.DATA, "Simple Packet is defined");
-        return new ButtonSingle( packet,
-                parameters.remove( Commands.TOKEN_REPEAT ) != null );
-        }
-
-
-    private ButtonMainTouch createButtonAlternate( Packet firstPacket, Packet secondPacket )
-        {
-        Scribe.debug(Debug.DATA, "Alternate Packet is defined");
-        return new ButtonAlternate( firstPacket, secondPacket);
-        }
-
-
-    private ButtonMainTouch createButtonDouble( Packet firstPacket, Packet secondPacket )
-        {
-        Scribe.debug(Debug.DATA, "Double Packet is defined");
-        return new ButtonDouble( firstPacket, secondPacket);
-        }
-
-
-    public ButtonMainTouch createButtonFromPackets( ExtendedMap<Long, Object> parameters )
-        {
-        Packet firstPacket;
-        Packet secondPacket;
-
-        /*
-            No packet is defined - it will be a LIST (if possible)
-            First packet is defined - it will be a SINGLE
-            Second packet is defined (and no SINGLE is given)   - it will be a DOUBLE (or ALTERNATE, if given)
-         */
-
-        firstPacket = (Packet)parameters.remove( Commands.TOKEN_FIRST );
-        if ( firstPacket == null )
-            {
-            firstPacket = packet( parameters );
-            }
-
-        // if no packet is defined, than it can be only a list
-        if ( firstPacket == null )
-            {
-            parameters.remove(Commands.TOKEN_LIST);
-            return createButtonList(parameters);
-            }
-
-        if ( parameters.remove(Commands.TOKEN_SINGLE) != null ||
-                (secondPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND )) == null )
-            {
-            return createButtonSingle(firstPacket, parameters);
-            }
-
-        // if DOUBLE exists (with or without ALTERNATE)
-        // or DOUBLE NOT exists (and NO ALTERNATE)
-        if ( parameters.remove( Commands.TOKEN_DOUBLE) != null ||
-                parameters.remove( Commands.TOKEN_ALTERNATE) == null )
-            {
-            return createButtonDouble(firstPacket, secondPacket);
-            }
-
-        // if DOUBLE NOT exists BUT ALTERNATE exists
-        return createButtonAlternate(firstPacket, secondPacket);
-        }
-
-
-    // return can be null, if there was an error
-    public Button createButtonFunction(ExtendedMap<Long, Object> parameters)
-        {
-        Object temp;
-
-        // Create MULTI TOUCH BUTTONS
-        if ((temp = parameters.remove(Commands.TOKEN_SWITCH)) != null)
-            {
-            return createButtonSwitch((long) temp, parameters);
-            }
-
-        if ( parameters.remove(Commands.TOKEN_METACAPS) != null)
-            {
-            return createButtonMeta(LayoutStates.META_CAPS, parameters);
-            }
-
-        if ( parameters.remove(Commands.TOKEN_METASHIFT) != null)
-            {
-            return createButtonMeta(LayoutStates.META_SHIFT, parameters);
-            }
-
-        if ( parameters.remove(Commands.TOKEN_METACTRL) != null)
-            {
-            return createButtonMeta(LayoutStates.META_CTRL, parameters);
-            }
-
-        if ( parameters.remove(Commands.TOKEN_METAALT) != null)
-            {
-            return createButtonMeta(LayoutStates.META_ALT, parameters);
-            }
-
-        // Create MAIN TOUCH BUTTONS
-        ButtonMainTouch buttonMainTouch;
-        if (parameters.remove(Commands.TOKEN_SPACETRAVEL) != null)
-            {
-            buttonMainTouch = createButtonSpaceTravel(parameters);
-            }
-
-        else if (parameters.remove(Commands.TOKEN_ENTER) != null)
-            {
-            buttonMainTouch = createButtonEnter(parameters);
-            }
-
-        else if ((temp = parameters.remove(Commands.TOKEN_MODIFY)) != null)
-            {
-            buttonMainTouch = createButtonModify( (long)temp, parameters);
-            }
-
-        // Create MAIN TOUCH BUTTONS depending on PACKETS
-        else
-            {
-            buttonMainTouch = createButtonFromPackets(parameters);
-            }
-
-        // All main-touch buttons can be set to onCircle/onStay
-        if (buttonMainTouch != null)
-            {
-            if (parameters.remove(Commands.TOKEN_ONCIRCLE) != null)
-                {
-                buttonMainTouch.setOnCircle();
-                }
-            else if (parameters.remove(Commands.TOKEN_ONSTAY) != null)
-                {
-                buttonMainTouch.setOnStay();
-                }
-            }
-
-        return buttonMainTouch;
+        Packet packet = (Packet) parameters.remove(Commands.TOKEN_FIRST);
+        return (packet != null) ? packet : packet(parameters);
         }
 
 
@@ -1329,56 +1149,183 @@ public class MethodsForCommands
         }
 
 
-    public ButtonPlan setSingle( ExtendedMap<Long, Object> parameters )
+    public Button setSwitch( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Switch Button is defined");
+
+        Long boardId = (Long) parameters.remove( Commands.TOKEN_BOARD );
+        if ( boardId == null )   return setEmpty( parameters );
+
+        // 'BACK' is a special token: go back to previous board
+        return completeButton(
+                new ButtonSwitch(boardId, parameters.remove(Commands.TOKEN_LOCK) != null),
+                parameters);
+
+        // !! Check non-used SWITCH buttons !!
+        }
+
+    public Button setMeta( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Meta Button is defined");
+
+        int meta;
+
+        if ( parameters.remove(Commands.TOKEN_CAPS) != null)
+            {
+            meta = LayoutStates.META_CAPS;
+            }
+        else if ( parameters.remove(Commands.TOKEN_SHIFT) != null)
+            {
+            meta = LayoutStates.META_SHIFT;
+            }
+        else if ( parameters.remove(Commands.TOKEN_CTRL) != null)
+            {
+            meta = LayoutStates.META_CTRL;
+            }
+        else if ( parameters.remove(Commands.TOKEN_ALT) != null)
+            {
+            meta = LayoutStates.META_ALT;
+            }
+        else
+            {
+            tokenizer.error("META", R.string.data_meta_unknown_meta_state);
+            return setEmpty( parameters );
+            }
+
+        // ButtonMeta constructor will not accept any non-valid parameter
+        try
+            {
+            return completeButton( new ButtonMeta( meta,
+                    parameters.remove( Commands.TOKEN_LOCK ) != null ),
+                    parameters );
+            }
+        catch (ExternalDataException e)
+            {
+            // this is not possible
+            return setEmpty( parameters );
+            }
+        }
+
+    public Button setSpaceTravel( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Space Travel Button is defined");
+
+        // Packet with default cannot be null!
+        return completeMainTouchButton( new ButtonSpaceTravel( packet(parameters, " ") ),
+                parameters);
+        }
+
+    public Button setEnter( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Enter Button is defined");
+
+        // Packet with default cannot be null!
+        return completeMainTouchButton( new ButtonEnter(
+                packetKey( parameters, 0x10000 + KeyEvent.KEYCODE_ENTER), // Or: '\n'
+                packetText( parameters, "\n" ),
+                parameters.remove( Commands.TOKEN_REPEAT ) != null ),
+                parameters);
+        }
+
+    public Button setModify( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Modify Button is defined");
+
+        Long rollId = (Long) parameters.remove( Commands.TOKEN_ROLL );
+        if ( rollId == null )   return setEmpty( parameters );
+
+        return completeMainTouchButton(
+                new ButtonModify( rollId, parameters.remove( Commands.TOKEN_REVERSE ) != null),
+                parameters);
+        }
+
+    public Button setList( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "List Button is defined");
+
+        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
+        ArrayList<KeyValuePair> packetList = (ArrayList<KeyValuePair>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_ADD ) );
+
+        if ( packetList == null || packetList.isEmpty() )
+            return setEmpty( parameters );
+
+        ButtonList buttonList = new ButtonList();
+
+        for ( KeyValuePair packet: packetList)
+            {
+            buttonList.addPacket( (Packet)packet.getValue() );
+            }
+
+        return completeMainTouchButton( buttonList, parameters);
+        }
+
+    public Button setAlternate( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Alternate Button is defined");
+
+        Packet firstPacket = firstPacket( parameters );
+        Packet secondPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND );
+        if ( firstPacket == null || secondPacket == null )
+            return setEmpty( parameters );
+
+        return completeMainTouchButton(new ButtonAlternate(firstPacket, secondPacket), parameters);
+        }
+
+    public Button setDouble( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Double Button is defined");
+
+        Packet firstPacket = firstPacket( parameters );
+        Packet secondPacket = (Packet)parameters.remove( Commands.TOKEN_SECOND );
+        if ( firstPacket == null || secondPacket == null )
+            return setEmpty( parameters );
+
+        return completeMainTouchButton(new ButtonDouble(firstPacket, secondPacket), parameters);
+        }
+
+    public Button setSingle( ExtendedMap<Long, Object> parameters )
         {
         Scribe.debug(Debug.DATA, "Simple Button is defined");
 
-        ButtonPlan buttonPlan = new ButtonPlan();
+        Packet packet = firstPacket( parameters );
+        if ( packet == null )   return setEmpty( parameters );
 
-        Packet packet = (Packet)parameters.remove( Commands.TOKEN_FIRST );
-        if ( packet == null )
-            {
-            packet = packet( parameters );
-            }
-
-        if ( packet == null )
-            {
-            buttonPlan.button = new Button();
-            completeButton(buttonPlan, parameters);
-            }
-        else
-            {
-            buttonPlan.button = new ButtonSingle(packet,
-                    parameters.remove(Commands.TOKEN_REPEAT) != null);
-            completeMainTouchButton(buttonPlan, parameters);
-            }
-
-        return buttonPlan;
+        return completeMainTouchButton(
+                new ButtonSingle(packet, parameters.remove(Commands.TOKEN_REPEAT) != null),
+                parameters);
         }
 
-    public void completeMainTouchButton( ButtonPlan buttonPlan, ExtendedMap<Long, Object> parameters )
+    public Button setButton( ExtendedMap<Long, Object> parameters )
+        {
+        // Do not consume, just check SECOND package!
+        return parameters.containsKey(Commands.TOKEN_SECOND) ?
+                setDouble( parameters ) : setSingle( parameters );
+        }
+
+    public Button setEmpty( ExtendedMap<Long, Object> parameters )
+        {
+        tokenizer.error( "BUTTON", R.string.data_button_function_missing);
+        return completeButton( new Button(), parameters);
+        }
+
+    public Button completeMainTouchButton( ButtonMainTouch button, ExtendedMap<Long, Object> parameters )
         {
         if (parameters.remove(Commands.TOKEN_ONCIRCLE) != null)
             {
-            ((ButtonMainTouch)buttonPlan.button).setOnCircle();
+            button.setOnCircle();
             }
         else if (parameters.remove(Commands.TOKEN_ONSTAY) != null)
             {
-            ((ButtonMainTouch)buttonPlan.button).setOnCircle();
+            button.setOnCircle();
             }
 
-        completeButton( buttonPlan, parameters);
+        return completeButton( button, parameters);
         }
 
-    public void completeButton( ButtonPlan buttonPlan, ExtendedMap<Long, Object> parameters )
+    public Button completeButton( Button button, ExtendedMap<Long, Object> parameters )
         {
-        if ( buttonPlan.button == null )
-            {
-            tokenizer.error( "BUTTON", R.string.data_button_function_missing);
-            buttonPlan.button = new Button();
-            }
-
-        buttonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
+        button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
 
         // TOKEN_ADDTITLE is a group code
         // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
@@ -1398,7 +1345,7 @@ public class MethodsForCommands
                     {
                     // TitleDescriptor is not completed, depends on the value of the buttons
                     titleDescriptor = titleDescriptor.copy();
-                    titleDescriptor.checkText( buttonPlan.button.getString() );
+                    titleDescriptor.checkText( button.getString() );
                     }
                 // Completed titleDescriptor, so one instance is enough for all buttons
                 titles.add(titleDescriptor);
@@ -1418,7 +1365,7 @@ public class MethodsForCommands
                 defaultTitle = new ExtendedMap<Long, Object>(0);
                 }
             titleDescriptor = addTitle(defaultTitle);
-            titleDescriptor.checkText( buttonPlan.button.getString() );
+            titleDescriptor.checkText( button.getString() );
             titles.add( titleDescriptor );
             }
 
@@ -1430,84 +1377,11 @@ public class MethodsForCommands
             buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
             }
         buttonNameBuilder.setCharAt(0, '\"');
-        buttonPlan.buttonName = buttonNameBuilder.append('\"').toString();
+        button.name = buttonNameBuilder.append('\"').toString();
 
-        buttonPlan.button.setTitles(titles);
-        }
+        button.setTitles(titles);
 
-    /**
-     * Creates temporary button data, which is copied into button position in setBlock
-     * @param parameters
-     * @return
-     */
-    public ButtonPlan setButton(ExtendedMap<Long, Object> parameters)
-        {
-        ButtonPlan buttonPlan = new ButtonPlan();
-
-        buttonPlan.button = createButtonFunction(parameters);
-        if ( buttonPlan.button == null )
-            {
-            tokenizer.error( "BUTTON", R.string.data_button_function_missing);
-            buttonPlan.button = new Button();
-            }
-
-        buttonPlan.button.setColor((int) parameters.remove(Commands.TOKEN_COLOR, DEFAULT_BUTTON_COLOR));
-
-        // TOKEN_ADDTITLE is a group code
-        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
-        ArrayList<KeyValuePair> titleList = (ArrayList<KeyValuePair>)parameters.remove(
-                Bit.setSignedBitOn( Commands.TOKEN_ADDTITLE ) );
-
-        // !! This part after this point could be nicer !!
-        SinglyLinkedList<TitleDescriptor> titles = new SinglyLinkedList<>();
-        TitleDescriptor titleDescriptor;
-
-        if ( titleList != null )
-            {
-            for (KeyValuePair title : titleList)
-                {
-                titleDescriptor = (TitleDescriptor) title.getValue();
-                if ( titleDescriptor.getText() == null )
-                    {
-                    // TitleDescriptor is not completed, depends on the value of the buttons
-                    titleDescriptor = titleDescriptor.copy();
-                    titleDescriptor.checkText( buttonPlan.button.getString() );
-                    }
-                // Completed titleDescriptor, so one instance is enough for all buttons
-                titles.add(titleDescriptor);
-                }
-            }
-        else
-            {
-            // if no titles are added, then addTitle will add one based on default titleSlot
-            // if no default exist (impossible situation!) then an empty parameter list is needed
-            ExtendedMap<Long, Object> defaultTitle;
-            if (defaults.containsKey(Commands.TOKEN_ADDTITLE))
-                {
-                defaultTitle = (ExtendedMap<Long, Object>) (defaults.get(Commands.TOKEN_ADDTITLE)).clone();
-                }
-            else
-                {
-                defaultTitle = new ExtendedMap<Long, Object>(0);
-                }
-            titleDescriptor = addTitle(defaultTitle);
-            titleDescriptor.checkText( buttonPlan.button.getString() );
-            titles.add( titleDescriptor );
-            }
-
-        // if title text is null, code should be used
-        // button id can be created from the titles (and from the code)
-        StringBuilder buttonNameBuilder = new StringBuilder();
-        for ( TitleDescriptor title : titles )
-            {
-            buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
-            }
-        buttonNameBuilder.setCharAt(0, '\"');
-        buttonPlan.buttonName = buttonNameBuilder.append('\"').toString();
-
-        buttonPlan.button.setTitles(titles);
-
-        return buttonPlan;
+        return button;
         }
 
 

@@ -99,6 +99,8 @@ public class Button implements Cloneable
     /** Button's title(s) */
     protected SinglyLinkedList<TitleDescriptor> titles;
 
+    /** Button's name - only for parsing */
+    public String name;
 
     /**
      * Connects the Button instance to its layout and position.
