@@ -164,28 +164,23 @@ public class PacketText extends Packet
         }
 
     @Override
-    public void sendSecondary()
+    public void sendSecondary( int second )
     	{
         if ( softBoardData.softBoardListener.undoLastString() )
         	{
-            /*
-            capsState++;
-
-            if ( capsState == 1 && stringCaps )
-            	{
-            	capsState = 2;
-				}
-            else if ( capsState > 2 )
-            	{
-                capsState = 0;
+            if ( second == TWIN )
+                twinState = !twinState;
+            else
+                {
+                capsState++;
+                if (capsState == 1 && stringCaps)   capsState = 2;
+                else if (capsState > 2)             capsState = 0;
                 }
-            */
-            twinState = !twinState;
             sendString( );
             }
         }
-    
-    @Override    
+
+    @Override
     public void release()
     	{
         // If needed, this could be a standalone method, called when touch releases the button

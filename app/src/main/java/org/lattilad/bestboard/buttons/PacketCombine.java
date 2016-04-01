@@ -44,11 +44,11 @@ public class PacketCombine extends Packet
         }
 
     @Override
-    public void sendSecondary()
+    public void sendSecondary( int second )
         {
         if (!softBoardData.layoutStates.isAnyHardMetaActive())
             {
-            packetFirst.send();
+            packetFirst.sendSecondary( second );
             packetFirstSent = true;
             }
         // NO sendSecondary for packetKey

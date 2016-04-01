@@ -151,6 +151,8 @@ public class Commands
 
     public static final long TOKEN_SINGLE = 0x75d0cfbfL;
     public static final long TOKEN_REPEAT = 0x713dd0a6L;
+    public static final long TOKEN_TWIN = 0x1817d9L;
+    public static final long TOKEN_CAPITAL = 0x757560b6cL;
 
     public static final long TOKEN_DOUBLE = 0x38822138L;
 
@@ -569,7 +571,7 @@ public class Commands
                 TOKEN_FIRST,
                 TOKEN_SECOND,
 
-                TOKEN_REPEAT,
+                TOKEN_REPEAT,TOKEN_TWIN, TOKEN_CAPITAL,
 
                 TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
                 TOKEN_COLOR,
@@ -593,7 +595,7 @@ public class Commands
                 TOKEN_TIME, TOKEN_FORMAT,
                 TOKEN_FIRST,
 
-                TOKEN_REPEAT,
+                TOKEN_REPEAT, TOKEN_TWIN, TOKEN_CAPITAL,
 
                 TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
                 TOKEN_COLOR,
@@ -604,6 +606,8 @@ public class Commands
                 .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET, TOKEN_FIRST, TOKEN_SECOND});
 
         add(TOKEN_REPEAT, PARAMETER_FLAG);
+        add(TOKEN_TWIN, PARAMETER_FLAG);
+        add(TOKEN_CAPITAL, PARAMETER_FLAG);
 
         add(TOKEN_DOUBLE, new long[]{
                 // First packet

@@ -26,16 +26,18 @@ public abstract class Packet
      * Send data to the editor field
      */
     public abstract void send();
-    
+
+    public static final int CAPITAL = 0;
+    public static final int TWIN = 1;
+
     /**
      * Send secondary data - if undo is possible
      * !! This method is not obligatory
      */
-    public void sendSecondary()
+    public void sendSecondary( int second )
     	{ 
         }
 
-        
     /**
      * Finish duties, when button is left
      * Packets are clearing AUTOCAPS state

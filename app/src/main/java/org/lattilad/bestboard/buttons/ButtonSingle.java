@@ -7,8 +7,12 @@ import org.lattilad.bestboard.SoftBoardData;
  */
 public class ButtonSingle extends ButtonMainTouch implements Cloneable
     {
+    public static final int CAPITAL = 0;
+    public static final int TWIN = 1;
+    public static final int REPEAT = 2; // sets onStay
+
     private Packet packet;
-    private boolean repeat;
+    private int second;
 
     @Override
     public ButtonSingle clone()
@@ -16,11 +20,11 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
         return (ButtonSingle)super.clone();
         }
 
-    public ButtonSingle(Packet packet, boolean repeat)
+    public ButtonSingle(Packet packet, int second)
         {
         this.packet = packet;
-        this.repeat = repeat;
-        if ( repeat )
+        this.second = second;
+        if ( second == REPEAT )
             setOnStay();
         }
 
@@ -89,7 +93,7 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
     @Override
     public boolean fireSecondary(int type)
         {
-        if ( repeat )
+        if ( second == REPEAT )
             {
             packet.send();
             layout.softBoardData.vibrate(SoftBoardData.VIBRATE_REPETED);
@@ -97,7 +101,7 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
             }
         else
             {
-            packet.sendSecondary();
+            packet.sendSecondary( second );
             layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
             }
         return false;

@@ -1291,8 +1291,16 @@ public class MethodsForCommands
         Packet packet = firstPacket( parameters );
         if ( packet == null )   return setEmpty( parameters );
 
+        int second = ButtonSingle.CAPITAL; // default behavior
+        if ( parameters.remove(Commands.TOKEN_TWIN) != null )
+            second = ButtonSingle.TWIN;
+        else if ( parameters.remove(Commands.TOKEN_REPEAT) != null )
+            second = ButtonSingle.REPEAT;
+        else
+            parameters.remove(Commands.TOKEN_CAPITAL); // should be removed, too
+
         return completeMainTouchButton(
-                new ButtonSingle(packet, parameters.remove(Commands.TOKEN_REPEAT) != null),
+                new ButtonSingle(packet, second),
                 parameters);
         }
 
@@ -1305,7 +1313,7 @@ public class MethodsForCommands
 
     public Button setEmpty( ExtendedMap<Long, Object> parameters )
         {
-        tokenizer.error( "BUTTON", R.string.data_button_function_missing);
+        tokenizer.error("BUTTON", R.string.data_button_function_missing);
         return completeButton( new Button(), parameters);
         }
 
@@ -1317,7 +1325,7 @@ public class MethodsForCommands
             }
         else if (parameters.remove(Commands.TOKEN_ONSTAY) != null)
             {
-            button.setOnCircle();
+            button.setOnStay();
             }
 
         return completeButton( button, parameters);
