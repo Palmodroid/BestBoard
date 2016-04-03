@@ -43,6 +43,12 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_SETTINGS )
             return;
 
+        if ( functionCode == Commands.TOKEN_BEGIN )
+            return;
+
+        if ( functionCode == Commands.TOKEN_END )
+            return;
+
         // functionCode is not known
         throw new ExternalDataException();
         }
@@ -66,6 +72,12 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_SETTINGS )
             return "SET";
+
+        if ( functionCode == Commands.TOKEN_BEGIN )
+            return "BEGIN";
+
+        if ( functionCode == Commands.TOKEN_END )
+            return "END";
 
         // this cannot be reached
         return "";
@@ -109,6 +121,17 @@ public class PacketFunction extends Packet
 
             softBoardData.softBoardListener.getApplicationContext().startActivity( intent );
             }
+
+        else if ( functionCode == Commands.TOKEN_BEGIN )
+            {
+            softBoardData.softBoardListener.setPosition( 0 );
+            }
+
+        else if ( functionCode == Commands.TOKEN_END )
+            {
+            softBoardData.softBoardListener.setPosition( 2000 );
+            }
+
         }
 
 

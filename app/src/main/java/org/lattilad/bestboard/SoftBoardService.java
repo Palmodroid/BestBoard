@@ -523,7 +523,7 @@ textAfterCursor. ;
     public void onStartInput(EditorInfo attribute, boolean restarting)
         {
         super.onStartInput(attribute, restarting);
-        Scribe.locus( Debug.SERVICE );
+        Scribe.locus(Debug.SERVICE);
 
         initInput();
         }
@@ -741,7 +741,7 @@ textAfterCursor. ;
 
     public void checkAtStrokeEnd()
         {
-        Scribe.locus( Debug.CURSOR );
+        Scribe.locus(Debug.CURSOR);
 
         if ( checkEnabledAfter == NEVER )
             {
@@ -891,7 +891,6 @@ textAfterCursor. ;
         }
 
 
-    @Override
     public void sendString( String string, int autoSpace )
         {
         Scribe.locus(Debug.SERVICE);
@@ -1074,6 +1073,99 @@ textAfterCursor. ;
             }
         }
 
+
+    public void setPosition( int position )
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null && retrieveTextEnabled)
+            {
+            if ( position <= 0 )
+                {
+                ic.setSelection(position, position);
+                return;
+                }
+
+            ic.beginBatchEdit();
+
+            CharSequence temp;
+
+            // What if text is selected ??
+
+            position = 0;
+            ic.setSelection( position, position);
+            do
+                {
+                temp = ic.getTextAfterCursor(2048, 0);
+                position += temp.length();
+                ic.setSelection( position, position );
+                } while (temp.length() == 2048);
+
+            ic.endBatchEdit();
+            }
+        }
+
+    private void _setPosition( InputConnection ic, int position )
+        {
+        // position cannot be negative
+        if ( position < 0 )
+            position = 0;
+
+        // position is bad, because it is somewhere AFTER end-position
+        do  {
+            if ( ic.setSelection(position, position) )
+                return;
+            position--;
+            } while ( position >= 0 );
+
+
+        /* int badPosition = position;
+
+        // find a good position
+        while (true)
+            {
+            // There are no good positions - this check is needed
+            // because ic error can cause also bad position
+            if ( position == 0 )
+                return;
+
+            position = position / 2;
+
+            // this good position is somewhere BEFORE end-position,
+            // while bad-position is somewhere AFTER end-position
+            if ( ic.setSelection(position, position) )
+                break;
+
+            badPosition = position;
+            }
+
+        //
+
+
+
+
+        while (true) {
+            if ( ic.setSelection(position, position) )
+                {
+                do
+                    {
+                    position++;
+
+                    if (!ic.setSelection(position, position))
+                        return;
+                    } while ( position < badPosition );
+                }
+
+            position = position / 2;
+
+            if ( badPosition == position )
+                return;
+
+            badPosition = position;
+            }
+            */
+        }
 
     /**
      * Simulates key-event

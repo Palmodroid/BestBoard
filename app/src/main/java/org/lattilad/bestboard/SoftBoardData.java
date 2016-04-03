@@ -370,7 +370,7 @@ public class SoftBoardData
 
         void sendString( String string, int autoSpace );
         // UseState needs this to change layout
-        public boolean undoLastString();
+        boolean undoLastString();
 
         LayoutView getLayoutView();
 
@@ -387,6 +387,8 @@ public class SoftBoardData
         void changeStringBeforeCursor( int length, String string );
 
         boolean sendDefaultEditorAction(boolean fromEnterKey);
+
+        void setPosition( int position );
 
         void startSoftBoardParser();
         }
