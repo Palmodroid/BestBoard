@@ -74,18 +74,19 @@ DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 0 SIZE 600 BOLD ITALICS )
 
 ; A 'váltosort' label-ként definiáljuk, mert minden boardra rákerül
 LET ( jump BLOCK (
-  BUTTON ( SWITCH lay1 )
-  BUTTON ( SWITCH lay2 )
-  BUTTON ( SWITCH lay3 )
-  BUTTON ( SWITCH lay4 )
-  BUTTON ( SWITCH lay5 )
-  BUTTON ( SWITCH lay6 LOCK )
-  BUTTON ( SWITCH BACK )
+  SWITCH ( BOARD lay1 )
+  SWITCH ( BOARD lay2 )
+  SWITCH ( BOARD lay3 )
+  SWITCH ( BOARD lay4 )
+  SWITCH ( BOARD lay5 )
+  SWITCH ( BOARD lay6 LOCK )
+  SWITCH ( BOARD BACK )
 ))
 
 ; Mivel ez sokszor szerepel, itt is csinálunk label-t
 ; Érdekes, hogy a draft token egyszerre lehet keyword és label is. Ennek az az oka,
 ; hogy először mindig a keyword kerül kiértékelésre, s csak ha az nincs, akkor a label.
+
 LET ( draft BUTTON ( DO DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS) ) )
 
 BLOCK ( LAYOUT lay1 COLUMN 1 ROW 1
@@ -129,24 +130,24 @@ BLOCK ( LAYOUT lay6 COLUMN 1 ROW -1 jump )
 
 BLOCK ( LAYOUT lay1 COLUMN 1 ROW 2
     R
-    BUTTON ( SINGLE FIRST ( TEXT "Single" ) )
-    BUTTON ( SINGLE FIRST ( TEXT "Repeat" ) REPEAT )
-    BUTTON ( DOUBLE FIRST ( TEXT "double" ) SECOND ( TEXT "DOUBLE" ) )
-    BUTTON ( ALTERNATE FIRST ( TEXT "alt" ) SECOND ( TEXT "ALT" ) )
-    BUTTON ( LIST ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") )
+    SINGLE ( FIRST ( TEXT "Single" ) )
+    SINGLE ( FIRST ( TEXT "Repeat" ) REPEAT )
+    DOUBLE ( FIRST ( TEXT "double" ) SECOND ( TEXT "DOUBLE" ) )
+    ALTERNATE ( FIRST ( TEXT "alt" ) SECOND ( TEXT "ALT" ) )
+    LIST ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") )
       )
 
 BLOCK ( LAYOUT lay1 COLUMN 1 ROW 3
     BUTTON ( TEXT "Single" ONSTAY )
     BUTTON ( TEXT "Repeat" REPEAT ONCIRCLE )
-    BUTTON ( DOUBLE TEXT "double" SECOND ( TEXT "DOUBLE" ) ONSTAY )
-    BUTTON ( ALTERNATE TEXT "alt" SECOND ( TEXT "ALT" ) ONSTAY )
-    BUTTON ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") ONSTAY )
+    DOUBLE ( TEXT "double" SECOND ( TEXT "DOUBLE" ) ONSTAY )
+    ALTERNATE ( TEXT "alt" SECOND ( TEXT "ALT" ) ONSTAY )
+    LIST ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") ONSTAY )
       )
 
 BLOCK ( LAYOUT lay1 COLUMN 3 ROW 1
-    BUTTON ( ENTER REPEAT )
-    BUTTON ( SPACETRAVEL )
+    ENTER ( REPEAT )
+    SPACETRAVEL ( )
     BUTTON ( DO BACKSPACE REPEAT)
     BUTTON ( DO DELETE REPEAT)
     BUTTON ( DO SETTINGS)
@@ -159,6 +160,26 @@ BLOCK ( LAYOUT lay1 COLUMN 2 ROW 4
     BUTTON ( TEXT "C" ADDTITLE () valami)
     BUTTON ( TEXT "D" valami ADDTITLE () )
     )
+    
+; lay2 - speciális billentyűk
+
+BLOCK ( LAYOUT lay2 COLUMN 3 ROW 1
+    ENTER ( REPEAT )
+    BUTTON ( TIME )
+    BUTTON ( TIME FORMAT ("yy.MM.dd") ERASESPACE AROUND AUTOSPACE AROUND)
+    BUTTON ( DO SETTINGS)
+      )
+      
+BLOCK ( LAYOUT lay2 COLUMN 2 ROW 2 
+	META ( SHIFT )
+	BUTTON ( DO BEGIN )
+	BUTTON ( DO WORDLEFT )
+	BUTTON ( DO WORDRIGHT )	
+	BUTTON ( DO END )
+	)
+
+
+
     
 ; A landscape lay2-n a korábbi pozícionálások kipróbálása van
 
@@ -371,14 +392,14 @@ BLOCK ( LAYOUT lay5 COLUMN 2 ROW 4
 		
 BLOCK ( LAYOUT lay5 COLUMN 2 ROW 4
 	EXTEND ( SECOND (TEXT "dbl"))
-	EXTEND ( ALTERNATE SECOND (TEXT "alt"))
-	EXTEND ( LIST ADD ( TEXT "1" ) ADD ( TEXT "2" ) ADD (TEXT "3"))
+	EXTEND ( TOALTERNATE SECOND (TEXT "alt"))
+	EXTEND ( TOLIST ADD ( TEXT "1" ) ADD ( TEXT "2" ) ADD (TEXT "3"))
 		)		
 
 ; lay6 - combined packets
 
 BLOCK ( LAYOUT lay6 COLUMN 2 ROW 2
-	BUTTON ( METASHIFT )
+	META ( SHIFT )
 	BUTTON ( TEXT "text")
 	BUTTON ( SEND 'K')
 	BUTTON ( COMBINE TEXT "text" SEND 'K')

@@ -150,6 +150,8 @@ public class Commands
     public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
     public static final long TOKEN_BEGIN = 0x146bcb1L;
     public static final long TOKEN_END = 0x14e3dL;
+    public static final long TOKEN_WORDLEFT = 0x2d2139ad572L;
+    public static final long TOKEN_WORDRIGHT = 0x685cd5eb8a72L;
 
     public static final long TOKEN_SINGLE = 0x75d0cfbfL;
     public static final long TOKEN_REPEAT = 0x713dd0a6L;

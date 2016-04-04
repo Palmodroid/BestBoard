@@ -619,8 +619,17 @@ textAfterCursor. ;
             elongationPeriod = sharedPrefs.getInt( PrefsFragment.EDITING_ELONGATION_PERIOD_INT_KEY, 0 );
             Scribe.debug( Debug.CURSOR, "Elongation period: " + elongationPeriod );
 
-            realCursorStart = editorInfo.initialSelStart;
-            realCursorEnd = editorInfo.initialSelEnd;
+            // The order is not obligatory, but we have to know, where is the start, and where is the end
+            if ( editorInfo.initialSelStart < editorInfo.initialSelEnd )
+                {
+                realCursorStart = editorInfo.initialSelStart;
+                realCursorEnd = editorInfo.initialSelEnd;
+                }
+            else
+                {
+                realCursorStart = editorInfo.initialSelEnd;
+                realCursorEnd = editorInfo.initialSelStart;
+                }
 
             Scribe.debug( Debug.CURSOR, isTextSelected() ?
                     "Text is selected" :
@@ -691,8 +700,17 @@ textAfterCursor. ;
                 }
             }
 
-        realCursorStart = newSelStart;
-        realCursorEnd = newSelEnd;
+        if ( newSelStart < newSelEnd )
+            {
+            realCursorStart = newSelStart;
+            realCursorEnd = newSelEnd;
+            }
+        else
+            {
+            realCursorStart = newSelEnd;
+            realCursorEnd = newSelStart;
+            }
+
         // Text is NOT selected...
         if ( newSelStart == newSelEnd )
             {
@@ -706,6 +724,9 @@ textAfterCursor. ;
             calculatedCursorStart = newSelStart;
             initTextSession();
             }
+
+        Scribe.debug(Debug.TEXT,
+                "Real Start: " + realCursorStart + " Real End: " + realCursorEnd );
         }
 
 
@@ -1083,7 +1104,7 @@ textAfterCursor. ;
         InputConnection ic = getCurrentInputConnection();
         if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
             {
-            ic.setSelection(select ? realCursorStart : 0, 0);
+            ic.setSelection(select ? realCursorEnd : 0, 0);
             }
         }
 
@@ -1103,7 +1124,7 @@ textAfterCursor. ;
                 {
                 temp = ic.getTextAfterCursor(2048, 0);
                 position += temp.length();
-                ic.setSelection( select ? realCursorEnd : position, position );
+                ic.setSelection( select ? realCursorStart : position, position );
                 } while (temp.length() == 2048);
 
             ic.endBatchEdit();
@@ -1121,120 +1142,67 @@ textAfterCursor. ;
         InputConnection ic = getCurrentInputConnection();
         if (ic != null)
             {
-            /*
             int offset = 0;
             int c;
 
-            while ( true )
+            Scribe.error( "Real start: " + realCursorStart + " Real end: " + realCursorEnd );
+            getTextBeforeCursor().reset();
+            while ( isWhiteSpace( c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
                 {
+                offset++;
+                }
+
+            while ( !isWhiteSpace(c) && c != -1 )
+                {
+                offset++;
                 c = getTextBeforeCursor().read();
-
-                Scribe.error(textBeforeCursor.toString());
-                Scribe.debug( Integer.toString(c) + "/" + (char)c );
-
-                if ( c == -1 )
-                    break;
-
-                if ( c != 32 )
-                    break;
-                
-                offset++;
                 }
 
-            Scribe.debug( "Offset:" + offset );
-            */
+            if ( select )
+                ic.setSelection( realCursorEnd, realCursorStart - offset );
+            else
+                ic.setSelection( realCursorStart - offset, realCursorStart - offset);
 
-            int offset = 1;
-            int c;
-
-            textBeforeCursor.reset();
-            Scribe.error( textBeforeCursor.toString() );
-
-            while( isWhiteSpace((c = textBeforeCursor.read())) && c != -1 )
-                {
-                Scribe.error( textBeforeCursor.toString() );
-                Scribe.debug( Integer.toString(c) + c );
-                offset++;
-                }
-
-            while( !isWhiteSpace((c = textBeforeCursor.read())) && c != -1 )
-                {
-                Scribe.error( textBeforeCursor.toString() );
-                Scribe.debug(Integer.toString(c) + c );
-                offset++;
-                }
-
-            Scribe.debug( Integer.toString(c) + " " + offset );
-
-            ic.setSelection( select ? realCursorEnd : realCursorStart - offset, realCursorStart - offset );
+            Scribe.error("New start: " + (realCursorStart - offset) + " New end: " + realCursorEnd);
             }
         }
 
-    public void jumpWordRight( boolean select ){}
+    public void jumpWordRight( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null)
+            {
+            int offset = 0;
+            int c;
+
+            Scribe.error( "Real start: " + realCursorStart + " Real end: " + realCursorEnd );
+            getTextAfterCursor().reset();
+            while ( isWhiteSpace( c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
+                {
+                offset++;
+                }
+
+            while ( !isWhiteSpace(c) && c != -1 )
+                {
+                offset++;
+                c = getTextAfterCursor().read();
+                }
+
+            if ( select )
+                ic.setSelection( realCursorStart, realCursorEnd + offset );
+            else
+                ic.setSelection( realCursorEnd + offset, realCursorEnd + offset);
+
+            Scribe.error("New start: " + realCursorStart + " New end: " + (realCursorEnd + offset));
+            }
+        }
+
+
     public void jumpParagraphLeft( boolean select ){}
     public void jumpParagraphRight( boolean select ){}
 
 
-    private void _setPosition( InputConnection ic, int position )
-        {
-        // position cannot be negative
-        if ( position < 0 )
-            position = 0;
-
-        // position is bad, because it is somewhere AFTER end-position
-        do  {
-            if ( ic.setSelection(position, position) )
-                return;
-            position--;
-            } while ( position >= 0 );
-
-
-        /* int badPosition = position;
-
-        // find a good position
-        while (true)
-            {
-            // There are no good positions - this check is needed
-            // because ic error can cause also bad position
-            if ( position == 0 )
-                return;
-
-            position = position / 2;
-
-            // this good position is somewhere BEFORE end-position,
-            // while bad-position is somewhere AFTER end-position
-            if ( ic.setSelection(position, position) )
-                break;
-
-            badPosition = position;
-            }
-
-        //
-
-
-
-
-        while (true) {
-            if ( ic.setSelection(position, position) )
-                {
-                do
-                    {
-                    position++;
-
-                    if (!ic.setSelection(position, position))
-                        return;
-                    } while ( position < badPosition );
-                }
-
-            position = position / 2;
-
-            if ( badPosition == position )
-                return;
-
-            badPosition = position;
-            }
-            */
-        }
 
     /**
      * Simulates key-event

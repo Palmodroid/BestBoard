@@ -50,6 +50,12 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_END )
             return;
 
+        if ( functionCode == Commands.TOKEN_WORDLEFT )
+            return;
+
+        if ( functionCode == Commands.TOKEN_WORDRIGHT )
+            return;
+
         // functionCode is not known
         throw new ExternalDataException();
         }
@@ -79,6 +85,12 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_END )
             return "END";
+
+        if ( functionCode == Commands.TOKEN_WORDLEFT )
+            return "WL";
+
+        if ( functionCode == Commands.TOKEN_WORDRIGHT )
+            return "WR";
 
         // this cannot be reached
         return "";
@@ -125,14 +137,26 @@ public class PacketFunction extends Packet
 
         else if ( functionCode == Commands.TOKEN_BEGIN )
             {
-            softBoardData.softBoardListener.jumpWordLeft(
+            softBoardData.softBoardListener.jumpBegin(
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF );
             }
 
         else if ( functionCode == Commands.TOKEN_END )
             {
             softBoardData.softBoardListener.jumpEnd(
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_WORDLEFT )
+            {
+            softBoardData.softBoardListener.jumpWordLeft(
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF );
+            }
+
+        else if ( functionCode == Commands.TOKEN_WORDRIGHT )
+            {
+            softBoardData.softBoardListener.jumpWordRight(
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         }

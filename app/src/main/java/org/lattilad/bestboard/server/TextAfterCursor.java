@@ -9,7 +9,7 @@ import org.lattilad.bestboard.scribe.Scribe;
 public class TextAfterCursor
     {
     /** Last element is cleared above this limit */
-    public final static int LENGTH_LIMIT = 4;
+    public final static int LENGTH_LIMIT = 2048;
 
     /** Connection to synchronize text directly from editor */
     private Connection connection;
