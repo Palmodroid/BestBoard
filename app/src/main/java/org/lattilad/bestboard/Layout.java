@@ -502,7 +502,7 @@ public class Layout
         halfHexagonHeightInPixels = 2 * quarterHexagonHeightInPixels;
 
         // MONITOR ROW size set here - a quoter of a hexagon is needed (and a little bit more, this is the extra 20%)
-        monitorSize = (softBoardData.monitorRow ? halfHexagonHeightInPixels * monitorSizePermil / 1800 : 0);
+        monitorSize = (softBoardData.monitorRow ? halfHexagonHeightInPixels * monitorSizePermil / 1000 : 0);
 
         // Area is one hexagon wider, then layout width
         layoutXOffset -= halfHexagonWidthInPixels;
@@ -686,14 +686,12 @@ public class Layout
         int mapY = canvasY - layoutYOffset;
 
         if (mapX < 0 || mapX >= getLayoutMap().getWidth())
-            return Layout.EMPTY_TOUCH_CODE;
+            return 0xFFFD00FD; // Empty color code generates Layout.EMPTY_TOUCH_CODE;
 
         if (mapY < 0 || mapY >= getLayoutMap().getHeight())
-            return Layout.EMPTY_TOUCH_CODE;
+            return 0xFFFD00FD; // Empty color code generates Layout.EMPTY_TOUCH_CODE;
 
-        int color = getLayoutMap().getPixel( mapX, mapY );
-
-        return color;
+        return getLayoutMap().getPixel( mapX, mapY );
         }
 
 

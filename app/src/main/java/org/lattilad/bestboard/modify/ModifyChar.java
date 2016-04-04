@@ -1,9 +1,9 @@
 package org.lattilad.bestboard.modify;
 
+import org.lattilad.bestboard.SoftBoardListener;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.lattilad.bestboard.SoftBoardData;
 
 
 /**
@@ -31,7 +31,7 @@ public class ModifyChar extends Modify
      * @param softBoardListener listener to communicate with the service
      * @param ignoreSpace spaces are ignored between the text and the cursor
      */
-    public ModifyChar( SoftBoardData.SoftBoardListener softBoardListener, boolean ignoreSpace )
+    public ModifyChar(SoftBoardListener softBoardListener, boolean ignoreSpace )
         {
         super( softBoardListener, ignoreSpace);
         }

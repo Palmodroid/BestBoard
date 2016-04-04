@@ -3,7 +3,7 @@ package org.lattilad.bestboard.states;
 import android.os.SystemClock;
 import android.view.KeyEvent;
 
-import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.SoftBoardListener;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -43,7 +43,7 @@ public class LayoutStates
     public static final long RELEASED = -1L;
 
     /** Service for simulated hard-key presses */
-    private SoftBoardData.SoftBoardListener softBoardListener;
+    private SoftBoardListener softBoardListener;
 
     /**
      * All meta-states in a common array
@@ -80,7 +80,7 @@ public class LayoutStates
      * Constructor populates arrays
      * @param softBoardListener ??????????
      */
-    public LayoutStates(SoftBoardData.SoftBoardListener softBoardListener)
+    public LayoutStates(SoftBoardListener softBoardListener)
         {
         this.softBoardListener = softBoardListener;
 

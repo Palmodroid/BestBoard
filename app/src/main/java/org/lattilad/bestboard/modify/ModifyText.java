@@ -1,10 +1,10 @@
 package org.lattilad.bestboard.modify;
 
 
+import org.lattilad.bestboard.SoftBoardListener;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import org.lattilad.bestboard.SoftBoardData;
 
 /**
  * Changes the string before the cursor as prescribed by the strings.
@@ -31,7 +31,7 @@ public class ModifyText extends Modify
      * @param softBoardListener listener to communicate with the service
      * @param ignoreSpace spaces are ignored between the text and the cursor
      */
-    public ModifyText( SoftBoardData.SoftBoardListener softBoardListener, boolean ignoreSpace )
+    public ModifyText( SoftBoardListener softBoardListener, boolean ignoreSpace )
         {
         super( softBoardListener, ignoreSpace);
         }

@@ -10,7 +10,7 @@ import android.preference.PreferenceManager;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.SoftBoardData.SoftBoardListener;
+import org.lattilad.bestboard.SoftBoardListener;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;

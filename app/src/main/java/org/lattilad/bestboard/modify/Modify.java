@@ -1,6 +1,6 @@
 package org.lattilad.bestboard.modify;
 
-import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.SoftBoardListener;
 
 public abstract class Modify
     {
@@ -12,14 +12,14 @@ public abstract class Modify
     /**
      * SoftBoardListener is needed to communicate with Service's StoredText class.
      */
-    protected SoftBoardData.SoftBoardListener softBoardListener;
+    protected SoftBoardListener softBoardListener;
 
     /**
      * Constructor gets the communication channel with Service and StoredText, as SoftBoardListener
      * @param softBoardListener listener to communicate with the service
      * @param ignoreSpace spaces are ignored between the text and the cursor
      */
-    protected Modify( SoftBoardData.SoftBoardListener softBoardListener, boolean ignoreSpace )
+    protected Modify( SoftBoardListener softBoardListener, boolean ignoreSpace )
         {
         this.softBoardListener = softBoardListener;
         this.ignoreSpace = ignoreSpace;

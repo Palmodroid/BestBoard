@@ -1407,8 +1407,8 @@ public class MethodsForCommands
             {
             // if DOUBLE exists (with or without ALTERNATE)
             // or DOUBLE NOT exists (and NO ALTERNATE)
-            if (parameters.remove(Commands.TOKEN_DOUBLE) != null ||
-                    parameters.remove(Commands.TOKEN_ALTERNATE) == null)
+            if (parameters.remove(Commands.TOKEN_TODOUBLE) != null ||
+                    parameters.remove(Commands.TOKEN_TOALTERNATE) == null)
                 {
                 buttonExtension.type = Commands.TOKEN_DOUBLE;
                 }
@@ -1420,7 +1420,7 @@ public class MethodsForCommands
         // ADD can be (LIST), where LIST is not obligatory
         else if ( (buttonExtension.data = parameters.remove( Bit.setSignedBitOn(Commands.TOKEN_ADD) )) != null )
             {
-            parameters.remove( Commands.TOKEN_LIST );
+            parameters.remove( Commands.TOKEN_TOLIST );
             buttonExtension.type = Commands.TOKEN_LIST;
             }
 

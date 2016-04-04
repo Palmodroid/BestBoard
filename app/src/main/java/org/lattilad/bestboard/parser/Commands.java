@@ -202,6 +202,9 @@ public class Commands
     // public static final long TOKEN_COLOR = 0x16b2be3L;
 
     public static final long TOKEN_EXTEND = 0x3da4e6fdL;
+    public static final long TOKEN_TOLIST = 0x7a9d0044L;
+    public static final long TOKEN_TODOUBLE = 0x28f8bda5e89L;
+    public static final long TOKEN_TOALTERNATE = 0x1faa2b1b5295331L;
 
     public static final long TOKEN_ADDMODIFY = 0x211999969455L;
     // public static final long TOKEN_ID = 0x102a6L;
@@ -798,13 +801,17 @@ public class Commands
                 TOKEN_COLOR,
 
                 TOKEN_SECOND,
-                TOKEN_DOUBLE,
-                TOKEN_ALTERNATE,
-                TOKEN_LIST,
+                TOKEN_TODOUBLE,
+                TOKEN_TOALTERNATE,
+                TOKEN_TOLIST,
                 TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
                 TOKEN_ONSTAY,
                 TOKEN_ONCIRCLE })
                 .method("extendButton").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault();
+
+        add(TOKEN_TODOUBLE, PARAMETER_FLAG );
+        add(TOKEN_TOALTERNATE, PARAMETER_FLAG );
+        add(TOKEN_TOLIST, PARAMETER_FLAG );
 
         add(TOKEN_ADDMODIFY, new long[]{
                 TOKEN_ID, TOKEN_ADDROLL, TOKEN_ROLLS,

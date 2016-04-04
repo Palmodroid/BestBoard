@@ -13,7 +13,6 @@ import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
 import org.lattilad.bestboard.prefs.PrefsFragment;
 import org.lattilad.bestboard.scribe.Scribe;
-import org.lattilad.bestboard.server.TextBeforeCursor;
 import org.lattilad.bestboard.states.BoardTable;
 import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.utils.TimeCounter;
@@ -351,47 +350,6 @@ public class SoftBoardData
      * INTERFACE - CONNECTION FOR SENDING KEYS
      */
 
-    public interface SoftBoardListener
-        {
-        /**
-         * Get application context.
-         * This method is defined by both Service and Activity.
-         * @return application context
-         */
-        Context getApplicationContext();
-        // THIS IS NOT NEEDED (MAYBE) IF LAYOUT and BOARDVIEW IS DIVIDED
-        // UseState.checkOrientation() needs context
-        // readPreferences() need context
-        // vibration needs context
-
-        boolean sendKeyDown( long downTime, int keyEventCode );
-        boolean sendKeyUp( long downTime, long eventTime, int keyEventCode );
-        void sendKeyDownUp(int keyEventCode);
-
-        void sendString( String string, int autoSpace );
-        // UseState needs this to change layout
-        boolean undoLastString();
-
-        LayoutView getLayoutView();
-
-        TextBeforeCursor getTextBeforeCursor();
-
-        void checkAtBowStart();
-        void checkAtStrokeEnd();
-
-        void deleteCharBeforeCursor(int n);
-        void deleteCharAfterCursor(int n);
-
-        int deleteSpacesBeforeCursor();
-        void changeStringBeforeCursor( String string );
-        void changeStringBeforeCursor( int length, String string );
-
-        boolean sendDefaultEditorAction(boolean fromEnterKey);
-
-        void setPosition( int position );
-
-        void startSoftBoardParser();
-        }
 
     public SoftBoardListener softBoardListener;
 

@@ -7,6 +7,7 @@ import org.lattilad.bestboard.prefs.PrefsActivity;
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.CapsState;
+import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.ExternalDataException;
 
 /**
@@ -124,12 +125,14 @@ public class PacketFunction extends Packet
 
         else if ( functionCode == Commands.TOKEN_BEGIN )
             {
-            softBoardData.softBoardListener.setPosition( 0 );
+            softBoardData.softBoardListener.jumpWordLeft(
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF );
             }
 
         else if ( functionCode == Commands.TOKEN_END )
             {
-            softBoardData.softBoardListener.setPosition( 2000 );
+            softBoardData.softBoardListener.jumpEnd(
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF );
             }
 
         }

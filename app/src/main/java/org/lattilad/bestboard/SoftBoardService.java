@@ -21,7 +21,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.lattilad.bestboard.SoftBoardData.SoftBoardListener;
 import org.lattilad.bestboard.buttons.PacketText;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.SoftBoardParser;
@@ -468,14 +467,21 @@ public class SoftBoardService extends InputMethodService implements
         return storeTextEnabled;
         }
 
-    /** realCursorPosition value if text is selected */
-    private int TEXT_SELECTED = Integer.MIN_VALUE;
+    /*
+     * real cursor positions are provided by the system (onUpdateSelection...)
+     * calculated position is calculated by bestboard.
+     * It is only used to check, whether stored texts should be invalidated.
+     * Real positions should be used always!
+     */
 
     /** Cursor position presented by the editor */
-    private int realCursorPosition;
+    private int realCursorStart;
+
+    /** Cursor position presented by the editor */
+    private int realCursorEnd;
 
     /** Cursor position calculated by the softkeyboard */
-    private int calculatedCursorPosition = 0;
+    private int calculatedCursorStart = 0;
 
     /** Lastly sent string. Null if undo is not possible */
     private String undoString;
@@ -491,8 +497,8 @@ public class SoftBoardService extends InputMethodService implements
 
 /*
 ? heavyCheckEnabled
-realCursorPosition= ; // -1 text selected
-calculatedCursorPosition= ;
+realCursorStart= ; // -1 text selected
+calculatedCursorStart= ;
 checkTimeLimit= ; // 0L - always allowed (no limit)  Long.MAX_VALUE - never allowed
 undoString= ;
 textBeforeCursor. ;
@@ -515,6 +521,10 @@ textAfterCursor. ;
         return textAfterCursor;
         }
 
+    public boolean isTextSelected()
+        {
+        return realCursorStart != realCursorEnd;
+        }
 
     /**
      * lastCharacter and calculatedPositions are set based on EditorInfo data.
@@ -555,7 +565,7 @@ textAfterCursor. ;
             Scribe.debug( Debug.TEXT, "Start: " + editorInfo.initialSelStart + ", end: " + editorInfo.initialSelEnd);
 
             // position of the cursor
-            calculatedCursorPosition = editorInfo.initialSelStart;
+            calculatedCursorStart = editorInfo.initialSelStart;
 
             SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
             String retrieveTextPreference = sharedPrefs.getString(getString(R.string.editing_retrieve_text_key),
@@ -573,7 +583,7 @@ textAfterCursor. ;
                 }
             else
                 {
-                retrieveTextEnabled = (calculatedCursorPosition >= 0);
+                retrieveTextEnabled = (calculatedCursorStart >= 0);
                 Scribe.debug(Debug.CURSOR, "Editing is set automatically. Retrieve text: " + retrieveTextEnabled);
                 }
 
@@ -609,18 +619,12 @@ textAfterCursor. ;
             elongationPeriod = sharedPrefs.getInt( PrefsFragment.EDITING_ELONGATION_PERIOD_INT_KEY, 0 );
             Scribe.debug( Debug.CURSOR, "Elongation period: " + elongationPeriod );
 
-            if ( editorInfo.initialSelStart != editorInfo.initialSelEnd )
-                {
-                // text is selected
-                realCursorPosition = TEXT_SELECTED;
-                Scribe.debug( Debug.CURSOR, "Text is selected");
-                }
-            else
-                {
-                // text is not selected
-                realCursorPosition = editorInfo.initialSelStart;
-                Scribe.debug(Debug.CURSOR, "Cursor position: " + realCursorPosition);
-                }
+            realCursorStart = editorInfo.initialSelStart;
+            realCursorEnd = editorInfo.initialSelEnd;
+
+            Scribe.debug( Debug.CURSOR, isTextSelected() ?
+                    "Text is selected" :
+                    "Cursor position: " + realCursorStart );
 
             // pressed hard-keys are released
             // NOT NEEDED IN INSTANTSIMULATE
@@ -640,7 +644,7 @@ textAfterCursor. ;
                 }
 
             // set autocaps state depending on field behavior and cursor position
-            if ( calculatedCursorPosition == 0 && editorInfo.initialCapsMode != 0 )
+            if ( calculatedCursorStart == 0 && editorInfo.initialCapsMode != 0 )
                 {
                 ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
                         .setAutoCapsState(CapsState.AUTOCAPS_ON);
@@ -673,34 +677,33 @@ textAfterCursor. ;
 
         // Cursor movement checking is independent from selection.
         // Cursor position is the start of the selection.
-        if ( calculatedCursorPosition != newSelStart )
+        if ( calculatedCursorStart != newSelStart )
             {
             if ( System.nanoTime() > checkEnabledAfter )
                 {
-                Scribe.debug( Debug.CURSOR, "Cursor is moving. Calculated position does not match: " + calculatedCursorPosition );
-                calculatedCursorPosition = newSelStart;
+                Scribe.debug( Debug.CURSOR, "Cursor is moving. Calculated position does not match: " + calculatedCursorStart);
+                calculatedCursorStart = newSelStart;
                 initTextSession();
                 }
             else
                 {
-                Scribe.debug( Debug.CURSOR, "Text processing is not yet finished. Calculated position does not match: " + calculatedCursorPosition );
+                Scribe.debug( Debug.CURSOR, "Text processing is not yet finished. Calculated position does not match: " + calculatedCursorStart);
                 }
             }
 
+        realCursorStart = newSelStart;
+        realCursorEnd = newSelEnd;
         // Text is NOT selected...
         if ( newSelStart == newSelEnd )
             {
             Scribe.debug( Debug.CURSOR, "Real cursor position: " + newSelStart );
-            realCursorPosition = newSelStart;
             }
 
         // Text is selected
         else // newSelStart != newSelEnd
             {
             Scribe.debug( Debug.CURSOR, "Cursor position: Text is selected, cursor position is invalidated!");
-            realCursorPosition = TEXT_SELECTED;
-            calculatedCursorPosition = newSelStart;
-
+            calculatedCursorStart = newSelStart;
             initTextSession();
             }
         }
@@ -719,18 +722,18 @@ textAfterCursor. ;
 
         if ( storeTextEnabled )
             {
-            if (realCursorPosition != calculatedCursorPosition)
+            if (realCursorStart != calculatedCursorStart)
                 {
                 Scribe.debug(Debug.CURSOR, "LIGHT CHECK: Cursor positions doesn't match at the start of the bow!" +
-                        " Calculated: " + calculatedCursorPosition +
-                        " Real: " + realCursorPosition);
+                        " Calculated: " + calculatedCursorStart +
+                        " Real: " + realCursorStart);
 
-                calculatedCursorPosition = realCursorPosition;
+                calculatedCursorStart = realCursorStart;
                 initTextSession();
                 }
             else
                 {
-                Scribe.debug(Debug.CURSOR, "LIGHT CHECK: Cursor positions match. Position: " + realCursorPosition);
+                Scribe.debug(Debug.CURSOR, "LIGHT CHECK: Cursor positions match. Position: " + realCursorStart);
                 }
             }
         else
@@ -763,7 +766,7 @@ textAfterCursor. ;
         Scribe.debug(Debug.TEXT, "String to send: [" + string + "], length: " + string.length());
 
         undoString = string;
-        calculatedCursorPosition += string.length();
+        calculatedCursorStart += string.length();
         checkEnabledAfter = NEVER;
         if ( storeTextEnabled )
             {
@@ -777,7 +780,7 @@ textAfterCursor. ;
         softBoardData.characterCounter.measure(string.length());
         softBoardData.showTiming();
 
-        Scribe.debug(Debug.CURSOR, "String. Calculated cursor position: " + calculatedCursorPosition);
+        Scribe.debug(Debug.CURSOR, "String. Calculated cursor position: " + calculatedCursorStart);
         }
 
 
@@ -796,7 +799,7 @@ textAfterCursor. ;
         if ( length > 0 )
             {
             undoString = null;
-            calculatedCursorPosition -= length;
+            calculatedCursorStart -= length;
             checkEnabledAfter = NEVER;
             if ( storeTextEnabled )
                 {
@@ -806,7 +809,7 @@ textAfterCursor. ;
             inputConnection.deleteSurroundingText(length, 0);
             }
 
-        Scribe.debug(Debug.CURSOR, "Deleted. Calculated cursor position: " + calculatedCursorPosition);
+        Scribe.debug(Debug.CURSOR, "Deleted. Calculated cursor position: " + calculatedCursorStart);
         }
 
 
@@ -817,7 +820,7 @@ textAfterCursor. ;
         if ( length > 0 )
             {
             undoString = null;
-            // calculatedCursorPosition does not change
+            // calculatedCursorStart does not change
             checkEnabledAfter = NEVER;
             if ( storeTextEnabled )
                 {
@@ -827,7 +830,7 @@ textAfterCursor. ;
             inputConnection.deleteSurroundingText( 0, length );
             }
 
-        Scribe.debug(Debug.CURSOR, "Deleted. Calculated cursor position: " + calculatedCursorPosition);
+        Scribe.debug(Debug.CURSOR, "Deleted. Calculated cursor position: " + calculatedCursorStart);
         }
 
 
@@ -943,7 +946,7 @@ textAfterCursor. ;
         {
         Scribe.locus(Debug.SERVICE);
 
-        if ( realCursorPosition >= 0 )
+        if ( !isTextSelected() )
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)
@@ -976,7 +979,7 @@ textAfterCursor. ;
         Scribe.locus(Debug.SERVICE);
 
         // text is selected
-        if ( realCursorPosition == TEXT_SELECTED )
+        if ( isTextSelected() )
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)
@@ -1028,7 +1031,7 @@ textAfterCursor. ;
         Scribe.locus(Debug.SERVICE);
 
         // text is selected
-        if ( realCursorPosition == TEXT_SELECTED )
+        if ( isTextSelected() )
             {
             InputConnection ic = getCurrentInputConnection();
             if (ic != null)
@@ -1074,37 +1077,103 @@ textAfterCursor. ;
         }
 
 
-    public void setPosition( int position )
+    public void jumpBegin( boolean select )
         {
         Scribe.locus(Debug.SERVICE);
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
+            {
+            ic.setSelection(select ? realCursorStart : 0, 0);
+            }
+        }
 
+
+    public void jumpEnd( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
         InputConnection ic = getCurrentInputConnection();
         if (ic != null && retrieveTextEnabled)
             {
-            if ( position <= 0 )
-                {
-                ic.setSelection(position, position);
-                return;
-                }
-
             ic.beginBatchEdit();
 
             CharSequence temp;
+            int position = realCursorEnd;
 
-            // What if text is selected ??
-
-            position = 0;
-            ic.setSelection( position, position);
             do
                 {
                 temp = ic.getTextAfterCursor(2048, 0);
                 position += temp.length();
-                ic.setSelection( position, position );
+                ic.setSelection( select ? realCursorEnd : position, position );
                 } while (temp.length() == 2048);
 
             ic.endBatchEdit();
             }
+
         }
+
+
+    public void jumpLeft( boolean select ){}
+    public void jumpRight( boolean select ){}
+
+    public void jumpWordLeft( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = getCurrentInputConnection();
+        if (ic != null)
+            {
+            /*
+            int offset = 0;
+            int c;
+
+            while ( true )
+                {
+                c = getTextBeforeCursor().read();
+
+                Scribe.error(textBeforeCursor.toString());
+                Scribe.debug( Integer.toString(c) + "/" + (char)c );
+
+                if ( c == -1 )
+                    break;
+
+                if ( c != 32 )
+                    break;
+                
+                offset++;
+                }
+
+            Scribe.debug( "Offset:" + offset );
+            */
+
+            int offset = 1;
+            int c;
+
+            textBeforeCursor.reset();
+            Scribe.error( textBeforeCursor.toString() );
+
+            while( isWhiteSpace((c = textBeforeCursor.read())) && c != -1 )
+                {
+                Scribe.error( textBeforeCursor.toString() );
+                Scribe.debug( Integer.toString(c) + c );
+                offset++;
+                }
+
+            while( !isWhiteSpace((c = textBeforeCursor.read())) && c != -1 )
+                {
+                Scribe.error( textBeforeCursor.toString() );
+                Scribe.debug(Integer.toString(c) + c );
+                offset++;
+                }
+
+            Scribe.debug( Integer.toString(c) + " " + offset );
+
+            ic.setSelection( select ? realCursorEnd : realCursorStart - offset, realCursorStart - offset );
+            }
+        }
+
+    public void jumpWordRight( boolean select ){}
+    public void jumpParagraphLeft( boolean select ){}
+    public void jumpParagraphRight( boolean select ){}
+
 
     private void _setPosition( InputConnection ic, int position )
         {

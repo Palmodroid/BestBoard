@@ -3,7 +3,7 @@ package org.lattilad.bestboard.states;
 import android.content.res.Configuration;
 
 import org.lattilad.bestboard.Layout;
-import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.SoftBoardListener;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.parser.Tokenizer;
@@ -37,7 +37,7 @@ public class BoardTable
     /**
      * Connection to service
      */
-    private SoftBoardData.SoftBoardListener softBoardListener;
+    private SoftBoardListener softBoardListener;
 
 
     public static final int ORIENTATION_PORTRAIT = 0;
@@ -275,7 +275,7 @@ public class BoardTable
     /******** MAIN PART OF THE CODE ********/
 
     /** Constructor - BoardLinks should be able to reach Service (SoftBoardDataListener) */
-    public BoardTable(SoftBoardData.SoftBoardListener softBoardListener)
+    public BoardTable(SoftBoardListener softBoardListener)
         {
         this.softBoardListener = softBoardListener;
         }

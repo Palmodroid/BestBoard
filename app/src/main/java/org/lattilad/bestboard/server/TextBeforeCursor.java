@@ -1,10 +1,10 @@
 package org.lattilad.bestboard.server;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class to store text before cursor.
@@ -28,7 +28,7 @@ public class TextBeforeCursor
         }
 
     /** Last element is cleared above this limit */
-    public final static int LENGTH_LIMIT = 20;
+    public final static int LENGTH_LIMIT = 100;
 
     /** Connection to synchronize text directly from editor */
     private Connection connection;
