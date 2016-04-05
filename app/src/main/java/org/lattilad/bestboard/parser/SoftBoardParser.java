@@ -10,7 +10,6 @@ import android.preference.PreferenceManager;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.SoftBoardListener;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -138,7 +137,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
          */
         Context getApplicationContext();
 
-        SoftBoardListener getSoftBoardDataListener();
+        // SoftBoardListener getSoftBoardDataListener();
 
         /**
          * Callback method is called after background task has finished without critical errors.
@@ -326,7 +325,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
         labels = Commands.createLabels();
         defaults = new ExtendedMap<>();
-        softBoardData = new SoftBoardData( caller.getSoftBoardDataListener() );
+        softBoardData = new SoftBoardData( );
 
         methodsForCommands = new MethodsForCommands( softBoardData, this );
         methodsForCommands.createDefaults();

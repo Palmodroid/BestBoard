@@ -78,12 +78,9 @@ public class LayoutStates
 
     /**
      * Constructor populates arrays
-     * @param softBoardListener ??????????
      */
-    public LayoutStates(SoftBoardListener softBoardListener)
+    public LayoutStates()
         {
-        this.softBoardListener = softBoardListener;
-
         // First, HARD_STATE_SIZE part: HardStates
         for (int m = 0; m < HARD_STATES_SIZE; m++)
             {
@@ -108,6 +105,11 @@ public class LayoutStates
 
         // Android meta-state is inactive
         androidMetaState = ANDROID_META_STATE_OFF;
+        }
+
+    public void connect(SoftBoardListener softBoardListener)
+        {
+        this.softBoardListener = softBoardListener;
         }
 
     /**

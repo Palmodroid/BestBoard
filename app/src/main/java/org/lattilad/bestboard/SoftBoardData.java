@@ -334,7 +334,7 @@ public class SoftBoardData
     /**
      * Connection to the system vibrator
      */
-    private final Vibrator vibrator;
+    private Vibrator vibrator;
 
     public final static int VIBRATE_PRIMARY = 1;
     public final static int VIBRATE_SECONDARY = 2;
@@ -358,21 +358,27 @@ public class SoftBoardData
      ** STARTING (CONSTRUCTOR) AND ENDING OF PARSING PHASE
      **/
 
-    /**
-     * Constructor
-     * Definies default TitleSlots
-     * @param softBoardListener to connect with service
-     */
-    public SoftBoardData( SoftBoardListener softBoardListener )
+    public SoftBoardData( )
         {
-        this.softBoardListener = softBoardListener;
-
         // static variables should be deleted!!
         TitleDescriptor.setTypeface(null);
 
-        layoutStates = new LayoutStates( softBoardListener );
+        layoutStates = new LayoutStates();
+        boardTable = new BoardTable();
+        }
 
-        boardTable = new BoardTable( softBoardListener );
+    /**
+     * SoftBoardProcessor finishes data population
+     * Definies default TitleSlots
+     * @param softBoardListener to connect with service
+     */
+    public void connect(SoftBoardListener softBoardListener)
+        {
+        this.softBoardListener = softBoardListener;
+
+        layoutStates.connect( softBoardListener );
+
+        boardTable.connect( softBoardListener );
 
         // Get instance of Vibrator from current Context
         vibrator = (Vibrator) softBoardListener.getApplicationContext().getSystemService(Context.VIBRATOR_SERVICE);

@@ -274,8 +274,8 @@ public class BoardTable
 
     /******** MAIN PART OF THE CODE ********/
 
-    /** Constructor - BoardLinks should be able to reach Service (SoftBoardDataListener) */
-    public BoardTable(SoftBoardListener softBoardListener)
+    /** BoardLinks should be able to reach Service (SoftBoardDataListener) */
+    public void connect(SoftBoardListener softBoardListener)
         {
         this.softBoardListener = softBoardListener;
         }
