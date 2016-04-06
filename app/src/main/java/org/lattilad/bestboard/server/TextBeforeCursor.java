@@ -62,6 +62,8 @@ public class TextBeforeCursor
 
     public void sendString( String string )
         {
+        if ( !connection.isStoreTextEnabled() ) return;
+
         Scribe.debug( Debug.TEXT,
                 "TEXT: String to add: " + string );
 
@@ -82,7 +84,9 @@ public class TextBeforeCursor
 
     public void sendDelete( int length )
         {
-        Scribe.debug( Debug.TEXT, "TEXT: Length to delete before cursor: " + length );
+        if ( !connection.isStoreTextEnabled() ) return;
+
+        Scribe.debug(Debug.TEXT, "TEXT: Length to delete before cursor: " + length);
 
         // only delete can shrink stored text
         // if stored text is already shorter than limit, then it remains valid after delete
@@ -120,10 +124,13 @@ public class TextBeforeCursor
      */
     public void invalidate()
         {
-        text.clear();
-        textLength = 0;
-        textReady = false;
-
+        if ( connection.isStoreTextEnabled() )
+            {
+            // stored text should be deleted
+            text.clear();
+            textLength = 0;
+            textReady = false;
+            }
         rewind();
 
         Scribe.debug( Debug.TEXT, "TEXT: Stored text before cursor is invalidated!" );
@@ -158,18 +165,20 @@ public class TextBeforeCursor
 
 
     /**
-     * Same as rewind, but if heavy checking is enabled, text will be invalidated
+     * If store-text is enabled, then same as rewind: stored text will be read once more
+     * If store-text is disabled, then text will be invalidated, and re-read before the next read
      */
     public void reset()
         {
-        if ( connection.isStoreTextEnabled() )
+        // if text is not stored, then every read should re-read text from editor
+        if ( !connection.isStoreTextEnabled() )
             {
-            rewind();
+            // same as invalidate
+            text.clear();
+            textLength = 0;
+            textReady = false;
             }
-        else
-            {
-            invalidate();
-            }
+        rewind();
         }
 
 

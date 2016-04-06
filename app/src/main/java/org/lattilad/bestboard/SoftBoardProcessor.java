@@ -51,15 +51,17 @@ public class SoftBoardProcessor implements
 
 
     /**
+     * TRUE: getText... methods can take text from editor
      * FALSE: getText... methods are disabled - no communication is enabled
+     * (jumpEnd uses the same method, so it is disabled, too)
      */
     private boolean retrieveTextEnabled = true;
 
     /**
-     * FALSE: stored text and calculated position are used; cursor position is checked after time-limit
-     * TRUE: text around cursor is always re-read, stored text/cursor position are not used
+     * TRUE: calculated cursor positions are used. Calculated positions checked at each bow-start,
+     * and after stroke-end+elongation+time (between strokes)
+     * FALSE: text around cursor is always re-read, stored text/cursor position are not used
      */
-    // private boolean heavyCheckEnabled = false;
     private boolean storeTextEnabled = true;
 
     /** public access is needed by Connection */
@@ -68,26 +70,22 @@ public class SoftBoardProcessor implements
         return storeTextEnabled;
         }
 
-    /*
-     * real cursor positions are provided by the system (onUpdateSelection...)
-     * calculated position is calculated by bestboard.
-     * It is only used to check, whether stored texts should be invalidated.
-     * Real positions should be used always!
-     */
-
     /** Cursor position presented by the editor */
     private int realCursorStart;
 
     /** Cursor position presented by the editor */
     private int realCursorEnd;
 
-    public boolean isTextSelected()
-        {
-        return realCursorStart != realCursorEnd;
-        }
-
     /** Cursor position calculated by the softkeyboard */
     private int calculatedCursorStart = 0;
+
+    /** Cursor position calculated by the softkeyboard */
+    private int calculatedCursorEnd = 0;
+
+    public boolean isTextSelected()
+        {
+        return calculatedCursorStart != calculatedCursorEnd;
+        }
 
     /** Lastly sent string. Null if undo is not possible */
     private String undoString;
@@ -96,7 +94,12 @@ public class SoftBoardProcessor implements
 
     private static final long ALWAYS = 0L;
 
-    // -> CHAT
+    /**
+     * Controls the behavior of onUpdateSelection
+     * Bow start: ALWAYS
+     * Text modifications: NEVER
+     * Stroke end: + elongationPeriod
+     */
     private long checkEnabledAfter = ALWAYS;
 
     private int elongationPeriod;
@@ -119,6 +122,11 @@ public class SoftBoardProcessor implements
 
     /** Temporary variable to store string to be send */
     private StringBuilder sendBuilder = new StringBuilder();
+
+
+    /*****************************************
+     * CONNECTION TO SERVICE
+     *****************************************/
 
 
     public SoftBoardProcessor( SoftBoardService softBoardService, SoftBoardData softBoardData )
@@ -168,6 +176,115 @@ public class SoftBoardProcessor implements
         }
 
 
+
+    /*****************************************
+     * CONTROL OF TEXT PROCESSING
+     *****************************************/
+
+
+    public void initInput()
+        {
+        Scribe.title( "Editor session started" );
+
+        EditorInfo editorInfo = softBoardService.getCurrentInputEditorInfo();
+        Scribe.debug( Debug.TEXT, "Start: " + editorInfo.initialSelStart + ", end: " + editorInfo.initialSelEnd);
+
+        // The order is not obligatory, but we have to know, where is the start, and where is the end
+        if ( editorInfo.initialSelStart < editorInfo.initialSelEnd )
+            {
+            realCursorStart = editorInfo.initialSelStart;
+            realCursorEnd = editorInfo.initialSelEnd;
+            }
+        else
+            {
+            realCursorStart = editorInfo.initialSelEnd;
+            realCursorEnd = editorInfo.initialSelStart;
+            }
+
+        // position of the cursor
+        calculatedCursorStart = realCursorStart;
+        calculatedCursorEnd = realCursorEnd;
+
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(softBoardService);
+        String retrieveTextPreference = sharedPrefs.getString(
+                softBoardService.getString(R.string.editing_retrieve_text_key),
+                softBoardService.getString(R.string.editing_retrieve_text_default));
+
+        if ( retrieveTextPreference.startsWith("E") )
+            {
+            retrieveTextEnabled = true;
+            Scribe.debug(Debug.CURSOR, "Editing (retrieve text) is enabled (forced)");
+            }
+        else if ( retrieveTextPreference.startsWith("D") )
+            {
+            retrieveTextEnabled = false;
+            Scribe.debug(Debug.CURSOR, "Editing (retrieve text) is disabled (forced)");
+            }
+        else
+            {
+            retrieveTextEnabled = (calculatedCursorStart >= 0);
+            Scribe.debug(Debug.CURSOR, "Editing is set automatically. Retrieve text: " + retrieveTextEnabled);
+            }
+
+        String storeTextPreference = sharedPrefs.getString(
+                softBoardService.getString(R.string.editing_store_text_key),
+                softBoardService.getString(R.string.editing_store_text_default));
+
+        if ( storeTextPreference.startsWith("E") )
+            {
+            storeTextEnabled = true;
+            Scribe.debug(Debug.CURSOR, "Editing (store text) is enabled (forced), LIGHT check.");
+            }
+        else if ( storeTextPreference.startsWith("D") )
+            {
+            storeTextEnabled = false;
+            Scribe.debug(Debug.CURSOR, "Editing (store text) is disabled (forced), HEAVY check.");
+            }
+        else
+            {
+            int inputType = editorInfo.inputType & InputType.TYPE_MASK_CLASS;
+
+            if ( inputType == InputType.TYPE_CLASS_TEXT || inputType == 0 )
+                {
+                storeTextEnabled = true;
+                Scribe.debug(Debug.CURSOR, "Editing (store text) is enabled automatically. LIGHT CHECK" );
+                }
+            else
+                {
+                storeTextEnabled = false;
+                Scribe.debug(Debug.CURSOR, "Editing (store text) is disabled automatically. HEAVY CHECK" );
+                }
+            }
+
+        elongationPeriod = sharedPrefs.getInt( PrefsFragment.EDITING_ELONGATION_PERIOD_INT_KEY, 0 );
+        Scribe.debug( Debug.CURSOR, "Elongation period: " + elongationPeriod );
+
+        // pressed hard-keys are released
+        // NOT NEEDED IN INSTANTSIMULATE
+        softBoardData.layoutStates.resetMetaButtons();
+
+        // enter's title is set
+        softBoardData.setAction(editorInfo.imeOptions);
+
+        initTextSession();
+        // Meta reset needed only in new input box
+        if ( softBoardData.textSessionSetsMetastates )
+            {
+            layoutView.type();
+            ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
+                    .setAutoCapsState(CapsState.AUTOCAPS_OFF);
+            layoutView.invalidate();
+            }
+
+        // set autocaps state depending on field behavior and cursor position
+        if ( calculatedCursorStart == 0 && editorInfo.initialCapsMode != 0 )
+            {
+            ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
+                    .setAutoCapsState(CapsState.AUTOCAPS_ON);
+            }
+        }
+
+
     /**
      * Initializes a new text session.
      * This happens at each EditText start, and at each uncontrolled cursor movements
@@ -183,111 +300,25 @@ public class SoftBoardProcessor implements
         }
 
 
-    public void initInput()
+    private void compareRealAndCalculated()
         {
-        if (softBoardData != null)
+        if ( calculatedCursorStart != realCursorStart )
             {
-            Scribe.title( "Editor session started" );
-
-            EditorInfo editorInfo = softBoardService.getCurrentInputEditorInfo();
-            Scribe.debug( Debug.TEXT, "Start: " + editorInfo.initialSelStart + ", end: " + editorInfo.initialSelEnd);
-
-            // position of the cursor
-            calculatedCursorStart = editorInfo.initialSelStart;
-
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(softBoardService);
-            String retrieveTextPreference = sharedPrefs.getString(
-                    softBoardService.getString(R.string.editing_retrieve_text_key),
-                    softBoardService.getString(R.string.editing_retrieve_text_default));
-
-            if ( retrieveTextPreference.startsWith("E") )
-                {
-                retrieveTextEnabled = true;
-                Scribe.debug(Debug.CURSOR, "Editing (retrieve text) is enabled (forced)");
-                }
-            else if ( retrieveTextPreference.startsWith("D") )
-                {
-                retrieveTextEnabled = false;
-                Scribe.debug(Debug.CURSOR, "Editing (retrieve text) is disabled (forced)");
-                }
-            else
-                {
-                retrieveTextEnabled = (calculatedCursorStart >= 0);
-                Scribe.debug(Debug.CURSOR, "Editing is set automatically. Retrieve text: " + retrieveTextEnabled);
-                }
-
-            String storeTextPreference = sharedPrefs.getString(
-                    softBoardService.getString(R.string.editing_store_text_key),
-                    softBoardService.getString(R.string.editing_store_text_default));
-
-            if ( storeTextPreference.startsWith("E") )
-                {
-                storeTextEnabled = true;
-                Scribe.debug(Debug.CURSOR, "Editing (store text) is enabled (forced), LIGHT check.");
-                }
-            else if ( storeTextPreference.startsWith("D") )
-                {
-                storeTextEnabled = false;
-                Scribe.debug(Debug.CURSOR, "Editing (store text) is disabled (forced), HEAVY check.");
-                }
-            else
-                {
-                int inputType = editorInfo.inputType & InputType.TYPE_MASK_CLASS;
-
-                if ( inputType == InputType.TYPE_CLASS_TEXT || inputType == 0 )
-                    {
-                    storeTextEnabled = true;
-                    Scribe.debug(Debug.CURSOR, "Editing (store text) is enabled automatically. LIGHT CHECK" );
-                    }
-                else
-                    {
-                    storeTextEnabled = false;
-                    Scribe.debug(Debug.CURSOR, "Editing (store text) is disabled automatically. HEAVY CHECK" );
-                    }
-                }
-
-            elongationPeriod = sharedPrefs.getInt( PrefsFragment.EDITING_ELONGATION_PERIOD_INT_KEY, 0 );
-            Scribe.debug( Debug.CURSOR, "Elongation period: " + elongationPeriod );
-
-            // The order is not obligatory, but we have to know, where is the start, and where is the end
-            if ( editorInfo.initialSelStart < editorInfo.initialSelEnd )
-                {
-                realCursorStart = editorInfo.initialSelStart;
-                realCursorEnd = editorInfo.initialSelEnd;
-                }
-            else
-                {
-                realCursorStart = editorInfo.initialSelEnd;
-                realCursorEnd = editorInfo.initialSelStart;
-                }
-
-            Scribe.debug( Debug.CURSOR, isTextSelected() ?
-                    "Text is selected" :
-                    "Cursor position: " + realCursorStart );
-
-            // pressed hard-keys are released
-            // NOT NEEDED IN INSTANTSIMULATE
-            softBoardData.layoutStates.resetMetaButtons();
-
-            // enter's title is set
-            softBoardData.setAction(editorInfo.imeOptions);
-
+            // if start is not correct: BOTH should be invalidated (because of overwrite)
+            Scribe.debug( Debug.CURSOR, "Cursor is moving. Calculated (" + calculatedCursorStart +
+                    ") and real (" + realCursorStart + ") start do not match.");
+            calculatedCursorStart = realCursorStart;
+            calculatedCursorEnd = realCursorEnd;
             initTextSession();
-            // Meta reset needed only in new input box
-            if ( softBoardData.textSessionSetsMetastates )
-                {
-                layoutView.type();
-                ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
-                        .setAutoCapsState(CapsState.AUTOCAPS_OFF);
-                layoutView.invalidate();
-                }
-
-            // set autocaps state depending on field behavior and cursor position
-            if ( calculatedCursorStart == 0 && editorInfo.initialCapsMode != 0 )
-                {
-                ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
-                        .setAutoCapsState(CapsState.AUTOCAPS_ON);
-                }
+            }
+        else if ( calculatedCursorEnd != realCursorEnd ) // && calculated start == real start
+            {
+            Scribe.debug( Debug.CURSOR, "Only cursor-end (selection) is moving. Calculated (" + calculatedCursorEnd +
+                    ") and real (" + realCursorEnd + ") end do not match. Start is correct.");
+            // if only end is not correct: ONLY TEXT AFTER should be invalidated
+            calculatedCursorEnd = realCursorEnd;
+            textAfterCursor.invalidate();
+            // undoString = null; // it can happen only in selection; there is no undo string during selection!
             }
         }
 
@@ -300,31 +331,10 @@ public class SoftBoardProcessor implements
      * If text is selected, then all stored-text functions are disabled
      */
     public void onUpdateSelection(int oldSelStart, int oldSelEnd,
-                                  int newSelStart, int newSelEnd, int candidatesStart,
-                                  int candidatesEnd)
+                                  int newSelStart, int newSelEnd,
+                                  int candidatesStart, int candidatesEnd)
         {
-        Scribe.debug(Debug.TEXT,
-                "OldStart: " + oldSelStart +
-                        " OldEnd: " + oldSelEnd +
-                        " NewStart: " + newSelStart +
-                        " NewEnd: " + newSelEnd );
-
-        // Cursor movement checking is independent from selection.
-        // Cursor position is the start of the selection.
-        if ( calculatedCursorStart != newSelStart )
-            {
-            if ( System.nanoTime() > checkEnabledAfter )
-                {
-                Scribe.debug( Debug.CURSOR, "Cursor is moving. Calculated position does not match: " + calculatedCursorStart);
-                calculatedCursorStart = newSelStart;
-                initTextSession();
-                }
-            else
-                {
-                Scribe.debug( Debug.CURSOR, "Text processing is not yet finished. Calculated position does not match: " + calculatedCursorStart);
-                }
-            }
-
+        // Real cursor position always should be updated
         if ( newSelStart < newSelEnd )
             {
             realCursorStart = newSelStart;
@@ -336,22 +346,21 @@ public class SoftBoardProcessor implements
             realCursorEnd = newSelStart;
             }
 
-        // Text is NOT selected...
-        if ( newSelStart == newSelEnd )
-            {
-            Scribe.debug( Debug.CURSOR, "Real cursor position: " + newSelStart );
-            }
-
-        // Text is selected
-        else // newSelStart != newSelEnd
-            {
-            Scribe.debug( Debug.CURSOR, "Cursor position: Text is selected, cursor position is invalidated!");
-            calculatedCursorStart = newSelStart;
-            initTextSession();
-            }
-
         Scribe.debug(Debug.TEXT,
-                "Real Start: " + realCursorStart + " Real End: " + realCursorEnd );
+                "Real Start: " + realCursorStart +
+                " Real End: " + realCursorEnd +
+                " Calculated Start: " + calculatedCursorStart +
+                " Calculated End: " + calculatedCursorEnd );
+
+        // Calculated cursor positions should be checked only if checkEnabledAfter allows it
+        if ( System.nanoTime() > checkEnabledAfter )
+            {
+            compareRealAndCalculated();
+            }
+        else
+            {
+            Scribe.debug(Debug.CURSOR, "Real position changed, but no check is needed during text processing.");
+            }
         }
 
 
@@ -364,29 +373,12 @@ public class SoftBoardProcessor implements
         {
         Scribe.locus(Debug.CURSOR);
 
+        // Check will be disabled after the first text processing,
+        // and enabled after stroke-end
         checkEnabledAfter = ALWAYS;
-
-        if ( storeTextEnabled )
-            {
-            if (realCursorStart != calculatedCursorStart)
-                {
-                Scribe.debug(Debug.CURSOR, "LIGHT CHECK: Cursor positions doesn't match at the start of the bow!" +
-                        " Calculated: " + calculatedCursorStart +
-                        " Real: " + realCursorStart);
-
-                calculatedCursorStart = realCursorStart;
-                initTextSession();
-                }
-            else
-                {
-                Scribe.debug(Debug.CURSOR, "LIGHT CHECK: Cursor positions match. Position: " + realCursorStart);
-                }
-            }
-        else
-            {
-            Scribe.debug(Debug.CURSOR, "HEAVY CHECK: Cursor position check is not needed.");
-            }
+        compareRealAndCalculated();
         }
+
 
     public void checkAtStrokeEnd()
         {
@@ -398,6 +390,20 @@ public class SoftBoardProcessor implements
             Scribe.debug( Debug.CURSOR, "Check is enabled after: " + checkEnabledAfter );
             }
         }
+
+
+    /*****************************************
+     * LOW LEVEL TEXT PROCESSING
+     *****************************************/
+
+    /**
+     * TEXT MODIFICATION SHOULD SET:
+     * - undoString
+     * - calculatedCursorStart/End
+     * - checkEnabledAfter = NEVER
+     * - TextBefore/AfterCursor (storeTextEnabled is checked inside Text... classes)
+     */
+
 
     /**
      * Text (string) can be sent ONLY through this method
@@ -413,13 +419,11 @@ public class SoftBoardProcessor implements
 
         undoString = string;
         calculatedCursorStart += string.length();
+        calculatedCursorEnd = calculatedCursorStart;
         checkEnabledAfter = NEVER;
-        if ( storeTextEnabled )
-            {
-            Scribe.debug(Debug.TEXT, "LIGHT CHECK: Text before cursor is updated.");
-            textBeforeCursor.sendString(string);
-            textAfterCursor.invalidate();
-            }
+        textBeforeCursor.sendString(string);
+        textAfterCursor.invalidate();
+
         inputConnection.commitText(string, 1);
 
         // TIMING EVENT
@@ -446,12 +450,12 @@ public class SoftBoardProcessor implements
             {
             undoString = null;
             calculatedCursorStart -= length;
+            calculatedCursorEnd = calculatedCursorStart;
             checkEnabledAfter = NEVER;
-            if ( storeTextEnabled )
-                {
-                Scribe.debug(Debug.TEXT, "LIGHT CHECK: Text before cursor is updated (deleted).");
-                textBeforeCursor.sendDelete(length);
-                }
+            textBeforeCursor.sendDelete(length);
+            // ?? textAfterCursor.invalidate();
+            // ?? what if text is selected ??
+
             inputConnection.deleteSurroundingText(length, 0);
             }
 
@@ -467,17 +471,148 @@ public class SoftBoardProcessor implements
             {
             undoString = null;
             // calculatedCursorStart does not change
+            calculatedCursorEnd = calculatedCursorStart;
             checkEnabledAfter = NEVER;
-            if ( storeTextEnabled )
-                {
-                Scribe.debug(Debug.TEXT, "LIGHT CHECK: Text after cursor is updated (deleted).");
-                textAfterCursor.sendDelete(length);
-                }
+            // textBeforeCursor
+            textAfterCursor.sendDelete(length);
+
             inputConnection.deleteSurroundingText( 0, length );
             }
 
         Scribe.debug(Debug.CURSOR, "Deleted. Calculated cursor position: " + calculatedCursorStart);
         }
+
+
+    public boolean undoLastString()
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if ( ic != null && undoString != null )
+            {
+            if (!isStoreTextEnabled() && !textBeforeCursor.compare(undoString))
+                {
+                Scribe.debug(Debug.TEXT, "HEAVY CHECK: Text undo: string does NOT match!");
+                }
+            else
+                {
+                sendDeleteBeforeCursor(ic, undoString.length());
+                undoString = null;
+                return true;
+                }
+            }
+        return false;
+        }
+
+
+    public void jumpBegin( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
+            {
+            ic.setSelection(select ? realCursorEnd : 0, 0);
+            }
+        }
+
+
+    public void jumpEnd( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null && retrieveTextEnabled)
+            {
+            ic.beginBatchEdit();
+
+            CharSequence temp;
+            int position = realCursorEnd;
+
+            do
+                {
+                temp = ic.getTextAfterCursor(2048, 0);
+                position += temp.length();
+                ic.setSelection( select ? realCursorStart : position, position );
+                } while (temp.length() == 2048);
+
+            ic.endBatchEdit();
+            }
+
+        }
+
+
+    public void jumpLeft( boolean select ){}
+    public void jumpRight( boolean select ){}
+
+    public void jumpWordLeft( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            int offset = 0;
+            int c;
+
+            Scribe.error( "Real start: " + realCursorStart + " Real end: " + realCursorEnd );
+            getTextBeforeCursor().reset();
+            while ( isWhiteSpace( c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
+                {
+                offset++;
+                }
+
+            while ( !isWhiteSpace(c) && c != -1 )
+                {
+                offset++;
+                c = getTextBeforeCursor().read();
+                }
+
+            if ( select )
+                ic.setSelection( realCursorEnd, realCursorStart - offset );
+            else
+                ic.setSelection( realCursorStart - offset, realCursorStart - offset);
+
+            Scribe.error("New start: " + (realCursorStart - offset) + " New end: " + realCursorEnd);
+            }
+        }
+
+    public void jumpWordRight( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            int offset = 0;
+            int c;
+
+            Scribe.error( "Real start: " + realCursorStart + " Real end: " + realCursorEnd );
+            getTextAfterCursor().reset();
+            while ( isWhiteSpace( c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
+                {
+                offset++;
+                }
+
+            while ( !isWhiteSpace(c) && c != -1 )
+                {
+                offset++;
+                c = getTextAfterCursor().read();
+                }
+
+            if ( select )
+                ic.setSelection( realCursorStart, realCursorEnd + offset );
+            else
+                ic.setSelection( realCursorEnd + offset, realCursorEnd + offset);
+
+            Scribe.error("New start: " + realCursorStart + " New end: " + (realCursorEnd + offset));
+            }
+        }
+
+
+    public void jumpParagraphLeft( boolean select ){}
+    public void jumpParagraphRight( boolean select ){}
+
+
+    /*****************************************
+     * HIGHER LEVEL TEXT PROCESSING
+     *****************************************/
 
 
     private int sendDeleteSpacesBeforeCursor( InputConnection inputConnection )
@@ -505,38 +640,6 @@ public class SoftBoardProcessor implements
 
         Scribe.debug(Debug.SERVICE, "Spaces deleted after cursor: " + space);
         return space;
-        }
-
-
-    public boolean undoLastString()
-        {
-        Scribe.locus(Debug.SERVICE);
-
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if ( ic != null && undoString != null )
-            {
-            if ( storeTextEnabled )
-                {
-                sendDeleteBeforeCursor(ic, undoString.length());
-                undoString = null;
-                return true;
-                }
-            else
-                {
-                if (textBeforeCursor.compare(undoString))
-                    {
-                    Scribe.debug(Debug.TEXT, "HEAVY CHECK: Text undo: string matches!");
-                    sendDeleteBeforeCursor(ic, undoString.length());
-                    undoString = null;
-                    return true;
-                    }
-                else
-                    {
-                    Scribe.debug(Debug.TEXT, "HEAVY CHECK: Text undo: string does NOT match!");
-                    }
-                }
-            }
-        return false;
         }
 
 
@@ -603,10 +706,11 @@ public class SoftBoardProcessor implements
             }
         }
 
+
     @Override
     public boolean sendDefaultEditorAction(boolean fromEnterKey)
         {
-        return false;
+        return softBoardService.sendDefaultEditorAction( fromEnterKey );
         }
 
 
@@ -727,112 +831,6 @@ public class SoftBoardProcessor implements
                 }
             }
         }
-
-
-    public void jumpBegin( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
-            {
-            ic.setSelection(select ? realCursorEnd : 0, 0);
-            }
-        }
-
-
-    public void jumpEnd( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null && retrieveTextEnabled)
-            {
-            ic.beginBatchEdit();
-
-            CharSequence temp;
-            int position = realCursorEnd;
-
-            do
-                {
-                temp = ic.getTextAfterCursor(2048, 0);
-                position += temp.length();
-                ic.setSelection( select ? realCursorStart : position, position );
-                } while (temp.length() == 2048);
-
-            ic.endBatchEdit();
-            }
-
-        }
-
-
-    public void jumpLeft( boolean select ){}
-    public void jumpRight( boolean select ){}
-
-    public void jumpWordLeft( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null)
-            {
-            int offset = 0;
-            int c;
-
-            Scribe.error( "Real start: " + realCursorStart + " Real end: " + realCursorEnd );
-            getTextBeforeCursor().reset();
-            while ( isWhiteSpace( c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
-                {
-                offset++;
-                }
-
-            while ( !isWhiteSpace(c) && c != -1 )
-                {
-                offset++;
-                c = getTextBeforeCursor().read();
-                }
-
-            if ( select )
-                ic.setSelection( realCursorEnd, realCursorStart - offset );
-            else
-                ic.setSelection( realCursorStart - offset, realCursorStart - offset);
-
-            Scribe.error("New start: " + (realCursorStart - offset) + " New end: " + realCursorEnd);
-            }
-        }
-
-    public void jumpWordRight( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null)
-            {
-            int offset = 0;
-            int c;
-
-            Scribe.error( "Real start: " + realCursorStart + " Real end: " + realCursorEnd );
-            getTextAfterCursor().reset();
-            while ( isWhiteSpace( c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
-                {
-                offset++;
-                }
-
-            while ( !isWhiteSpace(c) && c != -1 )
-                {
-                offset++;
-                c = getTextAfterCursor().read();
-                }
-
-            if ( select )
-                ic.setSelection( realCursorStart, realCursorEnd + offset );
-            else
-                ic.setSelection( realCursorEnd + offset, realCursorEnd + offset);
-
-            Scribe.error("New start: " + realCursorStart + " New end: " + (realCursorEnd + offset));
-            }
-        }
-
-
-    public void jumpParagraphLeft( boolean select ){}
-    public void jumpParagraphRight( boolean select ){}
-
 
 
     /**

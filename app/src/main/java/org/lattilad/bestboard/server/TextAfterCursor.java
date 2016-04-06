@@ -45,12 +45,14 @@ public class TextAfterCursor
      */
     public void invalidate()
         {
-        text = "";
-        textStart = 0;
-        textReady = false;
-
+        if ( connection.isStoreTextEnabled() )
+            {
+            // stored text should be deleted
+            text = "";
+            textStart = 0;
+            textReady = false;
+            }
         textCounter = -1; // reset();
-
         Scribe.debug( Debug.TEXT, "TEXT: Stored text after cursor is invalidated!");
         }
 
@@ -84,17 +86,21 @@ public class TextAfterCursor
      * If there are no more characters available, -1 is returned.
      * synchronize() will not change the position,
      * but puffer could become empty.
+     *
+     * If store-text is enabled, then same as rewind: stored text will be read once more
+     * If store-text is disabled, then text will be invalidated, and re-read before the next read
      */
     public void reset()
         {
-        if ( connection.isStoreTextEnabled() )
+        // if text is not stored, then every read should re-read text from editor
+        if ( !connection.isStoreTextEnabled() )
             {
-            textCounter = -1;
+            // same as invalidate
+            text = "";
+            textStart = 0;
+            textReady = false;
             }
-        else
-            {
-            invalidate();
-            }
+        textCounter = -1;
         }
 
 
@@ -141,6 +147,8 @@ public class TextAfterCursor
      */
     public void sendDelete(int length)
         {
+        if ( !connection.isStoreTextEnabled() ) return;
+
         Scribe.debug( Debug.TEXT, "TEXT: Length to delete after cursor: " + length );
 
         textStart += length;
