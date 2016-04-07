@@ -56,6 +56,18 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_WORDRIGHT )
             return;
 
+        if ( functionCode == Commands.TOKEN_LEFT1ST )
+            return;
+
+        if ( functionCode == Commands.TOKEN_RIGHT1ST )
+            return;
+
+        if ( functionCode == Commands.TOKEN_LEFT2ND )
+            return;
+
+        if ( functionCode == Commands.TOKEN_RIGHT2ND )
+            return;
+
         // functionCode is not known
         throw new ExternalDataException();
         }
@@ -91,6 +103,18 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_WORDRIGHT )
             return "WR";
+
+        if ( functionCode == Commands.TOKEN_LEFT1ST )
+            return "L1st";
+
+        if ( functionCode == Commands.TOKEN_RIGHT1ST )
+            return "R1st";
+
+        if ( functionCode == Commands.TOKEN_LEFT2ND )
+            return "L2nd";
+
+        if ( functionCode == Commands.TOKEN_RIGHT2ND )
+            return "R2nd";
 
         // this cannot be reached
         return "";
@@ -156,6 +180,30 @@ public class PacketFunction extends Packet
         else if ( functionCode == Commands.TOKEN_WORDRIGHT )
             {
             softBoardData.softBoardListener.jumpWordRight(
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_LEFT1ST )
+            {
+            softBoardData.softBoardListener.jumpLeftStart(
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF );
+            }
+
+        else if ( functionCode == Commands.TOKEN_RIGHT1ST )
+            {
+            softBoardData.softBoardListener.jumpRightStart(
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_LEFT2ND )
+            {
+            softBoardData.softBoardListener.jumpLeftEnd(
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF );
+            }
+
+        else if ( functionCode == Commands.TOKEN_RIGHT2ND )
+            {
+            softBoardData.softBoardListener.jumpRightEnd(
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 

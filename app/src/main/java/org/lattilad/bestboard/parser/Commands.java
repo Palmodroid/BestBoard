@@ -153,6 +153,12 @@ public class Commands
     public static final long TOKEN_WORDLEFT = 0x2d2139ad572L;
     public static final long TOKEN_WORDRIGHT = 0x685cd5eb8a72L;
 
+    public static final long TOKEN_LEFT1ST = 0xcc72551ccL;
+    public static final long TOKEN_LEFT2ND = 0xcc725565cL;
+    public static final long TOKEN_RIGHT1ST = 0x25fcd21475cL;
+    public static final long TOKEN_RIGHT2ND = 0x25fcd214becL;
+
+
     public static final long TOKEN_SINGLE = 0x75d0cfbfL;
     public static final long TOKEN_REPEAT = 0x713dd0a6L;
     public static final long TOKEN_TWIN = 0x1817d9L;

@@ -76,6 +76,56 @@ public class SoftBoardProcessor implements
     /** Cursor position presented by the editor */
     private int realCursorEnd;
 
+    private class Enviroment
+        {
+        private TextBeforeCursor textBeforeCursor = new TextBeforeCursor( this );
+        private TextAfterCursor textAfterCursor = new TextAfterCursor( this );
+
+        int[] cursorPosition = new int[2];
+        int movingCursorPosition = -1;
+        int storedTextPosition = -1;
+        String undoString;
+
+        void checkPositions( int realPosition0, int realPosition1 )
+            {
+            }
+
+        void invalidate()
+            {
+            }
+
+        void sendString( String string )
+            {
+            // in selection -> only problem, when end is fixed
+            if ( storedTextPosition != cursorPosition[0] )
+                {
+                textBeforeCursor.invalidate();
+                storedTextPosition = cursorPosition[0];
+
+            undoString = string;
+            cursorPosition[0] += string.length();
+            cursorPosition[1] = cursorPosition[0];
+
+            textBeforeCursor.sendString(string);
+            textAfterCursor.invalidate();
+
+            checkEnabledAfter = NEVER;
+            }
+
+        void sendDelete( int direction, int length )
+            {
+            }
+
+        static final int MOVE_CURSOR = 0;
+        static final int MOVE_SELECTION_START = 1;
+        static final int MOVE_SELECTION_END =2;
+
+        void move( int marker, int direction, int length)
+            {
+            }
+
+        }
+
     /** Cursor position calculated by the softkeyboard */
     private int calculatedCursorStart = 0;
 
@@ -502,6 +552,95 @@ public class SoftBoardProcessor implements
                 }
             }
         return false;
+        }
+
+
+    public void jumpLeftStart( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if ( ic != null && calculatedCursorStart > 0 )
+            {
+            undoString = null;
+            calculatedCursorStart--;
+            if ( !select )
+                {
+                calculatedCursorEnd = calculatedCursorStart;
+                }
+            checkEnabledAfter = NEVER;
+            textBeforeCursor.invalidate();
+            textAfterCursor.invalidate();
+
+            ic.setSelection(calculatedCursorStart, calculatedCursorEnd);
+            }
+        }
+
+    public void jumpRightStart( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if ( ic != null )
+            {
+            undoString = null;
+            ic.setSelection(calculatedCursorStart, calculatedCursorStart);
+            textAfterCursor.invalidate();
+            if ( textAfterCursor.read() != -1 )
+                calculatedCursorStart++;
+            if ( !select )
+                {
+                calculatedCursorEnd = calculatedCursorStart;
+                }
+            checkEnabledAfter = NEVER;
+            textBeforeCursor.invalidate();
+            textAfterCursor.invalidate();
+
+            ic.setSelection(calculatedCursorStart, calculatedCursorEnd);
+            }
+        }
+
+    public void jumpLeftEnd( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if ( ic != null && calculatedCursorStart > 0 )
+            {
+            undoString = null;
+            calculatedCursorEnd--;
+            if ( !select )
+                {
+                calculatedCursorStart = calculatedCursorEnd;
+                }
+            checkEnabledAfter = NEVER;
+            textBeforeCursor.invalidate();
+            textAfterCursor.invalidate();
+
+            ic.setSelection( calculatedCursorStart, calculatedCursorEnd );
+            }
+
+        }
+
+    public void jumpRightEnd( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if ( ic != null )
+            {
+            undoString = null;
+            calculatedCursorEnd++;
+            if ( !select )
+                {
+                calculatedCursorStart = calculatedCursorEnd;
+                }
+            checkEnabledAfter = NEVER;
+            textBeforeCursor.invalidate();
+            textAfterCursor.invalidate();
+
+            ic.setSelection(calculatedCursorStart, calculatedCursorEnd);
+            }
         }
 
 
