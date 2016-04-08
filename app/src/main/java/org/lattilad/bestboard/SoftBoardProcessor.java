@@ -78,8 +78,84 @@ public class SoftBoardProcessor implements
 
     private class Enviroment
         {
-        private TextBeforeCursor textBeforeCursor = new TextBeforeCursor( this );
-        private TextAfterCursor textAfterCursor = new TextAfterCursor( this );
+
+        /**
+         * Két "kurzor" van (ami három lehetőséget vehet fel:
+         * - NINCS kijelölés (cursor) - ilyenkor a két kurzor pozíciója egybe esik
+         * - VAN kijelölés (selection) - a két kurzor pozíciója elkülönül:
+         * - SELECTION_START - a kisebbik pozíción álló kurzor mozog (a másik fix),
+         * - SELECTION_END - a magasabbik pozíción álló kurzor mozog (a kisebb fix)
+         */
+
+        static final int MOVE_CURSOR = 1;
+        static final int MOVE_SELECTION_START = 2;
+        static final int MOVE_SELECTION_END =2;
+
+        /**
+         * Az éppen mozgó kurzor a három lehetőség közül (CURSOR/SELECTIOM_START/SELECTION_END).
+         * Fontos tudni, hogy a szöveget utoljára erre a kurzorra tároltuk el.
+         * Ezt megváltoztatni csak a changeCursor() metódussal szabad.
+         */
+        int cursor = MOVE_CURSOR;
+
+        /**
+         * A továbbiakban a kiválasztott kurzor körüli szöveg tárolódik,
+         * és a kiolvasáshoz be is állítja a pozíciót (kijelölés nélkül) a kurzorra.
+         * Ha befejeztük a pozíciók módosítását, akkor be kell állítani a kijelölést annak megfelelően.
+         */
+        void changeCursor( InputConnection ic, int cursor )
+            {
+            // CURSOR és SELECTION_START egy pozícióra esik.
+            // A különbség, hogy CURSOR esetén a végpozíció is itt van, míg SELECTION_START-nál nem
+            if ( cursor == MOVE_CURSOR )
+                {
+                if ( this.cursor == MOVE_SELECTION_END )
+                    {
+                    textBeforeCursor.invalidate();
+                    textAfterCursor.invalidate();
+                    }
+                else
+                    {
+                    textBeforeCursor.reset();
+                    textAfterCursor.reset();
+                    }
+                if ( ic != null )   ic.setSelection( calculatedCursorStart, calculatedCursorStart );
+                this.cursor = MOVE_CURSOR;
+                }
+
+            else if ( cursor == MOVE_SELECTION_START )
+                {
+                if ( this.cursor == MOVE_SELECTION_END )
+                    {
+                    textBeforeCursor.invalidate();
+                    textAfterCursor.invalidate();
+                    }
+                else
+                    {
+                    textBeforeCursor.reset();
+                    textAfterCursor.reset();
+                    }
+                if ( ic != null )   ic.setSelection( calculatedCursorStart, calculatedCursorStart );
+                this.cursor = MOVE_SELECTION_START;
+                }
+            else if ( cursor == MOVE_SELECTION_END )
+                {
+                if ( this.cursor != MOVE_SELECTION_END )
+                    {
+                    textBeforeCursor.invalidate();
+                    textAfterCursor.invalidate();
+                    }
+                else
+                    {
+                    textBeforeCursor.reset();
+                    textAfterCursor.reset();
+                    }
+                if ( ic != null )   ic.setSelection( calculatedCursorEnd, calculatedCursorEnd );
+                this.cursor = MOVE_SELECTION_END;
+                }
+            }
+
+
 
         int[] cursorPosition = new int[2];
         int movingCursorPosition = -1;
@@ -115,10 +191,6 @@ public class SoftBoardProcessor implements
         void sendDelete( int direction, int length )
             {
             }
-
-        static final int MOVE_CURSOR = 0;
-        static final int MOVE_SELECTION_START = 1;
-        static final int MOVE_SELECTION_END =2;
 
         void move( int marker, int direction, int length)
             {
