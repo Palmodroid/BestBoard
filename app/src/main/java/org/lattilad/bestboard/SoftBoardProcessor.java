@@ -89,7 +89,7 @@ public class SoftBoardProcessor implements
 
         static final int MOVE_CURSOR = 1;
         static final int MOVE_SELECTION_START = 2;
-        static final int MOVE_SELECTION_END =2;
+        static final int MOVE_SELECTION_END = 3;
 
         /**
          * Az éppen mozgó kurzor a három lehetőség közül (CURSOR/SELECTIOM_START/SELECTION_END).
@@ -102,6 +102,8 @@ public class SoftBoardProcessor implements
          * A továbbiakban a kiválasztott kurzor körüli szöveg tárolódik,
          * és a kiolvasáshoz be is állítja a pozíciót (kijelölés nélkül) a kurzorra.
          * Ha befejeztük a pozíciók módosítását, akkor be kell állítani a kijelölést annak megfelelően.
+         *
+         * Az a baj, hogy csak a kurzorpozíció mellől tudunk szöveget beolvasni.
          */
         void changeCursor( InputConnection ic, int cursor )
             {
@@ -138,6 +140,7 @@ public class SoftBoardProcessor implements
                 if ( ic != null )   ic.setSelection( calculatedCursorStart, calculatedCursorStart );
                 this.cursor = MOVE_SELECTION_START;
                 }
+
             else if ( cursor == MOVE_SELECTION_END )
                 {
                 if ( this.cursor != MOVE_SELECTION_END )
