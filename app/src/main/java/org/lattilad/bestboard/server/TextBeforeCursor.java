@@ -1,5 +1,7 @@
 package org.lattilad.bestboard.server;
 
+import android.view.inputmethod.InputConnection;
+
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 
@@ -32,6 +34,8 @@ public class TextBeforeCursor
 
     /** Connection to synchronize text directly from editor */
     private Connection connection;
+
+    private InputConnection inputConnection = null;
 
 
     /** ArrayList stores parts of the text before the cursor */
@@ -148,7 +152,7 @@ public class TextBeforeCursor
         {
         text.clear();
 
-        CharSequence temp = connection.getTextBeforeCursor( LENGTH_LIMIT );
+        CharSequence temp = connection.getTextBeforeCursor( inputConnection, LENGTH_LIMIT );
         if ( temp == null )
             {
             textLength = 0;
@@ -164,12 +168,18 @@ public class TextBeforeCursor
         }
 
 
+    public void reset()
+        {
+        reset( null );
+        }
+
     /**
      * If store-text is enabled, then same as rewind: stored text will be read once more
      * If store-text is disabled, then text will be invalidated, and re-read before the next read
      */
-    public void reset()
+    public void reset( InputConnection ic )
         {
+        inputConnection = ic;
         // if text is not stored, then every read should re-read text from editor
         if ( !connection.isStoreTextEnabled() )
             {
@@ -262,9 +272,9 @@ public class TextBeforeCursor
      * @param string to compare
      * @return true, if stored string ends with string
      */
-    public boolean compare( String string )
+    public boolean compare( InputConnection ic, String string )
         {
-        reset();
+        reset( ic );
 
         int n = string.length();
 

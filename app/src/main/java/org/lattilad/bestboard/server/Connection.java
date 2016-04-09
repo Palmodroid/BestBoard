@@ -1,6 +1,8 @@
 package org.lattilad.bestboard.server;
 
 
+import android.view.inputmethod.InputConnection;
+
 /**
  * Connection synchronizes text with stored text.
  * Normally these methods need an InputConnection to load text.
@@ -8,7 +10,7 @@ package org.lattilad.bestboard.server;
 public interface Connection
     {
     // CharSequence getSelectedText();
-    CharSequence getTextAfterCursor(int n);
-    CharSequence getTextBeforeCursor(int n);
+    CharSequence getTextAfterCursor( InputConnection ic, int n);
+    CharSequence getTextBeforeCursor( InputConnection ic, int n);
     boolean isStoreTextEnabled();
     }

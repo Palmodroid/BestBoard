@@ -2,6 +2,7 @@ package org.lattilad.bestboard.buttons;
 
 import android.content.Intent;
 
+import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.prefs.PrefsActivity;
 import org.lattilad.bestboard.SoftBoardData;
@@ -43,7 +44,7 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_SETTINGS )
             return;
-
+/*
         if ( functionCode == Commands.TOKEN_BEGIN )
             return;
 
@@ -55,7 +56,7 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_WORDRIGHT )
             return;
-
+*/
         if ( functionCode == Commands.TOKEN_LEFT1ST )
             return;
 
@@ -91,7 +92,7 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_SETTINGS )
             return "SET";
-
+/*
         if ( functionCode == Commands.TOKEN_BEGIN )
             return "BEGIN";
 
@@ -103,7 +104,7 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_WORDRIGHT )
             return "WR";
-
+*/
         if ( functionCode == Commands.TOKEN_LEFT1ST )
             return "L1st";
 
@@ -158,7 +159,7 @@ public class PacketFunction extends Packet
 
             softBoardData.softBoardListener.getApplicationContext().startActivity( intent );
             }
-
+/*
         else if ( functionCode == Commands.TOKEN_BEGIN )
             {
             softBoardData.softBoardListener.jumpBegin(
@@ -182,28 +183,32 @@ public class PacketFunction extends Packet
             softBoardData.softBoardListener.jumpWordRight(
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
-
+*/
         else if ( functionCode == Commands.TOKEN_LEFT1ST )
             {
-            softBoardData.softBoardListener.jumpLeftStart(
-                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF );
+            softBoardData.softBoardListener.jumpLeft(
+                    SoftBoardProcessor.SELECTION_START,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_RIGHT1ST )
             {
-            softBoardData.softBoardListener.jumpRightStart(
+            softBoardData.softBoardListener.jumpRight(
+                    SoftBoardProcessor.SELECTION_START,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_LEFT2ND )
             {
-            softBoardData.softBoardListener.jumpLeftEnd(
-                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF );
+            softBoardData.softBoardListener.jumpLeft(
+                    SoftBoardProcessor.SELECTION_END,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_RIGHT2ND )
             {
-            softBoardData.softBoardListener.jumpRightEnd(
+            softBoardData.softBoardListener.jumpRight(
+                    SoftBoardProcessor.SELECTION_END,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
