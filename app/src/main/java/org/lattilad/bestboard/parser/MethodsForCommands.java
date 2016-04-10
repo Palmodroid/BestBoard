@@ -1472,7 +1472,7 @@ public class MethodsForCommands
             empty = true;
             counter ++;
 
-            mod = new ModifyText( softBoardData.softBoardListener, ignorespace );
+            mod = new ModifyText( softBoardData, ignorespace );
 
             for ( List<Object> roll : tempRolls )
                 {
@@ -1491,7 +1491,7 @@ public class MethodsForCommands
             empty = true;
             counter++;
 
-            mod = new ModifyChar( softBoardData.softBoardListener, ignorespace );
+            mod = new ModifyChar( softBoardData, ignorespace );
 
             // PARAMETER_STRING_LIST gives only non-null String items
             for ( Object roll : rolls )

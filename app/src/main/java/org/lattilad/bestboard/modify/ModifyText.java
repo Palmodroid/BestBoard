@@ -1,7 +1,7 @@
 package org.lattilad.bestboard.modify;
 
 
-import org.lattilad.bestboard.SoftBoardListener;
+import org.lattilad.bestboard.SoftBoardData;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,12 +28,12 @@ public class ModifyText extends Modify
 
     /**
      * Constructor gets the communication channel with Service and StoredText, as SoftBoardListener
-     * @param softBoardListener listener to communicate with the service
+     * @param softBoardData contains listener to communicate with the service
      * @param ignoreSpace spaces are ignored between the text and the cursor
      */
-    public ModifyText( SoftBoardListener softBoardListener, boolean ignoreSpace )
+    public ModifyText( SoftBoardData softBoardData, boolean ignoreSpace )
         {
-        super( softBoardListener, ignoreSpace);
+        super( softBoardData, ignoreSpace);
         }
 
 
@@ -74,7 +74,7 @@ public class ModifyText extends Modify
     private boolean comparePreText( String string )
         {
         // preTextReader should start at the cursor
-        softBoardListener.getTextBeforeCursor().rewind();
+        softBoardData.softBoardListener.getTextBeforeCursor().rewind();
 
         // String should start at the end
         // String cannot be null and cannot be shorter than 1
@@ -85,7 +85,7 @@ public class ModifyText extends Modify
             {
             counter--;
 
-            if ( string.charAt( counter ) != softBoardListener.getTextBeforeCursor().read() )
+            if ( string.charAt( counter ) != softBoardData.softBoardListener.getTextBeforeCursor().read() )
                 return false;
             }
 
@@ -104,7 +104,7 @@ public class ModifyText extends Modify
      */
     public void change( )
         {
-        softBoardListener.getTextBeforeCursor().reset();
+        softBoardData.softBoardListener.getTextBeforeCursor().reset();
 
         int rollCounter = this.rollCounter;
             do	{
@@ -122,7 +122,7 @@ public class ModifyText extends Modify
                         this.rollCounter = rollCounter;
                         this.stringCounter = stringCounter;
 
-                        softBoardListener.changeStringBeforeCursor(inspected.length(), rolls.get(rollCounter).get(stringCounter));
+                        softBoardData.softBoardListener.changeStringBeforeCursor(inspected.length(), rolls.get(rollCounter).get(stringCounter));
 
                         return;
                         }
@@ -152,7 +152,7 @@ public class ModifyText extends Modify
      */
     public void changeBack( )
         {
-        softBoardListener.getTextBeforeCursor().reset();
+        softBoardData.softBoardListener.getTextBeforeCursor().reset();
 
         int rollCounter = this.rollCounter;
         do	{
@@ -171,7 +171,7 @@ public class ModifyText extends Modify
                     this.rollCounter = rollCounter;
                     this.stringCounter = stringCounter;
 
-                    softBoardListener.changeStringBeforeCursor( inspected.length(),
+                    softBoardData.softBoardListener.changeStringBeforeCursor( inspected.length(),
                             rolls.get( rollCounter ).get( stringCounter ) );
 
                     return;

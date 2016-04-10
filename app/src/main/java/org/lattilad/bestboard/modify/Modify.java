@@ -1,6 +1,6 @@
 package org.lattilad.bestboard.modify;
 
-import org.lattilad.bestboard.SoftBoardListener;
+import org.lattilad.bestboard.SoftBoardData;
 
 public abstract class Modify
     {
@@ -10,18 +10,18 @@ public abstract class Modify
     protected boolean ignoreSpace;
 
     /**
-     * SoftBoardListener is needed to communicate with Service's StoredText class.
+     * SoftBoardData.SoftBoardListener is needed to communicate with Service's StoredText class.
      */
-    protected SoftBoardListener softBoardListener;
+    protected SoftBoardData softBoardData;
 
     /**
      * Constructor gets the communication channel with Service and StoredText, as SoftBoardListener
-     * @param softBoardListener listener to communicate with the service
+     * @param softBoardData contains listener to communicate with the service
      * @param ignoreSpace spaces are ignored between the text and the cursor
      */
-    protected Modify( SoftBoardListener softBoardListener, boolean ignoreSpace )
+    protected Modify( SoftBoardData softBoardData, boolean ignoreSpace )
         {
-        this.softBoardListener = softBoardListener;
+        this.softBoardData = softBoardData;
         this.ignoreSpace = ignoreSpace;
         }
 
@@ -35,7 +35,7 @@ public abstract class Modify
 
         if ( ignoreSpace )
             {
-            spaces = softBoardListener.deleteSpacesBeforeCursor();
+            spaces = softBoardData.softBoardListener.deleteSpacesBeforeCursor();
             }
 
         if ( reverse )
@@ -46,7 +46,7 @@ public abstract class Modify
         if ( spaces >0 )
             {
             // http://stackoverflow.com/a/2807731
-            softBoardListener.sendString(new String(new char[spaces]).replace('\0', ' '), 0 );
+            softBoardData.softBoardListener.sendString(new String(new char[spaces]).replace('\0', ' '), 0 );
             }
         }
 
