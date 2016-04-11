@@ -47,16 +47,12 @@ public interface SoftBoardListener
 
 //    void jumpBegin( boolean select );
 //    void jumpEnd( boolean select );
-//    void jumpLeftStart( boolean select );
-//    void jumpRightStart( boolean select );
-//    void jumpLeftEnd( boolean select );
-//    void jumpRightEnd( boolean select );
 
     void jumpLeft( int cursor, boolean select );
     void jumpRight( int cursor, boolean select );
+    void jumpWordLeft( int cursor, boolean select );
+    void jumpWordRight( int cursor, boolean select );
 
-//    void jumpWordLeft( boolean select );
-//    void jumpWordRight( boolean select );
 //    void jumpParagraphLeft( boolean select );
 //    void jumpParagraphRight( boolean select );
 

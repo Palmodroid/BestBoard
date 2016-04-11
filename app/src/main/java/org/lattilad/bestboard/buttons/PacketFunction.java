@@ -50,13 +50,32 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_END )
             return;
+*/
 
         if ( functionCode == Commands.TOKEN_WORDLEFT )
             return;
 
         if ( functionCode == Commands.TOKEN_WORDRIGHT )
             return;
-*/
+
+        if ( functionCode == Commands.TOKEN_WORDLEFT1ST )
+            return;
+
+        if ( functionCode == Commands.TOKEN_WORDRIGHT1ST )
+            return;
+
+        if ( functionCode == Commands.TOKEN_WORDLEFT2ND )
+            return;
+
+        if ( functionCode == Commands.TOKEN_WORDRIGHT2ND )
+            return;
+
+        if ( functionCode == Commands.TOKEN_LEFT )
+            return;
+
+        if ( functionCode == Commands.TOKEN_RIGHT )
+            return;
+
         if ( functionCode == Commands.TOKEN_LEFT1ST )
             return;
 
@@ -98,13 +117,32 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_END )
             return "END";
+*/
 
         if ( functionCode == Commands.TOKEN_WORDLEFT )
             return "WL";
 
         if ( functionCode == Commands.TOKEN_WORDRIGHT )
             return "WR";
-*/
+
+        if ( functionCode == Commands.TOKEN_WORDLEFT1ST )
+            return "WL1";
+
+        if ( functionCode == Commands.TOKEN_WORDRIGHT1ST )
+            return "WR1";
+
+        if ( functionCode == Commands.TOKEN_WORDLEFT2ND )
+            return "WL2";
+
+        if ( functionCode == Commands.TOKEN_WORDRIGHT2ND )
+            return "WR2";
+
+        if ( functionCode == Commands.TOKEN_LEFT )
+            return "L";
+
+        if ( functionCode == Commands.TOKEN_RIGHT )
+            return "R";
+
         if ( functionCode == Commands.TOKEN_LEFT1ST )
             return "L1st";
 
@@ -184,6 +222,20 @@ public class PacketFunction extends Packet
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 */
+        else if ( functionCode == Commands.TOKEN_LEFT )
+            {
+            softBoardData.softBoardListener.jumpLeft(
+                    SoftBoardProcessor.SELECTION_LAST,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_RIGHT )
+            {
+            softBoardData.softBoardListener.jumpRight(
+                    SoftBoardProcessor.SELECTION_LAST,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
         else if ( functionCode == Commands.TOKEN_LEFT1ST )
             {
             softBoardData.softBoardListener.jumpLeft(
@@ -208,6 +260,48 @@ public class PacketFunction extends Packet
         else if ( functionCode == Commands.TOKEN_RIGHT2ND )
             {
             softBoardData.softBoardListener.jumpRight(
+                    SoftBoardProcessor.SELECTION_END,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_WORDLEFT )
+            {
+            softBoardData.softBoardListener.jumpWordLeft(
+                    SoftBoardProcessor.SELECTION_LAST,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_WORDRIGHT )
+            {
+            softBoardData.softBoardListener.jumpWordRight(
+                    SoftBoardProcessor.SELECTION_LAST,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_WORDLEFT1ST )
+            {
+            softBoardData.softBoardListener.jumpWordLeft(
+                    SoftBoardProcessor.SELECTION_START,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_WORDRIGHT1ST )
+            {
+            softBoardData.softBoardListener.jumpWordRight(
+                    SoftBoardProcessor.SELECTION_START,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_WORDLEFT2ND )
+            {
+            softBoardData.softBoardListener.jumpWordLeft(
+                    SoftBoardProcessor.SELECTION_END,
+                    softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
+            }
+
+        else if ( functionCode == Commands.TOKEN_WORDRIGHT2ND )
+            {
+            softBoardData.softBoardListener.jumpWordRight(
                     SoftBoardProcessor.SELECTION_END,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }

@@ -97,7 +97,7 @@ public class SoftBoardProcessor implements
     /**
      * Az éppen mozgó kurzor a három lehetőség közül (CURSOR/SELECTIOM_START/SELECTION_END).
      * Fontos tudni, hogy a szöveget utoljára erre a kurzorra tároltuk el.
-     * Ezt megváltoztatni csak a changeCursor() metódussal szabad.
+     * Ezt megváltoztatni csak a selectCursor() metódussal szabad.
      */
     private int cursorLastMoved = SELECTION_START;
 
@@ -261,8 +261,8 @@ public class SoftBoardProcessor implements
                                   int newSelStart, int newSelEnd,
                                   int candidatesStart, int candidatesEnd)
         {
-        Scribe.locus( Debug.CURSOR );
-        Scribe.error("!!!!!!!!!!!!!!!!");
+        Scribe.locus(Debug.CURSOR);
+
         // Real cursor position always should be updated
         realCursor[0] = newSelStart;
         realCursor[1] = newSelEnd;
@@ -280,7 +280,7 @@ public class SoftBoardProcessor implements
             }
         else
             {
-            Scribe.debug(Debug.CURSOR, "Real position changed, but no check is needed during text processing.");
+            Scribe.debug(Debug.CURSOR, "Real position changed during forbidden time-frame.");
             }
         }
 
@@ -296,11 +296,8 @@ public class SoftBoardProcessor implements
 
         // Check will be disabled after the first text processing,
         // and enabled after stroke-end
-        // if ( System.nanoTime() > checkEnabledAfter ) // ????????????????
-            {
-            checkEnabledAfter = ALWAYS;
-            checkCalculatedToReal();
-            }
+        checkEnabledAfter = ALWAYS;
+        checkCalculatedToReal();
         }
 
 
@@ -316,28 +313,29 @@ public class SoftBoardProcessor implements
         }
 
 
-    private void changeCalculatedPositions( int calculated1, int calculated2 )
+    private int modifyCalculatedCursor(int calculatedBoth )
         {
-        if ( calculated1 < calculated2 )
+        return modifyCalculatedCursor( calculatedBoth, calculatedBoth);
+        }
+
+    /** returns overlapped length, if cursors overlap */
+    private int modifyCalculatedCursor(int calculated0, int calculated1)
+        {
+        checkEnabledAfter = NEVER;
+        realCursor[0] = -1;
+        if ( calculated0 <= calculated1 )
             {
-            calculatedCursor[0] = calculated1;
-            calculatedCursor[1] = calculated2;
+            calculatedCursor[0] = calculated0;
+            calculatedCursor[1] = calculated1;
+            return 0;
             }
         else
             {
-            calculatedCursor[0] = calculated2;
-            calculatedCursor[1] = calculated1;
+            calculatedCursor[0] = calculated1;
+            calculatedCursor[1] = calculated0;
+            return calculated0 - calculated1;
             }
-        checkEnabledAfter = NEVER;
-        realCursor[0] = -1;
         }
-
-
-    /*****************************************
-     * LOW LEVEL TEXT PROCESSING
-     * Itt minden metódusnak szüksége van az InputConnection-re, ÉS
-     * Minden méret char-ban van megadva (és nem code-point-ban)
-     *****************************************/
 
 
     /**
@@ -348,7 +346,7 @@ public class SoftBoardProcessor implements
      * Az a baj, hogy csak a kurzorpozíció mellől tudunk szöveget beolvasni.
      * ERRE AKKOR VAN SZÜKSÉG, HA MI MAGUNK AKARJUK A KURZORT VÁLTOZTATNI
      */
-    private void changeCursor( InputConnection ic, int cursorToMove )
+    private void selectCursor(InputConnection ic, int cursorToMove)
         {
         Scribe.locus(Debug.CURSOR);
 
@@ -365,7 +363,7 @@ public class SoftBoardProcessor implements
             }
         else
             {
-            Scribe.debug(Debug.CURSOR, "Controlled cursor remained: " + cursorLastMoved );
+            Scribe.debug(Debug.CURSOR, "Controlled cursor remained: " + cursorLastMoved);
             }
 
         Scribe.debug(Debug.CURSOR, "Position set to: " + calculatedCursor[cursorToMove] );
@@ -376,17 +374,6 @@ public class SoftBoardProcessor implements
         textAfterCursor.reset();
         }
 
-    private void correctCalculatedPositions()
-        {
-        if ( calculatedCursor[0] > calculatedCursor[1] )
-            {
-            int tmp = calculatedCursor[0];
-            calculatedCursor[0] = calculatedCursor[1];
-            calculatedCursor[1] = tmp;
-            cursorLastMoved++; cursorLastMoved %= 2;
-            }
-        }
-
     /**
      * Javítja a cursor pozíciókat, ha külső változtatás történt.
      * ERRE AKKOR VAN SZÜKSÉG, HA A KÜLSŐ VÁLTOZÁSOK OKOZTÁK A MÓDOSÍTÁST
@@ -394,11 +381,12 @@ public class SoftBoardProcessor implements
     private void checkCalculatedToReal( )
         {
         Scribe.locus(Debug.CURSOR);
-if ( realCursor[0] == -1 )
-    {
-    Scribe.error(Debug.CURSOR, " Real position is already consumed! ");
-    return;
-    }
+
+        if ( realCursor[0] == -1 )
+            {
+            Scribe.error(Debug.CURSOR, " Real position is already consumed! ");
+            return;
+            }
 
         if ( realCursor[0] > realCursor[1] )
             {
@@ -406,7 +394,15 @@ if ( realCursor[0] == -1 )
             realCursor[0] = realCursor[1];
             realCursor[1] = tmp;
             }
-        correctCalculatedPositions();
+
+        // This part is not necessary, as modifyCalculatedCursor does not allow it
+        /* if ( calculatedCursor[0] > calculatedCursor[1] )
+            {
+            int tmp = calculatedCursor[0];
+            calculatedCursor[0] = calculatedCursor[1];
+            calculatedCursor[1] = tmp;
+            cursorLastMoved++; cursorLastMoved %= 2;
+            } */
 
         Scribe.debug(Debug.CURSOR, " Real position: " + realCursor[0] + "-" + realCursor[1] +
                 " Calculated position: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
@@ -423,20 +419,28 @@ if ( realCursor[0] == -1 )
             }
         else
             {
-            Scribe.debug(Debug.CURSOR, "Calculated positions are correct." );
+            Scribe.debug(Debug.CURSOR, "Calculated positions are correct.");
             }
 
         realCursor[0] = -1;
         }
 
+
+    /*****************************************
+     * LOW LEVEL TEXT PROCESSING
+     * Itt minden metódusnak szüksége van az InputConnection-re, ÉS
+     * Minden méret char-ban van megadva (és nem code-point-ban)
+     *****************************************/
+
+
     private void sendString( InputConnection ic, String string )
         {
         Scribe.locus(Debug.TEXT);
 
-        changeCursor(ic, SELECTION_START);
+        selectCursor(ic, SELECTION_START);
 
         undoString = string;
-        changeCalculatedPositions(calculatedCursor[0] + string.length(), calculatedCursor[0] + string.length());
+        modifyCalculatedCursor(calculatedCursor[0] + string.length());
         textBeforeCursor.sendString(string);
         textAfterCursor.invalidate();
         ic.commitText(string, 1);
@@ -470,10 +474,10 @@ if ( realCursor[0] == -1 )
         // kijelölésnél mindenképpen a kijelölést törli először
         if ( isSelected() )
             {
-            changeCursor(ic, SELECTION_START);
+            selectCursor(ic, SELECTION_START);
             // no undoString in selection
             // no change in calculatedCursor[0]
-            changeCalculatedPositions(calculatedCursor[0], calculatedCursor[0]);
+            modifyCalculatedCursor(calculatedCursor[0]);
             // no change in textBeforeCursor
             textAfterCursor.invalidate();
             ic.commitText("", 1);
@@ -485,7 +489,7 @@ if ( realCursor[0] == -1 )
             undoString = null;
             if ( length < 0 )
                 {
-                changeCalculatedPositions( calculatedCursor[0] + length, calculatedCursor[0] + length);
+                modifyCalculatedCursor(calculatedCursor[0] + length);
                 textBeforeCursor.sendDelete( -length);
                 // ?? textAfterCursor.invalidate();
                 ic.deleteSurroundingText( -length, 0);
@@ -493,7 +497,7 @@ if ( realCursor[0] == -1 )
             else // AFTER
                 {
                 // calculatedCursorStart does not change
-                changeCalculatedPositions( calculatedCursor[0], calculatedCursor[0]);
+                modifyCalculatedCursor(calculatedCursor[0]);
                 // textBeforeCursor
                 textAfterCursor.sendDelete(length);
                 ic.deleteSurroundingText( 0, length );
@@ -513,20 +517,21 @@ if ( realCursor[0] == -1 )
 
         undoString = null;
 
+        int otherMarker = (marker + 1) & 1;
         if ( isSelected() && !select )
             {
             if ( length < 0 )
                 {
-                changeCursor( ic, SELECTION_START );
-                changeCalculatedPositions( calculatedCursor[0], calculatedCursor[0]);
+                selectCursor(ic, SELECTION_START);
+                modifyCalculatedCursor(calculatedCursor[0]);
                 // textBeforeCursor no change;
                 textAfterCursor.invalidate();
                 Scribe.debug(Debug.CURSOR, "Cursor was moved to the beginning of the selection.");
                 }
             else
                 {
-                changeCursor( ic, SELECTION_END );
-                changeCalculatedPositions( calculatedCursor[1], calculatedCursor[1]);
+                selectCursor(ic, SELECTION_END);
+                modifyCalculatedCursor(calculatedCursor[1]);
                 textBeforeCursor.invalidate();
                 // textAfterCursor no change;
                 Scribe.debug(Debug.CURSOR, "Cursor was moved to the end of the selection.");
@@ -535,30 +540,44 @@ if ( realCursor[0] == -1 )
         else
             {
             Scribe.debug(Debug.CURSOR, "Cursor [" + marker + "] is: " + calculatedCursor[marker]);
-            int otherMarker = (marker + 1) & 1;
+            Scribe.debug(Debug.CURSOR, "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+            Scribe.error(Debug.CURSOR, "Length to move: " + length);
+            selectCursor(ic, marker);
+            int overlap = 0;
 
-            changeCursor(ic, marker);
+            if (!select)
+                {
+                modifyCalculatedCursor(calculatedCursor[marker] + length);
+                }
+            else
+                {
+                if ( marker == SELECTION_START )
+                    overlap = modifyCalculatedCursor(calculatedCursor[marker] + length, calculatedCursor[otherMarker]);
+                else
+                    overlap = modifyCalculatedCursor(calculatedCursor[otherMarker], calculatedCursor[marker] + length);
+
+                if ( overlap > 0 )
+                    modifyCalculatedCursor(calculatedCursor[marker]); // marker and otherMarker are switched!
+                }
+
+            Scribe.error(Debug.CURSOR, "Overlap: " + overlap);
+            Scribe.debug(Debug.CURSOR, "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+
             if (length < 0)
                 {
-                textBeforeCursor.sendDelete(-length);
+                textBeforeCursor.sendDelete( - length - overlap );
                 textAfterCursor.invalidate();
                 }
             else
                 {
                 textBeforeCursor.invalidate();
-                textAfterCursor.sendDelete(length);
+                textAfterCursor.sendDelete( length - overlap );
                 }
 
-            if (!select)
-                {
-                changeCalculatedPositions( calculatedCursor[marker] + length, calculatedCursor[marker] + length);
-                }
-            else
-                {
-                changeCalculatedPositions(calculatedCursor[marker] + length, calculatedCursor[otherMarker]);
-                }
             }
 
+        // some editors accept change only as second parameter. Why??
+        // ic.setSelection(calculatedCursor[otherMarker], calculatedCursor[marker]);
         ic.setSelection(calculatedCursor[0], calculatedCursor[1]);
 
         Scribe.debug(Debug.CURSOR, "Cursor [" + marker + "] was moved. Length: " + length + " chars. Selection: " + select);
@@ -633,11 +652,16 @@ if ( realCursor[0] == -1 )
             {
             if ( cursor == SELECTION_LAST )
                 {
-                cursor = cursorLastMoved;
+                if ( !select )
+                    cursor = SELECTION_START;
+                else if ( isSelected() ) // && select
+                    cursor = cursorLastMoved;
+                else // text is NOT selected BUT select
+                    cursor = SELECTION_START;
                 }
 
             ic.beginBatchEdit();
-            changeCursor( ic, cursor );
+            selectCursor(ic, cursor);
 
             int data = textBeforeCursor.read();
             int l = -1;
@@ -670,11 +694,16 @@ if ( realCursor[0] == -1 )
             {
             if ( cursor == SELECTION_LAST )
                 {
-                cursor = cursorLastMoved;
+                if ( !select )
+                    cursor = SELECTION_START;
+                else if ( isSelected() ) // && select
+                    cursor = cursorLastMoved;
+                else // text is NOT selected BUT select
+                    cursor = SELECTION_END;
                 }
 
             ic.beginBatchEdit();
-            changeCursor( ic, cursor );
+            selectCursor(ic, cursor);
 
             int data = textAfterCursor.read();
             int l = 1;
@@ -697,6 +726,89 @@ if ( realCursor[0] == -1 )
             ic.endBatchEdit();
             }
         }
+
+    public void jumpWordLeft( int cursor, boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            if ( cursor == SELECTION_LAST )
+                {
+                if ( !select )
+                    cursor = SELECTION_START;
+                else if ( isSelected() ) // && select
+                    cursor = cursorLastMoved;
+                else // text is NOT selected BUT select
+                    cursor = SELECTION_START;
+                }
+
+            ic.beginBatchEdit();
+            selectCursor(ic, cursor);
+
+            Scribe.debug( "Cursor: " + cursor );
+            Scribe.debug( "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+            Scribe.debug( "Stored text before cursor: " + textBeforeCursor.toString() );
+
+            int offset = 0;
+            int c;
+
+            while ( isWhiteSpace( c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
+                {
+                offset--;
+                }
+
+            while ( !isWhiteSpace(c) && c != -1 )
+                {
+                offset--;
+                c = getTextBeforeCursor().read();
+                }
+
+            Scribe.debug( "Offset: " + offset );
+
+            moveRelative( ic, cursor, offset, select );
+            ic.endBatchEdit();
+            }
+        }
+
+    public void jumpWordRight( int cursor, boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            if ( cursor == SELECTION_LAST )
+                {
+                if ( !select )
+                    cursor = SELECTION_START;
+                else if ( isSelected() ) // && select
+                    cursor = cursorLastMoved;
+                else // text is NOT selected BUT select
+                    cursor = SELECTION_END;
+                }
+
+            ic.beginBatchEdit();
+            selectCursor(ic, cursor);
+
+            int offset = 0;
+            int c;
+
+            while ( isWhiteSpace( c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
+                {
+                offset++;
+                }
+
+            while ( !isWhiteSpace(c) && c != -1 )
+                {
+                offset++;
+                c = getTextAfterCursor().read();
+                }
+
+            moveRelative( ic, cursor, offset, select );
+            ic.endBatchEdit();
+            }
+        }
+
 
 /*
     public void jumpRightStart( boolean select )
@@ -805,68 +917,6 @@ if ( realCursor[0] == -1 )
     public void jumpLeft( boolean select ){}
     public void jumpRight( boolean select ){}
 
-    public void jumpWordLeft( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null)
-            {
-            int offset = 0;
-            int c;
-
-            Scribe.error( "Real start: " + realCursorStart + " Real end: " + realCursorEnd );
-            getTextBeforeCursor().reset();
-            while ( isWhiteSpace( c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
-                {
-                offset++;
-                }
-
-            while ( !isWhiteSpace(c) && c != -1 )
-                {
-                offset++;
-                c = getTextBeforeCursor().read();
-                }
-
-            if ( select )
-                ic.setSelection( realCursorEnd, realCursorStart - offset );
-            else
-                ic.setSelection( realCursorStart - offset, realCursorStart - offset);
-
-            Scribe.error("New start: " + (realCursorStart - offset) + " New end: " + realCursorEnd);
-            }
-        }
-
-    public void jumpWordRight( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null)
-            {
-            int offset = 0;
-            int c;
-
-            Scribe.error( "Real start: " + realCursorStart + " Real end: " + realCursorEnd );
-            getTextAfterCursor().reset();
-            while ( isWhiteSpace( c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
-                {
-                offset++;
-                }
-
-            while ( !isWhiteSpace(c) && c != -1 )
-                {
-                offset++;
-                c = getTextAfterCursor().read();
-                }
-
-            if ( select )
-                ic.setSelection( realCursorStart, realCursorEnd + offset );
-            else
-                ic.setSelection( realCursorEnd + offset, realCursorEnd + offset);
-
-            Scribe.error("New start: " + realCursorStart + " New end: " + (realCursorEnd + offset));
-            }
-        }
-
 
     public void jumpParagraphLeft( boolean select ){}
     public void jumpParagraphRight( boolean select ){}
@@ -876,7 +926,7 @@ if ( realCursor[0] == -1 )
         {
         int space;
 
-        changeCursor(inputConnection, SELECTION_START);
+        selectCursor(inputConnection, SELECTION_START);
         for ( space = 0; textBeforeCursor.read() == ' '; space++ ) ;
 
         sendDelete(inputConnection, -space);
@@ -890,7 +940,7 @@ if ( realCursor[0] == -1 )
         {
         int space;
 
-        changeCursor( inputConnection, SELECTION_START);
+        selectCursor(inputConnection, SELECTION_START);
         for ( space = 0; textAfterCursor.read() == ' '; space++) ;
 
         sendDelete(inputConnection, space);
@@ -1017,7 +1067,7 @@ if ( realCursor[0] == -1 )
             // text is not selected
             else
                 {
-                changeCursor(ic, SELECTION_START);
+                selectCursor(ic, SELECTION_START);
 
                 int data = textBeforeCursor.read();
                 int l = 1;
@@ -1067,7 +1117,7 @@ if ( realCursor[0] == -1 )
             // text is not selected
             else
                 {
-                changeCursor(ic, SELECTION_START);
+                selectCursor(ic, SELECTION_START);
                 int data = textAfterCursor.read();
                 int l = 1;
 
