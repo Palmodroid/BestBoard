@@ -45,16 +45,15 @@ public interface SoftBoardListener
 
     boolean sendDefaultEditorAction(boolean fromEnterKey);
 
-//    void jumpBegin( boolean select );
-//    void jumpEnd( boolean select );
+    void jumpBegin( boolean select );
+    void jumpEnd( boolean select );
 
     void jumpLeft( int cursor, boolean select );
     void jumpRight( int cursor, boolean select );
     void jumpWordLeft( int cursor, boolean select );
     void jumpWordRight( int cursor, boolean select );
-
-//    void jumpParagraphLeft( boolean select );
-//    void jumpParagraphRight( boolean select );
+    void jumpParagraphLeft( int cursor, boolean select );
+    void jumpParagraphRight( int cursor, boolean select );
 
     void startSoftBoardParser();
     }

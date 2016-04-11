@@ -585,6 +585,40 @@ public class SoftBoardProcessor implements
         }
 
 
+    private void moveAbsolute(InputConnection ic, int marker, int position, boolean select)
+        {
+        Scribe.locus(Debug.CURSOR);
+
+        if ( position == calculatedCursor[marker] )   return;
+
+        undoString = null;
+
+        Scribe.debug(Debug.CURSOR, "Cursor [" + marker + "] is: " + calculatedCursor[marker]);
+        Scribe.debug(Debug.CURSOR, "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+        Scribe.error(Debug.CURSOR, "New position: " + position);
+
+        selectCursor(ic, marker);
+        if (!select)
+            {
+            modifyCalculatedCursor( position );
+            }
+        else
+            {
+            int otherMarker = (marker + 1) & 1;
+            modifyCalculatedCursor(position, calculatedCursor[otherMarker]);
+            }
+
+        Scribe.debug(Debug.CURSOR, "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+
+        textBeforeCursor.invalidate();
+        textAfterCursor.invalidate();
+
+        // some editors accept change only as second parameter. Why??
+        // ic.setSelection(calculatedCursor[otherMarker], calculatedCursor[marker]);
+        ic.setSelection(calculatedCursor[0], calculatedCursor[1]);
+        }
+
+
     /*****************************************
      * CONNECTION TO SERVICE
      *****************************************/
@@ -641,6 +675,44 @@ public class SoftBoardProcessor implements
     /*****************************************
      * HIGHER LEVEL TEXT PROCESSING
      *****************************************/
+
+
+    // Only SELECTION_START
+    public void jumpBegin( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
+            {
+            ic.beginBatchEdit();
+            moveAbsolute(ic, SELECTION_START, 0, select);
+            ic.endBatchEdit();
+            }
+        }
+
+    // Only SELECTION_END
+    public void jumpEnd( boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null && retrieveTextEnabled)
+            {
+            ic.beginBatchEdit();
+            CharSequence temp;
+            int position = calculatedCursor[1];
+            // ic.setSelection( position, position ); not needed, selection is ready
+            do
+                {
+                temp = ic.getTextAfterCursor(2048, 0);
+                position += temp.length();
+                ic.setSelection( position, position );
+                } while (temp.length() == 2048);
+            // original positions should be reset
+            ic.setSelection( calculatedCursor[0], calculatedCursor[1] );
+            moveAbsolute(ic, SELECTION_END, position, select);
+            ic.endBatchEdit();
+            }
+        }
 
 
     public void jumpLeft( int cursor, boolean select )
@@ -810,117 +882,89 @@ public class SoftBoardProcessor implements
         }
 
 
-/*
-    public void jumpRightStart( boolean select )
+    public void jumpParagraphLeft( int cursor, boolean select )
         {
         Scribe.locus(Debug.SERVICE);
-
         InputConnection ic = softBoardService.getCurrentInputConnection();
-        if ( ic != null )
+        if (ic != null)
             {
-            undoString = null;
-            ic.setSelection(calculatedCursorStart, calculatedCursorStart);
-            textAfterCursor.invalidate();
-            if ( textAfterCursor.read() != -1 )
-                calculatedCursorStart++;
-            if ( !select )
+            if ( cursor == SELECTION_LAST )
                 {
-                calculatedCursorEnd = calculatedCursorStart;
+                if ( !select )
+                    cursor = SELECTION_START;
+                else if ( isSelected() ) // && select
+                    cursor = cursorLastMoved;
+                else // text is NOT selected BUT select
+                    cursor = SELECTION_START;
                 }
-            checkEnabledAfter = NEVER;
-            textBeforeCursor.invalidate();
-            textAfterCursor.invalidate();
 
-            ic.setSelection(calculatedCursorStart, calculatedCursorEnd);
-            }
-        }
-
-    public void jumpLeftEnd( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if ( ic != null && calculatedCursorStart > 0 )
-            {
-            undoString = null;
-            calculatedCursorEnd--;
-            if ( !select )
-                {
-                calculatedCursorStart = calculatedCursorEnd;
-                }
-            checkEnabledAfter = NEVER;
-            textBeforeCursor.invalidate();
-            textAfterCursor.invalidate();
-
-            ic.setSelection( calculatedCursorStart, calculatedCursorEnd );
-            }
-
-        }
-
-    public void jumpRightEnd( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if ( ic != null )
-            {
-            undoString = null;
-            calculatedCursorEnd++;
-            if ( !select )
-                {
-                calculatedCursorStart = calculatedCursorEnd;
-                }
-            checkEnabledAfter = NEVER;
-            textBeforeCursor.invalidate();
-            textAfterCursor.invalidate();
-
-            ic.setSelection(calculatedCursorStart, calculatedCursorEnd);
-            }
-        }
-
-
-    public void jumpBegin( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
-            {
-            ic.setSelection(select ? realCursorEnd : 0, 0);
-            }
-        }
-
-
-    public void jumpEnd( boolean select )
-        {
-        Scribe.locus(Debug.SERVICE);
-        InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null && retrieveTextEnabled)
-            {
             ic.beginBatchEdit();
+            selectCursor(ic, cursor);
 
-            CharSequence temp;
-            int position = realCursorEnd;
+            Scribe.debug( "Cursor: " + cursor );
+            Scribe.debug( "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+            Scribe.debug( "Stored text before cursor: " + textBeforeCursor.toString() );
 
-            do
+            int offset = 0;
+            int c;
+
+            while ( isWhiteSpace( c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
                 {
-                temp = ic.getTextAfterCursor(2048, 0);
-                position += temp.length();
-                ic.setSelection( select ? realCursorStart : position, position );
-                } while (temp.length() == 2048);
+                offset--;
+                }
 
+            while ( c != '\n' && c != -1 )
+                {
+                offset--;
+                c = getTextBeforeCursor().read();
+                }
+
+            Scribe.debug( "Offset: " + offset );
+
+            moveRelative( ic, cursor, offset, select );
             ic.endBatchEdit();
             }
-
         }
 
 
-    public void jumpLeft( boolean select ){}
-    public void jumpRight( boolean select ){}
+    public void jumpParagraphRight( int cursor, boolean select )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            if ( cursor == SELECTION_LAST )
+                {
+                if ( !select )
+                    cursor = SELECTION_START;
+                else if ( isSelected() ) // && select
+                    cursor = cursorLastMoved;
+                else // text is NOT selected BUT select
+                    cursor = SELECTION_END;
+                }
 
+            ic.beginBatchEdit();
+            selectCursor(ic, cursor);
 
-    public void jumpParagraphLeft( boolean select ){}
-    public void jumpParagraphRight( boolean select ){}
-*/
+            int offset = 0;
+            int c;
+
+            while ( isWhiteSpace( c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
+                {
+                offset++;
+                }
+
+            while ( c!='\n' && c != -1 )
+                {
+                offset++;
+                c = getTextAfterCursor().read();
+                }
+
+            moveRelative( ic, cursor, offset, select );
+            ic.endBatchEdit();
+            }
+        }
+
 
     private int sendDeleteSpacesBeforeCursor( InputConnection inputConnection )
         {
