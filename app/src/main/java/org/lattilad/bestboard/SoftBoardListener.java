@@ -45,6 +45,9 @@ public interface SoftBoardListener
 
     boolean sendDefaultEditorAction(boolean fromEnterKey);
 
+    void toggleCursor();
+    void selectAll();
+
     void jumpBegin( boolean select );
     void jumpEnd( boolean select );
 

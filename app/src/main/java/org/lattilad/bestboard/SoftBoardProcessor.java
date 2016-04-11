@@ -677,6 +677,48 @@ public class SoftBoardProcessor implements
      *****************************************/
 
 
+    public void toggleCursor()
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if ( ic != null )
+            {
+            selectCursor( ic, (cursorLastMoved + 1) & 1 );
+            }
+        }
+
+
+    private int findLastPosition( InputConnection ic )
+        {
+        CharSequence temp;
+        int position = calculatedCursor[1];
+        // ic.setSelection( position, position ); not needed, selection is ready
+        do
+            {
+            temp = ic.getTextAfterCursor(2048, 0);
+            position += temp.length();
+            ic.setSelection( position, position );
+            } while (temp.length() == 2048);
+        // original positions should be reset
+        ic.setSelection( calculatedCursor[0], calculatedCursor[1] );
+        return position;
+        }
+
+
+    public void selectAll()
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
+            {
+            ic.beginBatchEdit();
+            moveAbsolute(ic, SELECTION_END, findLastPosition(ic), false);
+            moveAbsolute(ic, SELECTION_START, 0, true);
+            ic.endBatchEdit();
+            }
+        }
+
+
     // Only SELECTION_START
     public void jumpBegin( boolean select )
         {
@@ -690,6 +732,7 @@ public class SoftBoardProcessor implements
             }
         }
 
+
     // Only SELECTION_END
     public void jumpEnd( boolean select )
         {
@@ -698,18 +741,7 @@ public class SoftBoardProcessor implements
         if (ic != null && retrieveTextEnabled)
             {
             ic.beginBatchEdit();
-            CharSequence temp;
-            int position = calculatedCursor[1];
-            // ic.setSelection( position, position ); not needed, selection is ready
-            do
-                {
-                temp = ic.getTextAfterCursor(2048, 0);
-                position += temp.length();
-                ic.setSelection( position, position );
-                } while (temp.length() == 2048);
-            // original positions should be reset
-            ic.setSelection( calculatedCursor[0], calculatedCursor[1] );
-            moveAbsolute(ic, SELECTION_END, position, select);
+            moveAbsolute(ic, SELECTION_END, findLastPosition(ic), select);
             ic.endBatchEdit();
             }
         }

@@ -148,7 +148,9 @@ public class Commands
     public static final long TOKEN_BACKSPACE = 0x240879d29871L;
     public static final long TOKEN_DRAFT = 0x189da4dL;
     public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
+    public static final long TOKEN_TOGGLECURSOR = 0x493c3837822dda87L;
 
+    public static final long TOKEN_SELECTALL = 0x5ab4faaa9d61L;
     public static final long TOKEN_BEGIN = 0x146bcb1L;
     public static final long TOKEN_END = 0x14e3dL;
     public static final long TOKEN_LEFT = 0x118846L;

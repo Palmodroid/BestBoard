@@ -45,6 +45,12 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_SETTINGS )
             return;
 
+        if ( functionCode == Commands.TOKEN_TOGGLECURSOR )
+            return;
+
+        if ( functionCode == Commands.TOKEN_SELECTALL )
+            return;
+
         if ( functionCode == Commands.TOKEN_BEGIN )
             return;
 
@@ -128,6 +134,12 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_SETTINGS )
             return "SET";
+
+        if ( functionCode == Commands.TOKEN_TOGGLECURSOR )
+            return "CURS";
+
+        if ( functionCode == Commands.TOKEN_SELECTALL )
+            return "ALL";
 
         if ( functionCode == Commands.TOKEN_BEGIN )
             return "BEGIN";
@@ -230,6 +242,16 @@ public class PacketFunction extends Packet
             //intent.addFlags( Intent.FLAG_FROM_BACKGROUND );
 
             softBoardData.softBoardListener.getApplicationContext().startActivity(intent);
+            }
+
+        if ( functionCode == Commands.TOKEN_TOGGLECURSOR )
+            {
+            softBoardData.softBoardListener.toggleCursor();
+            }
+
+        if ( functionCode == Commands.TOKEN_SELECTALL )
+            {
+            softBoardData.softBoardListener.selectAll();
             }
 
         else if ( functionCode == Commands.TOKEN_BEGIN )
