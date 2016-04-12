@@ -256,139 +256,139 @@ public class PacketFunction extends Packet
 
         else if ( functionCode == Commands.TOKEN_BEGIN )
             {
-            softBoardData.softBoardListener.jumpBegin(
+            softBoardData.softBoardListener.jumpTop(
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_END )
             {
-            softBoardData.softBoardListener.jumpEnd(
+            softBoardData.softBoardListener.jumpBottom(
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_LEFT )
             {
             softBoardData.softBoardListener.jumpLeft(
-                    SoftBoardProcessor.SELECTION_LAST,
+                    SoftBoardProcessor.CURSOR_LAST,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_RIGHT )
             {
             softBoardData.softBoardListener.jumpRight(
-                    SoftBoardProcessor.SELECTION_LAST,
+                    SoftBoardProcessor.CURSOR_LAST,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_LEFT1ST )
             {
             softBoardData.softBoardListener.jumpLeft(
-                    SoftBoardProcessor.SELECTION_START,
+                    SoftBoardProcessor.CURSOR_BEGIN,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_RIGHT1ST )
             {
             softBoardData.softBoardListener.jumpRight(
-                    SoftBoardProcessor.SELECTION_START,
+                    SoftBoardProcessor.CURSOR_BEGIN,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_LEFT2ND )
             {
             softBoardData.softBoardListener.jumpLeft(
-                    SoftBoardProcessor.SELECTION_END,
+                    SoftBoardProcessor.CURSOR_END,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_RIGHT2ND )
             {
             softBoardData.softBoardListener.jumpRight(
-                    SoftBoardProcessor.SELECTION_END,
+                    SoftBoardProcessor.CURSOR_END,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_WORDLEFT )
             {
             softBoardData.softBoardListener.jumpWordLeft(
-                    SoftBoardProcessor.SELECTION_LAST,
+                    SoftBoardProcessor.CURSOR_LAST,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_WORDRIGHT )
             {
             softBoardData.softBoardListener.jumpWordRight(
-                    SoftBoardProcessor.SELECTION_LAST,
+                    SoftBoardProcessor.CURSOR_LAST,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_WORDLEFT1ST )
             {
             softBoardData.softBoardListener.jumpWordLeft(
-                    SoftBoardProcessor.SELECTION_START,
+                    SoftBoardProcessor.CURSOR_BEGIN,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_WORDRIGHT1ST )
             {
             softBoardData.softBoardListener.jumpWordRight(
-                    SoftBoardProcessor.SELECTION_START,
+                    SoftBoardProcessor.CURSOR_BEGIN,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_WORDLEFT2ND )
             {
             softBoardData.softBoardListener.jumpWordLeft(
-                    SoftBoardProcessor.SELECTION_END,
+                    SoftBoardProcessor.CURSOR_END,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_WORDRIGHT2ND )
             {
             softBoardData.softBoardListener.jumpWordRight(
-                    SoftBoardProcessor.SELECTION_END,
+                    SoftBoardProcessor.CURSOR_END,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_PARALEFT )
             {
-            softBoardData.softBoardListener.jumpParagraphLeft(
-                    SoftBoardProcessor.SELECTION_LAST,
+            softBoardData.softBoardListener.jumpParaLeft(
+                    SoftBoardProcessor.CURSOR_LAST,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_PARARIGHT )
             {
-            softBoardData.softBoardListener.jumpParagraphRight(
-                    SoftBoardProcessor.SELECTION_LAST,
+            softBoardData.softBoardListener.jumpParaRight(
+                    SoftBoardProcessor.CURSOR_LAST,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_PARALEFT1ST )
             {
-            softBoardData.softBoardListener.jumpParagraphLeft(
-                    SoftBoardProcessor.SELECTION_START,
+            softBoardData.softBoardListener.jumpParaLeft(
+                    SoftBoardProcessor.CURSOR_BEGIN,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_PARARIGHT1ST )
             {
-            softBoardData.softBoardListener.jumpParagraphRight(
-                    SoftBoardProcessor.SELECTION_START,
+            softBoardData.softBoardListener.jumpParaRight(
+                    SoftBoardProcessor.CURSOR_BEGIN,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_PARALEFT2ND )
             {
-            softBoardData.softBoardListener.jumpParagraphLeft(
-                    SoftBoardProcessor.SELECTION_END,
+            softBoardData.softBoardListener.jumpParaLeft(
+                    SoftBoardProcessor.CURSOR_END,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 
         else if ( functionCode == Commands.TOKEN_PARARIGHT2ND )
             {
-            softBoardData.softBoardListener.jumpParagraphRight(
-                    SoftBoardProcessor.SELECTION_END,
+            softBoardData.softBoardListener.jumpParaRight(
+                    SoftBoardProcessor.CURSOR_END,
                     softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() != MetaState.META_OFF);
             }
 

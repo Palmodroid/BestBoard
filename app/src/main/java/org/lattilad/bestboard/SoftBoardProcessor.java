@@ -53,7 +53,7 @@ public class SoftBoardProcessor implements
     /**
      * TRUE: getText... methods can take text from editor
      * FALSE: getText... methods are disabled - no communication is enabled
-     * (jumpEnd uses the same method, so it is disabled, too)
+     * (jumpBottom uses the same method, so it is disabled, too)
      */
     private boolean retrieveTextEnabled = true;
 
@@ -74,13 +74,13 @@ public class SoftBoardProcessor implements
      * Két "kurzor" van:
      * - NINCS kijelölés (cursor) - ilyenkor a két kurzor pozíciója egybe esik
      * - VAN kijelölés (selection) - a két kurzor pozíciója elkülönül:
-     * - SELECTION_START - a kisebbik pozíción álló kurzor mozog (a másik fix),
-     * - SELECTION_END - a magasabbik pozíción álló kurzor mozog (a kisebb fix)
+     * - CURSOR_BEGIN - a kisebbik pozíción álló kurzor mozog (a másik fix),
+     * - CURSOR_END - a magasabbik pozíción álló kurzor mozog (a kisebb fix)
      */
 
-    public static final int SELECTION_START = 0;
-    public static final int SELECTION_END = 1;
-    public static final int SELECTION_LAST = -1;
+    public static final int CURSOR_BEGIN = 0;
+    public static final int CURSOR_END = 1;
+    public static final int CURSOR_LAST = -1;
 
     /** a ket kurzorpozicio kivulrol - onUpdateSelection() */
     private int[] realCursor = { 0, 0 };
@@ -95,11 +95,11 @@ public class SoftBoardProcessor implements
          }
 
     /**
-     * Az éppen mozgó kurzor a három lehetőség közül (CURSOR/SELECTIOM_START/SELECTION_END).
+     * Az éppen mozgó kurzor a három lehetőség közül (CURSOR/SELECTIOM_START/CURSOR_END).
      * Fontos tudni, hogy a szöveget utoljára erre a kurzorra tároltuk el.
      * Ezt megváltoztatni csak a selectCursor() metódussal szabad.
      */
-    private int cursorLastMoved = SELECTION_START;
+    private int cursorLastMoved = CURSOR_BEGIN;
 
     private static final long NEVER = Long.MAX_VALUE;
     private static final long ALWAYS = 0L;
@@ -437,7 +437,7 @@ public class SoftBoardProcessor implements
         {
         Scribe.locus(Debug.TEXT);
 
-        selectCursor(ic, SELECTION_START);
+        selectCursor(ic, CURSOR_BEGIN);
 
         undoString = string;
         modifyCalculatedCursor(calculatedCursor[0] + string.length());
@@ -474,7 +474,7 @@ public class SoftBoardProcessor implements
         // kijelölésnél mindenképpen a kijelölést törli először
         if ( isSelected() )
             {
-            selectCursor(ic, SELECTION_START);
+            selectCursor(ic, CURSOR_BEGIN);
             // no undoString in selection
             // no change in calculatedCursor[0]
             modifyCalculatedCursor(calculatedCursor[0]);
@@ -507,57 +507,66 @@ public class SoftBoardProcessor implements
         }
 
     /*
-     * MARKER: SELECTION_START/SELECTION_END
+     * MARKER: CURSOR_BEGIN/CURSOR_END
      */
-    private void moveRelative(InputConnection ic, int marker, int length, boolean select)
+    private void moveRelative(InputConnection ic, int cursor, int length, boolean select)
         {
         Scribe.locus(Debug.CURSOR);
 
-        if (length == 0 )   return;
-
         undoString = null;
-
-        int otherMarker = (marker + 1) & 1;
+        int otherCursor = (cursor + 1) & 1;
         if ( isSelected() && !select )
+            // If length is 0, then it should be at the end
+            // There is a selection in the other direction, so that way it cannot be 0
             {
             if ( length < 0 )
                 {
-                selectCursor(ic, SELECTION_START);
+                selectCursor(ic, CURSOR_BEGIN);
                 modifyCalculatedCursor(calculatedCursor[0]);
                 // textBeforeCursor no change;
                 textAfterCursor.invalidate();
                 Scribe.debug(Debug.CURSOR, "Cursor was moved to the beginning of the selection.");
                 }
-            else
+            else if ( length > 0 )
                 {
-                selectCursor(ic, SELECTION_END);
+                selectCursor(ic, CURSOR_END);
                 modifyCalculatedCursor(calculatedCursor[1]);
                 textBeforeCursor.invalidate();
                 // textAfterCursor no change;
                 Scribe.debug(Debug.CURSOR, "Cursor was moved to the end of the selection.");
                 }
+            else // length == 0
+                {
+                selectCursor(ic, cursor);
+                modifyCalculatedCursor(calculatedCursor[cursor]);
+                textBeforeCursor.invalidate(); // The remaining stored text should be empty
+                textAfterCursor.invalidate();  // The other one should be invalidated
+                Scribe.debug(Debug.CURSOR, "Cursor was moved to the beginning/end of the selection.");
+                }
             }
         else
             {
-            Scribe.debug(Debug.CURSOR, "Cursor [" + marker + "] is: " + calculatedCursor[marker]);
+            if (length == 0 )   return;
+
+            Scribe.debug(Debug.CURSOR, "Cursor [" + cursor + "] is: " + calculatedCursor[cursor]);
             Scribe.debug(Debug.CURSOR, "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
             Scribe.error(Debug.CURSOR, "Length to move: " + length);
-            selectCursor(ic, marker);
+            selectCursor(ic, cursor);
             int overlap = 0;
 
             if (!select)
                 {
-                modifyCalculatedCursor(calculatedCursor[marker] + length);
+                modifyCalculatedCursor(calculatedCursor[cursor] + length);
                 }
             else
                 {
-                if ( marker == SELECTION_START )
-                    overlap = modifyCalculatedCursor(calculatedCursor[marker] + length, calculatedCursor[otherMarker]);
+                if ( cursor == CURSOR_BEGIN)
+                    overlap = modifyCalculatedCursor(calculatedCursor[cursor] + length, calculatedCursor[otherCursor]);
                 else
-                    overlap = modifyCalculatedCursor(calculatedCursor[otherMarker], calculatedCursor[marker] + length);
+                    overlap = modifyCalculatedCursor(calculatedCursor[otherCursor], calculatedCursor[cursor] + length);
 
                 if ( overlap > 0 )
-                    modifyCalculatedCursor(calculatedCursor[marker]); // marker and otherMarker are switched!
+                    modifyCalculatedCursor(calculatedCursor[cursor]); // cursor and otherCursor are switched!
                 }
 
             Scribe.error(Debug.CURSOR, "Overlap: " + overlap);
@@ -577,35 +586,35 @@ public class SoftBoardProcessor implements
             }
 
         // some editors accept change only as second parameter. Why??
-        // ic.setSelection(calculatedCursor[otherMarker], calculatedCursor[marker]);
-        ic.setSelection(calculatedCursor[0], calculatedCursor[1]);
+        ic.setSelection(calculatedCursor[otherCursor], calculatedCursor[cursor]);
+        // ic.setSelection(calculatedCursor[0], calculatedCursor[1]);
 
-        Scribe.debug(Debug.CURSOR, "Cursor [" + marker + "] was moved. Length: " + length + " chars. Selection: " + select);
+        Scribe.debug(Debug.CURSOR, "Cursor [" + cursor + "] was moved. Length: " + length + " chars. Selection: " + select);
         Scribe.debug(Debug.CURSOR, "Cursor positions: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
         }
 
 
-    private void moveAbsolute(InputConnection ic, int marker, int position, boolean select)
+    private void moveAbsolute(InputConnection ic, int cursor, int position, boolean select)
         {
         Scribe.locus(Debug.CURSOR);
 
-        if ( position == calculatedCursor[marker] )   return;
+        if ( position == calculatedCursor[cursor] )   return;
 
         undoString = null;
 
-        Scribe.debug(Debug.CURSOR, "Cursor [" + marker + "] is: " + calculatedCursor[marker]);
+        Scribe.debug(Debug.CURSOR, "Cursor [" + cursor + "] is: " + calculatedCursor[cursor]);
         Scribe.debug(Debug.CURSOR, "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
         Scribe.error(Debug.CURSOR, "New position: " + position);
 
-        selectCursor(ic, marker);
+        int otherCursor = (cursor + 1) & 1;
+        selectCursor(ic, cursor);
         if (!select)
             {
             modifyCalculatedCursor( position );
             }
         else
             {
-            int otherMarker = (marker + 1) & 1;
-            modifyCalculatedCursor(position, calculatedCursor[otherMarker]);
+            modifyCalculatedCursor(position, calculatedCursor[otherCursor]);
             }
 
         Scribe.debug(Debug.CURSOR, "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
@@ -614,8 +623,8 @@ public class SoftBoardProcessor implements
         textAfterCursor.invalidate();
 
         // some editors accept change only as second parameter. Why??
-        // ic.setSelection(calculatedCursor[otherMarker], calculatedCursor[marker]);
-        ic.setSelection(calculatedCursor[0], calculatedCursor[1]);
+        ic.setSelection(calculatedCursor[otherCursor], calculatedCursor[cursor]);
+        // ic.setSelection(calculatedCursor[0], calculatedCursor[1]);
         }
 
 
@@ -709,39 +718,39 @@ public class SoftBoardProcessor implements
         {
         Scribe.locus(Debug.SERVICE);
         InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
+        if (ic != null && retrieveTextEnabled) // because of consistency with jumpBottom
             {
             ic.beginBatchEdit();
-            moveAbsolute(ic, SELECTION_END, findLastPosition(ic), false);
-            moveAbsolute(ic, SELECTION_START, 0, true);
+            moveAbsolute(ic, CURSOR_END, findLastPosition(ic), false);
+            moveAbsolute(ic, CURSOR_BEGIN, 0, true);
             ic.endBatchEdit();
             }
         }
 
 
-    // Only SELECTION_START
-    public void jumpBegin( boolean select )
+    // Only CURSOR_BEGIN
+    public void jumpTop(boolean select)
         {
         Scribe.locus(Debug.SERVICE);
         InputConnection ic = softBoardService.getCurrentInputConnection();
-        if (ic != null && retrieveTextEnabled) // because of consistency with jumpEnd
+        if (ic != null && retrieveTextEnabled) // because of consistency with jumpBottom
             {
             ic.beginBatchEdit();
-            moveAbsolute(ic, SELECTION_START, 0, select);
+            moveAbsolute(ic, CURSOR_BEGIN, 0, select);
             ic.endBatchEdit();
             }
         }
 
 
-    // Only SELECTION_END
-    public void jumpEnd( boolean select )
+    // Only CURSOR_END
+    public void jumpBottom(boolean select)
         {
         Scribe.locus(Debug.SERVICE);
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if (ic != null && retrieveTextEnabled)
             {
             ic.beginBatchEdit();
-            moveAbsolute(ic, SELECTION_END, findLastPosition(ic), select);
+            moveAbsolute(ic, CURSOR_END, findLastPosition(ic), select);
             ic.endBatchEdit();
             }
         }
@@ -754,14 +763,14 @@ public class SoftBoardProcessor implements
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if ( ic != null )
             {
-            if ( cursor == SELECTION_LAST )
+            if ( cursor == CURSOR_LAST)
                 {
                 if ( !select )
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 else if ( isSelected() ) // && select
                     cursor = cursorLastMoved;
                 else // text is NOT selected BUT select
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 }
 
             ic.beginBatchEdit();
@@ -796,14 +805,14 @@ public class SoftBoardProcessor implements
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if ( ic != null )
             {
-            if ( cursor == SELECTION_LAST )
+            if ( cursor == CURSOR_LAST)
                 {
                 if ( !select )
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 else if ( isSelected() ) // && select
                     cursor = cursorLastMoved;
                 else // text is NOT selected BUT select
-                    cursor = SELECTION_END;
+                    cursor = CURSOR_END;
                 }
 
             ic.beginBatchEdit();
@@ -837,14 +846,14 @@ public class SoftBoardProcessor implements
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if (ic != null)
             {
-            if ( cursor == SELECTION_LAST )
+            if ( cursor == CURSOR_LAST)
                 {
                 if ( !select )
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 else if ( isSelected() ) // && select
                     cursor = cursorLastMoved;
                 else // text is NOT selected BUT select
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 }
 
             ic.beginBatchEdit();
@@ -881,14 +890,14 @@ public class SoftBoardProcessor implements
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if (ic != null)
             {
-            if ( cursor == SELECTION_LAST )
+            if ( cursor == CURSOR_LAST)
                 {
                 if ( !select )
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 else if ( isSelected() ) // && select
                     cursor = cursorLastMoved;
                 else // text is NOT selected BUT select
-                    cursor = SELECTION_END;
+                    cursor = CURSOR_END;
                 }
 
             ic.beginBatchEdit();
@@ -914,20 +923,20 @@ public class SoftBoardProcessor implements
         }
 
 
-    public void jumpParagraphLeft( int cursor, boolean select )
+    public void jumpParaLeft(int cursor, boolean select)
         {
         Scribe.locus(Debug.SERVICE);
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if (ic != null)
             {
-            if ( cursor == SELECTION_LAST )
+            if ( cursor == CURSOR_LAST)
                 {
                 if ( !select )
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 else if ( isSelected() ) // && select
                     cursor = cursorLastMoved;
                 else // text is NOT selected BUT select
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 }
 
             ic.beginBatchEdit();
@@ -959,20 +968,20 @@ public class SoftBoardProcessor implements
         }
 
 
-    public void jumpParagraphRight( int cursor, boolean select )
+    public void jumpParaRight(int cursor, boolean select)
         {
         Scribe.locus(Debug.SERVICE);
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if (ic != null)
             {
-            if ( cursor == SELECTION_LAST )
+            if ( cursor == CURSOR_LAST)
                 {
                 if ( !select )
-                    cursor = SELECTION_START;
+                    cursor = CURSOR_BEGIN;
                 else if ( isSelected() ) // && select
                     cursor = cursorLastMoved;
                 else // text is NOT selected BUT select
-                    cursor = SELECTION_END;
+                    cursor = CURSOR_END;
                 }
 
             ic.beginBatchEdit();
@@ -1002,7 +1011,7 @@ public class SoftBoardProcessor implements
         {
         int space;
 
-        selectCursor(inputConnection, SELECTION_START);
+        selectCursor(inputConnection, CURSOR_BEGIN);
         for ( space = 0; textBeforeCursor.read() == ' '; space++ ) ;
 
         sendDelete(inputConnection, -space);
@@ -1016,7 +1025,7 @@ public class SoftBoardProcessor implements
         {
         int space;
 
-        selectCursor(inputConnection, SELECTION_START);
+        selectCursor(inputConnection, CURSOR_BEGIN);
         for ( space = 0; textAfterCursor.read() == ' '; space++) ;
 
         sendDelete(inputConnection, space);
@@ -1143,7 +1152,7 @@ public class SoftBoardProcessor implements
             // text is not selected
             else
                 {
-                selectCursor(ic, SELECTION_START);
+                selectCursor(ic, CURSOR_BEGIN);
 
                 int data = textBeforeCursor.read();
                 int l = 1;
@@ -1193,7 +1202,7 @@ public class SoftBoardProcessor implements
             // text is not selected
             else
                 {
-                selectCursor(ic, SELECTION_START);
+                selectCursor(ic, CURSOR_BEGIN);
                 int data = textAfterCursor.read();
                 int l = 1;
 
