@@ -715,7 +715,7 @@ public class SoftBoardProcessor implements
             ic.setSelection( position, position );
             } while (temp.length() == 2048);
         // original positions should be reset
-        ic.setSelection( calculatedCursor[0], calculatedCursor[1] );
+        ic.setSelection(calculatedCursor[0], calculatedCursor[1]);
         return position;
         }
 
@@ -876,7 +876,6 @@ public class SoftBoardProcessor implements
                 {
                 offset--;
                 }
-
             while ( !isWhiteSpace(c) && c != -1 )
                 {
                 offset--;
@@ -884,7 +883,6 @@ public class SoftBoardProcessor implements
                 }
 
             Scribe.debug( "Offset: " + offset );
-
             moveRelative( ic, cursor, offset, select );
             ic.endBatchEdit();
             }
@@ -906,6 +904,10 @@ public class SoftBoardProcessor implements
                     cursor = CURSOR_END;
                 }
 
+            Scribe.debug( "Cursor: " + cursor );
+            Scribe.debug( "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+            Scribe.debug( "Stored text before cursor: " + textBeforeCursor.toString() );
+
             ic.beginBatchEdit();
             selectCursor(ic, cursor);
 
@@ -916,13 +918,12 @@ public class SoftBoardProcessor implements
                 {
                 offset++;
                 }
-
             while ( !isWhiteSpace(c) && c != -1 )
                 {
                 offset++;
                 c = getTextAfterCursor().read();
                 }
-
+            Scribe.debug( "Offset: " + offset );
             moveRelative( ic, cursor, offset, select );
             ic.endBatchEdit();
             }
