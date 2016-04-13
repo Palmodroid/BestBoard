@@ -42,6 +42,8 @@
     <string name="data_send_packet_key_override">"Packet default key was overwritten!"</string>
     <string name="data_send_function_invalid">"Function token is invalid!"</string>
     <string name="data_send_missing">"Button's function is missing!"</string>
+    <string name="data_cursor_bad_parameter">"Cursor parameter cannot be identified!"</string>
+    <string name="data_select_bad_parameter">"Select parameter cannot be identified!"</string>
     <string name="data_autocaps_bad_parameter">"Auto-caps parameter cannot be identified!"</string>
     <string name="data_autospace_bad_parameter">"Auto-space parameter cannot be identified!"</string>
     <string name="data_erasespaces_bad_parameter">"Erase-spaces parameter cannot be identified!"</string>

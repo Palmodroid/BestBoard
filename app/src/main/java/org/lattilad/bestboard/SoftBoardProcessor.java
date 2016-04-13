@@ -57,6 +57,12 @@ public class SoftBoardProcessor implements
      */
     private boolean retrieveTextEnabled = true;
 
+    /** public access */
+    public boolean isRetrieveTextEnabled()
+        {
+        return retrieveTextEnabled;
+        }
+
     /**
      * TRUE: calculated cursor positions are used. Calculated positions checked at each bow-start,
      * and after stroke-end+elongation+time (between strokes)

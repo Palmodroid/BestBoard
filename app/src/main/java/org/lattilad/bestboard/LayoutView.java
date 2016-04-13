@@ -741,6 +741,11 @@ public class LayoutView extends View
             {
             // if (bowAction != TOUCH_HOLD) - but HOLD never calls evaluate main
             strokePoints.add(strokePoint);
+
+            // !! Shorter stroke can be drawn !!
+            while ( strokePoints.size() > 150 )
+                strokePoints.remove( 0 );
+
             if (layout.softBoardData.displayStroke) this.invalidate();
             }
         // if bowAction == TOUCH_UP - strokePoints will be cleared later

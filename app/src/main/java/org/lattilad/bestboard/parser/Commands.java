@@ -118,7 +118,22 @@ public class Commands
     public static final long TOKEN_COMBINE = 0x790d8163bL;
     public static final long TOKEN_TIME = 0x17cd86L;
     public static final long TOKEN_FORMAT = 0x40c43e96L;
-    
+
+    public static final long TOKEN_TOP = 0x19ea5L;
+    public static final long TOKEN_LEFT = 0x118846L;
+    public static final long TOKEN_RIGHT = 0x3136316L;
+    public static final long TOKEN_BOTTOM = 0x303d866aL;
+    public static final long TOKEN_WORD = 0x1a3febL;
+    public static final long TOKEN_PARA = 0x148bffL;
+    public static final long TOKEN_CURSOR = 0x3509a5d7L;
+    public static final long TOKEN_SELECT = 0x755cd451L;
+    public static final long TOKEN_LAST = 0x1174c3L;
+    public static final long TOKEN_BEGIN = 0x146bcb1L;
+    public static final long TOKEN_END = 0x14e3dL;
+    public static final long TOKEN_ALWAYS = 0x2bc78e36L;
+    public static final long TOKEN_NEVER = 0x29e37a4L;
+    public static final long TOKEN_IFSHIFT = 0xb01e8a12fL;
+
     public static final long TOKEN_AUTOCAPS = 0xef6e451a57L;
     public static final long TOKEN_STRINGCAPS = 0xd4c9a99e4004bL;
     public static final long TOKEN_AUTOSPACE = 0x229af1ada341L;
@@ -149,28 +164,7 @@ public class Commands
     public static final long TOKEN_DRAFT = 0x189da4dL;
     public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
     public static final long TOKEN_TOGGLECURSOR = 0x493c3837822dda87L;
-
     public static final long TOKEN_SELECTALL = 0x5ab4faaa9d61L;
-    public static final long TOKEN_BEGIN = 0x146bcb1L;
-    public static final long TOKEN_END = 0x14e3dL;
-    public static final long TOKEN_LEFT = 0x118846L;
-    public static final long TOKEN_RIGHT = 0x3136316L;
-    public static final long TOKEN_LEFT1ST = 0xcc72551ccL;
-    public static final long TOKEN_LEFT2ND = 0xcc725565cL;
-    public static final long TOKEN_RIGHT1ST = 0x25fcd21475cL;
-    public static final long TOKEN_RIGHT2ND = 0x25fcd214becL;
-    public static final long TOKEN_WORDLEFT = 0x2d2139ad572L;
-    public static final long TOKEN_WORDRIGHT = 0x685cd5eb8a72L;
-    public static final long TOKEN_WORDLEFT1ST = 0x22e18704d0fccc8L;
-    public static final long TOKEN_WORDRIGHT1ST = 0x50a988c228050dc8L;
-    public static final long TOKEN_WORDLEFT2ND = 0x22e18704d0fd158L;
-    public static final long TOKEN_WORDRIGHT2ND = 0x50a988c228051258L;
-    public static final long TOKEN_PARALEFT = 0x22efd985446L;
-    public static final long TOKEN_PARARIGHT = 0x50caa78edf16L;
-    public static final long TOKEN_PARALEFT1ST = 0x1b00bb65f7f6dccL;
-    public static final long TOKEN_PARARIGHT1ST = 0x3e71b1e2d227535cL;
-    public static final long TOKEN_PARALEFT2ND = 0x1b00bb65f7f725cL;
-    public static final long TOKEN_PARARIGHT2ND = 0x3e71b1e2d22757ecL;
 
     public static final long TOKEN_SINGLE = 0x75d0cfbfL;
     public static final long TOKEN_REPEAT = 0x713dd0a6L;
@@ -520,6 +514,7 @@ public class Commands
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
                 TOKEN_DO,
+                TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
                 TOKEN_COMBINE,
                 TOKEN_TIME, TOKEN_FORMAT})
@@ -537,6 +532,7 @@ public class Commands
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
                 TOKEN_DO,
+                TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
                 TOKEN_COMBINE,
                 TOKEN_TIME, TOKEN_FORMAT })
@@ -554,6 +550,7 @@ public class Commands
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
                 TOKEN_DO,
+                TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
                 TOKEN_COMBINE,
                 TOKEN_TIME, TOKEN_FORMAT })
@@ -564,6 +561,15 @@ public class Commands
         add(TOKEN_SEND, PARAMETER_INT);
         add(TOKEN_DO, PARAMETER_KEYWORD);
         add(TOKEN_COMBINE, PARAMETER_FLAG);
+
+        add(TOKEN_TOP, PARAMETER_FLAG);
+        add(TOKEN_LEFT, PARAMETER_FLAG);
+        add(TOKEN_RIGHT, PARAMETER_FLAG);
+        add(TOKEN_BOTTOM, PARAMETER_FLAG);
+        add(TOKEN_WORD, PARAMETER_FLAG);
+        add(TOKEN_PARA, PARAMETER_FLAG);
+        add(TOKEN_CURSOR, PARAMETER_KEYWORD);
+        add(TOKEN_SELECT, PARAMETER_KEYWORD);
 
         add(TOKEN_AUTOCAPS, PARAMETER_KEYWORD);
         add(TOKEN_STRINGCAPS, PARAMETER_FLAG);
@@ -591,6 +597,7 @@ public class Commands
                 TOKEN_SEND,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                 TOKEN_DO,
+                TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
                 TOKEN_COMBINE,
                 TOKEN_TIME, TOKEN_FORMAT,
 
@@ -617,6 +624,7 @@ public class Commands
                 TOKEN_SEND,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                 TOKEN_DO,
+                TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
                 TOKEN_COMBINE,
                 TOKEN_TIME, TOKEN_FORMAT,
                 TOKEN_FIRST,
@@ -645,6 +653,7 @@ public class Commands
                 TOKEN_SEND,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                 TOKEN_DO,
+                TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
                 TOKEN_COMBINE,
                 TOKEN_TIME, TOKEN_FORMAT,
                 TOKEN_FIRST,
@@ -668,6 +677,7 @@ public class Commands
                 TOKEN_SEND,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                 TOKEN_DO,
+                TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
                 TOKEN_COMBINE,
                 TOKEN_TIME, TOKEN_FORMAT,
                 TOKEN_FIRST,
@@ -753,6 +763,7 @@ public class Commands
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
                 TOKEN_DO,
+                TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
                 TOKEN_COMBINE,
                 TOKEN_TIME, TOKEN_FORMAT,

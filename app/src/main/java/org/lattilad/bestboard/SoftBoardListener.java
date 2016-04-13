@@ -21,6 +21,8 @@ public interface SoftBoardListener
     // readPreferences() need context
     // vibration needs context
 
+    boolean isRetrieveTextEnabled();
+
     boolean sendKeyDown( long downTime, int keyEventCode );
     boolean sendKeyUp( long downTime, long eventTime, int keyEventCode );
     void sendKeyDownUp(int keyEventCode);

@@ -6,6 +6,7 @@ import android.view.KeyEvent;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonAlternate;
 import org.lattilad.bestboard.buttons.ButtonDouble;
@@ -21,6 +22,7 @@ import org.lattilad.bestboard.buttons.Packet;
 import org.lattilad.bestboard.buttons.PacketCombine;
 import org.lattilad.bestboard.buttons.PacketFunction;
 import org.lattilad.bestboard.buttons.PacketKey;
+import org.lattilad.bestboard.buttons.PacketMove;
 import org.lattilad.bestboard.buttons.PacketText;
 import org.lattilad.bestboard.buttons.PacketTextTime;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
@@ -1043,29 +1045,122 @@ public class MethodsForCommands
 
 
     /**
+     * Creates packetMove from parameters.
+     * @return Move packet or null
+     */
+    public PacketMove packetMove( ExtendedMap<Long, Object> parameters, PacketKey packetKey )
+        {
+        PacketMove packet = null;
+
+        int moveType;
+        int cursorType = SoftBoardProcessor.CURSOR_LAST;
+        int selectionType = PacketMove.SELECT_IFSHIFT;
+
+        long temp;
+
+        if (parameters.remove(Commands.TOKEN_TOP) != null)
+            {
+            moveType = PacketMove.TOP;
+            }
+        else if (parameters.remove(Commands.TOKEN_BOTTOM) != null)
+            {
+            moveType = PacketMove.BOTTOM;
+            }
+        else
+            {
+            if (parameters.remove(Commands.TOKEN_RIGHT) != null)
+                {
+                moveType = PacketMove.RIGHT;
+                }
+            else if (parameters.remove(Commands.TOKEN_LEFT) != null)
+                {
+                moveType = PacketMove.LEFT;
+                }
+            else
+                {
+                // This is NOT a packetMove !
+                return null;
+                }
+
+            // These parameters can modify only RIGHT/LEFT
+            if (parameters.remove(Commands.TOKEN_WORD) != null)
+                {
+                moveType |= PacketMove.WORD;
+                }
+            else if (parameters.remove(Commands.TOKEN_PARA) != null)
+                {
+                moveType |= PacketMove.PARA;
+                }
+            }
+
+        temp = (long) parameters.remove(Commands.TOKEN_CURSOR, -1L);
+        if (temp == Commands.TOKEN_BEGIN)
+            cursorType = SoftBoardProcessor.CURSOR_BEGIN;
+        else if (temp == Commands.TOKEN_END)
+            cursorType = SoftBoardProcessor.CURSOR_END;
+        else if (temp == Commands.TOKEN_LAST)
+            ; // default remains
+        else if (temp != -1L)
+            tokenizer.error("PACKET", R.string.data_cursor_bad_parameter);
+
+        temp = (long) parameters.remove(Commands.TOKEN_SELECT, -1L);
+        if (temp == Commands.TOKEN_ALWAYS)
+            cursorType = PacketMove.SELECT_ALWAYS;
+        else if (temp == Commands.TOKEN_NEVER)
+            cursorType = PacketMove.SELECT_NEVER;
+        else if (temp == Commands.TOKEN_IFSHIFT)
+            ; // default remains
+        else if (temp != -1L)
+            tokenizer.error("PACKET", R.string.data_select_bad_parameter);
+
+        // Complete packetKey will be NOT null
+        // BUT if SEND is missing, it will generate it, and will consume remaining parameters
+        // This default Key cannot be combined with Move!!
+        if ( packetKey == null )
+            {
+            packetKey = packetKey(parameters,
+                    0x10000 + ((moveType & 0xFF) <= PacketMove.LEFT ?
+                            KeyEvent.KEYCODE_DPAD_LEFT : KeyEvent.KEYCODE_DPAD_RIGHT));
+            }
+
+        packet = new PacketMove( softBoardData, moveType, cursorType, selectionType, packetKey );
+
+        return packet;
+        }
+
+
+    /**
      * Create text or key or function packet from parameters.
      * @param parameters for text or key or function packet
      * @return the created packet, or null if no TEXT or KEY or DO parameter is given
      */
     public Packet packet( ExtendedMap<Long, Object> parameters )
         {
-        Packet packet;
+        PacketKey packetKey = packetKey(parameters, NO_DEFAULT_KEY); // can be combined
 
-        packet = packetText(parameters, null);
-
+        // Try text
+        Packet packet = packetText( parameters, null );
+        // NO TEXT - Try function
         if ( packet == null )
             {
-            packet = packetFunction(parameters);
+            packet = packetFunction( parameters );
             }
+        // NO TEXT, NO FUNCTION - Try move ( it will consume KEY, too )
         if ( packet == null )
             {
-            packet = packetKey(parameters, NO_DEFAULT_KEY);
+            packet = packetMove( parameters, packetKey );
             }
+        // NO TEXT, NO FUNCTION, NO MOVE - Try key
+        if ( packet == null )
+            {
+            packet = packetKey;
+            }
+
+        // Packet is defined, but it can be COMBINED with key
+        // PacketMove can be COMBINED, but only with its own key!
         else if ( parameters.remove(Commands.TOKEN_COMBINE) != null )
             {
-            PacketKey packetKey;
-
-            if ( (packetKey = packetKey(parameters, NO_DEFAULT_KEY)) != null )
+            if ( packetKey != null )
                 {
                 packet = new PacketCombine( softBoardData, packet, packetKey);
                 }
