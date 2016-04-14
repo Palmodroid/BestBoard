@@ -743,8 +743,8 @@ public class LayoutView extends View
             strokePoints.add(strokePoint);
 
             // !! Shorter stroke can be drawn !!
-            while ( strokePoints.size() > 150 )
-                strokePoints.remove( 0 );
+            // while ( strokePoints.size() > 150 )
+            //     strokePoints.remove( 0 );
 
             if (layout.softBoardData.displayStroke) this.invalidate();
             }
