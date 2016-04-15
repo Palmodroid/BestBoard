@@ -69,7 +69,7 @@ public class ButtonMeta extends ButtonMultiTouch implements
         }
 
     @Override
-    public void drawChangingButton(Canvas canvas)
+    public void drawButtonChangingPart(Canvas canvas)
         {
         if ( layout.softBoardData.layoutStates.metaStates[type].getState() == MetaState.IN_TOUCH &&
                 layout.softBoardData.displayTouch)

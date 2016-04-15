@@ -1225,14 +1225,6 @@ public class MethodsForCommands
         // !! http://stackoverflow.com/questions/509076/how-do-i-address-unchecked-cast-warnings
         // Maybe better to avoid Unchecked cast warnings
 
-        // text is optional, if it is null, then button's getString() function will be used
-        String text = null;
-        Object temp = parameters.remove(Commands.TOKEN_TEXT);
-        if ( temp != null )
-            {
-            text = SoftBoardParser.stringFromText( temp );
-            }
-
         int xOffset = (int)parameters.remove(Commands.TOKEN_XOFFSET, 0);
         int yOffset = (int)parameters.remove(Commands.TOKEN_YOFFSET, 0);
         int size = (int)parameters.remove(Commands.TOKEN_SIZE, 1000);
@@ -1240,7 +1232,23 @@ public class MethodsForCommands
         boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, false);
         int color = (int)parameters.remove(Commands.TOKEN_COLOR, Color.BLACK);
 
-        return new TitleDescriptor(text, xOffset, yOffset, size, bold, italics, color );
+        int type = -1; // USE getFirstString();
+        // text is optional, if it is null, then button's getFirstString() and getSecondString() function will be used
+        String text = null;
+        Object temp = parameters.remove(Commands.TOKEN_TEXT);
+        if ( temp != null )
+            {
+            text = SoftBoardParser.stringFromText( temp );
+            return new TitleDescriptor(text, xOffset, yOffset, size, bold, italics, color );
+            }
+        else
+            {
+            if ( parameters.remove( Commands.TOKEN_GETSECOND ) != null )
+                type = -2;
+            else
+                parameters.remove( Commands.TOKEN_GETFIRST ); // This is the default value
+            return new TitleDescriptor( type, xOffset, yOffset, size, bold, italics, color );
+            }
         }
 
 

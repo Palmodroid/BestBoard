@@ -37,7 +37,7 @@ public class ButtonSwitch extends ButtonMultiTouch implements
         }
 
     @Override
-    public void drawChangingButton(Canvas canvas)
+    public void drawButtonChangingPart(Canvas canvas)
         {
         int state = layout.softBoardData.boardTable.getState(layoutId);
 

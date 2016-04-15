@@ -42,16 +42,16 @@ public class Button implements Cloneable
     {
     /**
      * If a Button subclass implements ChangingButton interface,
-     * then Layout.onDraw() calls its drawChangingButton() method,
+     * then Layout.onDraw() calls its drawButtonChangingPart() method,
      * which can redraw the changed button over the layout-bitmap.
      * Buttons with ChangingButton interface will be collected in the Layout.addButton method().
-     */
+     *
     public interface ChangingButton
         {
         // offset is always layout.xOffset (direct draw on screen)
-        public void drawChangingButton(Canvas canvas);
+        public void drawButtonChangingPart(Canvas canvas);
         }
-
+    */
 
     /*
     http://stackoverflow.com/a/7580966 how to clone
@@ -251,26 +251,38 @@ public class Button implements Cloneable
 
 
     /**
-     * Draw button directly on the screen (above layout-bitmap) (Layout.onDraw)
-     * Background color is the color of the touched keys (layout.softBoardData.touchColor)
-     * Layout.xOffset is applied (as for the layout-bitmap)
-     * @param canvas canvas of the bitmap
-     */
-    public void drawTouchedButton( Canvas canvas )
-        {
-        drawButton( canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
-        }
-
-
-    /**
      * Draw button on layout-bitmap (Layout.createLayoutScreen())
      * Background color is the button's original color
      * No x offset is applied
      * @param canvas canvas of the bitmap
      */
-    public void drawButton( Canvas canvas )
+    public void drawButtonConstantPart(Canvas canvas)
         {
         drawButton(canvas, color, 0, 0);
+        }
+
+
+    /**
+     * If isChangingButton == true than changing part will be redrawn at every touch
+     * Draw button directly on the screen (above layout-bitmap) (Layout.onDraw)
+     * Layout.xOffset is applied (as for the layout-bitmap)
+     * @param canvas canvas of the bitmap
+     */
+    public void drawButtonChangingPart(Canvas canvas)
+        {
+        // draw last title - if it is a marker
+        }
+
+
+    /**
+     * Draw button directly on the screen (above layout-bitmap) (Layout.onDraw)
+     * Background color is the color of the touched keys (layout.softBoardData.touchColor)
+     * Layout.xOffset is applied (as for the layout-bitmap)
+     * @param canvas canvas of the bitmap
+     */
+    public void drawButtonTouched(Canvas canvas)
+        {
+        drawButton( canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
         }
 
 

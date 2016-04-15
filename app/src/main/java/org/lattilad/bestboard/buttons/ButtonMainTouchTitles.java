@@ -50,7 +50,7 @@ public abstract class ButtonMainTouchTitles extends ButtonMainTouch
      * @param canvas canvas to draw on
      */
     @Override
-    public void drawChangingButton(Canvas canvas)
+    public void drawButtonChangingPart(Canvas canvas)
         {
         int centerX = getPixelX( columnInGrids, layout.layoutXOffset);
         int centerY = getPixelY( rowInGrids, layout.layoutYOffset);
@@ -67,10 +67,10 @@ public abstract class ButtonMainTouchTitles extends ButtonMainTouch
      * @param canvas canvas of the bitmap
      */
     @Override
-    public void drawTouchedButton( Canvas canvas )
+    public void drawButtonTouched(Canvas canvas)
         {
-        super.drawTouchedButton( canvas ); // draws touchedButton without the changing part
-        drawChangingButton( canvas ); // draws the changing part
+        super.drawButtonTouched(canvas); // draws touchedButton without the changing part
+        drawButtonChangingPart(canvas); // draws the changing part
         }
 
     }

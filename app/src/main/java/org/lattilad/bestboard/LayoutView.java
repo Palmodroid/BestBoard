@@ -937,7 +937,7 @@ public class LayoutView extends View
 
         // TouchedButton - draw over the bitmap!
         if (mainTouchBow.buttonMainTouch != null && layout.softBoardData.displayTouch)
-            mainTouchBow.buttonMainTouch.drawTouchedButton(canvas);
+            mainTouchBow.buttonMainTouch.drawButtonTouched(canvas);
 
         // TouchedPoints - if needed
         if (layout.softBoardData.displayStroke)

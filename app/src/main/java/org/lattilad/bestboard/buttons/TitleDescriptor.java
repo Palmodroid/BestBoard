@@ -109,6 +109,7 @@ public class TitleDescriptor
      ** TITLE SPECIFIC SETTINGS
      **/
 
+    private int type; // -1 getFirst -2 getSecond, 0 text
     private String text; // !! getters and setters needed !!
 
     public String getText()
@@ -129,9 +130,23 @@ public class TitleDescriptor
     private boolean italics;
     private int color;
 
-    public TitleDescriptor(String text, int xOffset, int yOffset, int size,
+    public TitleDescriptor( String text, int xOffset, int yOffset, int size,
+                           boolean bold, boolean italics, int color )
+        {
+        this( 0, text, xOffset, yOffset, size, bold, italics, color);
+        }
+
+    public TitleDescriptor( int type, int xOffset, int yOffset, int size,
+                           boolean bold, boolean italics, int color )
+        {
+        this( type, null, xOffset, yOffset, size, bold, italics, color);
+        }
+
+    // Only for private use! type OR text should be NULL
+    private TitleDescriptor(int type, String text, int xOffset, int yOffset, int size,
                            boolean bold, boolean italics, int color)
         {
+        this.type = type;
         this.text = text;
         this.xOffset = xOffset;
         this.yOffset = yOffset;
@@ -144,7 +159,7 @@ public class TitleDescriptor
     // !! Cloneable could be used here, but it has some problems !!
     public TitleDescriptor copy()
         {
-        return new TitleDescriptor( text, xOffset, yOffset, size, bold, italics, color);
+        return new TitleDescriptor( type, text, xOffset, yOffset, size, bold, italics, color);
         }
 
     /**
