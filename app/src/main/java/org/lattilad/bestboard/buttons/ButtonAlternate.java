@@ -1,13 +1,17 @@
 package org.lattilad.bestboard.buttons;
 
+import android.graphics.Canvas;
+
 import org.lattilad.bestboard.SoftBoardData;
+
+import java.util.Iterator;
 
 /**
  * Double button with double packet
  * First packet should be undo-able (Text),
  * second can be any type: Text(String) or Hard-key or function
  */
-public class ButtonAlternate extends ButtonMainTouchTitles implements Cloneable
+public class ButtonAlternate extends ButtonMainTouch implements Cloneable
     {
     private int counter = 0;
     private Packet[] packets = new Packet[2];
@@ -24,16 +28,43 @@ public class ButtonAlternate extends ButtonMainTouchTitles implements Cloneable
         packets[1] = packetSecond;
         }
 
-    public String getString()
+    public String getFirstString()
         {
         return packets[0].getString();
         }
 
-
-    @Override
-    public String getChangingString()
+    public String getSecondString()
         {
-        return packets[counter].getString();
+        return packets[1].getString();
+        }
+
+    public boolean isChangingButton()
+        {
+        return true;
+        }
+
+    // All but last title is drawn
+    protected void drawButtonTitles( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
+        {
+        int centerX = getPixelX(columnInGrids, xOffsetInPixel);
+        int centerY = getPixelY(rowInGrids, yOffsetInPixel);
+
+        Iterator<TitleDescriptor> titlesIterator = titles.iterator();
+        if (titlesIterator.hasNext())
+            titlesIterator.next(); // just step over the last item
+        while (titlesIterator.hasNext())
+            {
+            titlesIterator.next().drawTextTitle(canvas, layout, centerX, centerY);
+            }
+        }
+
+    // Last title is drawn as changing part
+    public void drawButtonChangingPart(Canvas canvas)
+        {
+        // draw last title - always with changing string
+        int centerX = getPixelX( columnInGrids, layout.layoutXOffset);
+        int centerY = getPixelY( rowInGrids, layout.layoutYOffset);
+        titles.getLast().drawTitle(canvas, layout, packets[counter].getString(), centerX, centerY);
         }
 
     /**

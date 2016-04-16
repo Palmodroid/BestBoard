@@ -23,7 +23,7 @@ public class ButtonModify extends ButtonMainTouch implements Cloneable
         this.reverse = reverse;
         }
 
-    public String getString()
+    public String getFirstString()
         {
         return reverse ? "REV" : "MOD";
         }

@@ -2,10 +2,10 @@ package org.lattilad.bestboard.buttons;
 
 
 import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.SoftBoardMarker;
 import org.lattilad.bestboard.scribe.Scribe;
 
-public class ButtonEnter extends ButtonMainTouchTitles implements
-        Button.ChangingButton, Cloneable
+public class ButtonEnter extends ButtonMainTouch implements Cloneable
     {
     private PacketKey packetKey;
     private PacketText packetText;
@@ -26,10 +26,9 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
             setOnStay();
         }
 
-    @Override
-    public String getChangingString()
+    public int defaultTitleType()
         {
-        return layout.softBoardData.getActionTitle();
+        return SoftBoardMarker.ENTER_ACTION_MARKER;
         }
 
     @Override
@@ -71,15 +70,15 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
             // ?? What to do with repeat here ??
             if ( !layout.softBoardData.softBoardListener.sendDefaultEditorAction( true ) )
                 {
-                Scribe.error( "ENTER: default action was not accepted by editor!" );
+                Scribe.error( "ENTER: default enterAction was not accepted by editor!" );
                 }
             }
 
-        // No action is defined
+        // No enterAction is defined
         else
             {
             // editor
-            if ( layout.softBoardData.action == SoftBoardData.ACTION_MULTILINE )
+            if ( layout.softBoardData.enterAction == SoftBoardData.ACTION_MULTILINE )
                 {
                 if ( !packetKey.sendIfNoMeta() )    // if any meta is turned on - send HARD-KEY
                     {
@@ -90,7 +89,7 @@ public class ButtonEnter extends ButtonMainTouchTitles implements
             // simulated hard-key
             else // ACTION_UNSPECIFIED or ACTION_NONE
                 {
-                packetKey.send();                   // No action - send HARD-KEY anyway
+                packetKey.send();                   // No enterAction - send HARD-KEY anyway
                 }
             }
         }

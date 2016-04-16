@@ -6,6 +6,7 @@ import android.view.KeyEvent;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.SoftBoardMarker;
 import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonAlternate;
@@ -266,69 +267,55 @@ public class MethodsForCommands
         */
         }
 
-    /** Set entertitle * ENTERTITLE (text) */
-    public void setEnterTitle( Object textParameter )
+    public void setMarkers( ExtendedMap<Long, Object> parameters )
         {
-        softBoardData.actionTitles[SoftBoardData.ACTION_MULTILINE] = SoftBoardParser.stringFromText(textParameter);
-        tokenizer.note(R.string.data_entertitle, softBoardData.actionTitles[SoftBoardData.ACTION_MULTILINE] );
-        }
+        String temp;
+        // !! This could be organised from a table
 
-    /** Set gotitle * GOTITLE (text) */
-    public void setGoTitle( Object textParameter )
-        {
-        softBoardData.actionTitles[SoftBoardData.ACTION_GO] = SoftBoardParser.stringFromText( textParameter );
-        tokenizer.note(R.string.data_gotitle, softBoardData.actionTitles[SoftBoardData.ACTION_GO] );
-        }
+        temp = (String)parameters.remove( Commands.TOKEN_ENTERTEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_MULTILINE, temp );
 
-    /** Set searchtitle * SEARCHTITLE (text) */
-    public void setSearchTitle( Object textParameter )
-        {
-        softBoardData.actionTitles[SoftBoardData.ACTION_SEARCH] = SoftBoardParser.stringFromText( textParameter );
-        tokenizer.note(R.string.data_searchtitle, softBoardData.actionTitles[SoftBoardData.ACTION_SEARCH] );
-        }
+        temp = (String)parameters.remove( Commands.TOKEN_GOTEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_GO, temp );
 
-    /** Set sendtitle * SENDTITLE (text) */
-    public void setSendTitle( Object textParameter )
-        {
-        softBoardData.actionTitles[SoftBoardData.ACTION_SEND] = SoftBoardParser.stringFromText( textParameter );
-        tokenizer.note(R.string.data_sendtitle, softBoardData.actionTitles[SoftBoardData.ACTION_SEND] );
-        }
+        temp = (String)parameters.remove( Commands.TOKEN_SEARCHTEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_SEARCH, temp );
 
-    /** Set nexttitle * NEXTTITLE (text) */
-    public void setNextTitle( Object textParameter )
-        {
-        softBoardData.actionTitles[SoftBoardData.ACTION_NEXT] = SoftBoardParser.stringFromText( textParameter );
-        tokenizer.note(R.string.data_nexttitle, softBoardData.actionTitles[SoftBoardData.ACTION_NEXT] );
-        }
+        temp = (String)parameters.remove( Commands.TOKEN_SENDTEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_SEND, temp );
 
-    /** Set donetitle * DONETITLE (text) */
-    public void setDoneTitle( Object textParameter )
-        {
-        softBoardData.actionTitles[SoftBoardData.ACTION_DONE] = SoftBoardParser.stringFromText( textParameter );
-        tokenizer.note(R.string.data_donetitle, softBoardData.actionTitles[SoftBoardData.ACTION_DONE] );
-        }
+        temp = (String)parameters.remove( Commands.TOKEN_NEXTTEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_NEXT, temp );
 
-    /** Set prevtitle * PREVTITLE (text) */
-    public void setPrevTitle( Object textParameter )
-        {
-        softBoardData.actionTitles[SoftBoardData.ACTION_PREVIOUS] = SoftBoardParser.stringFromText( textParameter );
-        tokenizer.note(R.string.data_prevtitle, softBoardData.actionTitles[SoftBoardData.ACTION_PREVIOUS] );
-        }
+        temp = (String)parameters.remove( Commands.TOKEN_DONETEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_DONE, temp );
 
-    /** Set nonetitle * NONETITLE (text) */
-    public void setNoneTitle( Object textParameter )
-        {
-        softBoardData.actionTitles[SoftBoardData.ACTION_NONE] = SoftBoardParser.stringFromText( textParameter );
-        tokenizer.note(R.string.data_nonetitle, softBoardData.actionTitles[SoftBoardData.ACTION_NONE] );
-        }
+        temp = (String)parameters.remove( Commands.TOKEN_PREVTEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_PREVIOUS, temp );
 
-    /** Set unknowntitle * UNKNOWNTITLE (text) */
-    public void setUnknownTitle( Object textParameter )
-        {
-        softBoardData.actionTitles[SoftBoardData.ACTION_UNSPECIFIED] = SoftBoardParser.stringFromText( textParameter );
-        tokenizer.note(R.string.data_unknowntitle, softBoardData.actionTitles[SoftBoardData.ACTION_UNSPECIFIED] );
-        }
+        temp = (String)parameters.remove( Commands.TOKEN_NONETEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_NONE, temp );
 
+        temp = (String)parameters.remove( Commands.TOKEN_UNKNOWNTEXT );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_UNSPECIFIED, temp );
+
+        temp = (String)parameters.remove( Commands.TOKEN_AUTOFUNCON );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.AUTO_FUNC_MARKER, 1, temp );
+
+        temp = (String)parameters.remove( Commands.TOKEN_AUTOFUNCOFF );
+        if ( temp != null )
+            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.AUTO_FUNC_MARKER, 0, temp );
+        }
 
     /**
      * Adds a new board - portrait-landscape layout pair
@@ -746,17 +733,39 @@ public class MethodsForCommands
                         SinglyLinkedList<TitleDescriptor> titles =
                                 new SinglyLinkedList<>( button.getTitles() );
 
+                        TitleDescriptor markerTitle = titles.getLast().isMarker() ? titles.getLast() : null ;
+
                         TitleDescriptor titleDescriptor;
                         for ( KeyValuePair title : buttonExtension.titleList )
                             {
-                            titleDescriptor = ((TitleDescriptor)title.getValue());
-                            if ( titleDescriptor.getText() == null )
+                            titleDescriptor = (TitleDescriptor) title.getValue();
+                            if ( titleDescriptor.getType() < TitleDescriptor.TEXT )
                                 {
+                                // TitleDescriptor is not completed, depends on the value of the buttons
                                 titleDescriptor = titleDescriptor.copy();
-                                titleDescriptor.checkText( button.getString());
+                                if ( titleDescriptor.getType() == TitleDescriptor.BUTTON_DECIDES )
+                                    titleDescriptor.setType( button.defaultTitleType() );
+
+                                if ( titleDescriptor.getType() == TitleDescriptor.GET_FIRST_STRING )
+                                    titleDescriptor.setText( button.getFirstString() );
+                                else if ( titleDescriptor.getType() == TitleDescriptor.GET_SECOND_STRING )
+                                    titleDescriptor.setText( button.getSecondString() );
+                                // else: text can remain null
                                 }
-                            titles.add( titleDescriptor );
+
+                            if ( titleDescriptor.getType() == TitleDescriptor.TEXT )
+                                {
+                                // Completed titleDescriptor, so one instance is enough for all buttons
+                                titles.add(titleDescriptor);
+                                }
+                            else
+                                {
+                                // Marker-title should be the last among titles
+                                markerTitle = titleDescriptor;
+                                }
                             }
+                        if ( markerTitle != null )
+                            titles.add(markerTitle);
 
                         button.setTitles(titles);
                         tokenizer.note( "EXTEND", R.string.data_button_titles_extended);
@@ -1232,8 +1241,7 @@ public class MethodsForCommands
         boolean italics = (boolean)parameters.remove(Commands.TOKEN_ITALICS, false);
         int color = (int)parameters.remove(Commands.TOKEN_COLOR, Color.BLACK);
 
-        int type = -1; // USE getFirstString();
-        // text is optional, if it is null, then button's getFirstString() and getSecondString() function will be used
+        // text is optional
         String text = null;
         Object temp = parameters.remove(Commands.TOKEN_TEXT);
         if ( temp != null )
@@ -1241,14 +1249,25 @@ public class MethodsForCommands
             text = SoftBoardParser.stringFromText( temp );
             return new TitleDescriptor(text, xOffset, yOffset, size, bold, italics, color );
             }
+
+        // if no text,
+        int type = TitleDescriptor.BUTTON_DECIDES;
+        if ( parameters.remove( Commands.TOKEN_GETFIRST ) != null )
+            type = TitleDescriptor.GET_FIRST_STRING;
+        else if ( parameters.remove( Commands.TOKEN_GETSECOND ) != null )
+            type = TitleDescriptor.GET_SECOND_STRING;
         else
             {
-            if ( parameters.remove( Commands.TOKEN_GETSECOND ) != null )
-                type = -2;
-            else
-                parameters.remove( Commands.TOKEN_GETFIRST ); // This is the default value
-            return new TitleDescriptor( type, xOffset, yOffset, size, bold, italics, color );
+            long marker = (long)parameters.remove( Commands.TOKEN_MARKER, -1L );
+            if ( marker == Commands.TOKEN_ENTER )
+                type = SoftBoardMarker.ENTER_ACTION_MARKER;
+            else if ( marker == Commands.TOKEN_AUTOFUNC )
+                type = SoftBoardMarker.AUTO_FUNC_MARKER;
+            else if ( marker != -1L )
+                tokenizer.error("MARKERTITLE", R.string.data_markertitle_bad_parameter );
             }
+
+        return new TitleDescriptor( type, xOffset, yOffset, size, bold, italics, color );
         }
 
 
@@ -1449,18 +1468,37 @@ public class MethodsForCommands
 
         if ( titleList != null )
             {
+            TitleDescriptor markerTitle = null;
             for (KeyValuePair title : titleList)
                 {
                 titleDescriptor = (TitleDescriptor) title.getValue();
-                if ( titleDescriptor.getText() == null )
+                if ( titleDescriptor.getType() < TitleDescriptor.TEXT )
                     {
                     // TitleDescriptor is not completed, depends on the value of the buttons
                     titleDescriptor = titleDescriptor.copy();
-                    titleDescriptor.checkText( button.getString() );
+                    if ( titleDescriptor.getType() == TitleDescriptor.BUTTON_DECIDES )
+                        titleDescriptor.setType( button.defaultTitleType() );
+
+                    if ( titleDescriptor.getType() == TitleDescriptor.GET_FIRST_STRING )
+                        titleDescriptor.setText( button.getFirstString() );
+                    else if ( titleDescriptor.getType() == TitleDescriptor.GET_SECOND_STRING )
+                        titleDescriptor.setText( button.getSecondString() );
+                    // else: text can remain null
                     }
-                // Completed titleDescriptor, so one instance is enough for all buttons
-                titles.add(titleDescriptor);
+
+                if ( titleDescriptor.getType() == TitleDescriptor.TEXT )
+                    {
+                    // Completed titleDescriptor, so one instance is enough for all buttons
+                    titles.add(titleDescriptor);
+                    }
+                else
+                    {
+                    // Marker-title should be the last among titles
+                    markerTitle = titleDescriptor;
+                    }
                 }
+            if ( markerTitle != null )
+                titles.add(markerTitle);
             }
         else
             {
@@ -1476,11 +1514,17 @@ public class MethodsForCommands
                 defaultTitle = new ExtendedMap<Long, Object>(0);
                 }
             titleDescriptor = addTitle(defaultTitle);
-            titleDescriptor.checkText( button.getString() );
-            titles.add( titleDescriptor );
+            if ( titleDescriptor.getType() == TitleDescriptor.BUTTON_DECIDES )
+                titleDescriptor.setType( button.defaultTitleType() );
+
+            if ( titleDescriptor.getType() == TitleDescriptor.GET_FIRST_STRING )
+                titleDescriptor.setText( button.getFirstString() );
+            else if ( titleDescriptor.getType() == TitleDescriptor.GET_SECOND_STRING )
+                titleDescriptor.setText( button.getSecondString() );
+            // else: text can remain null
+            titles.add(titleDescriptor);
             }
 
-        // if title text is null, code should be used
         // button id can be created from the titles (and from the code)
         StringBuilder buttonNameBuilder = new StringBuilder();
         for ( TitleDescriptor title : titles )

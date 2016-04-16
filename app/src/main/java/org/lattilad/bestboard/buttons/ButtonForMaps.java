@@ -62,7 +62,7 @@ public class ButtonForMaps extends Button
         hexagonMapPaint.setColor(
                 layout.colorFromTouchCode(
                         layout.touchCodeFromPosition(columnInHexagons, rowInHexagons), false));
-        canvas.drawPath(hexagonPath( 0,0 ), hexagonMapPaint);
+        canvas.drawPath(hexagonPath(0, 0), hexagonMapPaint);
 
         hexagonMapPaint.setColor(
                 layout.colorFromTouchCode(
@@ -75,17 +75,23 @@ public class ButtonForMaps extends Button
         //        " r: " + row + " c: " + col);
         }
 
-
+    /**
     @Override
-    public String getString()
+    public String getFirstString()
         {
         throw new UnsupportedOperationException();
         }
 
+    @Override
+    public String getSecondString()
+        {
+        throw new UnsupportedOperationException();
+        }
 
     @Override
     protected void drawButton( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
         {
         throw new UnsupportedOperationException();
         }
+    */
     }

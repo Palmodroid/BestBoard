@@ -115,7 +115,7 @@ public class Layout
     /**
      * Changeable buttons of the layout - filled up by addButton
      */
-    public ArrayList<Button.ChangingButton> changingButtons = new ArrayList<>();
+    public ArrayList<Button> changingButtons = new ArrayList<>();
 
 
     /**
@@ -376,8 +376,8 @@ public class Layout
         buttons[index] = button;
 
         // if button is a changedButton, then store it in changedButtons list as well
-        if (button instanceof Button.ChangingButton)
-            changingButtons.add((Button.ChangingButton) button);
+        if (button.isChangingButton())
+            changingButtons.add(button);
 
         return ret;
         }
@@ -748,9 +748,9 @@ public class Layout
     public void drawChangedButtons(Canvas canvas)
         {
         // ChangedButtons - draw over the bitmap, too
-        for (Button.ChangingButton changingButton : changingButtons)
+        for (Button changingButton : changingButtons)
             {
-            changingButton.drawChangingButton(canvas);
+            changingButton.drawButtonChangingPart(canvas);
             }
         }
         

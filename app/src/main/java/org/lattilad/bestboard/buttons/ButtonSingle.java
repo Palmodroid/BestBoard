@@ -69,7 +69,7 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
         }
 
 
-    public String getString()
+    public String getFirstString()
         {
         return packet.getString();
         }

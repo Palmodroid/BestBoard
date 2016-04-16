@@ -803,7 +803,7 @@ public class LayoutView extends View
             //  check bow's finish - finish previous button
             if (mainTouchBow.buttonMainTouch != null)
                 {
-                Scribe.debug( Debug.TOUCH, "Previous button is released: " + mainTouchBow.buttonMainTouch.getString() );
+                Scribe.debug( Debug.TOUCH, "Previous button is released: " + mainTouchBow.buttonMainTouch.getFirstString() );
 
                 // meta check could be here, after finishing the next main-stream button
                 // but in this case we should finish here
@@ -836,7 +836,7 @@ public class LayoutView extends View
                 // Button is on MAIN TOUCH
                 if (newBowButton instanceof ButtonMainTouch)
                     {
-                    Scribe.debug( Debug.TOUCH, "A new MAIN bow is started, MAIN button touched: " + newBowButton.getString() );
+                    Scribe.debug( Debug.TOUCH, "A new MAIN bow is started, MAIN button touched: " + newBowButton.getFirstString() );
                     // start a new MAIN bow
                     mainTouchBow = new MainTouchBow( newBowTouchCode, (ButtonMainTouch)newBowButton );
 
@@ -860,7 +860,7 @@ public class LayoutView extends View
                     {
                     // if MULTI -> put in MULTI
                     // MULTI TOUCH can start here only!!
-                    Scribe.debug( Debug.TOUCH, "MAIN pointer changed to MULTI. MULTI button touched: " + newBowButton.getString() );
+                    Scribe.debug( Debug.TOUCH, "MAIN pointer changed to MULTI. MULTI button touched: " + newBowButton.getFirstString() );
 
                     multiTouchPointers.put(strokePointerId, new MultiTouchBow(newBowTouchCode, (ButtonMultiTouch) newBowButton));
 

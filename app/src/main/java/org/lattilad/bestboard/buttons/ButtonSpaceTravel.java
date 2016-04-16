@@ -6,7 +6,7 @@ import org.lattilad.bestboard.SoftBoardData;
  * Simple button with traveller-space
  * This class doesn't use the Packet sending mechanism, it will send space directly
  */
-public class ButtonSpaceTravel extends ButtonMainTouchTitles implements Cloneable
+public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
     {
     private Packet packet;
     private boolean done = false;
@@ -22,7 +22,7 @@ public class ButtonSpaceTravel extends ButtonMainTouchTitles implements Cloneabl
         this.packet = packet;
         }
 
-    public String getString()
+    public String getFirstString()
         {
         return packet.getString();
         }
@@ -59,18 +59,11 @@ public class ButtonSpaceTravel extends ButtonMainTouchTitles implements Cloneabl
         }
         
     @Override
-    public String getChangingString()
-    	{
-        return layout.softBoardData.autoEnabled ? "ON" : "OFF";
-    	}
-
-    
-    @Override
     public boolean fireSecondary(int type)
     	{
     	if ( !done || layout.softBoardData.softBoardListener.undoLastString() )
         	{
-            layout.softBoardData.autoEnabled = !layout.softBoardData.autoEnabled;
+            layout.softBoardData.autoFuncEnabled = !layout.softBoardData.autoFuncEnabled;
             layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
 			done = false;
         	}

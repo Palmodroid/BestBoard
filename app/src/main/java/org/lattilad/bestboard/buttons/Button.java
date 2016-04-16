@@ -80,10 +80,16 @@ public class Button implements Cloneable
      * It will be only used if no title/title-text is given.
      * @return Default title text - empty string for empty button
      */
-    public String getString()
+    public String getFirstString()
         {
         return "";
         }
+
+    public String getSecondString()
+        {
+        return getFirstString();
+        }
+
 
 
     /** Button's layout */
@@ -251,6 +257,30 @@ public class Button implements Cloneable
 
 
     /**
+     * Changing buttons should be redrawn after each touch
+     * This method should return true, if this is a changing button.
+     * The original method checks only markers.
+     * To change other parts (background), this method should be overridden
+     * @return true, if this button has got changing parts
+     */
+    public boolean isChangingButton()
+        {
+        // This method checks only markers
+        return titles.getLast().isMarker();
+        }
+
+
+    /**
+     * Button subclasses can decide about the default title type by overriding this method.
+     * @return default title type
+     */
+    public int defaultTitleType()
+        {
+        return TitleDescriptor.GET_FIRST_STRING;
+        }
+
+
+    /**
      * Draw button on layout-bitmap (Layout.createLayoutScreen())
      * Background color is the button's original color
      * No x offset is applied
@@ -258,7 +288,11 @@ public class Button implements Cloneable
      */
     public void drawButtonConstantPart(Canvas canvas)
         {
-        drawButton(canvas, color, 0, 0);
+        // draw the background
+        drawButtonBackground(canvas, color, 0, 0);
+
+        // draw the titles - ONLY TEXT titles
+        drawButtonTitles(canvas, 0, 0);
         }
 
 
@@ -271,6 +305,7 @@ public class Button implements Cloneable
     public void drawButtonChangingPart(Canvas canvas)
         {
         // draw last title - if it is a marker
+        drawButtonMarker(canvas, layout.layoutXOffset, layout.layoutYOffset);
         }
 
 
@@ -282,26 +317,13 @@ public class Button implements Cloneable
      */
     public void drawButtonTouched(Canvas canvas)
         {
-        drawButton( canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
-        }
-
-
-    /**
-     * Draw button with the specified background color and with the specified x-offset in pixel
-     * @param canvas canvas to draw on
-     * @param color background color
-     * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or layout.xOffset-layout.layoutXOffset (direct draw on screen)
-     * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
-     */
-    protected void drawButton( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
-        {
         // draw the background
-        drawButtonBackground(canvas, color, xOffsetInPixel, yOffsetInPixel);
+        drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
 
-        // draw the titles
-        drawButtonTitles(canvas, xOffsetInPixel, yOffsetInPixel);
+        // draw the titles - ONLY TEXT titles
+        drawButtonTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
+
+        drawButtonChangingPart( canvas );
         }
 
 
@@ -326,7 +348,7 @@ public class Button implements Cloneable
 
 
     /**
-     * Draws the titles for drawButton
+     * Draws the titles for drawButton. ONLY TEXT Titles are drawn, markers are skipped
      * drawButton will calculate pixel coordinates previously
      * This method could be changed, if not all titles are needed
      * @param canvas canvas to draw on
@@ -341,13 +363,34 @@ public class Button implements Cloneable
         // Theoretically from index/touchCode the buttons position can be calculated.
         // BUT this is NOT obligatory!! So the buttons will store their position.
 
-        int centerX = getPixelX( columnInGrids, xOffsetInPixel);
-        int centerY = getPixelY(rowInGrids, yOffsetInPixel);
+        int centerX = getPixelX(columnInGrids, xOffsetInPixel);
+        int centerY = getPixelY( rowInGrids, yOffsetInPixel);
 
         for ( TitleDescriptor title : titles )
             {
-            title.drawTitle(canvas, layout, centerX, centerY );
+            // ONLY TEXT titles are drawn (text != null)
+            title.drawTextTitle(canvas, layout, centerX, centerY);
             }
+        }
+
+
+    /**
+     * Draws the marker (if any) for drawButton. Marker can be ONLY at the last position
+     * drawButton will calculate pixel coordinates previously
+     * This method could be changed, if not all titles are needed
+     * @param canvas canvas to draw on
+     * @param xOffsetInPixel x offset in pixels
+     * (can be 0 (layout bitmap) or layout.xOffset (direct draw on screen)
+     * @param yOffsetInPixel y offset in pixels
+     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
+     */
+    protected void drawButtonMarker( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
+        {
+        int centerX = getPixelX(columnInGrids, xOffsetInPixel);
+        int centerY = getPixelY(rowInGrids, yOffsetInPixel);
+
+        // ONLY VALID MARKERS are drawn
+        titles.getLast().drawMarkerTitle(canvas, layout, centerX, centerY);
         }
 
 
@@ -379,6 +422,4 @@ public class Button implements Cloneable
                 getPixelY( rowInGrids, - layout.halfHexagonHeightInPixels / 2),
                 TitleDescriptor.textPaint);
         }
-
-
     }

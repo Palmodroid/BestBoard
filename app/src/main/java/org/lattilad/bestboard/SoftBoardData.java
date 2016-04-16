@@ -275,24 +275,26 @@ public class SoftBoardData
 
 
     /**
-     * * STATES NEEDED BY THE SOFTBOARD
+     * STATES NEEDED BY THE SOFTBOARD
      **/
 
     public LayoutStates layoutStates;
 
-    // defined in constructor, because SoftBoardDataListener is needed
     public BoardTable boardTable;
-    
+
+    public SoftBoardMarker softBoardMarker;
+
+
     /*
      * If auto-space, auto-caps are enabled
      */
-    public boolean autoEnabled = true;
+    public boolean autoFuncEnabled = true;
 
     /**
      * Action of the enter key defined by imeOptions of onStartInput's EditorInfo
      * Available values are defined by the next constants
      */
-    public int action = 0;
+    public int enterAction = 0;
 
     public static final int ACTION_UNSPECIFIED = 0;
     public static final int ACTION_NONE = 1;
@@ -304,21 +306,6 @@ public class SoftBoardData
     public static final int ACTION_PREVIOUS = 7;
     public static final int ACTION_MULTILINE = 8;
 
-
-    /**
-     * Action-titles displayed by the enter-key
-     */
-    // Number of actionTitles should be ACTION_TITLES!
-    public String[] actionTitles = {
-            "???",
-            "---",
-            "GO",
-            "SRCH",
-            "SEND",
-            "NEXT",
-            "DONE",
-            "PREV",
-            "CR"};
 
     /**
      * Text of the monitor row
@@ -365,6 +352,7 @@ public class SoftBoardData
 
         layoutStates = new LayoutStates();
         boardTable = new BoardTable();
+        softBoardMarker = new SoftBoardMarker( this );
         }
 
     /**
@@ -398,67 +386,61 @@ public class SoftBoardData
      * !! Could be changed to a direct equation?
      * @param imeOptions provided by EditorInfo of onStartInput
      */
-    public void setAction( int imeOptions )
+    public void setEnterAction(int imeOptions)
         {
         if ( (imeOptions & EditorInfo.IME_FLAG_NO_ENTER_ACTION) != 0)
             {
             // !! Just for checking input fields - it should be NONE ??
-            action = ACTION_MULTILINE;
+            enterAction = ACTION_MULTILINE;
             Scribe.debug( Debug.DATA, "Ime action: MULTILINE because of NO ENTER ACTION flag." );
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_NONE) != 0)
             {
-            action = ACTION_NONE;
+            enterAction = ACTION_NONE;
             Scribe.debug( Debug.DATA, "Ime action: NONE.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_GO) != 0)
             {
-            action = ACTION_GO;
+            enterAction = ACTION_GO;
             Scribe.debug( Debug.DATA, "Ime action: GO.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_SEARCH) != 0)
             {
-            action = ACTION_SEARCH;
+            enterAction = ACTION_SEARCH;
             Scribe.debug( Debug.DATA, "Ime action: SEARCH.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_SEND) != 0)
             {
-            action = ACTION_SEND;
+            enterAction = ACTION_SEND;
             Scribe.debug( Debug.DATA, "Ime action: SEND.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_NEXT) != 0)
             {
-            action = ACTION_NEXT;
+            enterAction = ACTION_NEXT;
             Scribe.debug( Debug.DATA, "Ime action: NEXT.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_DONE) != 0)
             {
-            action = ACTION_DONE;
+            enterAction = ACTION_DONE;
             Scribe.debug( Debug.DATA, "Ime action: DONE.");
             }
         else if ( (imeOptions & EditorInfo.IME_ACTION_PREVIOUS) != 0)
             {
-            action = ACTION_PREVIOUS;
+            enterAction = ACTION_PREVIOUS;
             Scribe.debug( Debug.DATA, "Ime action: PREVIOUS.");
             }
         else // EditorInfo.IME_ACTION_UNSPECIFIED
             {
             // !! Just for checking input fields - it should be NONE ??
-            action = ACTION_UNSPECIFIED;
+            enterAction = ACTION_UNSPECIFIED;
             Scribe.debug( Debug.DATA, "Ime action: UNSPECIFIED, because action is not known.");
             }
         }
 
 
-    public String getActionTitle()
-        {
-        return actionTitles[ action ];
-        }
-
-
     public boolean isActionSupplied()
         {
-        return ( action >= ACTION_GO && action <= ACTION_PREVIOUS );
+        return ( enterAction >= ACTION_GO && enterAction <= ACTION_PREVIOUS );
         }
 
 

@@ -8,8 +8,7 @@ import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.states.BoardTable;
 
-public class ButtonSwitch extends ButtonMultiTouch implements
-        Button.ChangingButton, Cloneable
+public class ButtonSwitch extends ButtonMultiTouch implements Cloneable
     {
     private long layoutId;
     private boolean lockKey;
@@ -31,7 +30,7 @@ public class ButtonSwitch extends ButtonMultiTouch implements
         }
 
     @Override
-    public String getString()
+    public String getFirstString()
         {
         return (lockKey ? "L" : "") + Tokenizer.regenerateKeyword(layoutId);
         }
@@ -42,13 +41,15 @@ public class ButtonSwitch extends ButtonMultiTouch implements
         int state = layout.softBoardData.boardTable.getState(layoutId);
 
         if ( state == BoardTable.ACTIVE )
-            drawButton( canvas, layout.softBoardData.metaColor, layout.layoutXOffset, layout.layoutYOffset);
+            drawButtonBackground(canvas, layout.softBoardData.metaColor, layout.layoutXOffset, layout.layoutYOffset);
         else if ( state == BoardTable.LOCKED )
-            drawButton( canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
+            drawButtonBackground(canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
         else if ( state == BoardTable.TOUCHED &&
                 layout.softBoardData.displayTouch)
-            drawButton( canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
-        // If state == HIDDEN, then no redraw is needed
+            drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
+        else
+            return; // If state == HIDDEN, then no redraw is needed
+        drawButtonTitles( canvas, layout.layoutXOffset, layout.layoutYOffset);
         }
 
     @Override

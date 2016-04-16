@@ -24,9 +24,14 @@ public class ButtonDouble extends ButtonMainTouch implements Cloneable
         this.packetSecond = packetSecond;
         }
 
-    public String getString()
+    public String getFirstString()
         {
         return packetFirst.getString();
+        }
+
+    public String getSecondString()
+        {
+        return packetSecond.getString();
         }
 
     private static int counter = 0;

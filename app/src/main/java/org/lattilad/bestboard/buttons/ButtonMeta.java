@@ -10,8 +10,7 @@ import org.lattilad.bestboard.states.CapsState;
 import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.ExternalDataException;
 
-public class ButtonMeta extends ButtonMultiTouch implements
-        Button.ChangingButton, Cloneable
+public class ButtonMeta extends ButtonMultiTouch implements Cloneable
     {
     private int type;
     private boolean lockKey;
@@ -32,7 +31,7 @@ public class ButtonMeta extends ButtonMultiTouch implements
         }
 
     @Override
-    public String getString()
+    public String getFirstString()
         {
         if (lockKey)
             {
@@ -73,19 +72,21 @@ public class ButtonMeta extends ButtonMultiTouch implements
         {
         if ( layout.softBoardData.layoutStates.metaStates[type].getState() == MetaState.IN_TOUCH &&
                 layout.softBoardData.displayTouch)
-            drawButton( canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
+            drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
 
         else if ( layout.softBoardData.layoutStates.metaStates[type].getState() == MetaState.META_ON )
-            drawButton( canvas, layout.softBoardData.metaColor, layout.layoutXOffset, layout.layoutYOffset);
+            drawButtonBackground(canvas, layout.softBoardData.metaColor, layout.layoutXOffset, layout.layoutYOffset);
 
         else if ( layout.softBoardData.layoutStates.metaStates[type].getState() == MetaState.META_LOCK )
-            drawButton( canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
+            drawButtonBackground(canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
 
         // It is only needed by CAPS, but all meta-buttons will know it.
-        else if ( layout.softBoardData.layoutStates.metaStates[type].getState() == CapsState.AUTOCAPS_ON )
-            drawButton( canvas, layout.softBoardData.autoColor, layout.layoutXOffset, layout.layoutYOffset);
+        else if ( layout.softBoardData.layoutStates.metaStates[type].getState() == CapsState.AUTOCAPS_ON)
+            drawButtonBackground(canvas, layout.softBoardData.autoColor, layout.layoutXOffset, layout.layoutYOffset);
 
-        // If state == META_OFF, then no redraw is needed
+        else
+            return; // If state == META_OFF, then no redraw is needed
+        drawButtonTitles( canvas, layout.layoutXOffset, layout.layoutYOffset);
         }
 
     @Override

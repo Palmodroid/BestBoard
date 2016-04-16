@@ -24,7 +24,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         packets.add( packet );
         }
 
-    public String getString()
+    public String getFirstString()
         {
         if ( packets.isEmpty() )
             return "LIST";

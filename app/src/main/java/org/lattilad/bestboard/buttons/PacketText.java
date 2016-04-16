@@ -184,7 +184,7 @@ public class PacketText extends Packet
     public void release()
     	{
         // If needed, this could be a standalone method, called when touch releases the button
-        if (softBoardData.autoEnabled)
+        if (softBoardData.autoFuncEnabled)
         	( (CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS] ).setAutoCapsState( autoCaps );
         Scribe.debug(Debug.TEXT, "PacketText released, autocaps state is set.");
         }

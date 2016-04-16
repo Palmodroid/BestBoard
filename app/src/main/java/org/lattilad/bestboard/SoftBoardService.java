@@ -51,7 +51,7 @@ public class SoftBoardService extends InputMethodService implements
 
     /**
      * Service is notified if it needs to react preference changes.
-     * Preference PREFS_COUNTER is incremented, and preference PREFS_TYPE identifies action.
+     * Preference PREFS_COUNTER is incremented, and preference PREFS_TYPE identifies enterAction.
      * It is not necessary to check other changes.
      * @param sharedPrefs shared preferences
      * @param key key which is changed
@@ -107,7 +107,7 @@ public class SoftBoardService extends InputMethodService implements
                     break;
 
                 default:
-                    Scribe.error( "SERVICE: preference action type is invalid!" );
+                    Scribe.error( "SERVICE: preference enterAction type is invalid!" );
                 }
             }
         }

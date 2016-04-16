@@ -221,7 +221,7 @@ public class SoftBoardProcessor implements
         softBoardData.layoutStates.resetMetaButtons();
 
         // enter's title is set
-        softBoardData.setAction(editorInfo.imeOptions);
+        softBoardData.setEnterAction(editorInfo.imeOptions);
 
         // Meta reset needed only in new input box
         if ( softBoardData.textSessionSetsMetastates )
@@ -1051,17 +1051,17 @@ public class SoftBoardProcessor implements
             {
             ic.beginBatchEdit();
 
-            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 && softBoardData.autoEnabled)
+            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 && softBoardData.autoFuncEnabled)
                 {
                 sendDeleteSpacesBeforeCursor( ic );
                 }
-            if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 && softBoardData.autoEnabled )
+            if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 && softBoardData.autoFuncEnabled)
                 {
                 sendDeleteSpacesAfterCursor( ic );
                 }
 
             sendBuilder.setLength(0);
-            if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoEnabled )
+            if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoFuncEnabled)
                 {
                 textBeforeCursor.reset();
                 if ( !isWhiteSpace( textBeforeCursor.read()) )
@@ -1070,7 +1070,7 @@ public class SoftBoardProcessor implements
 
             sendBuilder.append(string);
 
-            if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 && softBoardData.autoEnabled )
+            if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 && softBoardData.autoFuncEnabled)
                 {
                 textAfterCursor.reset();
                 if ( !isSpace( textAfterCursor.read()) )

@@ -22,7 +22,7 @@ public class TitleDescriptor
      * Paint for text, set before drawing each title
      * Button can use it as well, because data is written before each draw
      */
-    public static Paint textPaint = new Paint();
+    static public Paint textPaint = new Paint();
 
     /** Common paint settings for all titles */
     static
@@ -34,12 +34,12 @@ public class TitleDescriptor
      * Typeface is set by coat descriptor file
      * @param typeface Common font for all titles
      */
-    public static void setTypeface( Typeface typeface )
+    static public void setTypeface( Typeface typeface )
         {
         textPaint.setTypeface( typeface );
         }
 
-    public static class FontData
+    static public class FontData
         {
         public int textSize;
         public int yAdjust;
@@ -109,7 +109,28 @@ public class TitleDescriptor
      ** TITLE SPECIFIC SETTINGS
      **/
 
-    private int type; // -1 getFirst -2 getSecond, 0 text
+    public static final int TEXT = 0;
+    public static final int GET_FIRST_STRING = -1;
+    public static final int GET_SECOND_STRING = -2;
+    public static final int BUTTON_DECIDES = -3;
+
+    private int type;
+
+    public int getType()
+        {
+        return type;
+        }
+
+    public void setType( int type )
+        {
+        this.type = type;
+        }
+
+    public boolean isMarker()
+        {
+        return type > TEXT;
+        }
+
     private String text; // !! getters and setters needed !!
 
     public String getText()
@@ -117,10 +138,10 @@ public class TitleDescriptor
         return text;
         }
 
-    public void checkText( String defaultText )
+    public void setText(String newText)
         {
-        if (text == null)
-            text = defaultText;
+        type = 0;
+        text = newText;
         }
 
     private int xOffset;
@@ -163,7 +184,7 @@ public class TitleDescriptor
         }
 
     /**
-     * Draws the stored title on the button.
+     * Draws titles on the button. Only TEXT titles are drawn.
      * Title can be attached to several buttons, so position data is given as parameter.
      * Because button's background is drawn first, the buttons calculated position can be used.
      * (Repeated calculation is not needed.)
@@ -173,9 +194,18 @@ public class TitleDescriptor
      * @param centerX coord. in pixels (offset included)
      * @param centerY coord. in pixels
      */
-    public void drawTitle( Canvas canvas, Layout layout, int centerX, int centerY )
+    public void drawTextTitle(Canvas canvas, Layout layout, int centerX, int centerY)
         {
-        drawTitle( canvas, layout, text, centerX, centerY );
+        if ( text != null )
+            drawTitle( canvas, layout, text, centerX, centerY );
+        }
+
+    public void drawMarkerTitle(Canvas canvas, Layout layout, int centerX, int centerY)
+        {
+        // if ( type > 0 ) getMarkerText checks for real markers
+        drawTitle( canvas, layout,
+                layout.softBoardData.softBoardMarker.getMarkerText( type ),
+                centerX, centerY );
         }
 
     /**
@@ -206,5 +236,4 @@ public class TitleDescriptor
                 centerY + yOffset * layout.halfHexagonHeightInPixels / 1000 + adjust,
                 textPaint);
         }
-
     }
