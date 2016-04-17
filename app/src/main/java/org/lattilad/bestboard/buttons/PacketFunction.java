@@ -20,37 +20,16 @@ public class PacketFunction extends Packet
      */
     private long functionCode;
 
+
     /**
      * Constructor of button inner function
      * @param softBoardData general keyboard data class
      * @param functionCode token code of the function
-     * @throws ExternalDataException if function code is not valid
      */
-    public PacketFunction( SoftBoardData softBoardData, long functionCode ) throws ExternalDataException
+    public PacketFunction( SoftBoardData softBoardData, long functionCode )
         {
         super( softBoardData );
         this.functionCode = functionCode;
-
-        if ( functionCode == Commands.TOKEN_DELETE )
-            return;
-
-        if ( functionCode == Commands.TOKEN_BACKSPACE )
-            return;
-
-        if ( functionCode == Commands.TOKEN_DRAFT )
-            return;
-
-        if ( functionCode == Commands.TOKEN_SETTINGS )
-            return;
-
-        if ( functionCode == Commands.TOKEN_TOGGLECURSOR )
-            return;
-
-        if ( functionCode == Commands.TOKEN_SELECTALL )
-            return;
-
-        // functionCode is not known
-        throw new ExternalDataException();
         }
 
 
@@ -79,8 +58,11 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_SELECTALL )
             return "ALL";
 
-        // this cannot be reached
-        return "";
+        if ( functionCode == Commands.TOKEN_AUTOFUNC )
+            return "AF";
+
+        // any other code
+        return "ERR";
         }
 
 
@@ -130,6 +112,11 @@ public class PacketFunction extends Packet
         else if ( functionCode == Commands.TOKEN_SELECTALL )
             {
             softBoardData.softBoardListener.selectAll();
+            }
+
+        else if ( functionCode == Commands.TOKEN_AUTOFUNC )
+            {
+            softBoardData.autoFuncEnabled = !softBoardData.autoFuncEnabled;
             }
         }
 

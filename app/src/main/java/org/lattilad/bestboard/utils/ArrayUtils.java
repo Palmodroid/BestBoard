@@ -46,4 +46,24 @@ public class ArrayUtils
             }
         return 0;
         }
+
+
+    public static long[] concat(long[]... arrays)
+        {
+        int resultLength = 0;
+
+        for (long[] array : arrays)
+            resultLength += array.length;
+
+        long[] result = new long[resultLength];
+
+        int resultPosition = 0;
+        for (long[] array : arrays)
+            {
+            System.arraycopy(array, 0, result, resultPosition, array.length);
+            resultPosition += array.length;
+            }
+        return result;
+        }
+
     }

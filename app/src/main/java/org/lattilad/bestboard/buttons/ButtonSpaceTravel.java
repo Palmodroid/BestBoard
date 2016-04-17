@@ -9,7 +9,13 @@ import org.lattilad.bestboard.SoftBoardData;
 public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
     {
     private Packet packet;
-    private boolean done = false;
+    private Packet packetSecond;
+
+    // 0 - nothing happened
+    // 1 - SPACE packet was sent
+    // 2 - secondary packet was sent - without previous SPACE
+    // 3 - secondary packet was sent - after deleting already delivered space
+    private int done = 0;
 
     @Override
     public ButtonSpaceTravel clone()
@@ -17,9 +23,10 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
         return (ButtonSpaceTravel)super.clone();
         }
 
-    public ButtonSpaceTravel( Packet packet )
+    public ButtonSpaceTravel( Packet packet, Packet packetSecond )
         {
         this.packet = packet;
+        this.packetSecond = packetSecond; // can be null
         }
 
     public String getFirstString()
@@ -34,26 +41,28 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
             {
             packet.send();
             layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
-            done = true;
+            done = 1;
             }
         else
             {
-            done = false;
+            done = 0;
             }
         }
 
     @Override
     public void mainTouchEnd( boolean isTouchUp )
         {
-        if ( isTouchUp && !done )
+        if ( isTouchUp && done == 0 )
             {
             packet.send();
             layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
-            done = true;
+            done = 1;
             }
 
-        if (done)
+        if (done == 1)
             packet.release();   // autocaps should be set
+        else if (done >= 2)
+            packetSecond.release();
 
         // done = false; // this is not needed, because bow will always start first
         }
@@ -61,12 +70,29 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
     @Override
     public boolean fireSecondary(int type)
     	{
-    	if ( !done || layout.softBoardData.softBoardListener.undoLastString() )
-        	{
-            layout.softBoardData.autoFuncEnabled = !layout.softBoardData.autoFuncEnabled;
-            layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
-			done = false;
-        	}
-    	return false;
-    	}
+        if ( packetSecond != null )
+            {
+            // nothing happened OR first packet is undoable
+            if (done == 0 || ( done == 1 && layout.softBoardData.softBoardListener.undoLastString() ))
+                {
+                packetSecond.send();
+                layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
+                done = 2;
+                }
+
+            // secondary already is sent and is undoable
+            else if ( done >= 2 && layout.softBoardData.softBoardListener.undoLastString() )
+                {
+                if ( done == 3 ) // previous space should be resent
+                    {
+                    packet.send();
+                    done = 1;
+                    }
+                else // done == 2 // no space was sent previously
+                    done = 0;
+                layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
+                }
+            }
+        return false;
+        }
     }

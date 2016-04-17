@@ -908,7 +908,7 @@ public class MethodsForCommands
         PacketKey packet = null;
         int temp;
 
-        temp = (int)parameters.remove(Commands.TOKEN_SEND, NO_DEFAULT_KEY);
+        temp = (int)parameters.remove(Commands.TOKEN_KEY, NO_DEFAULT_KEY);
 
         if ( temp == NO_DEFAULT_KEY )             // KEY token is missing
             {
@@ -1032,24 +1032,21 @@ public class MethodsForCommands
      */
     public PacketFunction packetFunction( ExtendedMap<Long, Object> parameters )
         {
-        PacketFunction packet = null;
-        long temp;
-
-        temp = (long)parameters.remove(Commands.TOKEN_DO, -1L);
-
-        if ( temp != -1L )
-            {
-            try
-                {
-                packet = new PacketFunction( softBoardData, temp );
-                }
-            catch ( ExternalDataException e )
-                {
-                tokenizer.error( "PACKET", R.string.data_send_function_invalid );
-                }
-            }
-
-        return packet;
+        if ( parameters.remove(Commands.TOKEN_DELETE) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_DELETE);
+        else if ( parameters.remove(Commands.TOKEN_BACKSPACE) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_BACKSPACE);
+        else if ( parameters.remove(Commands.TOKEN_DRAFT) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_DRAFT);
+        else if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_SETTINGS);
+        else if ( parameters.remove(Commands.TOKEN_TOGGLECURSOR) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_TOGGLECURSOR);
+        else if ( parameters.remove(Commands.TOKEN_SELECTALL) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_SELECTALL);
+        else if ( parameters.remove(Commands.TOKEN_AUTOFUNC) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_AUTOFUNC);
+        return null;
         }
 
 
@@ -1147,27 +1144,25 @@ public class MethodsForCommands
         {
         PacketKey packetKey = packetKey(parameters, NO_DEFAULT_KEY); // can be combined
 
-        // Try text
         Packet packet = packetText( parameters, null );
-        // NO TEXT - Try function
         if ( packet == null )
             {
-            packet = packetFunction( parameters );
-            }
-        // NO TEXT, NO FUNCTION - Try move ( it will consume KEY, too )
-        if ( packet == null )
-            {
-            packet = packetMove( parameters, packetKey );
-            }
-        // NO TEXT, NO FUNCTION, NO MOVE - Try key
-        if ( packet == null )
-            {
-            packet = packetKey;
+            packet = packetMove(parameters, packetKey);
+            if ( packet == null )
+                {
+                packet = packetFunction( parameters );
+                if ( packet == null )
+                    {
+                    packet = packetKey;
+                    return packet;
+                    // No combine is allowed
+                    }
+                }
             }
 
         // Packet is defined, but it can be COMBINED with key
         // PacketMove can be COMBINED, but only with its own key!
-        else if ( parameters.remove(Commands.TOKEN_COMBINE) != null )
+        if ( parameters.remove(Commands.TOKEN_COMBINE) != null )
             {
             if ( packetKey != null )
                 {
@@ -1280,7 +1275,9 @@ public class MethodsForCommands
 
         // 'BACK' is a special token: go back to previous board
         return completeButton(
-                new ButtonSwitch(boardId, parameters.remove(Commands.TOKEN_LOCK) != null),
+                new ButtonSwitch(boardId,
+                        parameters.remove(Commands.TOKEN_LOCK) != null,
+                        parameters.remove(Commands.TOKEN_SHOWAUTOCAPS) != null),
                 parameters);
 
         // !! Check non-used SWITCH buttons !!
@@ -1333,7 +1330,9 @@ public class MethodsForCommands
         Scribe.debug(Debug.DATA, "Space Travel Button is defined");
 
         // Packet with default cannot be null!
-        return completeMainTouchButton( new ButtonSpaceTravel( packet(parameters, " ") ),
+        return completeMainTouchButton( new ButtonSpaceTravel(
+                        packet(parameters, " "),
+                        (Packet)parameters.remove(Commands.TOKEN_SECOND)), // Can be null
                 parameters);
         }
 

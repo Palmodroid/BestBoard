@@ -656,7 +656,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 // no method to call; no result to return
                 }
 
-/*            // Parameter-command has CHANGE_LABEL parameter
+            // Parameter-command has CHANGE_LABEL parameter
             else if ( commandData.getParameterType() == Commands.PARAMETER_CHANGE_LABEL )
                 {
                 Scribe.debug( Debug.PARSER, "[" + commandString + "] creates label." );
@@ -666,7 +666,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                 // no method to call; no result to return
                 }
-*/
+
             // Parameter-command has FLAG (true) parameter
             else if ( commandData.getParameterType() == Commands.PARAMETER_FLAG )
                 {
@@ -1321,12 +1321,10 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 keyString + "[" + Long.toHexString(key) + "], " + valueString);
 
         // This label key was previously set!
-        // THIS WAS USED BY CHANGE! This part is not used anymore, Change after LET is allowed
-/*        if ( error && denyOverwrite )
+        if ( error && denyOverwrite )
             {
             tokenizer.error( keyString, R.string.parser_label_overwritten );
             }
-*/
         }
 
 
