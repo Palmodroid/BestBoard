@@ -86,13 +86,13 @@ public class Commands
     public static final long TOKEN_ODDS = 0x13d439L;
     public static final long TOKEN_EVENS = 0x1a9a13dL;
 
-    public static final long TOKEN_FORCEON = 0x95c3165f2L;
-    public static final long TOKEN_FORCEOFF = 0x15a52ffbb05L;
-// !!!!!!!!!!!!!!!!!!
-    public static final long TOKEN_FORCECAPS = 0x320dfec8a852L;
-    public static final long TOKEN_FORCESHIFT = 0x73c05d4ab24e6L;
-    public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
-    public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
+    // public static final long TOKEN_FORCEON = 0x95c3165f2L;
+    // public static final long TOKEN_FORCEOFF = 0x15a52ffbb05L;
+
+    // public static final long TOKEN_FORCECAPS = 0x320dfec8a852L;
+    // public static final long TOKEN_FORCESHIFT = 0x73c05d4ab24e6L;
+    // public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
+    // public static final long TOKEN_FORCEALT = 0x15a52ff7113L;
 
     public static final long TOKEN_ASBOARD = 0x66e540fa6L;
     // public static final long TOKEN_LOCK = 0x11bd48L;
@@ -446,7 +446,7 @@ public class Commands
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
                 TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
                 TOKEN_ALIGN, TOKEN_COLOR,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_TURNON, TOKEN_TURNOFF,
                 TOKEN_ASBOARD,
                 TOKEN_LOCK, TOKEN_START})
                 .method("addLayout").allowAsLabel().allowAsDefault();
@@ -460,10 +460,13 @@ public class Commands
         add(TOKEN_ALIGN, PARAMETER_KEYWORD );
         add(TOKEN_COLOR, PARAMETER_COLOR);
 
-        add(TOKEN_FORCECAPS, PARAMETER_BOOLEAN);
-        add(TOKEN_FORCESHIFT, PARAMETER_BOOLEAN);
-        add(TOKEN_FORCECTRL, PARAMETER_BOOLEAN);
-        add(TOKEN_FORCEALT, PARAMETER_BOOLEAN);
+        add(TOKEN_TURNON, PARAMETER_KEYWORD | PARAMETER_MOD_LIST );
+        add(TOKEN_TURNOFF, PARAMETER_KEYWORD | PARAMETER_MOD_LIST);
+
+        /* add(TOKEN_FORCECAPS, PARAMETER_BOOLEAN);
+           add(TOKEN_FORCESHIFT, PARAMETER_BOOLEAN);
+           add(TOKEN_FORCECTRL, PARAMETER_BOOLEAN);
+           add(TOKEN_FORCEALT, PARAMETER_BOOLEAN); */
 
         add(TOKEN_ASBOARD, PARAMETER_FLAG);
         // If ASBOARD is given, then addBoard is called, so LOCK and ROOT can be used, too
@@ -523,10 +526,8 @@ public class Commands
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
                 TOKEN_AUTOSPACE,
-
                 TOKEN_KEY,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
-
+                TOKEN_TURNON, TOKEN_TURNOFF,
                 TOKEN_DELETE, TOKEN_BACKSPACE, TOKEN_TOGGLE, TOKEN_SELECTALL, TOKEN_DRAFT, TOKEN_SETTINGS,
                 TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
@@ -658,7 +659,7 @@ public class Commands
                 TOKEN_ERASESPACE,
                 TOKEN_AUTOSPACE,
                 TOKEN_KEY,
-                TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
+                TOKEN_TURNON, TOKEN_TURNOFF,
                 TOKEN_REPEAT }))
                 .method("setEnter").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});

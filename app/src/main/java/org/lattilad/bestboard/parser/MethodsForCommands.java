@@ -498,11 +498,15 @@ public class MethodsForCommands
 
         color = (int)parameters.remove(Commands.TOKEN_COLOR, DEFAULT_LAYOUT_COLOR);
 
+        for ( int n = 0; n < LayoutStates.META_STATES_SIZE; n++ )
+            {
+            metaStates[n] = Trilean.IGNORED;
+            }
+
         List<Object> keywordList;
-        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_FORCEON );
+        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_TURNON);
         if ( keywordList != null )
             {
-            // PARAMETER_STRING_LIST gives only non-null String items
             for (Object keyword: keywordList)
                 {
                 if ( (long)keyword == Commands.TOKEN_SHIFT )
@@ -514,14 +518,13 @@ public class MethodsForCommands
                 else if ( (long)keyword == Commands.TOKEN_CAPS )
                     metaStates[ LayoutStates.META_CAPS ] = Trilean.TRUE;
                 else
-                    tokenizer.error("FORCEON", R.string.data_meta_bad_parameter );
+                    tokenizer.error("TURNON", R.string.data_meta_bad_parameter );
                 }
             }
 
-        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_FORCEOFF );
+        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_TURNOFF);
         if ( keywordList != null )
             {
-            // PARAMETER_STRING_LIST gives only non-null String items
             for (Object keyword: keywordList)
                 {
                 if ( (long)keyword == Commands.TOKEN_SHIFT )
@@ -533,11 +536,12 @@ public class MethodsForCommands
                 else if ( (long)keyword == Commands.TOKEN_CAPS )
                     metaStates[ LayoutStates.META_CAPS ] = Trilean.FALSE;
                 else
-                    tokenizer.error("FORCEON", R.string.data_meta_bad_parameter );
+                    tokenizer.error("TURNOFF", R.string.data_meta_bad_parameter );
                 }
             }
 
         /*
+        // THIS was used by FORCECTRL ON/OFF type
         // missing token (null) is interpreted as IGNORE
         metaStates[ LayoutStates.META_SHIFT ] =
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCESHIFT ));
@@ -964,7 +968,7 @@ public class MethodsForCommands
             {
             // TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT
             packet = new PacketKey( softBoardData, temp,
-                    LayoutStates.generateBinaryHardState(parameters));
+                    LayoutStates.generateBinaryHardState(tokenizer, parameters));
             }
 
         return packet;

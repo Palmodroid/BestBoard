@@ -3,13 +3,16 @@ package org.lattilad.bestboard.states;
 import android.os.SystemClock;
 import android.view.KeyEvent;
 
+import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardListener;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Commands;
+import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.ExtendedMap;
 
 import java.util.Arrays;
+import java.util.List;
 
 /**
  * Summary of the states
@@ -245,7 +248,7 @@ public class LayoutStates
         }
 
 
-    /**
+    /** !! IT COULD BE MOVED TO MethodForCommands !!
      * Helper method for creating PacketKey. (SoftBoardData.Packet)
      * Forced hard-states are stored in binary format (instead of three objects).
      * IGNORE: 0, ON: 2, OFF: 1 - as defined in HardState
@@ -253,9 +256,53 @@ public class LayoutStates
      * @param parameters PacketKey tokens
      * @return binaryHardState
      */
-    public static int generateBinaryHardState( ExtendedMap<Long, Object> parameters )
+    public static int generateBinaryHardState( Tokenizer tokenizer, ExtendedMap<Long, Object> parameters )
         {
         // AACCSS
+        int binaryAltState = HardState.FORCE_IGNORED;
+        int binaryCtrlState = HardState.FORCE_IGNORED;
+        int binaryShiftState = HardState.FORCE_IGNORED;
+
+        List<Object> keywordList;
+        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_TURNON);
+        if ( keywordList != null )
+            {
+            for (Object keyword: keywordList)
+                {
+                if ( (long)keyword == Commands.TOKEN_SHIFT )
+                    binaryShiftState = HardState.FORCE_ON;
+                else if ( (long)keyword == Commands.TOKEN_CTRL )
+                    binaryShiftState = HardState.FORCE_ON;
+                else if ( (long)keyword == Commands.TOKEN_ALT )
+                    binaryShiftState = HardState.FORCE_ON;
+                else
+                    tokenizer.error("TURNON", R.string.data_meta_bad_parameter );
+                }
+            }
+
+        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_TURNOFF);
+        if ( keywordList != null )
+            {
+            for (Object keyword: keywordList)
+                {
+                if ( (long)keyword == Commands.TOKEN_SHIFT )
+                    binaryShiftState = HardState.FORCE_OFF;
+                else if ( (long)keyword == Commands.TOKEN_CTRL )
+                    binaryShiftState = HardState.FORCE_OFF;
+                else if ( (long)keyword == Commands.TOKEN_ALT )
+                    binaryShiftState = HardState.FORCE_OFF;
+                else
+                    tokenizer.error("TURNOFF", R.string.data_meta_bad_parameter );
+                }
+            }
+
+        // AACCSS
+        int binaryHardState =
+                binaryAltState << (HardState.FORCE_BITS * 2) |
+                binaryCtrlState << HardState.FORCE_BITS |
+                binaryShiftState;
+
+        /*
         int binaryHardState = 0;
         Boolean temp;
 
@@ -278,6 +325,7 @@ public class LayoutStates
         temp = (Boolean) parameters.remove( Commands.TOKEN_FORCESHIFT );
         if ( Boolean.FALSE.equals( temp ) ) binaryHardState |= HardState.FORCE_OFF;
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
+        */
 
         Scribe.debug( Debug.LAYOUTSTATE,  "Binary Hard state SHIFT added, ready: " + Integer.toBinaryString( binaryHardState ) );
 
