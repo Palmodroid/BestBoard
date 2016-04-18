@@ -56,7 +56,7 @@ public class ButtonSwitch extends ButtonMultiTouch implements Cloneable
 
         else
             return; // If state == HIDDEN, then no redraw is needed
-        drawButtonTitles( canvas, layout.layoutXOffset, layout.layoutYOffset);
+        drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
         }
 
     @Override

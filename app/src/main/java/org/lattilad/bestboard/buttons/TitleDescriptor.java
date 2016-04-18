@@ -126,7 +126,7 @@ public class TitleDescriptor
         this.type = type;
         }
 
-    public boolean isMarker()
+    public boolean isShowTitle()
         {
         return type > TEXT;
         }
@@ -200,11 +200,11 @@ public class TitleDescriptor
             drawTitle( canvas, layout, text, centerX, centerY );
         }
 
-    public void drawMarkerTitle(Canvas canvas, Layout layout, int centerX, int centerY)
+    public void drawShowTitle(Canvas canvas, Layout layout, int centerX, int centerY)
         {
-        // if ( type > 0 ) getMarkerText checks for real markers
+        // if ( type > 0 ) getShowText checks for real showtitles
         drawTitle( canvas, layout,
-                layout.softBoardData.softBoardMarker.getMarkerText( type ),
+                layout.softBoardData.softBoardShow.getShowText(type),
                 centerX, centerY );
         }
 

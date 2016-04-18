@@ -513,7 +513,7 @@ public class SoftBoardProcessor implements
         }
 
     /*
-     * MARKER: CURSOR_BEGIN/CURSOR_END
+     * CURSOR_BEGIN/CURSOR_END
      */
     private void moveRelative(InputConnection ic, int cursor, int length, boolean select)
         {

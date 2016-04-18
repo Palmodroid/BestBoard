@@ -2,7 +2,7 @@ package org.lattilad.bestboard.buttons;
 
 
 import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.SoftBoardMarker;
+import org.lattilad.bestboard.SoftBoardShow;
 import org.lattilad.bestboard.scribe.Scribe;
 
 public class ButtonEnter extends ButtonMainTouch implements Cloneable
@@ -28,7 +28,7 @@ public class ButtonEnter extends ButtonMainTouch implements Cloneable
 
     public int defaultTitleType()
         {
-        return SoftBoardMarker.ENTER_ACTION_MARKER;
+        return SoftBoardShow.ENTER_ACTION;
         }
 
     @Override

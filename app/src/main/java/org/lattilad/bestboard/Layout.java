@@ -306,6 +306,7 @@ public class Layout
         }
 
     boolean[] storedMetaStates = new boolean[ LayoutStates.META_STATES_SIZE ];
+
     /**
      * Force meta-states, as defined by setForcedMeta()
      * This method is called when layout is chosen.

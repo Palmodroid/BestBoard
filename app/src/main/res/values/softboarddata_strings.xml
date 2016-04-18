@@ -46,9 +46,11 @@
     <string name="data_autocaps_bad_parameter">"Auto-caps parameter cannot be identified!"</string>
     <string name="data_autospace_bad_parameter">"Auto-space parameter cannot be identified!"</string>
     <string name="data_erasespaces_bad_parameter">"Erase-spaces parameter cannot be identified!"</string>
-    <string name="data_markertitle_bad_parameter">"Marker-title parameter cannot be identified!"</string>
+    <string name="data_toggle_bad_parameter">"Toggle parameter cannot be identified!"</string>
+    <string name="data_meta_bad_parameter">"Meta parameter cannot be identified!"</string>
+    <string name="data_showtitle_bad_parameter">"Marker-title parameter cannot be identified!"</string>
     <string name="data_meta_unknown_meta_state">"Unknown meta-state!"</string>
-    <string name="data_button_function_missing">"No function is definied for button, an empty button is set!"</string>
+    <string name="data_button_function_missing">"No function is defined for button, an empty button is set!"</string>
     <string name="data_button_overwritten">"Previous button definition is overwritten!"</string>
     <string name="data_button_added">"Button added:"</string>
     <string name="data_button_error">"Cannot create button!"</string>

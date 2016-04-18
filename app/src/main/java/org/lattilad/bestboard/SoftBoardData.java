@@ -282,7 +282,7 @@ public class SoftBoardData
 
     public BoardTable boardTable;
 
-    public SoftBoardMarker softBoardMarker;
+    public SoftBoardShow softBoardShow;
 
 
     /*
@@ -352,7 +352,7 @@ public class SoftBoardData
 
         layoutStates = new LayoutStates();
         boardTable = new BoardTable();
-        softBoardMarker = new SoftBoardMarker( this );
+        softBoardShow = new SoftBoardShow( this );
         }
 
     /**

@@ -6,7 +6,7 @@ import android.view.KeyEvent;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.SoftBoardMarker;
+import org.lattilad.bestboard.SoftBoardShow;
 import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonAlternate;
@@ -267,54 +267,54 @@ public class MethodsForCommands
         */
         }
 
-    public void setMarkers( ExtendedMap<Long, Object> parameters )
+    public void setShowTitles(ExtendedMap<Long, Object> parameters)
         {
         String temp;
         // !! This could be organised from a table
 
         temp = (String)parameters.remove( Commands.TOKEN_ENTERTEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_MULTILINE, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_MULTILINE, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_GOTEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_GO, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_GO, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_SEARCHTEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_SEARCH, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_SEARCH, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_SENDTEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_SEND, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_SEND, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_NEXTTEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_NEXT, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_NEXT, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_DONETEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_DONE, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_DONE, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_PREVTEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_PREVIOUS, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_PREVIOUS, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_NONETEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_NONE, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_NONE, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_UNKNOWNTEXT );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.ENTER_ACTION_MARKER, SoftBoardData.ACTION_UNSPECIFIED, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_UNSPECIFIED, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_AUTOFUNCON );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.AUTO_FUNC_MARKER, 1, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.AUTO_FUNC, 1, temp);
 
         temp = (String)parameters.remove( Commands.TOKEN_AUTOFUNCOFF );
         if ( temp != null )
-            softBoardData.softBoardMarker.setMarkerText(SoftBoardMarker.AUTO_FUNC_MARKER, 0, temp );
+            softBoardData.softBoardShow.setShowText(SoftBoardShow.AUTO_FUNC, 0, temp);
         }
 
     /**
@@ -498,6 +498,46 @@ public class MethodsForCommands
 
         color = (int)parameters.remove(Commands.TOKEN_COLOR, DEFAULT_LAYOUT_COLOR);
 
+        List<Object> keywordList;
+        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_FORCEON );
+        if ( keywordList != null )
+            {
+            // PARAMETER_STRING_LIST gives only non-null String items
+            for (Object keyword: keywordList)
+                {
+                if ( (long)keyword == Commands.TOKEN_SHIFT )
+                    metaStates[ LayoutStates.META_SHIFT ] = Trilean.TRUE;
+                else if ( (long)keyword == Commands.TOKEN_CTRL )
+                    metaStates[ LayoutStates.META_CTRL ] = Trilean.TRUE;
+                else if ( (long)keyword == Commands.TOKEN_ALT )
+                    metaStates[ LayoutStates.META_ALT ] = Trilean.TRUE;
+                else if ( (long)keyword == Commands.TOKEN_CAPS )
+                    metaStates[ LayoutStates.META_CAPS ] = Trilean.TRUE;
+                else
+                    tokenizer.error("FORCEON", R.string.data_meta_bad_parameter );
+                }
+            }
+
+        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_FORCEOFF );
+        if ( keywordList != null )
+            {
+            // PARAMETER_STRING_LIST gives only non-null String items
+            for (Object keyword: keywordList)
+                {
+                if ( (long)keyword == Commands.TOKEN_SHIFT )
+                    metaStates[ LayoutStates.META_SHIFT ] = Trilean.FALSE;
+                else if ( (long)keyword == Commands.TOKEN_CTRL )
+                    metaStates[ LayoutStates.META_CTRL ] = Trilean.FALSE;
+                else if ( (long)keyword == Commands.TOKEN_ALT )
+                    metaStates[ LayoutStates.META_ALT ] = Trilean.FALSE;
+                else if ( (long)keyword == Commands.TOKEN_CAPS )
+                    metaStates[ LayoutStates.META_CAPS ] = Trilean.FALSE;
+                else
+                    tokenizer.error("FORCEON", R.string.data_meta_bad_parameter );
+                }
+            }
+
+        /*
         // missing token (null) is interpreted as IGNORE
         metaStates[ LayoutStates.META_SHIFT ] =
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCESHIFT ));
@@ -507,6 +547,7 @@ public class MethodsForCommands
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCEALT ));
         metaStates[ LayoutStates.META_CAPS ] =
                 Trilean.valueOf((Boolean)parameters.remove( Commands.TOKEN_FORCECAPS ));
+        */
 
         try
             {
@@ -733,7 +774,7 @@ public class MethodsForCommands
                         SinglyLinkedList<TitleDescriptor> titles =
                                 new SinglyLinkedList<>( button.getTitles() );
 
-                        TitleDescriptor markerTitle = titles.getLast().isMarker() ? titles.getLast() : null ;
+                        TitleDescriptor showTitle = titles.getLast().isShowTitle() ? titles.getLast() : null ;
 
                         TitleDescriptor titleDescriptor;
                         for ( KeyValuePair title : buttonExtension.titleList )
@@ -760,12 +801,12 @@ public class MethodsForCommands
                                 }
                             else
                                 {
-                                // Marker-title should be the last among titles
-                                markerTitle = titleDescriptor;
+                                // Show-title should be the last among titles
+                                showTitle = titleDescriptor;
                                 }
                             }
-                        if ( markerTitle != null )
-                            titles.add(markerTitle);
+                        if ( showTitle != null )
+                            titles.add(showTitle);
 
                         button.setTitles(titles);
                         tokenizer.note( "EXTEND", R.string.data_button_titles_extended);
@@ -1032,20 +1073,27 @@ public class MethodsForCommands
      */
     public PacketFunction packetFunction( ExtendedMap<Long, Object> parameters )
         {
+        Long temp;
+
         if ( parameters.remove(Commands.TOKEN_DELETE) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_DELETE);
-        else if ( parameters.remove(Commands.TOKEN_BACKSPACE) != null )
+        if ( parameters.remove(Commands.TOKEN_BACKSPACE) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_BACKSPACE);
-        else if ( parameters.remove(Commands.TOKEN_DRAFT) != null )
-            return new PacketFunction( softBoardData, Commands.TOKEN_DRAFT);
-        else if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )
-            return new PacketFunction( softBoardData, Commands.TOKEN_SETTINGS);
-        else if ( parameters.remove(Commands.TOKEN_TOGGLECURSOR) != null )
-            return new PacketFunction( softBoardData, Commands.TOKEN_TOGGLECURSOR);
-        else if ( parameters.remove(Commands.TOKEN_SELECTALL) != null )
+        if ( (temp = (Long)parameters.remove(Commands.TOKEN_TOGGLE)) != null )
+            {
+            if ( temp == Commands.TOKEN_CURSOR )
+                return new PacketFunction(softBoardData, Commands.TOKEN_CURSOR);
+            if ( temp == Commands.TOKEN_AUTOFUNC )
+                return new PacketFunction(softBoardData, Commands.TOKEN_AUTOFUNC);
+            tokenizer.error("TOGGLE", R.string.data_toggle_bad_parameter);
+            return null;
+            }
+        if ( parameters.remove(Commands.TOKEN_SELECTALL) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_SELECTALL);
-        else if ( parameters.remove(Commands.TOKEN_AUTOFUNC) != null )
-            return new PacketFunction( softBoardData, Commands.TOKEN_AUTOFUNC);
+        if ( parameters.remove(Commands.TOKEN_DRAFT) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_DRAFT);
+        if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_SETTINGS);
         return null;
         }
 
@@ -1253,13 +1301,13 @@ public class MethodsForCommands
             type = TitleDescriptor.GET_SECOND_STRING;
         else
             {
-            long marker = (long)parameters.remove( Commands.TOKEN_MARKER, -1L );
-            if ( marker == Commands.TOKEN_ENTER )
-                type = SoftBoardMarker.ENTER_ACTION_MARKER;
-            else if ( marker == Commands.TOKEN_AUTOFUNC )
-                type = SoftBoardMarker.AUTO_FUNC_MARKER;
-            else if ( marker != -1L )
-                tokenizer.error("MARKERTITLE", R.string.data_markertitle_bad_parameter );
+            long show = (long)parameters.remove( Commands.TOKEN_SHOW, -1L );
+            if ( show == Commands.TOKEN_ENTER )
+                type = SoftBoardShow.ENTER_ACTION;
+            else if ( show == Commands.TOKEN_AUTOFUNC )
+                type = SoftBoardShow.AUTO_FUNC;
+            else if ( show != -1L )
+                tokenizer.error("SHOWTITLE", R.string.data_showtitle_bad_parameter);
             }
 
         return new TitleDescriptor( type, xOffset, yOffset, size, bold, italics, color );
@@ -1277,7 +1325,7 @@ public class MethodsForCommands
         return completeButton(
                 new ButtonSwitch(boardId,
                         parameters.remove(Commands.TOKEN_LOCK) != null,
-                        parameters.remove(Commands.TOKEN_SHOWAUTOCAPS) != null),
+                        parameters.remove(Commands.TOKEN_CAPSSTATE) != null),
                 parameters);
 
         // !! Check non-used SWITCH buttons !!
@@ -1467,7 +1515,7 @@ public class MethodsForCommands
 
         if ( titleList != null )
             {
-            TitleDescriptor markerTitle = null;
+            TitleDescriptor showTitle = null;
             for (KeyValuePair title : titleList)
                 {
                 titleDescriptor = (TitleDescriptor) title.getValue();
@@ -1492,12 +1540,12 @@ public class MethodsForCommands
                     }
                 else
                     {
-                    // Marker-title should be the last among titles
-                    markerTitle = titleDescriptor;
+                    // Show-title should be the last among titles
+                    showTitle = titleDescriptor;
                     }
                 }
-            if ( markerTitle != null )
-                titles.add(markerTitle);
+            if ( showTitle != null )
+                titles.add(showTitle);
             }
         else
             {

@@ -86,7 +86,7 @@ public class ButtonMeta extends ButtonMultiTouch implements Cloneable
 
         else
             return; // If state == META_OFF, then no redraw is needed
-        drawButtonTitles( canvas, layout.layoutXOffset, layout.layoutYOffset);
+        drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
         }
 
     @Override

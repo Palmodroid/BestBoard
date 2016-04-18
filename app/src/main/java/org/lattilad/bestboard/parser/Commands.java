@@ -52,7 +52,7 @@ public class Commands
     public static final long TOKEN_STROKECOLOR = 0x1ec12db0915dd7dL;
     public static final long TOKEN_FONT = 0xd1bbaL;
 
-    public static final long TOKEN_MARKERTITLES = 0x37098b5401f8a886L;
+    public static final long TOKEN_SHOWTITLES = 0xd260affc0215fL;
     public static final long TOKEN_ENTERTEXT = 0x2ec74ff10e17L;
     public static final long TOKEN_GOTEXT = 0x44e7bdb0L;
     public static final long TOKEN_SEARCHTEXT = 0xd1b3cdb202a54L;
@@ -86,6 +86,9 @@ public class Commands
     public static final long TOKEN_ODDS = 0x13d439L;
     public static final long TOKEN_EVENS = 0x1a9a13dL;
 
+    public static final long TOKEN_FORCEON = 0x95c3165f2L;
+    public static final long TOKEN_FORCEOFF = 0x15a52ffbb05L;
+// !!!!!!!!!!!!!!!!!!
     public static final long TOKEN_FORCECAPS = 0x320dfec8a852L;
     public static final long TOKEN_FORCESHIFT = 0x73c05d4ab24e6L;
     public static final long TOKEN_FORCECTRL = 0x320dfec90e30L;
@@ -125,9 +128,14 @@ public class Commands
     public static final long TOKEN_BACKSPACE = 0x240879d29871L;
     public static final long TOKEN_DRAFT = 0x189da4dL;
     public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
-    public static final long TOKEN_TOGGLECURSOR = 0x493c3837822dda87L;
     public static final long TOKEN_SELECTALL = 0x5ab4faaa9d61L;
+
+    public static final long TOKEN_TOGGLE = 0x7a99172fL;
+    public static final long TOKEN_TURNON = 0x7b4d533bL;
+    public static final long TOKEN_TURNOFF = 0x11d2090692L;
+
     public static final long TOKEN_AUTOFUNC = 0xef6e47d688L;
+    // public static final long TOKEN_CURSOR = 0x3509a5d7L;
 
     public static final long TOKEN_TOP = 0x19ea5L;
     public static final long TOKEN_LEFT = 0x118846L;
@@ -190,7 +198,7 @@ public class Commands
     public static final long TOKEN_SWITCH = 0x775d93d7L;
     public static final long TOKEN_BOARD = 0x14e5880L;
     // public static final long TOKEN_LOCK = 0x11bd48L;
-    public static final long TOKEN_SHOWAUTOCAPS = 0x46506f34db589e64L;
+    public static final long TOKEN_CAPSSTATE = 0x27422f120618L;
     // !! BACK is used as textual token !!
     public static final long TOKEN_BACK = 0x9b7c8L;
 
@@ -212,7 +220,7 @@ public class Commands
 
     public static final long TOKEN_ADDTITLE = 0xe504eb848aL;
     // public static final long TOKEN_TEXT = 0x17b9c8L;
-    public static final long TOKEN_MARKER = 0x5c22931bL;
+    public static final long TOKEN_SHOW = 0x1702acL;
     public static final long TOKEN_XOFFSET = 0x141b96a3d1L;
     public static final long TOKEN_YOFFSET = 0x14b484849aL;
     public static final long TOKEN_SIZE = 0x17098aL;
@@ -372,7 +380,7 @@ public class Commands
                 TOKEN_STROKECOLOR,
                 TOKEN_FONT,
 
-                TOKEN_MARKERTITLES,
+                TOKEN_SHOWTITLES,
 
                 TOKEN_STOP
         });
@@ -402,11 +410,11 @@ public class Commands
         add(TOKEN_STROKECOLOR, PARAMETER_COLOR).method("setStrokeColor");
         add(TOKEN_FONT, PARAMETER_FILE).method("setTypeface");
 
-        add(TOKEN_MARKERTITLES, new long[]{
+        add(TOKEN_SHOWTITLES, new long[]{
                 TOKEN_ENTERTEXT, TOKEN_GOTEXT, TOKEN_SEARCHTEXT, TOKEN_SENDTEXT, TOKEN_NEXTTEXT,
                 TOKEN_DONETEXT, TOKEN_PREVTEXT, TOKEN_NONETEXT, TOKEN_UNKNOWNTEXT,
                 TOKEN_AUTOFUNCON, TOKEN_AUTOFUNCOFF })
-                .method("setMarkers").allowAsLabel().allowAsDefault();
+                .method("setShowTitles").allowAsLabel().allowAsDefault();
 
         add(TOKEN_ENTERTEXT, PARAMETER_TEXT);
         add(TOKEN_GOTEXT, PARAMETER_TEXT);
@@ -519,7 +527,7 @@ public class Commands
                 TOKEN_KEY,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
 
-                TOKEN_DELETE, TOKEN_BACKSPACE, TOKEN_DRAFT, TOKEN_SETTINGS, TOKEN_TOGGLECURSOR, TOKEN_SELECTALL, TOKEN_AUTOFUNC,
+                TOKEN_DELETE, TOKEN_BACKSPACE, TOKEN_TOGGLE, TOKEN_SELECTALL, TOKEN_DRAFT, TOKEN_SETTINGS,
                 TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
                 TOKEN_COMBINE,
@@ -546,9 +554,8 @@ public class Commands
         add(TOKEN_BACKSPACE, PARAMETER_FLAG);
         add(TOKEN_DRAFT, PARAMETER_FLAG);
         add(TOKEN_SETTINGS, PARAMETER_FLAG);
-        add(TOKEN_TOGGLECURSOR, PARAMETER_FLAG);
+        add(TOKEN_TOGGLE, PARAMETER_KEYWORD);
         add(TOKEN_SELECTALL, PARAMETER_FLAG);
-        add(TOKEN_AUTOFUNC, PARAMETER_FLAG);
 
         add(TOKEN_TOP, PARAMETER_FLAG);
         add(TOKEN_LEFT, PARAMETER_FLAG);
@@ -684,7 +691,7 @@ public class Commands
         add(TOKEN_SWITCH, new long[]{
                 TOKEN_BOARD,
                 TOKEN_LOCK,
-                TOKEN_SHOWAUTOCAPS,
+                TOKEN_CAPSSTATE,
                 TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
                         TOKEN_COLOR,
                 TOKEN_OVERWRITE})
@@ -692,17 +699,17 @@ public class Commands
 
         add(TOKEN_BOARD, PARAMETER_KEYWORD);
         // add(TOKEN_LOCK, PARAMETER_FLAG);
-        add(TOKEN_SHOWAUTOCAPS, PARAMETER_FLAG);
+        add(TOKEN_CAPSSTATE, PARAMETER_FLAG);
 
         add(TOKEN_ADDTITLE, new long[]{
                 TOKEN_TEXT, TOKEN_GETFIRST, TOKEN_GETSECOND,
-                TOKEN_MARKER,
+                TOKEN_SHOW,
                 TOKEN_XOFFSET, TOKEN_YOFFSET, TOKEN_SIZE,
                 TOKEN_BOLD, TOKEN_NONBOLD, TOKEN_ITALICS, TOKEN_NONITALICS,
                 TOKEN_COLOR })
                 .method("addTitle").allowAsLabel().allowAsDefault();
         // add(TOKEN_TEXT, PARAMETER_TEXT);
-        add(TOKEN_MARKER, PARAMETER_KEYWORD);
+        add(TOKEN_SHOW, PARAMETER_KEYWORD);
         add(TOKEN_GETFIRST, PARAMETER_FLAG);
         add(TOKEN_GETSECOND, PARAMETER_FLAG);
         add(TOKEN_XOFFSET, PARAMETER_INT );

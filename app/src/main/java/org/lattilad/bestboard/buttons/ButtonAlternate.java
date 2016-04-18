@@ -44,7 +44,7 @@ public class ButtonAlternate extends ButtonMainTouch implements Cloneable
         }
 
     // All but last title is drawn
-    protected void drawButtonTitles( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
+    protected void drawButtonTextTitles(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
         {
         int centerX = getPixelX(columnInGrids, xOffsetInPixel);
         int centerY = getPixelY(rowInGrids, yOffsetInPixel);

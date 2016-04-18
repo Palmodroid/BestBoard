@@ -1,7 +1,5 @@
 package org.lattilad.bestboard.buttons;
 
-import android.graphics.Canvas;
-
 /**
  * Base class for buttons on the MULTI stroke
  */
@@ -20,7 +18,7 @@ public abstract class ButtonMultiTouch extends Button
 
     // public void drawButtonConstantPart(Canvas canvas) - remains original
 
-    // public void drawButtonChangingPart(Canvas canvas) - is overridden (call super, if marker is needed)
+    // public void drawButtonChangingPart(Canvas canvas) - is overridden (call super, if show is needed)
 
     // public void drawButtonTouched(Canvas canvas) - is not used
 

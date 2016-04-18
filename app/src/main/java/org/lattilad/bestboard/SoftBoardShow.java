@@ -1,27 +1,27 @@
 package org.lattilad.bestboard;
 
 /**
- * Markers
+ * Show-titles
  */
-public class SoftBoardMarker
+public class SoftBoardShow
     {
     /**
-     * Available markers:
+     * Available shows:
      * - Enteraction
      * - Autofunc
      */
     private SoftBoardData softBoardData;
 
-    public SoftBoardMarker( SoftBoardData softBoardData )
+    public SoftBoardShow(SoftBoardData softBoardData)
         {
         this.softBoardData = softBoardData;
         }
 
     // Markers should start from 1 ( TEXT is 0 )
 
-    public final static int ENTER_ACTION_MARKER = 1;
+    public final static int ENTER_ACTION = 1;
 
-    public final static int AUTO_FUNC_MARKER = 2;
+    public final static int AUTO_FUNC = 2;
 
     public String[] enterActionTexts = {
             "???",
@@ -38,24 +38,24 @@ public class SoftBoardMarker
             "OFF",
             "AUTO" };
 
-    public String getMarkerText( int marker )
+    public String getShowText(int show)
         {
-        if ( marker == ENTER_ACTION_MARKER )
+        if ( show == ENTER_ACTION)
             return enterActionTexts[ softBoardData.enterAction ];
 
-        if ( marker == AUTO_FUNC_MARKER )
+        if ( show == AUTO_FUNC)
             return autoFuncTexts[ softBoardData.autoFuncEnabled ? 1 : 0 ];
 
         return "";
         }
 
-    public void setMarkerText( int marker, int num, String text )
+    public void setShowText(int show, int num, String text)
         {
         String[] array;
 
-        if ( marker == ENTER_ACTION_MARKER )
+        if ( show == ENTER_ACTION)
             array = enterActionTexts;
-        else if ( marker == AUTO_FUNC_MARKER )
+        else if ( show == AUTO_FUNC)
             array = autoFuncTexts;
         else
             return;

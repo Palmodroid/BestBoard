@@ -7,7 +7,6 @@ import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.prefs.PrefsActivity;
 import org.lattilad.bestboard.states.CapsState;
 import org.lattilad.bestboard.states.LayoutStates;
-import org.lattilad.bestboard.utils.ExternalDataException;
 
 /**
  * Editor functions performed by the keyboard
@@ -52,7 +51,7 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_SETTINGS )
             return "SET";
 
-        if ( functionCode == Commands.TOKEN_TOGGLECURSOR )
+        if ( functionCode == Commands.TOKEN_CURSOR )
             return "CURS";
 
         if ( functionCode == Commands.TOKEN_SELECTALL )
@@ -104,7 +103,7 @@ public class PacketFunction extends Packet
             softBoardData.softBoardListener.getApplicationContext().startActivity(intent);
             }
 
-        else if ( functionCode == Commands.TOKEN_TOGGLECURSOR )
+        else if ( functionCode == Commands.TOKEN_CURSOR )
             {
             softBoardData.softBoardListener.toggleCursor();
             }

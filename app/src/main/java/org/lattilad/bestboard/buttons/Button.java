@@ -259,14 +259,14 @@ public class Button implements Cloneable
     /**
      * Changing buttons should be redrawn after each touch
      * This method should return true, if this is a changing button.
-     * The original method checks only markers.
+     * The original method checks only showtitles.
      * To change other parts (background), this method should be overridden
      * @return true, if this button has got changing parts
      */
     public boolean isChangingButton()
         {
-        // This method checks only markers
-        return titles.getLast().isMarker();
+        // This method checks only show-titles
+        return titles.getLast().isShowTitle();
         }
 
 
@@ -292,7 +292,7 @@ public class Button implements Cloneable
         drawButtonBackground(canvas, color, 0, 0);
 
         // draw the titles - ONLY TEXT titles
-        drawButtonTitles(canvas, 0, 0);
+        drawButtonTextTitles(canvas, 0, 0);
         }
 
 
@@ -304,8 +304,8 @@ public class Button implements Cloneable
      */
     public void drawButtonChangingPart(Canvas canvas)
         {
-        // draw last title - if it is a marker
-        drawButtonMarker(canvas, layout.layoutXOffset, layout.layoutYOffset);
+        // draw last title - if it is a showtitle
+        drawButtonShowTitle(canvas, layout.layoutXOffset, layout.layoutYOffset);
         }
 
 
@@ -321,9 +321,9 @@ public class Button implements Cloneable
         drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
 
         // draw the titles - ONLY TEXT titles
-        drawButtonTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
+        drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
 
-        drawButtonChangingPart( canvas );
+        drawButtonChangingPart(canvas);
         }
 
 
@@ -348,7 +348,7 @@ public class Button implements Cloneable
 
 
     /**
-     * Draws the titles for drawButton. ONLY TEXT Titles are drawn, markers are skipped
+     * Draws the titles for drawButton. ONLY TEXT Titles are drawn, show-titles are skipped
      * drawButton will calculate pixel coordinates previously
      * This method could be changed, if not all titles are needed
      * @param canvas canvas to draw on
@@ -357,14 +357,14 @@ public class Button implements Cloneable
      * @param yOffsetInPixel y offset in pixels
      * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
      */
-    protected void drawButtonTitles( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
+    protected void drawButtonTextTitles(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
         {
         // index (in buttons[][index]) == touchCode (this is always true)
         // Theoretically from index/touchCode the buttons position can be calculated.
         // BUT this is NOT obligatory!! So the buttons will store their position.
 
         int centerX = getPixelX(columnInGrids, xOffsetInPixel);
-        int centerY = getPixelY( rowInGrids, yOffsetInPixel);
+        int centerY = getPixelY(rowInGrids, yOffsetInPixel);
 
         for ( TitleDescriptor title : titles )
             {
@@ -375,7 +375,7 @@ public class Button implements Cloneable
 
 
     /**
-     * Draws the marker (if any) for drawButton. Marker can be ONLY at the last position
+     * Draws the showtitle (if any) for drawButton. Show-title can be ONLY at the last position
      * drawButton will calculate pixel coordinates previously
      * This method could be changed, if not all titles are needed
      * @param canvas canvas to draw on
@@ -384,13 +384,13 @@ public class Button implements Cloneable
      * @param yOffsetInPixel y offset in pixels
      * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
      */
-    protected void drawButtonMarker( Canvas canvas, int xOffsetInPixel, int yOffsetInPixel )
+    protected void drawButtonShowTitle(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
         {
         int centerX = getPixelX(columnInGrids, xOffsetInPixel);
         int centerY = getPixelY(rowInGrids, yOffsetInPixel);
 
         // ONLY VALID MARKERS are drawn
-        titles.getLast().drawMarkerTitle(canvas, layout, centerX, centerY);
+        titles.getLast().drawShowTitle(canvas, layout, centerX, centerY);
         }
 
 
