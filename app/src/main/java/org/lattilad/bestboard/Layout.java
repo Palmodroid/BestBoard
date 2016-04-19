@@ -856,19 +856,6 @@ public class Layout
         }
 
 
-    public static String StringPrelude(String string, int prelude)
-        {
-        if (string == null)
-            return null;
-        if (prelude >= string.length())
-            return string;
-        if (prelude <= 0)
-            return "";
-        return string.substring(0, prelude);
-        }
-
-
-
     // id is needed only for debug
     private long layoutId;
     
@@ -879,7 +866,7 @@ public class Layout
         Scribe.debug( Debug.LAYOUT, "Layout is created: " + toString());
         }
     
-    // toString is needed only for debuging
+    // toString is needed only for debugging
     @Override
     public String toString()
         {

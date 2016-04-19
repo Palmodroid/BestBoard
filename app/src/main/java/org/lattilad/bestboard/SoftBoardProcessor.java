@@ -22,6 +22,7 @@ import org.lattilad.bestboard.server.TextAfterCursor;
 import org.lattilad.bestboard.server.TextBeforeCursor;
 import org.lattilad.bestboard.states.CapsState;
 import org.lattilad.bestboard.states.LayoutStates;
+import org.lattilad.bestboard.utils.StringUtils;
 
 /**
  * Text processing part of SoftBoardService
@@ -372,7 +373,7 @@ public class SoftBoardProcessor implements
             Scribe.debug(Debug.CURSOR, "Controlled cursor remained: " + cursorLastMoved);
             }
 
-        Scribe.debug(Debug.CURSOR, "Position set to: " + calculatedCursor[cursorToMove] );
+        Scribe.debug(Debug.CURSOR, "Position set to: " + calculatedCursor[cursorToMove]);
 //        if ( ic != null )
 //            ic.setSelection( calculatedCursor[cursorToMove], calculatedCursor[cursorToMove] );
 
@@ -698,7 +699,7 @@ public class SoftBoardProcessor implements
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if ( ic != null )
             {
-            selectCursor( ic, (cursorLastMoved + 1) & 1 );
+            selectCursor(ic, (cursorLastMoved + 1) & 1);
             }
         }
 
@@ -872,11 +873,11 @@ public class SoftBoardProcessor implements
             int offset = 0;
             int c;
 
-            while ( isWhiteSpace( c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
+            while (StringUtils.isWhiteSpace(c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
                 {
                 offset--;
                 }
-            while ( !isWhiteSpace(c) && c != -1 )
+            while ( !StringUtils.isWhiteSpace(c) && c != -1 )
                 {
                 offset--;
                 c = getTextBeforeCursor().read();
@@ -914,11 +915,11 @@ public class SoftBoardProcessor implements
             int offset = 0;
             int c;
 
-            while ( isWhiteSpace( c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
+            while ( StringUtils.isWhiteSpace(c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
                 {
                 offset++;
                 }
-            while ( !isWhiteSpace(c) && c != -1 )
+            while ( !StringUtils.isWhiteSpace(c) && c != -1 )
                 {
                 offset++;
                 c = getTextAfterCursor().read();
@@ -956,7 +957,7 @@ public class SoftBoardProcessor implements
             int offset = 0;
             int c;
 
-            while ( isWhiteSpace( c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
+            while ( StringUtils.isWhiteSpace(c = getTextBeforeCursor().read()) ) // -1 is NOT whitespace !!
                 {
                 offset--;
                 }
@@ -997,7 +998,7 @@ public class SoftBoardProcessor implements
             int offset = 0;
             int c;
 
-            while ( isWhiteSpace( c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
+            while ( StringUtils.isWhiteSpace(c = getTextAfterCursor().read()) ) // -1 is NOT whitespace !!
                 {
                 offset++;
                 }
@@ -1064,7 +1065,7 @@ public class SoftBoardProcessor implements
             if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoFuncEnabled)
                 {
                 textBeforeCursor.reset();
-                if ( !isWhiteSpace( textBeforeCursor.read()) )
+                if ( !StringUtils.isWhiteSpace(textBeforeCursor.read()) )
                     sendBuilder.append(' ');
                 }
 
@@ -1073,7 +1074,7 @@ public class SoftBoardProcessor implements
             if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 && softBoardData.autoFuncEnabled)
                 {
                 textAfterCursor.reset();
-                if ( !isSpace( textAfterCursor.read()) )
+                if ( !StringUtils.isSpace(textAfterCursor.read()) )
                     sendBuilder.append(' ');
                 }
 
@@ -1375,13 +1376,4 @@ public class SoftBoardProcessor implements
         return text;
         }
 
-    public boolean isWhiteSpace( int ch )
-        {
-        return ch == ' ' || ch == '\n' || ch == '\t';
-        }
-
-    public boolean isSpace( int ch )
-        {
-        return ch == ' ';
-        }
     }
