@@ -866,8 +866,8 @@ public class SoftBoardProcessor implements
             selectCursor(ic, cursor);
 
             Scribe.debug( "Cursor: " + cursor );
-            Scribe.debug( "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
-            Scribe.debug( "Stored text before cursor: " + textBeforeCursor.toString() );
+            Scribe.debug("Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+            Scribe.debug("Stored text before cursor: " + textBeforeCursor.toString());
 
             int offset = 0;
             int c;
@@ -904,8 +904,8 @@ public class SoftBoardProcessor implements
                     cursor = CURSOR_END;
                 }
 
-            Scribe.debug( "Cursor: " + cursor );
-            Scribe.debug( "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+            Scribe.debug("Cursor: " + cursor);
+            Scribe.debug("Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
             Scribe.debug( "Stored text before cursor: " + textBeforeCursor.toString() );
 
             ic.beginBatchEdit();
@@ -950,8 +950,8 @@ public class SoftBoardProcessor implements
             selectCursor(ic, cursor);
 
             Scribe.debug( "Cursor: " + cursor );
-            Scribe.debug( "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
-            Scribe.debug( "Stored text before cursor: " + textBeforeCursor.toString() );
+            Scribe.debug("Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
+            Scribe.debug("Stored text before cursor: " + textBeforeCursor.toString());
 
             int offset = 0;
             int c;
@@ -1172,21 +1172,22 @@ public class SoftBoardProcessor implements
                     softBoardData.layoutStates.forceBinaryHardState(0x15);
                     sendKeyDownUp(KeyEvent.KEYCODE_DEL);
                     softBoardData.layoutStates.clearBinaryHardState();
-
-                    return;
                     }
-                else if ((data & 0xFC00) == 0xDC00)
+                else
                     {
-                    Scribe.debug(Debug.TEXT, "Unicode (2 bytes) delete!");
-                    l++;
+                    if ((data & 0xFC00) == 0xDC00)
+                        {
+                        Scribe.debug(Debug.TEXT, "Unicode (2 bytes) delete!");
+                        l++;
+                        }
+                    else if ((data & 0xFC00) == 0xD800)
+                        {
+                        Scribe.error(Debug.TEXT, "Deleting unicode lower part!");
+                        }
+                    sendDelete(ic, -l);
                     }
-                else if ((data & 0xFC00) == 0xD800)
-                    {
-                    Scribe.error(Debug.TEXT, "Deleting unicode lower part!");
-                    }
-
-                sendDelete(ic, -l);
                 }
+            ic.endBatchEdit();
             }
         }
 
@@ -1221,21 +1222,22 @@ public class SoftBoardProcessor implements
                     softBoardData.layoutStates.forceBinaryHardState(0x15);
                     sendKeyDownUp(KeyEvent.KEYCODE_FORWARD_DEL);
                     softBoardData.layoutStates.clearBinaryHardState();
-
-                    return;
                     }
-                else if ((data & 0xFC00) == 0xD800)
+                else
                     {
-                    Scribe.debug(Debug.TEXT, "Unicode (2 bytes) delete!");
-                    l++;
+                    if ((data & 0xFC00) == 0xD800)
+                        {
+                        Scribe.debug(Debug.TEXT, "Unicode (2 bytes) delete!");
+                        l++;
+                        }
+                    else if ((data & 0xFC00) == 0xDC00)
+                        {
+                        Scribe.error(Debug.TEXT, "Deleting unicode lower part!");
+                        }
+                    sendDelete(ic, l);
                     }
-                else if ((data & 0xFC00) == 0xDC00)
-                    {
-                    Scribe.error(Debug.TEXT, "Deleting unicode lower part!");
-                    }
-
-                sendDelete(ic, l);
                 }
+            ic.endBatchEdit();
             }
         }
 
