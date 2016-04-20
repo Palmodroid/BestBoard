@@ -109,6 +109,7 @@ public class TitleDescriptor
      ** TITLE SPECIFIC SETTINGS
      **/
 
+    // positive values means - showtitles -  system variables
     public static final int TEXT = 0;
     public static final int GET_FIRST_STRING = -1;
     public static final int GET_SECOND_STRING = -2;
@@ -140,7 +141,7 @@ public class TitleDescriptor
 
     public void setText(String newText)
         {
-        type = 0;
+        type = TEXT;
         text = newText;
         }
 
@@ -164,6 +165,7 @@ public class TitleDescriptor
         }
 
     // Only for private use! type OR text should be NULL
+    // (BUTTON_INFO-s text will be non-null only during running time)
     private TitleDescriptor(int type, String text, int xOffset, int yOffset, int size,
                            boolean bold, boolean italics, int color)
         {
@@ -202,7 +204,7 @@ public class TitleDescriptor
 
     public void drawShowTitle(Canvas canvas, Layout layout, int centerX, int centerY)
         {
-        // if ( type > 0 ) getShowText checks for real showtitles
+        // if ( type > 0 ) getShowText checks for real show-titles
         drawTitle( canvas, layout,
                 layout.softBoardData.softBoardShow.getShowText(type),
                 centerX, centerY );

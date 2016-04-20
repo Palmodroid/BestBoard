@@ -210,6 +210,8 @@ public class Commands
     public static final long TOKEN_SHIFT = 0x32f4092L;
     // public static final long TOKEN_LOCK = 0x11bd48L;
 
+    public static final long TOKEN_MEMORY = 0x5c9130daL;
+
     public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
 
     public static final long TOKEN_ENTER = 0x1a3c13eL;
@@ -482,6 +484,7 @@ public class Commands
                 TOKEN_LIST | PARAMETER_MOD_MULTIPLE,
                 TOKEN_MODIFY | PARAMETER_MOD_MULTIPLE,
                 TOKEN_SPACETRAVEL | PARAMETER_MOD_MULTIPLE,
+                TOKEN_MEMORY | PARAMETER_MOD_MULTIPLE,
                 TOKEN_ENTER | PARAMETER_MOD_MULTIPLE,
                 TOKEN_META | PARAMETER_MOD_MULTIPLE,
                 TOKEN_SWITCH | PARAMETER_MOD_MULTIPLE,
@@ -671,6 +674,15 @@ public class Commands
         add(TOKEN_SPACETRAVEL, ArrayUtils.concat(packetArray, buttonArray, new long[]{
                 TOKEN_SECOND }))
                 .method("setSpaceTravel").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
+
+        add(TOKEN_MEMORY, ArrayUtils.concat(buttonArray, new long[]{
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE}))
+                .method("setMemory").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
 
         add(TOKEN_META, new long[]{

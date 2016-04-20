@@ -14,6 +14,7 @@ import org.lattilad.bestboard.buttons.ButtonDouble;
 import org.lattilad.bestboard.buttons.ButtonEnter;
 import org.lattilad.bestboard.buttons.ButtonList;
 import org.lattilad.bestboard.buttons.ButtonMainTouch;
+import org.lattilad.bestboard.buttons.ButtonMemory;
 import org.lattilad.bestboard.buttons.ButtonMeta;
 import org.lattilad.bestboard.buttons.ButtonModify;
 import org.lattilad.bestboard.buttons.ButtonSingle;
@@ -1003,7 +1004,7 @@ public class MethodsForCommands
             }
         else if ( defaultText != null ) // both TEXT and default -> override default
             {
-            tokenizer.error("PACKET", R.string.data_send_packet_text_override );
+            tokenizer.note("PACKET", R.string.data_send_packet_text_override );
             }
 
         if (temp != null)
@@ -1377,6 +1378,16 @@ public class MethodsForCommands
             // this is not possible
             return setEmpty( parameters );
             }
+        }
+
+    public Button setMemory( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Memory Button is defined");
+
+        // Packet with default cannot be null!
+        return completeMainTouchButton( new ButtonMemory(
+                        packetText(parameters, "")), // Can be null
+                parameters);
         }
 
     public Button setSpaceTravel( ExtendedMap<Long, Object> parameters )

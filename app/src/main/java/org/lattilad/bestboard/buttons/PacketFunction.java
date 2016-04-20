@@ -129,16 +129,16 @@ public class PacketFunction extends Packet
                 {
                 case StringUtils.LOWER_CASE:
                     softBoardData.softBoardListener.changeLastWordOrSelected
-                            (StringUtils.toUpperFirst(string, softBoardData.locale), false);
+                            (StringUtils.toUpperFirst(string, softBoardData.locale), true);
                     break;
                 case StringUtils.FIRST_UPPER_CASE:
                 case StringUtils.MIXED_CASE:
                     softBoardData.softBoardListener.changeLastWordOrSelected
-                            ( string.toUpperCase( softBoardData.locale ), false);
+                            ( string.toUpperCase( softBoardData.locale ), true);
                     break;
                 case StringUtils.UPPER_CASE:
                     softBoardData.softBoardListener.changeLastWordOrSelected
-                            ( string.toLowerCase( softBoardData.locale ), false);
+                            ( string.toLowerCase( softBoardData.locale ), true);
                     break;
                 }
             }

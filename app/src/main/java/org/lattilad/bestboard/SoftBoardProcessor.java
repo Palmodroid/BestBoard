@@ -1452,13 +1452,11 @@ public class SoftBoardProcessor implements
                 {
                 if (lastIsSelected)
                     {
-                    modifyCalculatedCursor(calculatedCursor[0] - newText.length(), calculatedCursor[1]);
-                    textBeforeCursor.sendDelete(newText.length());
+                    moveRelative(ic, CURSOR_BEGIN, -newText.length(), true);
                     }
                 else
                     {
-                    modifyCalculatedCursor(calculatedCursor[0] - lastWordLengthAfterCursor);
-                    textBeforeCursor.sendDelete(lastWordLengthAfterCursor);
+                    moveRelative( ic, CURSOR_BEGIN, -lastWordLengthAfterCursor, false);
                     }
                 }
             ic.endBatchEdit();

@@ -61,7 +61,7 @@ public class StringUtils
             else
                 {
                 spaceAllowed = true;
-                abbreviation.append(ch);
+                abbreviation.append( (char)ch );
                 if (!isUTF16FirstHalf(ch))
                     abbreviationLength++;
                 // UTF16 lower part will not increase counter

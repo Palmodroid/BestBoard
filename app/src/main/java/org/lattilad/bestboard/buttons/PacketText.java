@@ -93,6 +93,11 @@ public class PacketText extends Packet
         return string;
         }
 
+    public void setString( String string )
+        {
+        this.string = string;
+        }
+
     private void sendString( )
         {
         String stringToSend;
