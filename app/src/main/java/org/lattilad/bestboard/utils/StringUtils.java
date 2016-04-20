@@ -106,4 +106,69 @@ public class StringUtils
         {
         return ch == ' ';
         }
+
+
+    public static final int UNKNOWN_CASE = -1;
+    public static final int LOWER_CASE = 1;
+    public static final int MIXED_CASE = 2;
+    public static final int FIRST_UPPER_CASE = 3;
+    public static final int UPPER_CASE = 4;
+
+    public static int checkStringCase( String string )
+        {
+        return checkStringCase( string, Integer.MAX_VALUE );
+        }
+
+    /**
+     * Checks the case of the string.
+     * UNKNOWN_CASE - no letters in the string
+     * LOWER_CASE - all letters are lower case
+     * UPPER_CASE - all letters are upper case
+     * FIRST_UPPER_CASE - first letter is uppercase, but all others are lowercase
+     * MICED_CASE - mixed lower case and upper case letters
+     * @param string string to check
+     * @param maxLength max. characters to check
+     * @return case-type
+     */
+    public static int checkStringCase( String string, int maxLength )
+        {
+        int counter;
+        int firstLetter = UNKNOWN_CASE;
+        int lowerCaseLetters = 0;
+        int upperCaseLetters = 0;
+
+        if (string.length() < maxLength)
+            maxLength = string.length();
+
+        // Find the first letter
+        for (counter = 0; counter < maxLength; counter++)
+            {
+            if (Character.isLetter(string.charAt(counter)))
+                {
+                firstLetter = Character.isUpperCase(string.charAt(counter)) ? UPPER_CASE : LOWER_CASE;
+                break;
+                }
+            }
+        for (counter++; counter < maxLength; counter++)
+            {
+            if (Character.isLetter(string.charAt(counter)))
+                {
+                if (Character.isUpperCase(string.charAt(counter)))
+                    upperCaseLetters++;
+                else
+                    lowerCaseLetters++;
+                }
+            }
+        if (firstLetter == UNKNOWN_CASE) return UNKNOWN_CASE; // There are no letters
+        else if (firstLetter == UPPER_CASE)
+            {
+            if (upperCaseLetters == 0) return FIRST_UPPER_CASE;
+            if (lowerCaseLetters == 0) return UPPER_CASE;
+            }
+        else // firstLetter == LOWER_CASE
+            {
+            if (upperCaseLetters == 0) return LOWER_CASE;
+            }
+        return MIXED_CASE;
+        }
     }
