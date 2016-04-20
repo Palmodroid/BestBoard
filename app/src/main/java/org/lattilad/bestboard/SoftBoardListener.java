@@ -60,6 +60,9 @@ public interface SoftBoardListener
     void jumpParaLeft(int cursor, boolean select);
     void jumpParaRight(int cursor, boolean select);
 
+    String getWordOrSelected();
+    void changeLastWordOrSelected( String newText, boolean restoreCursor );
+
     void startSoftBoardParser();
     }
 

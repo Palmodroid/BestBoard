@@ -7,6 +7,7 @@ import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.prefs.PrefsActivity;
 import org.lattilad.bestboard.states.CapsState;
 import org.lattilad.bestboard.states.LayoutStates;
+import org.lattilad.bestboard.utils.StringUtils;
 
 /**
  * Editor functions performed by the keyboard
@@ -56,6 +57,9 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_SELECTALL )
             return "ALL";
+
+        if ( functionCode == Commands.TOKEN_CAPITALIZE )
+            return "CAP";
 
         if ( functionCode == Commands.TOKEN_AUTOFUNC )
             return "AF";
@@ -116,6 +120,27 @@ public class PacketFunction extends Packet
         else if ( functionCode == Commands.TOKEN_AUTOFUNC )
             {
             softBoardData.autoFuncEnabled = !softBoardData.autoFuncEnabled;
+            }
+
+        else if ( functionCode == Commands.TOKEN_CAPITALIZE )
+            {
+            String string = softBoardData.softBoardListener.getWordOrSelected();
+            switch (StringUtils.checkStringCase(string, 2048))
+                {
+                case StringUtils.LOWER_CASE:
+                    softBoardData.softBoardListener.changeLastWordOrSelected
+                            (StringUtils.toUpperFirst(string, softBoardData.locale), false);
+                    break;
+                case StringUtils.FIRST_UPPER_CASE:
+                case StringUtils.MIXED_CASE:
+                    softBoardData.softBoardListener.changeLastWordOrSelected
+                            ( string.toUpperCase( softBoardData.locale ), false);
+                    break;
+                case StringUtils.UPPER_CASE:
+                    softBoardData.softBoardListener.changeLastWordOrSelected
+                            ( string.toLowerCase( softBoardData.locale ), false);
+                    break;
+                }
             }
         }
 

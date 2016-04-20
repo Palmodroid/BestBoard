@@ -1292,7 +1292,7 @@ public class SoftBoardProcessor implements
         {
         Scribe.debug(Debug.SERVICE, keyEventCode + " hard button is down!");
 
-        return sendKeyEvent( downTime, downTime, KeyEvent.ACTION_DOWN, keyEventCode );
+        return sendKeyEvent(downTime, downTime, KeyEvent.ACTION_DOWN, keyEventCode);
         }
 
 
@@ -1374,6 +1374,95 @@ public class SoftBoardProcessor implements
                 }
             }
         return text;
+        }
+
+
+    private boolean lastIsSelected = true;
+    private int lastWordLengthBeforeCursor = -1;
+    private int lastWordLengthAfterCursor = -1;
+
+
+    public String getWordOrSelected()
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            if ( isSelected() )
+                {
+                lastIsSelected = true;
+
+                CharSequence text = ic.getSelectedText(0); // can be null
+                if ( text != null )
+                    return text.toString();
+                }
+
+            else
+                {
+                lastIsSelected = false;
+
+                ic.beginBatchEdit();
+                StringBuilder builder = new StringBuilder();
+                String string;
+                int c;
+
+                textBeforeCursor.reset();
+                lastWordLengthBeforeCursor = 0;
+                while (!StringUtils.isWhiteSpace(c = getTextBeforeCursor().read()) && c != -1) // -1 is NOT whitespace !!
+                    {
+                    builder.insert(0, (char) c);
+                    lastWordLengthBeforeCursor ++;
+                    }
+
+                textAfterCursor.reset();
+                lastWordLengthAfterCursor = 0;
+                while ( !StringUtils.isWhiteSpace(c = getTextAfterCursor().read()) && c != -1) // -1 is NOT whitespace !!
+                    {
+                    builder.append( (char)c);
+                    lastWordLengthAfterCursor++;
+                    }
+
+                string = builder.toString();
+                Scribe.debug( "Word around cursor: " + string );
+                ic.endBatchEdit();
+                return string;
+                }
+            }
+        return "";
+        }
+
+
+    public void changeLastWordOrSelected( String newText, boolean restoreCursor )
+        {
+        Scribe.locus(Debug.SERVICE);
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            ic.beginBatchEdit();
+
+            if (!lastIsSelected) // word should be deleted
+                {
+                sendDelete(ic, -lastWordLengthBeforeCursor);
+                sendDelete(ic, lastWordLengthAfterCursor);
+                }
+
+            sendString(ic, newText);
+
+            if (restoreCursor)
+                {
+                if (lastIsSelected)
+                    {
+                    modifyCalculatedCursor(calculatedCursor[0] - newText.length(), calculatedCursor[1]);
+                    textBeforeCursor.sendDelete(newText.length());
+                    }
+                else
+                    {
+                    modifyCalculatedCursor(calculatedCursor[0] - lastWordLengthAfterCursor);
+                    textBeforeCursor.sendDelete(lastWordLengthAfterCursor);
+                    }
+                }
+            ic.endBatchEdit();
+            }
         }
 
     }
