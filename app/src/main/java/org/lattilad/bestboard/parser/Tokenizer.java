@@ -21,7 +21,8 @@ import java.io.Reader;
  * <ul>
  * <li>keywords - letters, digits and '_' allowed.
  * Keywords are converted to lowercase, and cannot begin with number.</li>
- * <li>"string" - All BMP characters, some escape sequences are allowed.</li>
+ * <li>"string" - All BMP characters, some escape sequences are allowed.
+ * Strings divided by '+' (plus sign right after the " sign) are added.</li>
  * <li>'c' - One character. All BMP characters, same escape sequences are allowed.</li>
  * <li>-+integers - negative or positive sign (on the first position) and 0-9 are allowed.</li>
  * <li>-+0xhexadecimals - same as integers, but A-F letters are also allowed.</li>
@@ -306,10 +307,13 @@ public class Tokenizer
 	/** Decimal fraction character */
 	public static final int MARK_FRACTION = '.';
 
-	/** Character (single) quote mark character */
+    /** String (double) quote mark character */
 	public static final int MARK_STRING = '\"';
 
-	/** String (double) quote mark character */
+    /** String should continue - (double) quote mark character and a plus sign together */
+    public static final int MARK_CONTINUE = '+';
+
+    /** Character (single) quote mark character */
 	public static final int MARK_CHARACTER = '\'';
 
     /** Unicode mark (dollar) character */
@@ -374,6 +378,7 @@ public class Tokenizer
 
 	/**
 	 * True if character is a valid white-space
+     * Eventually white-space terminates each token
 	 * EOL and EOF, START and END are special white-spaces
 	 * !! Special mark characters cannot be used as white spaces !!
 	 */
@@ -1319,13 +1324,35 @@ public class Tokenizer
 					// All escape sequences are translated to characters, which are added to the token.
 					if ( ch == MARK_STRING )
 						{
+                        if ( read() == MARK_CONTINUE )
+                            {
+                            while ( (ch = read()) != MARK_STRING )
+                                {
+                                if ( ch == MARK_NOTE )
+                                    findNextEOL();
+                                else if ( ch > ' ' || ch == EOF )
+                                    {
+                                    error( getStringToken(), R.string.error_string_not_terminated );
+                                    pushBackLastRead();
+                                    return tokenType;
+                                    }
+                                }
+                            continue;
+                            }
+                        else
+                            {
+                            pushBackLastRead();
+                            return tokenType;
+                            }
+						}
+					else if ( ch == EOF )
+						{
+						error(getStringToken(), R.string.error_string_not_terminated);
 						return tokenType;
 						}
-					else if ( ch == EOL || ch == EOF )
+					else if ( ch == EOL )
 						{
-						error( getStringToken(), R.string.error_string_not_terminated );
-						pushBackLastRead();
-						return tokenType;
+						continue;
 						}
                     else if ( ch == MARK_UNICODE )
                         {
