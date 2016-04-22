@@ -1,17 +1,24 @@
 package org.lattilad.bestboard.buttons;
 
 import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.modify.ModifyText;
 
-import java.util.ArrayList;
+import java.util.List;
+
 
 /**
- * Double list with list of packets
- * Packets should be undo-able (Text)
- * !! List cannot remain empty !!
+ * List button with modify behavior
+ * If no modification is possible, then writes the first string
  */
 public class ButtonList extends ButtonMainTouch implements Cloneable
     {
-    private ArrayList<Packet> packets = new ArrayList<>();
+    // packet's string and modifyText's first string should be the same
+    PacketText packetText;
+    Packet packetSecond;
+    ModifyText modifyText;
+    List<Object> strings;
+    boolean secondSent = false;
+
 
     @Override
     public ButtonList clone()
@@ -19,51 +26,74 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         return (ButtonList)super.clone();
         }
 
-    public void addPacket( Packet packet )
+    public ButtonList(PacketText packetText, Packet packetSecond, List<Object> strings)
         {
-        packets.add( packet );
+        this.packetText = packetText;
+        this.packetSecond = packetSecond;
+        this.strings = strings;
+        }
+
+    public ButtonList(PacketText packetText, Packet packetSecond )
+        {
+        this.packetText = packetText;
+        this.packetSecond = packetSecond;
+        modifyText = new ModifyText(layout.softBoardData, true );
+        modifyText.setFirstString( packetText.getString() );
+        }
+
+    protected void connected()
+        {
+        modifyText = new ModifyText(layout.softBoardData, true );
+        modifyText.addStringRoll( strings );
+        packetText.setString( modifyText.getFirstString() );
+        }
+
+    public void extendList( String string )
+        {
+        modifyText.extendFirstRoll( string );
         }
 
     public String getFirstString()
         {
-        if ( packets.isEmpty() )
-            return "LIST";
-        else
-            return packets.get(0).getString();
+        return packetText.getString();
         }
 
-    private static int counter = 0;
-
-
-    /**
-     * Packet is sent independently from touch down/move
-     */
     @Override
     public void mainTouchStart( boolean isTouchDown )
         {
-        counter = 0;
-        packets.get(0).send();
+        if ( !modifyText.change( false ) )
+            {
+            packetText.send();
+            }
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }
 
     @Override
     public void mainTouchEnd( boolean isTouchUp )
         {
-        packets.get(counter).release();
+        // Change behaves as send - so release is always needed
+        if ( secondSent )   packetSecond.release();
+        else                packetText.release();
         }
 
     @Override
     public boolean fireSecondary(int type)
         {
-        if ( layout.softBoardData.softBoardListener.undoLastString() )
+        if ( packetSecond != null && layout.softBoardData.softBoardListener.undoLastString() )
             {
-            counter++;
-            if ( counter == packets.size() )
-                counter = 0;
-
-            packets.get(counter).send();
+            if ( secondSent )
+                {
+                packetText.send();
+                secondSent = false;
+                }
+            else
+                {
+                packetSecond.send();
+                secondSent = true;
+                }
             layout.softBoardData.vibrate(SoftBoardData.VIBRATE_SECONDARY);
             }
         return false;
         }
+
     }

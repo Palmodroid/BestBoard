@@ -440,7 +440,7 @@ public class BoardTable
             return;
             }
 
-        if ( id == Commands.TOKEN_BACK )
+        if ( id == -1L )
             {
             selectPreviousBoard();
             return;

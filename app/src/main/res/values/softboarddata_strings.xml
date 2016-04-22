@@ -36,7 +36,6 @@
     <string name="data_layout_overwritten">"Previous layout was overwritten!"</string>
     <string name="data_align_bad_parameter">"Align parameter cannot be identified!"</string>
     <string name="data_layout_error">"New layout cannot be created with these parameters!"</string>
-    <string name="data_layout_missing">"Layout parameter is missing!"</string>
     <string name="data_no_layout">"Layout does not exist!"</string>
     <string name="data_send_packet_text_override">"Packet default text was overwritten!"</string>
     <string name="data_send_packet_key_override">"Packet default key was overwritten!"</string>
@@ -58,6 +57,7 @@
     <string name="data_button_color_changed">"The color of the button is changed!"</string>
     <string name="data_button_titles_extended">"The titles of the button are extended!"</string>
     <string name="data_button_extended_invalid">"Only single or list buttons can be extended!"</string>
+    <string name="data_button_extended_invalid_list">"Valid string is needed to extend single to list buttons!"</string>
     <string name="data_button_extended_onstay">"Secondary functions are activated on stay!"</string>
     <string name="data_button_extended_oncircle">"Secondary functions are activated on circle!"</string>
     <string name="data_packet_combine_missing">"Key packet is missing!"</string>

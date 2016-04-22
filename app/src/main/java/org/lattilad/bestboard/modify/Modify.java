@@ -28,10 +28,12 @@ public abstract class Modify
     /**
      * This method just helps to change the text before the spaces standing before the cursor
      * @param reverse Direction of the change
+     * @return true if change was made, false otherwise
      */
-    public void change( boolean reverse )
+    public boolean change( boolean reverse )
         {
         int spaces=0;
+        boolean changed;
 
         if ( ignoreSpace )
             {
@@ -39,18 +41,20 @@ public abstract class Modify
             }
 
         if ( reverse )
-            changeBack();
+            changed = changeBack();
         else
-            change();
+            changed = change();
 
         if ( spaces >0 )
             {
             // http://stackoverflow.com/a/2807731
             softBoardData.softBoardListener.sendString(new String(new char[spaces]).replace('\0', ' '), 0 );
             }
+
+        return changed;
         }
 
 
-    public abstract void change();
-    public abstract void changeBack();
+    protected abstract boolean change();
+    protected abstract boolean changeBack();
     }

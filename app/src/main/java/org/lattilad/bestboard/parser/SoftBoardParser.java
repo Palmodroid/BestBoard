@@ -247,6 +247,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
     public int parseDescriptorFile(File descriptorFile) throws TaskCancelledException, IOException, InvalidCoatFileException, ExternalDataException
         {
         Scribe.locus( Debug.PARSER );
+
+        Scribe.clear_secondary(); // Secondary config will store data from ONE run
         Scribe.note_secondary(caller.getApplicationContext().getString(R.string.parser_starting));
 
         // Descriptor file check

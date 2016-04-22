@@ -93,8 +93,6 @@ public class Debug
                 .enableFileLog( coatLogFileName )       // Secondary file name : "coat.log"
                 .enableSysLog( LOG_TAG_COAT )           // Secondary log-tag : "COAT"
                 .initSecondary();
-
-        Scribe.clear_secondary(); // Secondary config will store data from ONE run
-		}
+        }
 	
 	}

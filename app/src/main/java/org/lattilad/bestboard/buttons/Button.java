@@ -120,8 +120,13 @@ public class Button implements Cloneable
         this.layout = layout;
         this.columnInGrids = getGridX(arrayColumn, arrayRow);
         this.rowInGrids = getGridY(arrayRow);
+        connected();
         }
 
+    protected void connected()
+        {
+        // methods which requires softboarddata should come here
+        }
 
     /**
      * Sets button's background color

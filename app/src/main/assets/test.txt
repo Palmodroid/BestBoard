@@ -133,7 +133,7 @@ BLOCK ( LAYOUT lay1 COLUMN 1 ROW 2
     SINGLE ( FIRST ( TEXT "Repeat" ) REPEAT )
     DOUBLE ( FIRST ( TEXT "double" ) SECOND ( TEXT "DOUBLE" ) )
     ALTERNATE ( FIRST ( TEXT "alt" ) SECOND ( TEXT "ALT" ) )
-    LIST ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") )
+    MULTI ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") )
     BUTTON ( CAPITALIZE )
       )
 
@@ -142,7 +142,8 @@ BLOCK ( LAYOUT lay1 COLUMN 1 ROW 3
     BUTTON ( TEXT "Repeat" REPEAT ONCIRCLE )
     DOUBLE ( TEXT "double" SECOND ( TEXT "DOUBLE" ) ONSTAY )
     ALTERNATE ( TEXT "alt" SECOND ( TEXT "ALT" ) ONSTAY )
-    LIST ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") ONSTAY )
+    MULTI ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") ONSTAY )
+    LIST ( TEXT "List" AUTOSPACE AROUND ERASESPACE AROUND ADDTEXT "List all data" ADDTEXT "List's of other data" ADDTEXT "Some more data" SECOND ( TEXT "secondary") )
     BUTTON ( TOGGLE AUTOFUNC ADDTITLE (SHOW AUTOFUNC ) )
       )
 
@@ -425,7 +426,7 @@ BLOCK ( LAYOUT lay5 COLUMN 2 ROW 4
 BLOCK ( LAYOUT lay5 COLUMN 2 ROW 4
 	EXTEND ( SECOND (TEXT "dbl"))
 	EXTEND ( TOALTERNATE SECOND (TEXT "alt"))
-	EXTEND ( TOLIST ADD ( TEXT "1" ) ADD ( TEXT "2" ) ADD (TEXT "3"))
+	EXTEND ( TOMULTI ADD ( TEXT "1" ) ADD ( TEXT "2" ) ADD (TEXT "3"))
 		)		
 
 ; lay6 - combined packets

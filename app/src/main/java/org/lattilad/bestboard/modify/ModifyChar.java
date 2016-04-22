@@ -61,7 +61,7 @@ public class ModifyChar extends Modify
      * If ignoreSpace is true, then spaces before the cursor are deleted,
      * and are restored after the operation.
      */
-    public void change( )
+    protected boolean change( )
         {
         softBoardData.softBoardListener.getTextBeforeCursor().reset();
         int last = softBoardData.softBoardListener.getTextBeforeCursor().read();
@@ -85,7 +85,7 @@ public class ModifyChar extends Modify
                     softBoardData.softBoardListener.changeStringBeforeCursor(
                             String.valueOf( rolls.get( rollCounter ).charAt( charCounter ) ));
 
-                    return;
+                    return true;
                     }
                 } while ( charCounter != this.charCounter );
 
@@ -100,6 +100,7 @@ public class ModifyChar extends Modify
 
         this.rollCounter = 0;
         // Character was not found, no change in text
+        return false;
         }
         
         
@@ -111,7 +112,7 @@ public class ModifyChar extends Modify
      * If ignoreSpace is true, then spaces before the cursor are deleted,
      * and are restored after the operation.
      */
-    public void changeBack( )
+    protected boolean changeBack( )
         {
         softBoardData.softBoardListener.getTextBeforeCursor().reset();
         int last = softBoardData.softBoardListener.getTextBeforeCursor().read();
@@ -136,7 +137,7 @@ public class ModifyChar extends Modify
                     softBoardData.softBoardListener.changeStringBeforeCursor(
                         String.valueOf( rolls.get( stringCounter ).charAt( charCounter ) ));
 
-                    return;
+                    return true;
                     }
                 } while ( charCounter != this.charCounter );
 
@@ -150,6 +151,7 @@ public class ModifyChar extends Modify
 
         this.rollCounter = 0;
         // Character was not found, no change in text
+        return false;
         }
     
     }

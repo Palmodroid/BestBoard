@@ -13,6 +13,7 @@ import org.lattilad.bestboard.buttons.ButtonAlternate;
 import org.lattilad.bestboard.buttons.ButtonDouble;
 import org.lattilad.bestboard.buttons.ButtonEnter;
 import org.lattilad.bestboard.buttons.ButtonList;
+import org.lattilad.bestboard.buttons.ButtonMulti;
 import org.lattilad.bestboard.buttons.ButtonMainTouch;
 import org.lattilad.bestboard.buttons.ButtonMemory;
 import org.lattilad.bestboard.buttons.ButtonMeta;
@@ -91,10 +92,11 @@ public class MethodsForCommands
 
         private ArrayList<KeyValuePair> titleList = null;
 
-        // Can be TOKEN_DOUBLE TOKEN_ALTERNATE OR TOKEN_LIST
+        // Can be TOKEN_DOUBLE TOKEN_ALTERNATE TOKEN_MULTI OR TOKEN_LIST
         private Long type = null;
         // SECONDARY packet (DOUBLE OR ALTERNATE)
-        // List of ADD packets (LIST)
+        // List of ADD packets (MULTI)
+        // List of ADDTEXT packets (LIST)
         private Object data = null;
 
         private boolean onCircle = false;
@@ -130,6 +132,9 @@ public class MethodsForCommands
 
     /** Map of temporary layouts, identified by code of keywords */
     public Map<Long, Layout> layouts = new HashMap<>();
+
+    /** Last layout created by addLayout or used by setBlock */
+    private long lastLayoutId = -1L;
 
     /** Typeface will be set at the and of parseSoftBoard, both for titledescriptor and layouts */
     public File typefaceFile = null;
@@ -560,6 +565,7 @@ public class MethodsForCommands
 
             // needed only by debugging purposes
             layout.setLayoutId(id);
+            lastLayoutId = id;
 
             if ( layouts.put(id, layout) != null )
                 {
@@ -601,12 +607,9 @@ public class MethodsForCommands
      */
     public void setBlock(ExtendedMap<Long, Object> parameters)
         {
-        Long layoutId = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
-        if (layoutId == null)
-            {
-            tokenizer.error( "CURSOR", R.string.data_layout_missing);
-            return;
-            }
+        // Try to use the last layout, if layout is missing
+        Long temp = (Long)parameters.remove( Commands.TOKEN_LAYOUT );
+        if (temp != null)   lastLayoutId = temp; // Given layout will be used later
 
         // starting (HOME) positions - rows should be adjusted after getting layout
         int homeArrayColumn = (int)parameters.remove(Commands.TOKEN_COLUMN, 1) -1;
@@ -623,7 +626,7 @@ public class MethodsForCommands
             return;
             }
 
-        Layout layout = layouts.get( layoutId );
+        Layout layout = layouts.get( lastLayoutId );
         if ( layout == null )
             {
             Scribe.error(Debug.PARSER, "BLOCK: layout is missing!!");
@@ -738,9 +741,17 @@ public class MethodsForCommands
                                 {
                                 button = ((ButtonSingle) button).extendToAlternate((Packet) buttonExtension.data);
                                 }
+                            else if (buttonExtension.type == Commands.TOKEN_MULTI)
+                                {
+                                button = ((ButtonSingle) button).extendToMulti();
+                                }
                             else if (buttonExtension.type == Commands.TOKEN_LIST)
                                 {
-                                button = ((ButtonSingle) button).extendToList();
+                                ButtonList buttonList = ((ButtonSingle) button).extendToList();
+                                if ( buttonList != null )
+                                    button = buttonList;
+                                else
+                                    tokenizer.error("EXTEND", R.string.data_button_extended_invalid_list);
                                 }
                             // button should be written back
                             try
@@ -753,11 +764,22 @@ public class MethodsForCommands
                                 }
                             }
 
-                        if (buttonExtension.type == Commands.TOKEN_LIST && button instanceof ButtonList)
+                        if (buttonExtension.type == Commands.TOKEN_MULTI && button instanceof ButtonMulti)
                             {
                             for (KeyValuePair packet : (ArrayList<KeyValuePair>) buttonExtension.data)
                                 {
-                                ((ButtonList) button).addPacket((Packet) packet.getValue());
+                                ((ButtonMulti) button).addPacket((Packet) packet.getValue());
+                                }
+                            error = false;
+                            }
+
+                        else if (buttonExtension.type == Commands.TOKEN_LIST && button instanceof ButtonList)
+                            {
+                            for (KeyValuePair text : (ArrayList<KeyValuePair>) buttonExtension.data)
+                                {
+                                String string = (String)text.getValue();
+                                if ( string.length() > 0 )
+                                    ((ButtonList)button).extendList(string);
                                 }
                             error = false;
                             }
@@ -962,7 +984,7 @@ public class MethodsForCommands
             }
         else if ( defaultKey != NO_DEFAULT_KEY ) // both TEXT and default -> override default
             {
-            tokenizer.error("PACKET", R.string.data_send_packet_key_override );
+            tokenizer.error("PACKET", R.string.data_send_packet_key_override);
             }
 
         if ( temp != NO_DEFAULT_KEY )
@@ -1004,7 +1026,7 @@ public class MethodsForCommands
             }
         else if ( defaultText != null ) // both TEXT and default -> override default
             {
-            tokenizer.note("PACKET", R.string.data_send_packet_text_override );
+            tokenizer.note("PACKET", R.string.data_send_packet_text_override);
             }
 
         if (temp != null)
@@ -1324,11 +1346,14 @@ public class MethodsForCommands
     public Button setSwitch( ExtendedMap<Long, Object> parameters )
         {
         Scribe.debug(Debug.DATA, "Switch Button is defined");
+        Long boardId = -1L; // 'BACK' is a special token: go back to previous board
 
-        Long boardId = (Long) parameters.remove( Commands.TOKEN_BOARD );
-        if ( boardId == null )   return setEmpty( parameters );
+        if ( parameters.remove( Commands.TOKEN_BACK) == null ) // BACK is not found
+            {
+            boardId = (Long) parameters.remove(Commands.TOKEN_BOARD);
+            if (boardId == null) return setEmpty(parameters);
+            }
 
-        // 'BACK' is a special token: go back to previous board
         return completeButton(
                 new ButtonSwitch(boardId,
                         parameters.remove(Commands.TOKEN_LOCK) != null,
@@ -1408,7 +1433,7 @@ public class MethodsForCommands
         // Packet with default cannot be null!
         return completeMainTouchButton( new ButtonEnter(
                 packetKey( parameters, 0x10000 + KeyEvent.KEYCODE_ENTER), // Or: '\n'
-                packetText( parameters, "\n" ),
+                packetText(parameters, "\n"),
                 parameters.remove( Commands.TOKEN_REPEAT ) != null ),
                 parameters);
         }
@@ -1425,25 +1450,58 @@ public class MethodsForCommands
                 parameters);
         }
 
-    public Button setList( ExtendedMap<Long, Object> parameters )
+
+    public Button setList(ExtendedMap<Long, Object> parameters)
         {
         Scribe.debug(Debug.DATA, "List Button is defined");
 
+        PacketText packetText = packetText(parameters, "");
+
+        List<Object> strings = new ArrayList<>();
+        if ( packetText.getString().length() > 0)
+            strings.add( packetText.getString() );
+
         // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
-        ArrayList<KeyValuePair> packetList = (ArrayList<KeyValuePair>)parameters.remove(
-                Bit.setSignedBitOn( Commands.TOKEN_ADD ) );
-
-        if ( packetList == null || packetList.isEmpty() )
-            return setEmpty( parameters );
-
-        ButtonList buttonList = new ButtonList();
-
-        for ( KeyValuePair packet: packetList)
+        ArrayList<KeyValuePair> textList = (ArrayList<KeyValuePair>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_ADDTEXT ) );
+        if ( textList != null )
             {
-            buttonList.addPacket( (Packet)packet.getValue() );
+            for ( KeyValuePair text : textList )
+                {
+                String string = (String)text.getValue();
+                if ( string.length() > 0 )
+                    strings.add( string );
+                }
             }
 
-        return completeMainTouchButton( buttonList, parameters);
+        if ( strings.size() > 0 )
+            return completeMainTouchButton( new ButtonList( packetText,
+                    (Packet)parameters.remove( Commands.TOKEN_SECOND ),
+                    strings ), parameters );
+        else
+            return setEmpty( parameters );
+        }
+
+
+    public Button setMulti(ExtendedMap<Long, Object> parameters)
+        {
+        Scribe.debug(Debug.DATA, "Multi Button is defined");
+
+        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
+        ArrayList<KeyValuePair> packetMulti = (ArrayList<KeyValuePair>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_ADD ) );
+
+        if ( packetMulti == null || packetMulti.isEmpty() )
+            return setEmpty( parameters );
+
+        ButtonMulti buttonMulti = new ButtonMulti();
+
+        for ( KeyValuePair packet: packetMulti)
+            {
+            buttonMulti.addPacket( (Packet)packet.getValue() );
+            }
+
+        return completeMainTouchButton(buttonMulti, parameters);
         }
 
     public Button setAlternate( ExtendedMap<Long, Object> parameters )
@@ -1628,10 +1686,16 @@ public class MethodsForCommands
                 buttonExtension.type = Commands.TOKEN_ALTERNATE;
                 }
             }
-        // ADD can be (LIST), where LIST is not obligatory
+        // ADD can be (MULTI), where MULTI is not obligatory
         else if ( (buttonExtension.data = parameters.remove( Bit.setSignedBitOn(Commands.TOKEN_ADD) )) != null )
             {
-            parameters.remove( Commands.TOKEN_TOLIST );
+            parameters.remove( Commands.TOKEN_TOMULTI);
+            buttonExtension.type = Commands.TOKEN_MULTI;
+            }
+        // ADDTEXT can be (LIST), where LIST is not obligatory
+        else if ( (buttonExtension.data = parameters.remove( Bit.setSignedBitOn(Commands.TOKEN_ADDTEXT) )) != null )
+            {
+            parameters.remove( Commands.TOKEN_TOLIST);
             buttonExtension.type = Commands.TOKEN_LIST;
             }
 

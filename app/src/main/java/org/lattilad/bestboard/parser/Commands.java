@@ -193,8 +193,10 @@ public class Commands
 
     public static final long TOKEN_ALTERNATE = 0x21d3dacd0f44L;
 
-    public static final long TOKEN_LIST = 0x119f8bL;
+    public static final long TOKEN_MULTI = 0x28dc92bL;
     public static final long TOKEN_ADD = 0x13767L;
+    public static final long TOKEN_LIST = 0x119f8bL;
+    public static final long TOKEN_ADDTEXT = 0x63091a2b0L;
 
     public static final long TOKEN_SWITCH = 0x775d93d7L;
     public static final long TOKEN_BOARD = 0x14e5880L;
@@ -234,6 +236,7 @@ public class Commands
     // public static final long TOKEN_COLOR = 0x16b2be3L;
 
     public static final long TOKEN_EXTEND = 0x3da4e6fdL;
+    public static final long TOKEN_TOMULTI = 0x11b8b2c3e8L;
     public static final long TOKEN_TOLIST = 0x7a9d0044L;
     public static final long TOKEN_TODOUBLE = 0x28f8bda5e89L;
     public static final long TOKEN_TOALTERNATE = 0x1faa2b1b5295331L;
@@ -482,6 +485,7 @@ public class Commands
                 TOKEN_DOUBLE | PARAMETER_MOD_MULTIPLE,
                 TOKEN_ALTERNATE | PARAMETER_MOD_MULTIPLE,
                 TOKEN_LIST | PARAMETER_MOD_MULTIPLE,
+                TOKEN_MULTI | PARAMETER_MOD_MULTIPLE,
                 TOKEN_MODIFY | PARAMETER_MOD_MULTIPLE,
                 TOKEN_SPACETRAVEL | PARAMETER_MOD_MULTIPLE,
                 TOKEN_MEMORY | PARAMETER_MOD_MULTIPLE,
@@ -624,9 +628,9 @@ public class Commands
                 .method("setAlternate").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET, TOKEN_FIRST, TOKEN_SECOND});
 
-        add(TOKEN_LIST, ArrayUtils.concat(buttonArray, new long[]{
+        add(TOKEN_MULTI, ArrayUtils.concat(buttonArray, new long[]{
                 TOKEN_ADD | PARAMETER_MOD_MULTIPLE }))
-                .method("setList").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .method("setMulti").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON});
 
         add(TOKEN_ADD, new long[]{
@@ -642,6 +646,19 @@ public class Commands
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                 TOKEN_DO */}).method("packet").allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_PACKET});;
+
+        add(TOKEN_LIST, ArrayUtils.concat(buttonArray, new long[]{
+                TOKEN_TEXT,
+                TOKEN_AUTOCAPS,
+                TOKEN_STRINGCAPS,
+                TOKEN_ERASESPACE,
+                TOKEN_AUTOSPACE,
+                TOKEN_ADDTEXT | PARAMETER_MOD_MULTIPLE,
+                TOKEN_SECOND}))
+                .method("setList").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET, TOKEN_SECOND });
+
+        add(TOKEN_ADDTEXT, PARAMETER_TEXT);
 
         add(TOKEN_MODIFY, new long[]{
                 TOKEN_ROLL,
@@ -705,6 +722,7 @@ public class Commands
 
         add(TOKEN_SWITCH, new long[]{
                 TOKEN_BOARD,
+                TOKEN_BACK,
                 TOKEN_LOCK,
                 TOKEN_CAPSSTATE,
                 TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
@@ -713,6 +731,7 @@ public class Commands
                 .method("setSwitch").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault().labels(new long[]{TOKEN_BUTTON});
 
         add(TOKEN_BOARD, PARAMETER_KEYWORD);
+        add(TOKEN_BACK, PARAMETER_FLAG);
         // add(TOKEN_LOCK, PARAMETER_FLAG);
         add(TOKEN_CAPSSTATE, PARAMETER_FLAG);
 
@@ -749,14 +768,17 @@ public class Commands
                 TOKEN_SECOND,
                 TOKEN_TODOUBLE,
                 TOKEN_TOALTERNATE,
+                TOKEN_TOMULTI,
                 TOKEN_TOLIST,
                 TOKEN_ADD | PARAMETER_MOD_MULTIPLE,
+                TOKEN_ADDTEXT | PARAMETER_MOD_MULTIPLE,
                 TOKEN_ONSTAY,
                 TOKEN_ONCIRCLE })
                 .method("extendButton").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault();
 
         add(TOKEN_TODOUBLE, PARAMETER_FLAG );
         add(TOKEN_TOALTERNATE, PARAMETER_FLAG );
+        add(TOKEN_TOMULTI, PARAMETER_FLAG );
         add(TOKEN_TOLIST, PARAMETER_FLAG );
 
         add(TOKEN_ADDMODIFY, new long[]{

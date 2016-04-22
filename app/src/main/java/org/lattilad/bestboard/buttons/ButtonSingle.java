@@ -55,19 +55,31 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
         }
 
 
-    public ButtonList extendToList()
+    public ButtonMulti extendToMulti()
         {
-        ButtonList buttonList;
+        ButtonMulti buttonMulti;
 
-        buttonList = new ButtonList();
-        buttonList.addPacket( packet ); // Packet of the Single Button becomes the first element
-        buttonList.setTitles(getTitles());
-        buttonList.setColor(color);
+        buttonMulti = new ButtonMulti();
+        buttonMulti.addPacket( packet ); // Packet of the Single Button becomes the first element
+        buttonMulti.setTitles(getTitles());
+        buttonMulti.setColor(color);
         // onCircle cannot be checked because of repeat
 
-        return buttonList;
+        return buttonMulti;
         }
 
+    public ButtonList extendToList( )
+        {
+        if ( packet instanceof PacketText && packet.getString().length() > 0 )
+            {
+            ButtonList buttonList = new ButtonList((PacketText)packet, null);
+            buttonList.setTitles(getTitles());
+            buttonList.setColor(color);
+            // onCircle cannot be checked because of repeat
+            return buttonList;
+            }
+        return null;
+        }
 
     public String getFirstString()
         {

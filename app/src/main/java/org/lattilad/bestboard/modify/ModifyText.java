@@ -67,6 +67,45 @@ public class ModifyText extends Modify
 
 
     /**
+     * Special list button uses TextModify with only one roll.
+     * List button needs the first element
+     * @return first string element
+     */
+    public String getFirstString()
+        {
+        // rolls is never null, but can be empty
+        // elements inside rolls cannot be empty
+        return rolls.isEmpty() ? "" : rolls.get(0).get(0);
+        }
+
+    /**
+     * Sets the first element for special list button
+     * @param string first element
+     */
+    public void setFirstString( String string )
+        {
+        if ( string != null && string.length() > 0 )
+            {
+            if (rolls.isEmpty()) rolls.add(new ArrayList<String>());
+            rolls.get(0).add(0, string) ;
+            }
+        }
+
+    /**
+     * Extends the elements of the first roll for special list button
+     * @param string first element
+     */
+    public void extendFirstRoll( String string )
+        {
+        if ( string != null && string.length() > 0 )
+            {
+            if (rolls.isEmpty()) rolls.add(new ArrayList<String>());
+            rolls.get(0).add( string );
+            }
+        }
+
+
+    /**
      * Compares string with the preText puffer - starting from the end
      * @param string to compare with CANNOT BE NULL
      * @return true if puffer-end is equal with the string
@@ -102,7 +141,7 @@ public class ModifyText extends Modify
      * If ignoreSpace is true, then spaces before the cursor are deleted,
      * and are restored after the operation.
      */
-    public void change( )
+    protected boolean change( )
         {
         softBoardData.softBoardListener.getTextBeforeCursor().reset();
 
@@ -124,7 +163,7 @@ public class ModifyText extends Modify
 
                         softBoardData.softBoardListener.changeStringBeforeCursor(inspected.length(), rolls.get(rollCounter).get(stringCounter));
 
-                        return;
+                        return true;
                         }
                     } while ( stringCounter != this.stringCounter );
 
@@ -139,6 +178,7 @@ public class ModifyText extends Modify
 
         this.rollCounter = 0;
         // Text was not found, no change in text
+        return false;
         }
 
 
@@ -150,7 +190,7 @@ public class ModifyText extends Modify
      * If ignoreSpace is true, then spaces before the cursor are deleted,
      * and are restored after the operation.
      */
-    public void changeBack( )
+    protected boolean changeBack( )
         {
         softBoardData.softBoardListener.getTextBeforeCursor().reset();
 
@@ -174,7 +214,7 @@ public class ModifyText extends Modify
                     softBoardData.softBoardListener.changeStringBeforeCursor( inspected.length(),
                             rolls.get( rollCounter ).get( stringCounter ) );
 
-                    return;
+                    return true;
                     }
                 } while ( stringCounter != this.stringCounter );
 
@@ -188,6 +228,7 @@ public class ModifyText extends Modify
 
         this.rollCounter = 0;
         // Text was not found, no change in text
+        return false;
         }
 
     }
