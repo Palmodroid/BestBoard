@@ -130,6 +130,7 @@ public class Commands
     public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
     public static final long TOKEN_SELECTALL = 0x5ab4faaa9d61L;
     public static final long TOKEN_CHANGECASE = 0x5c19ec2779e2bL;
+    public static final long TOKEN_RUN = 0x194cfL;
 
     public static final long TOKEN_TOGGLE = 0x7a99172fL;
     public static final long TOKEN_TURNON = 0x7b4d533bL;
@@ -536,7 +537,7 @@ public class Commands
                 TOKEN_AUTOSPACE,
                 TOKEN_KEY,
                 TOKEN_TURNON, TOKEN_TURNOFF,
-                TOKEN_DELETE, TOKEN_BACKSPACE, TOKEN_TOGGLE, TOKEN_SELECTALL, TOKEN_CHANGECASE, TOKEN_DRAFT, TOKEN_SETTINGS,
+                TOKEN_DELETE, TOKEN_BACKSPACE, TOKEN_TOGGLE, TOKEN_SELECTALL, TOKEN_CHANGECASE, TOKEN_DRAFT, TOKEN_SETTINGS, TOKEN_RUN,
                 TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
                 TOKEN_COMBINE,
@@ -566,6 +567,7 @@ public class Commands
         add(TOKEN_TOGGLE, PARAMETER_KEYWORD);
         add(TOKEN_SELECTALL, PARAMETER_FLAG);
         add(TOKEN_CHANGECASE, PARAMETER_FLAG);
+        add(TOKEN_RUN, PARAMETER_STRING);
 
         add(TOKEN_TOP, PARAMETER_FLAG);
         add(TOKEN_LEFT, PARAMETER_FLAG);

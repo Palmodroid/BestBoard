@@ -6,18 +6,18 @@ import android.view.KeyEvent;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.SoftBoardShow;
 import org.lattilad.bestboard.SoftBoardProcessor;
+import org.lattilad.bestboard.SoftBoardShow;
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonAlternate;
 import org.lattilad.bestboard.buttons.ButtonDouble;
 import org.lattilad.bestboard.buttons.ButtonEnter;
 import org.lattilad.bestboard.buttons.ButtonList;
-import org.lattilad.bestboard.buttons.ButtonMulti;
 import org.lattilad.bestboard.buttons.ButtonMainTouch;
 import org.lattilad.bestboard.buttons.ButtonMemory;
 import org.lattilad.bestboard.buttons.ButtonMeta;
 import org.lattilad.bestboard.buttons.ButtonModify;
+import org.lattilad.bestboard.buttons.ButtonMulti;
 import org.lattilad.bestboard.buttons.ButtonSingle;
 import org.lattilad.bestboard.buttons.ButtonSpaceTravel;
 import org.lattilad.bestboard.buttons.ButtonSwitch;
@@ -26,6 +26,7 @@ import org.lattilad.bestboard.buttons.PacketCombine;
 import org.lattilad.bestboard.buttons.PacketFunction;
 import org.lattilad.bestboard.buttons.PacketKey;
 import org.lattilad.bestboard.buttons.PacketMove;
+import org.lattilad.bestboard.buttons.PacketRun;
 import org.lattilad.bestboard.buttons.PacketText;
 import org.lattilad.bestboard.buttons.PacketTextTime;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
@@ -1098,9 +1099,10 @@ public class MethodsForCommands
      * @param parameters Function packet parameters (DO)
      * @return Function packet or null
      */
-    public PacketFunction packetFunction( ExtendedMap<Long, Object> parameters )
+    public Packet packetFunction( ExtendedMap<Long, Object> parameters )
         {
         Long temp;
+        String string;
 
         if ( parameters.remove(Commands.TOKEN_DELETE) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_DELETE);
@@ -1123,6 +1125,9 @@ public class MethodsForCommands
             return new PacketFunction( softBoardData, Commands.TOKEN_DRAFT);
         if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_SETTINGS);
+        if ( (string = (String)parameters.remove(Commands.TOKEN_RUN)) != null )
+            return new PacketRun(softBoardData, string);
+
         return null;
         }
 
