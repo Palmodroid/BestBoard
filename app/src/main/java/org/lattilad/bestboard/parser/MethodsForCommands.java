@@ -277,50 +277,50 @@ public class MethodsForCommands
 
     public void setShowTitles(ExtendedMap<Long, Object> parameters)
         {
-        String temp;
+        Object temp;
         // !! This could be organised from a table
 
-        temp = (String)parameters.remove( Commands.TOKEN_ENTERTEXT );
+        temp = parameters.remove( Commands.TOKEN_ENTERTEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_MULTILINE, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_GOTEXT );
+        temp = parameters.remove( Commands.TOKEN_GOTEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_GO, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_SEARCHTEXT );
+        temp = parameters.remove( Commands.TOKEN_SEARCHTEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_SEARCH, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_SENDTEXT );
+        temp = parameters.remove( Commands.TOKEN_SENDTEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_SEND, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_NEXTTEXT );
+        temp = parameters.remove( Commands.TOKEN_NEXTTEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_NEXT, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_DONETEXT );
+        temp = parameters.remove( Commands.TOKEN_DONETEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_DONE, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_PREVTEXT );
+        temp = parameters.remove( Commands.TOKEN_PREVTEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_PREVIOUS, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_NONETEXT );
+        temp = parameters.remove( Commands.TOKEN_NONETEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_NONE, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_UNKNOWNTEXT );
+        temp = parameters.remove( Commands.TOKEN_UNKNOWNTEXT );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.ENTER_ACTION, SoftBoardData.ACTION_UNSPECIFIED, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_AUTOFUNCON );
+        temp = parameters.remove( Commands.TOKEN_AUTOFUNCON );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.AUTO_FUNC, 1, temp);
 
-        temp = (String)parameters.remove( Commands.TOKEN_AUTOFUNCOFF );
+        temp = parameters.remove( Commands.TOKEN_AUTOFUNCOFF );
         if ( temp != null )
             softBoardData.softBoardShow.setShowText(SoftBoardShow.AUTO_FUNC, 0, temp);
         }

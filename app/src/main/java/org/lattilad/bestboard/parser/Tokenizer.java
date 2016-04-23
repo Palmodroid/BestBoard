@@ -771,6 +771,7 @@ public class Tokenizer
 		if ( ch == MARK_ESCAPE )	return MARK_ESCAPE;
 		if ( ch == MARK_STRING )	return MARK_STRING;
 		if ( ch == MARK_CHARACTER )	return MARK_CHARACTER;
+		if ( ch == MARK_UNICODE )	return MARK_UNICODE;
 
 		// Four digit hexadecimal code identifies unicode character
 		int value = 0;

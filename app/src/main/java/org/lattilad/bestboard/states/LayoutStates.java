@@ -264,7 +264,7 @@ public class LayoutStates
         int binaryShiftState = HardState.FORCE_IGNORED;
 
         List<Object> keywordList;
-        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_TURNON);
+        keywordList = (List<Object>)parameters.remove( Commands.TOKEN_TURNON );
         if ( keywordList != null )
             {
             for (Object keyword: keywordList)
@@ -272,9 +272,9 @@ public class LayoutStates
                 if ( (long)keyword == Commands.TOKEN_SHIFT )
                     binaryShiftState = HardState.FORCE_ON;
                 else if ( (long)keyword == Commands.TOKEN_CTRL )
-                    binaryShiftState = HardState.FORCE_ON;
+                    binaryCtrlState = HardState.FORCE_ON;
                 else if ( (long)keyword == Commands.TOKEN_ALT )
-                    binaryShiftState = HardState.FORCE_ON;
+                    binaryAltState = HardState.FORCE_ON;
                 else
                     tokenizer.error("TURNON", R.string.data_meta_bad_parameter );
                 }
@@ -288,9 +288,9 @@ public class LayoutStates
                 if ( (long)keyword == Commands.TOKEN_SHIFT )
                     binaryShiftState = HardState.FORCE_OFF;
                 else if ( (long)keyword == Commands.TOKEN_CTRL )
-                    binaryShiftState = HardState.FORCE_OFF;
+                    binaryCtrlState = HardState.FORCE_OFF;
                 else if ( (long)keyword == Commands.TOKEN_ALT )
-                    binaryShiftState = HardState.FORCE_OFF;
+                    binaryAltState = HardState.FORCE_OFF;
                 else
                     tokenizer.error("TURNOFF", R.string.data_meta_bad_parameter );
                 }
@@ -301,6 +301,9 @@ public class LayoutStates
                 binaryAltState << (HardState.FORCE_BITS * 2) |
                 binaryCtrlState << HardState.FORCE_BITS |
                 binaryShiftState;
+
+        Scribe.error("BINARY: alt: " + binaryAltState + " ctrl: " + binaryCtrlState +
+                " shift: " + binaryShiftState + " all: " + binaryHardState);
 
         /*
         int binaryHardState = 0;
@@ -327,7 +330,7 @@ public class LayoutStates
         if ( Boolean.TRUE.equals( temp ) ) binaryHardState |= HardState.FORCE_ON;
         */
 
-        Scribe.debug( Debug.LAYOUTSTATE,  "Binary Hard state SHIFT added, ready: " + Integer.toBinaryString( binaryHardState ) );
+        Scribe.debug(Debug.LAYOUTSTATE, "Binary Hard state SHIFT added, ready: " + Integer.toBinaryString(binaryHardState));
 
         return binaryHardState;
         }

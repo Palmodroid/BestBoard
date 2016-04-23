@@ -1,5 +1,7 @@
 package org.lattilad.bestboard;
 
+import org.lattilad.bestboard.parser.SoftBoardParser;
+
 /**
  * Show-titles
  */
@@ -49,7 +51,7 @@ public class SoftBoardShow
         return "";
         }
 
-    public void setShowText(int show, int num, String text)
+    public void setShowText(int show, int num, Object text)
         {
         String[] array;
 
@@ -61,7 +63,7 @@ public class SoftBoardShow
             return;
 
         if ( num >=0 && num <= array.length )
-            array[num] = text;
+            array[num] = SoftBoardParser.stringFromText( text );
         }
 
     }
