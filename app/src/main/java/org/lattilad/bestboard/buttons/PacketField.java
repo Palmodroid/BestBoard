@@ -7,9 +7,6 @@ import org.lattilad.bestboard.SoftBoardData;
  */
 public class PacketField extends PacketText
     {
-    // movement should be inside PacketText
-    int movement = 0;
-
     public PacketField(SoftBoardData softBoardData, String string, int autoCaps, boolean stringCaps, int autoSpace)
         {
         super(softBoardData, string, autoCaps, stringCaps, autoSpace);
@@ -19,13 +16,8 @@ public class PacketField extends PacketText
             {
             StringBuilder builder = new StringBuilder( string );
             builder.deleteCharAt( position );
-            setString(builder.toString());
-            movement = position - getString().length();
+            this.string = builder.toString();
+            this.movement = position - this.string.length();
             }
-        }
-
-    public PacketField(SoftBoardData softBoardData, Character character, int autoCaps, int autoSpace )
-        {
-        super(softBoardData, character, autoCaps, autoSpace);
         }
     }

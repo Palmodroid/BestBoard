@@ -30,6 +30,8 @@ public interface SoftBoardListener
     void sendKeyDownUp(int keyEventCode);
 
     void sendString( String string, int autoSpace );
+    void sendString( String string, int autoSpace, int movement );
+
     // UseState needs this to change layout
     boolean undoLastString();
 

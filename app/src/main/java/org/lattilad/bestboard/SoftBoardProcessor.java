@@ -1055,6 +1055,12 @@ public class SoftBoardProcessor implements
 
     public void sendString( String string, int autoSpace )
         {
+        sendString( string, autoSpace, 0 );
+        }
+
+
+    public void sendString( String string, int autoSpace, int movement )
+        {
         Scribe.locus(Debug.SERVICE);
 
         InputConnection ic = softBoardService.getCurrentInputConnection();
@@ -1085,10 +1091,14 @@ public class SoftBoardProcessor implements
                 {
                 textAfterCursor.reset();
                 if ( !StringUtils.isSpace(textAfterCursor.read()) )
+                    {
                     sendBuilder.append(' ');
+                    if ( movement != 0 )    movement--;
+                    }
                 }
 
             sendString(ic, sendBuilder.toString());
+            moveRelative( ic, CURSOR_BEGIN, movement, false );
 
             ic.endBatchEdit();
             }

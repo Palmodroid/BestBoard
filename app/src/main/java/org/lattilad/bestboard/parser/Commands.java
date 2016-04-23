@@ -119,6 +119,7 @@ public class Commands
     public static final long TOKEN_SECOND = 0x7556168dL;
 
     public static final long TOKEN_TEXT = 0x17b9c8L;
+    public static final long TOKEN_FIELD = 0x1bc2d9cL;
     public static final long TOKEN_KEY = 0x16d1bL;
     public static final long TOKEN_COMBINE = 0x790d8163bL;
     public static final long TOKEN_TIME = 0x17cd86L;
@@ -534,6 +535,7 @@ public class Commands
 
         long[] packetArray = new long[]{
                 TOKEN_TEXT,
+                TOKEN_FIELD,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
@@ -560,6 +562,7 @@ public class Commands
                 .method("packet");
 
         add(TOKEN_TEXT, PARAMETER_TEXT);
+        add(TOKEN_FIELD, PARAMETER_TEXT);
         add(TOKEN_KEY, PARAMETER_INT);
         add(TOKEN_COMBINE, PARAMETER_FLAG);
 
@@ -640,6 +643,7 @@ public class Commands
 
         add(TOKEN_ADD, new long[]{
                 TOKEN_TEXT,
+                TOKEN_FIELD,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
@@ -654,6 +658,7 @@ public class Commands
 
         add(TOKEN_LIST, ArrayUtils.concat(buttonArray, new long[]{
                 TOKEN_TEXT,
+                TOKEN_FIELD,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
@@ -681,6 +686,7 @@ public class Commands
 
         add(TOKEN_ENTER, ArrayUtils.concat( buttonArray, new long[]{
                 TOKEN_TEXT,
+                TOKEN_FIELD,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,

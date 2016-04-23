@@ -24,6 +24,7 @@ import org.lattilad.bestboard.buttons.ButtonSpaceTravel;
 import org.lattilad.bestboard.buttons.ButtonSwitch;
 import org.lattilad.bestboard.buttons.Packet;
 import org.lattilad.bestboard.buttons.PacketCombine;
+import org.lattilad.bestboard.buttons.PacketField;
 import org.lattilad.bestboard.buttons.PacketFunction;
 import org.lattilad.bestboard.buttons.PacketKey;
 import org.lattilad.bestboard.buttons.PacketMove;
@@ -1014,12 +1015,16 @@ public class MethodsForCommands
         {
         PacketText packet = null;
         Object temp;
+        boolean field = false;
 
         temp = parameters.remove(Commands.TOKEN_TEXT);
-
         if ( temp == null )             // TEXT token is missing
             {
-            temp = parameters.remove( Commands.TOKEN_TIME );
+            temp = parameters.remove(Commands.TOKEN_FIELD);
+            if ( temp != null )
+                field = true;
+            else // temp == null
+                temp = parameters.remove( Commands.TOKEN_TIME );
             }
           
         if ( temp == null )             // TEXT and TIME token is missing
@@ -1072,8 +1077,12 @@ public class MethodsForCommands
 
             if (temp instanceof String)
                 {
-                packet = new PacketText( softBoardData, (String)temp, autoCaps,
-                (boolean)parameters.remove( Commands.TOKEN_STRINGCAPS, false), autoSpace );
+                if (field)
+                    packet = new PacketField(softBoardData, (String) temp, autoCaps,
+                            (boolean) parameters.remove(Commands.TOKEN_STRINGCAPS, false), autoSpace);
+                else
+                    packet = new PacketText(softBoardData, (String) temp, autoCaps,
+                            (boolean) parameters.remove(Commands.TOKEN_STRINGCAPS, false), autoSpace);
                 }
             else if (temp instanceof Character)
                 {
