@@ -18,6 +18,7 @@ import org.lattilad.bestboard.buttons.ButtonMemory;
 import org.lattilad.bestboard.buttons.ButtonMeta;
 import org.lattilad.bestboard.buttons.ButtonModify;
 import org.lattilad.bestboard.buttons.ButtonMulti;
+import org.lattilad.bestboard.buttons.ButtonProgram;
 import org.lattilad.bestboard.buttons.ButtonSingle;
 import org.lattilad.bestboard.buttons.ButtonSpaceTravel;
 import org.lattilad.bestboard.buttons.ButtonSwitch;
@@ -1102,7 +1103,6 @@ public class MethodsForCommands
     public Packet packetFunction( ExtendedMap<Long, Object> parameters )
         {
         Long temp;
-        String string;
 
         if ( parameters.remove(Commands.TOKEN_DELETE) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_DELETE);
@@ -1125,9 +1125,17 @@ public class MethodsForCommands
             return new PacketFunction( softBoardData, Commands.TOKEN_DRAFT);
         if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_SETTINGS);
-        if ( (string = (String)parameters.remove(Commands.TOKEN_RUN)) != null )
-            return new PacketRun(softBoardData, string);
 
+        // packetRun will continue evaluation
+        return packetRun( parameters );
+        }
+
+
+    public PacketRun packetRun( ExtendedMap<Long, Object> parameters )
+        {
+        String string;
+        if ((string = (String) parameters.remove(Commands.TOKEN_RUN)) != null)
+            return new PacketRun(softBoardData, string);
         return null;
         }
 
@@ -1408,6 +1416,15 @@ public class MethodsForCommands
             // this is not possible
             return setEmpty( parameters );
             }
+        }
+
+    public Button setProgram( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Program Button is defined");
+
+        return completeMainTouchButton( new ButtonProgram(
+                        packetRun(parameters)), // Can be null
+                parameters);
         }
 
     public Button setMemory( ExtendedMap<Long, Object> parameters )

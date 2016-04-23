@@ -21,6 +21,8 @@ public interface SoftBoardListener
     // readPreferences() need context
     // vibration needs context
 
+    String getEditorPackageName( );
+
     boolean isRetrieveTextEnabled();
 
     boolean sendKeyDown( long downTime, int keyEventCode );

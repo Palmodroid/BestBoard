@@ -257,6 +257,16 @@ public class SoftBoardProcessor implements
         }
 
 
+    public String getEditorPackageName( )
+        {
+        EditorInfo info = softBoardService.getCurrentInputEditorInfo();
+        // UID alapján ez szükséges lehet
+
+        String packageName = info.packageName;
+        return packageName == null ? "" : packageName;
+        }
+
+
     /**
      * This is the most important part:
      * Here we can control whether cursor/selection was changed without our knowledge.

@@ -215,6 +215,8 @@ public class Commands
 
     public static final long TOKEN_MEMORY = 0x5c9130daL;
 
+    public static final long TOKEN_PROGRAM = 0xf61900e6aL;
+
     public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
 
     public static final long TOKEN_ENTER = 0x1a3c13eL;
@@ -490,6 +492,7 @@ public class Commands
                 TOKEN_MODIFY | PARAMETER_MOD_MULTIPLE,
                 TOKEN_SPACETRAVEL | PARAMETER_MOD_MULTIPLE,
                 TOKEN_MEMORY | PARAMETER_MOD_MULTIPLE,
+                TOKEN_PROGRAM | PARAMETER_MOD_MULTIPLE,
                 TOKEN_ENTER | PARAMETER_MOD_MULTIPLE,
                 TOKEN_META | PARAMETER_MOD_MULTIPLE,
                 TOKEN_SWITCH | PARAMETER_MOD_MULTIPLE,
@@ -702,6 +705,11 @@ public class Commands
                 TOKEN_ERASESPACE,
                 TOKEN_AUTOSPACE}))
                 .method("setMemory").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
+
+        add(TOKEN_PROGRAM, ArrayUtils.concat(buttonArray, new long[]{
+                TOKEN_RUN }))
+                .method("setProgram").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
 
         add(TOKEN_META, new long[]{
