@@ -1117,8 +1117,8 @@ public class MethodsForCommands
             }
         if ( parameters.remove(Commands.TOKEN_SELECTALL) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_SELECTALL);
-        if ( parameters.remove(Commands.TOKEN_CAPITALIZE) != null )
-            return new PacketFunction( softBoardData, Commands.TOKEN_CAPITALIZE);
+        if ( parameters.remove(Commands.TOKEN_CHANGECASE) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_CHANGECASE);
         if ( parameters.remove(Commands.TOKEN_DRAFT) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_DRAFT);
         if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )

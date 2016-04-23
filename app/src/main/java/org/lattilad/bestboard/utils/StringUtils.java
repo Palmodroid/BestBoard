@@ -162,12 +162,12 @@ public class StringUtils
         if (firstLetter == UNKNOWN_CASE) return UNKNOWN_CASE; // There are no letters
         else if (firstLetter == UPPER_CASE)
             {
+            if (lowerCaseLetters == 0) return UPPER_CASE; // Even if one character long
             if (upperCaseLetters == 0) return FIRST_UPPER_CASE;
-            if (lowerCaseLetters == 0) return UPPER_CASE;
             }
         else // firstLetter == LOWER_CASE
             {
-            if (upperCaseLetters == 0) return LOWER_CASE;
+            if (upperCaseLetters == 0) return LOWER_CASE; // Even if one character long
             }
         return MIXED_CASE;
         }

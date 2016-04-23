@@ -3,7 +3,6 @@ package org.lattilad.bestboard.buttons;
 import android.graphics.Canvas;
 
 import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.SoftBoardShow;
 import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.StringUtils;
@@ -95,7 +94,8 @@ public class ButtonMemory extends ButtonMainTouch implements Cloneable
     // Last title is drawn as changing part
     public void drawButtonChangingPart(Canvas canvas)
         {
-        if (state == 2 )
+        if (state == 2 &&
+                layout.softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() == MetaState.META_LOCK )
             {
             drawButtonBackground(canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
             drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
@@ -157,10 +157,14 @@ public class ButtonMemory extends ButtonMainTouch implements Cloneable
     @Override
     public boolean fireSecondary(int type)
         {
-        if ( done )
+        if ( done ) // state 3
             {
             layout.softBoardData.softBoardListener.undoLastString();
             done = false;
+            }
+        if ( state == 2 )
+            {
+            layout.softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].setState(MetaState.META_OFF);
             }
         packet.setString( "" );
         state = 1;

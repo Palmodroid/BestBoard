@@ -58,7 +58,7 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_SELECTALL )
             return "ALL";
 
-        if ( functionCode == Commands.TOKEN_CAPITALIZE )
+        if ( functionCode == Commands.TOKEN_CHANGECASE)
             return "CAP";
 
         if ( functionCode == Commands.TOKEN_AUTOFUNC )
@@ -122,7 +122,7 @@ public class PacketFunction extends Packet
             softBoardData.autoFuncEnabled = !softBoardData.autoFuncEnabled;
             }
 
-        else if ( functionCode == Commands.TOKEN_CAPITALIZE )
+        else if ( functionCode == Commands.TOKEN_CHANGECASE)
             {
             String string = softBoardData.softBoardListener.getWordOrSelected();
             switch (StringUtils.checkStringCase(string, 2048))
@@ -138,7 +138,7 @@ public class PacketFunction extends Packet
                     break;
                 case StringUtils.UPPER_CASE:
                     softBoardData.softBoardListener.changeLastWordOrSelected
-                            ( string.toLowerCase( softBoardData.locale ), true);
+                            ( string.toLowerCase(softBoardData.locale), true);
                     break;
                 }
             }
