@@ -535,7 +535,7 @@ public class Commands
 
         long[] packetArray = new long[]{
                 TOKEN_TEXT,
-                TOKEN_FIELD,
+                // TOKEN_FIELD,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
@@ -643,7 +643,7 @@ public class Commands
 
         add(TOKEN_ADD, new long[]{
                 TOKEN_TEXT,
-                TOKEN_FIELD,
+                // TOKEN_FIELD,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
@@ -658,7 +658,7 @@ public class Commands
 
         add(TOKEN_LIST, ArrayUtils.concat(buttonArray, new long[]{
                 TOKEN_TEXT,
-                TOKEN_FIELD,
+                // TOKEN_FIELD,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
@@ -686,7 +686,7 @@ public class Commands
 
         add(TOKEN_ENTER, ArrayUtils.concat( buttonArray, new long[]{
                 TOKEN_TEXT,
-                TOKEN_FIELD,
+                // TOKEN_FIELD,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,

@@ -5,6 +5,15 @@ import org.lattilad.bestboard.SoftBoardData;
 /**
  * Special Text, where cursor is moved back to the position of the last '\c'
  */
+
+
+/**
+ ** !! ERROR !!
+ ** PacketField cannot work together with cursor movements !! (undoString, listPacket)
+ ** !! FIELD is not allowed in any parameter-commands !!
+ **/
+
+
 public class PacketField extends PacketText
     {
     public PacketField(SoftBoardData softBoardData, String string, int autoCaps, boolean stringCaps, int autoSpace)

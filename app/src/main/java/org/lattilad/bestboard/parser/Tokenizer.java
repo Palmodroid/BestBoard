@@ -22,7 +22,7 @@ import java.io.Reader;
  * <li>keywords - letters, digits and '_' allowed.
  * Keywords are converted to lowercase, and cannot begin with number.</li>
  * <li>"string" - All BMP characters, some escape sequences are allowed.
- * Strings divided by '+' (plus sign right after the " sign) are added.</li>
+ * Strings can be divided by '_' (underline sign right after the " sign: "_)</li>
  * <li>'c' - One character. All BMP characters, same escape sequences are allowed.</li>
  * <li>-+integers - negative or positive sign (on the first position) and 0-9 are allowed.</li>
  * <li>-+0xhexadecimals - same as integers, but A-F letters are also allowed.</li>
@@ -311,7 +311,7 @@ public class Tokenizer
 	public static final int MARK_STRING = '\"';
 
     /** String should continue - (double) quote mark character and a plus sign together */
-    public static final int MARK_CONTINUE = '+';
+    public static final int MARK_CONTINUE = '_';
 
     /** Character (single) quote mark character */
 	public static final int MARK_CHARACTER = '\'';
