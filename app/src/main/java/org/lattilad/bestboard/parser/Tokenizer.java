@@ -4,7 +4,6 @@ import android.content.Context;
 
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.scribe.Scribe;
-import org.lattilad.bestboard.utils.ExternalDataException;
 
 import java.io.IOException;
 import java.io.Reader;
@@ -307,7 +306,7 @@ public class Tokenizer
 	public static final int EOL_TOGGLE = '#';
 
 	/** Note character - line will be ignored after note */
-	public static final int MARK_NOTE = ';';
+	public static final int MARK_REM = ';';
 
 	/** Decimal fraction character */
 	public static final int MARK_FRACTION = '.';
@@ -394,9 +393,9 @@ public class Tokenizer
 
 		// NOTE is not a real white space, but identifieing it as a white space stops
 		// any skip of non-white-spaces
-		// That means: no white-spaces are needed before the MARK_NOTE,
-		// Therefore MARK_NOTE should be evaluated BEFORE white-spaces
-        return ch == MARK_NOTE;
+		// That means: no white-spaces are needed before the MARK_REM,
+		// Therefore MARK_REM should be evaluated BEFORE white-spaces
+        return ch == MARK_REM;
         }
 
 	/**
@@ -992,7 +991,7 @@ public class Tokenizer
 					}
 
 				// Note - skip this line
-				else if ( ch == MARK_NOTE )
+				else if ( ch == MARK_REM)
 					{
 					// Type remains unknown, but in next round an EOL or EOF should come 
 					findNextEOL();
@@ -1376,7 +1375,7 @@ public class Tokenizer
                             {
                             while ( (ch = read()) != MARK_STRING )
                                 {
-                                if ( ch == MARK_NOTE )
+                                if ( ch == MARK_REM)
                                     findNextEOL();
                                 else if ( ch > ' ' || ch == EOF )
                                     {
