@@ -4,9 +4,11 @@ import android.content.Context;
 
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.utils.ExternalDataException;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.util.Locale;
 
 
 /**
@@ -81,6 +83,9 @@ public class Tokenizer
 
 	/** INTERNAL: Color value - TYPE_INTEGER will be returned. */
 	private static final int TYPE_COLOR = 7;
+
+	/** INTERNAL: Color token value - TYPE_INTEGER will be returned. */
+	private static final int TYPE_COLORTOKEN = 8;
 
 	/** End of reader stream token */
 	public static final int TYPE_EOF = -1;
@@ -1096,6 +1101,13 @@ public class Tokenizer
 						tokenMinusSign = false; // minus sign will be omitted
 						tokenType = TYPE_COLOR;
 						}
+					else if ( (ch=='n' || ch=='N') && tokenInteger == 0 )
+						{
+						tokenStringBuilder.append((char) ch);
+						tokenLength = 0;
+						tokenMinusSign = false; // minus sign will be omitted
+						tokenType = TYPE_COLORTOKEN;
+						}
 					else if ( (ch == MARK_FRACTION) )
 						{
 						tokenStringBuilder.append( (char)ch );
@@ -1244,7 +1256,42 @@ public class Tokenizer
                         return tokenType;
 						}
 					break;
-					
+
+				case TYPE_COLORTOKEN:
+					// Format:
+					// 0ntext - where text is a color token, defined by ColorToken.java
+					// color token cannot contain numbers!
+					if ( isValidAsciiLetter(ch) )
+						{
+						tokenStringBuilder.append( (char)ch );
+						tokenLength++;
+                        }
+					else
+						{
+                        // 0n should be trimmed
+                        tokenInteger = ColorToken.get( tokenStringBuilder.substring(2).toLowerCase(Locale.US) );
+                        if ( tokenInteger < 0L )
+                            {
+							tokenInteger = 0xFFFFFFFFL;
+							error( getStringToken(), R.string.error_color_missing_returning_opaque );
+							}
+						if ( !isValidWhiteSpace(ch) )
+							{
+							error( getStringToken(), R.string.error_color_malformed_ending );
+							findNextWhiteSpace();
+							}
+						else
+							{
+							// Correctly terminated hexadecimal integer returned - no messages.
+							// Last white-space should be evaluated.
+							pushBackLastRead();
+							}
+						// valid external token should be given because of rewindLastToken
+						tokenType = TYPE_INTEGER;
+						return tokenType;
+						}
+					break;
+
 				case TYPE_FRACTION:
 					// Format: d...d.d...d, can be signed
 					// Will be returned only as double

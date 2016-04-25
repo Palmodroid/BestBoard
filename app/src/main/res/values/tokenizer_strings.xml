@@ -18,6 +18,7 @@
 	
 	<string name="error_color_malformed_no_numeric">"Malformed color value. No numeric characters were found."</string>
 	<string name="error_color_malformed_returning_opaque">"Malformed color value. Returning opaque white color."</string>
+	<string name="error_color_missing_returning_opaque">"Missing color token. Returning opaque white color."</string>
 	<string name="error_color_malformed_ending">"Malformed color value. Ending was truncated."</string>
 	
 	<string name="error_fraction_exceeds">"Fraction exceeds the maxmaximal number of digits. Numeric result is unpredictable!"</string>
