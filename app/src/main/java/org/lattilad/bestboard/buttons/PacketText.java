@@ -19,7 +19,7 @@ public class PacketText extends Packet
 
     /** Movement of cursor can be set after sending text
      PacketField uses it */
-    protected int movement = 0;
+    protected int movement = 0; // FIELD is vorbidden, use of movement is erased
 
     /** Autocaps command, delivered after data was sent */
     private int autoCaps = CapsState.AUTOCAPS_OFF;
@@ -119,19 +119,19 @@ public class PacketText extends Packet
             {
             case 0:
                 softBoardData.softBoardListener.sendString(
-                        stringToSend, autoSpace, movement );
+                        stringToSend, autoSpace );
                 break;
 
             case 1:
                 softBoardData.softBoardListener.sendString(
-                        StringUtils.toUpperFirst( stringToSend, softBoardData.locale ), autoSpace, movement );
+                        StringUtils.toUpperFirst( stringToSend, softBoardData.locale ), autoSpace );
                 break;
 
             default: // case 2:
                 // http://stackoverflow.com/questions/4052840/most-efficient-way-to-make-the-first-character-of-a-string-lower-case
                 // http://stackoverflow.com/questions/26515060/why-java-character-touppercase-tolowercase-has-no-locale-parameter-like-string-t
                 softBoardData.softBoardListener.sendString(
-                        stringToSend.toUpperCase( softBoardData.locale ), autoSpace, movement );
+                        stringToSend.toUpperCase( softBoardData.locale ), autoSpace );
             }
         }
 

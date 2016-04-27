@@ -1055,14 +1055,53 @@ public class SoftBoardProcessor implements
 
     public void sendString( String string, int autoSpace )
         {
-        sendString( string, autoSpace, 0 );
+        Scribe.locus(Debug.SERVICE);
+
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            ic.beginBatchEdit();
+
+            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 && softBoardData.autoFuncEnabled)
+                {
+                sendDeleteSpacesBeforeCursor( ic );
+                }
+            if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 && softBoardData.autoFuncEnabled)
+                {
+                sendDeleteSpacesAfterCursor( ic );
+                }
+
+            sendBuilder.setLength(0);
+            if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoFuncEnabled)
+                {
+                textBeforeCursor.reset();
+                if ( !StringUtils.isWhiteSpace(textBeforeCursor.read()) )
+                    sendBuilder.append(' ');
+                }
+
+            sendBuilder.append(string);
+
+            if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 && softBoardData.autoFuncEnabled)
+                {
+                textAfterCursor.reset();
+                if ( !StringUtils.isSpace(textAfterCursor.read()) )
+                    {
+                    sendBuilder.append(' ');
+                    }
+                }
+
+            sendString(ic, sendBuilder.toString());
+
+            ic.endBatchEdit();
+            }
         }
 
 
     public void sendString( String string, int autoSpace, int movement )
         {
         Scribe.locus(Debug.SERVICE);
-
+        Scribe.error("FIELD IS ERASED, THIS METHOD CANNOT BE USED!!");
+        /*
         InputConnection ic = softBoardService.getCurrentInputConnection();
         if (ic != null)
             {
@@ -1102,6 +1141,7 @@ public class SoftBoardProcessor implements
 
             ic.endBatchEdit();
             }
+            */
         }
 
 
