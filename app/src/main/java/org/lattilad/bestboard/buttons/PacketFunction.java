@@ -1,6 +1,7 @@
 package org.lattilad.bestboard.buttons;
 
 import android.content.Intent;
+import android.net.Uri;
 
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.parser.Commands;
@@ -8,6 +9,7 @@ import org.lattilad.bestboard.prefs.PrefsActivity;
 import org.lattilad.bestboard.states.CapsState;
 import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.utils.StringUtils;
+import org.lattilad.bestboard.webview.WebViewActivity;
 
 /**
  * Editor functions performed by the keyboard
@@ -64,6 +66,9 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_AUTOFUNC )
             return "AF";
 
+        if ( functionCode == Commands.TOKEN_HELP )
+            return "HELP";
+
         // any other code
         return "ERR";
         }
@@ -117,11 +122,6 @@ public class PacketFunction extends Packet
             softBoardData.softBoardListener.selectAll();
             }
 
-        else if ( functionCode == Commands.TOKEN_AUTOFUNC )
-            {
-            softBoardData.autoFuncEnabled = !softBoardData.autoFuncEnabled;
-            }
-
         else if ( functionCode == Commands.TOKEN_CHANGECASE)
             {
             String string = softBoardData.softBoardListener.getWordOrSelected();
@@ -142,6 +142,24 @@ public class PacketFunction extends Packet
                     break;
                 }
             }
+
+        else if ( functionCode == Commands.TOKEN_AUTOFUNC )
+            {
+            softBoardData.autoFuncEnabled = !softBoardData.autoFuncEnabled;
+            }
+
+        else if (functionCode == Commands.TOKEN_HELP )
+            {
+            Intent intent = new Intent( softBoardData.softBoardListener.getApplicationContext(), WebViewActivity.class);
+            intent.setData(Uri.parse("http://lattilad.org/"));
+            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            //intent.addFlags( Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT );
+            //intent.addFlags( Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY );
+            intent.addFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
+            //intent.addFlags( Intent.FLAG_FROM_BACKGROUND );
+            softBoardData.softBoardListener.getApplicationContext().startActivity(intent);
+            }
+
         }
 
 

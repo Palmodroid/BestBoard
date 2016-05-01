@@ -29,7 +29,12 @@ public interface SoftBoardListener
     boolean sendKeyUp( long downTime, long eventTime, int keyEventCode );
     void sendKeyDownUp(int keyEventCode);
 
+    long getProcessCounter();
+    boolean checkProcessCounter(long operationCounter);
+
     void sendString( String string, int autoSpace );
+
+    // Actually not in use - should be part of FIELD/PLAY
     void sendString( String string, int autoSpace, int movement );
 
     // UseState needs this to change layout

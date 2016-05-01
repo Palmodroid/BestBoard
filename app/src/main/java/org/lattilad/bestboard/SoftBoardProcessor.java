@@ -136,7 +136,16 @@ public class SoftBoardProcessor implements
         return textAfterCursor;
         }
 
+    /*
+     * Currently only the last string is undoable. Movements, deletions (selection) cannot be undone.
+     * During one bow check of undoString is enough, but multi-touch senstive buttons (like list)
+     * should check undoCounter as well.
+     */
+    /** Contains last string, or null of no undo is possible */
     private String undoString = null;
+
+    /** UndoCounter increases after each operation, so multi-touch operations can check validity */
+    private long undoCounter = 0L;
 
     /** Temporary variable to store string to be send */
     private StringBuilder sendBuilder = new StringBuilder();
@@ -250,6 +259,7 @@ public class SoftBoardProcessor implements
         {
         // no undo at start
         undoString = null;
+        undoCounter ++;
 
         // surrounding text is changed
         textBeforeCursor.invalidate();
@@ -443,6 +453,20 @@ public class SoftBoardProcessor implements
         }
 
 
+    public long getProcessCounter()
+        {
+        return undoCounter;
+        }
+
+    /**
+     * Checks if operation counter is still valid (true),
+     * or a new operation is already started (false)
+     */
+    public boolean checkProcessCounter(long processCounter)
+        {
+        return processCounter == undoCounter;
+        }
+
     /*****************************************
      * LOW LEVEL TEXT PROCESSING
      * Itt minden metódusnak szüksége van az InputConnection-re, ÉS
@@ -457,6 +481,7 @@ public class SoftBoardProcessor implements
         selectCursor(ic, CURSOR_BEGIN);
 
         undoString = string;
+        undoCounter++;
         modifyCalculatedCursor(calculatedCursor[0] + string.length());
         textBeforeCursor.sendString(string);
         textAfterCursor.invalidate();
@@ -493,6 +518,7 @@ public class SoftBoardProcessor implements
             {
             selectCursor(ic, CURSOR_BEGIN);
             // no undoString in selection
+            undoCounter ++;
             // no change in calculatedCursor[0]
             modifyCalculatedCursor(calculatedCursor[0]);
             // no change in textBeforeCursor
@@ -504,6 +530,7 @@ public class SoftBoardProcessor implements
         else if ( length != 0 )
             {
             undoString = null;
+            undoCounter ++;
             if ( length < 0 )
                 {
                 modifyCalculatedCursor(calculatedCursor[0] + length);
@@ -531,6 +558,7 @@ public class SoftBoardProcessor implements
         Scribe.locus(Debug.CURSOR);
 
         undoString = null;
+        undoCounter ++;
         int otherCursor = (cursor + 1) & 1;
         if ( isSelected() && !select )
             // If length is 0, then it should be at the end
@@ -618,6 +646,7 @@ public class SoftBoardProcessor implements
         if ( position == calculatedCursor[cursor] )   return;
 
         undoString = null;
+        undoCounter ++;
 
         Scribe.debug(Debug.CURSOR, "Cursor [" + cursor + "] is: " + calculatedCursor[cursor]);
         Scribe.debug(Debug.CURSOR, "Calculated cursor: " + calculatedCursor[0] + "-" + calculatedCursor[1]);
@@ -1325,6 +1354,9 @@ public class SoftBoardProcessor implements
             Scribe.error("Cannot get input connection!");
             return false;
             }
+
+        // key event should clear multiple-touch undo-s
+        undoCounter ++;
 
         return ic.sendKeyEvent(new KeyEvent(
                 downTime,               // this key originally went down

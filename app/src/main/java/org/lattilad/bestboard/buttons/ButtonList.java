@@ -13,11 +13,13 @@ import java.util.List;
 public class ButtonList extends ButtonMainTouch implements Cloneable
     {
     // packet's string and modifyText's first string should be the same
-    PacketText packetText;
-    Packet packetSecond;
-    ModifyText modifyText;
-    List<Object> strings;
-    boolean secondSent = false;
+    private PacketText packetText;
+    private Packet packetSecond;
+    private ModifyText modifyText;
+    private List<Object> strings;
+    private boolean secondSent = false;
+
+    private long processCounter = -1L;
 
 
     @Override
@@ -61,10 +63,15 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
     @Override
     public void mainTouchStart( boolean isTouchDown )
         {
-        if ( !modifyText.change( false ) )
+        if ( layout.softBoardData.softBoardListener.checkProcessCounter(processCounter) )
+            {
+            modifyText.change( false );
+            }
+        else
             {
             packetText.send();
             }
+        processCounter = layout.softBoardData.softBoardListener.getProcessCounter();
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }
 

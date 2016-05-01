@@ -1134,6 +1134,8 @@ public class MethodsForCommands
             return new PacketFunction( softBoardData, Commands.TOKEN_DRAFT);
         if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_SETTINGS);
+        if ( parameters.remove(Commands.TOKEN_HELP) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_HELP);
 
         // packetRun will continue evaluation
         return packetRun( parameters );
