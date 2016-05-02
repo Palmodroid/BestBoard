@@ -958,14 +958,14 @@ public class Tokenizer
         tokenDivider = 1;
         tokenMinusSign = false;
 
-        // number of characters in character constans (if not 1 an error will be generated)
+        // number of characters in character constants (if not 1 an error will be generated)
         // number of integer digits in numerical types (if exceeds MAX_DIGITS an error will be generated)
         // number of characters in keywords (longer than MAX_CHARACTERS cannot be converted to long token codes)
         // not used in string type (no length limit)
         int tokenLength = 0;
 
-        // The digits of argb, rgb and single digit grayscale formats are counting two digits.
-        // This is a helper variable to immediateli calculate doubled digits.
+        // The digits of argb, rgb and single digit gray-scale formats are counting two digits.
+        // This is a helper variable to immediately calculate doubled digits.
         // Whether Integer or IntegerDoubledDigits should be returned, will be decided after counting all digits.
         long tokenIntegerDoubledDigits = 0;
 
