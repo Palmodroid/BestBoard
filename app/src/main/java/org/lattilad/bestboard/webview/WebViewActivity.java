@@ -1,8 +1,9 @@
 package org.lattilad.bestboard.webview;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.util.Log;
 import android.view.Window;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -82,7 +83,7 @@ public class WebViewActivity extends Activity
 
         webView.getSettings().setBuiltInZoomControls(true);
 
-/*      // webView.getSettings().setAllowFileAccess(true); // true by default
+      // webView.getSettings().setAllowFileAccess(true); // true by default
         if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
             {
             Log.d("TAG", "No SDCARD");
@@ -91,11 +92,11 @@ public class WebViewActivity extends Activity
             {
             webView.loadUrl("file://"+Environment.getExternalStorageDirectory()+"/_bestboard/coat.log");
             }
-*/
+
 
 //        webView.loadUrl("file:///android_asset/help.html");
 
-        Uri data = getIntent().getData();
+/*        Uri data = getIntent().getData();
 
         if (data != null)
             {
@@ -106,7 +107,7 @@ public class WebViewActivity extends Activity
             {
             webView.loadData(getIntent().toString(), "text/html", "UTF-8");
             }
-
+*/
 
 
 
