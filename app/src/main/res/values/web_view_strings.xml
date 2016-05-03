@@ -4,4 +4,6 @@
     <string name="web_view_search">Search</string>
     <string name="web_view_back">Back</string>
     <string name="web_view_forth">Forth</string>
+    <string name="web_view_dummy">Dummy menu</string>
+
 </resources>
