@@ -7,7 +7,7 @@
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true">
+        android:layout_alignParentBottom="true" >
 
         <Button
             android:id="@+id/back"
@@ -53,13 +53,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_above="@id/toolbar"/>
+        android:layout_above="@id/toolbar"
+        android:layout_alignWithParentIfMissing="true"/>
 
     <WebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_above="@id/progress"/>
+        android:layout_above="@id/progress"
+        android:layout_alignWithParentIfMissing="true"/>
 
 </RelativeLayout>
