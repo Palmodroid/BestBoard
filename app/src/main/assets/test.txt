@@ -1,4 +1,10 @@
-﻿﻿COAT ( 1000 )
+﻿COAT ( 1000 )
+
+NAME "Test" 
+VERSION 1
+AUTHOR "Thon"
+ADDTAGS ( "keyboard" "hexagonal" "test" ) 
+DESCRIPTION "Soft-keyboard for testing" 
 
 LET ( black 0c0 )
 LET ( green 0c8e8 )
@@ -6,439 +12,1056 @@ LET ( yellow 0cee4 )
 LET ( blue 0c99e )
 LET ( rose 0ce6b2ab )
 LET ( brown 0ccb2 )
-LET ( pink 0cfcf )
-LET ( darkpink 0ce99 )
+LET ( fuchsia 0cfcf )
+LET ( pink 0ce99 )
 LET ( purple 0cc673d9 )
-LET ( gray 0c9 )
+LET ( gray 0c8 )
+LET ( silver 0ca )
 LET ( white 0cffe )
 LET ( orange 0cf84 )
 LET ( khaki 0cd4ddaa )
 LET ( magenta 0c800080 )
 LET ( red 0ca00 )
 
-;
-; *** DEFINITIONS OF THE BOARDS AND LAYOUTS ***
-;
+LET ( ENTERTEXT '✓' )
 
-; A default érték komplex paramétereknél használható. 
-; A komplex paraméter minden további előfordulásánál ezek az értékek lesznek először megadva,
-; amiket további paraméterek felülírhatnak.
+SHOWTITLES (
+	ENTERTEXT ENTERTEXT
+	GOTEXT ENTERTEXT
+	SEARCHTEXT ENTERTEXT
+	SENDTEXT ENTERTEXT
+	NEXTTEXT ENTERTEXT
+	DONETEXT ENTERTEXT
+	PREVTEXT ENTERTEXT
+	NONETEXT ENTERTEXT
+	UNKNOWNTEXT ENTERTEXT
+	AUTOFUNCON "Auto"
+	AUTOFUNCOFF "Off" )
 
-DEFAULT ( ADDLAYOUT ( HEXAGONAL ALIGN odds ROWS 5 HALFCOLUMNS 15 ) )
+DEFAULT ( ADDTITLE ( SIZE 1000 ) )
+LET ( script ADDTITLE ( YOFFSET 0 SIZE 800 BOLD COLOR magenta) )
+LET ( link ADDTITLE ( YOFFSET 0 SIZE 800 BOLD COLOR white) )
+LET ( north ADDTITLE ( YOFFSET -400 SIZE  800 COLOR red ) )
+LET ( south ADDTITLE ( YOFFSET +300 SIZE 1000 ) )
 
-; A let érték ezzel szemben egy label-t definiál. 
-; Az itt szereplő értékek a label helyett lesznek behelyettesítve, 
-; vagyis a korábban megadott paramétereket felülírhatják, 
-; míg a később megadott paraméterek a label paramétereit írhatják felül.
-LET ( landlay ADDLAYOUT ( ALIGN evens HALFCOLUMNS 25 ) )
+; central part of kinesa
+; #############################################
 
-; A legegyszerűbb esetben a board (landscape/portrait pár) mindkét irányhoz 
-; ugyanazt a layout-ot használja. 
-; Ilyenkor a layout-ban elhelyezett ASBOARD jelzi, hogy ugyanezen a néven egy board is 
-; kerüljön létrehozásra. START (legelső board) és LOCK (mindig lock-olt board) használható
+LET ( kinesacentr BLOCK (
+    BUTTON ( TEXT 'v' COLOR blue )
+    BUTTON ( TEXT 'c' COLOR green ) 
+    BUTTON ( TEXT 'z' COLOR green ) 
+    BUTTON ( TEXT 'm' COLOR green ) 
+ CRL    BUTTON ( TEXT 'b' COLOR blue ) 
+    BUTTON ( TEXT 'l' COLOR green ) 
+    BUTTON ( TEXT 's' COLOR yellow ) 
+    BUTTON ( TEXT 'e' COLOR yellow ) 
+    BUTTON ( TEXT 't' COLOR green ) 
+ CRL    BUTTON ( TEXT 'f' COLOR blue )
+    BUTTON ( TEXT 'r' COLOR green ) 
+    BUTTON ( TEXT 'a' COLOR yellow ) 
+    SPACETRAVEL ( ERASESPACE around AUTOCAPS hold COLOR fuchsia ADDTITLE ( script COLOR red) ) 
+    BUTTON ( TEXT 'n' COLOR yellow ) 
+    BUTTON ( TEXT 'y' COLOR green ) 
+ CRR    BUTTON ( TEXT 'j' COLOR blue ) 
+    BUTTON ( TEXT 'o' COLOR green ) 
+    BUTTON ( TEXT 'k' COLOR yellow ) 
+    BUTTON ( TEXT 'i' COLOR yellow ) 
+    BUTTON ( TEXT 'g' COLOR green )
+ CRR    BUTTON ( TEXT 'h' COLOR blue ) 
+    BUTTON ( TEXT 'p' COLOR green ) 
+    BUTTON ( TEXT 'u' COLOR green ) 
+    BUTTON ( TEXT 'd' COLOR green ) 
+    ) )
 
-ADDLAYOUT ( ID lay1 COLOR yellow ASBOARD START )
+; accented part of kinesa
+; #############################################
 
-; A két külön iránynak megfelelő layoutot külön kell definiálni
-ADDLAYOUT ( ID lay2 ROWS 6 COLOR rose ) 
-ADDLAYOUT ( ID lay2w landlay ROWS 7 COLOR rose ) 
-ADDBOARD ( ID lay2 PORTRAIT lay2 LANDSCAPE lay2w LOCK ) 
+LET ( kinesaaccent BLOCK (
+    BUTTON ( TEXT 'í' COLOR rose )
+ DL
+ DL    BUTTON ( TEXT 'ú' COLOR purple  )
+ DR    BUTTON ( TEXT 'ü' COLOR purple  )
+ DR    BUTTON ( TEXT 'ű' COLOR purple  )
+ HOME
+ SKIP 5
+    BUTTON ( TEXT 'á' COLOR rose )
+ DR    BUTTON ( TEXT 'é' COLOR rose )
+ DR    BUTTON ( TEXT 'ó' COLOR purple  )
+ DL    BUTTON ( TEXT 'ö' COLOR purple  )
+ DL    BUTTON ( TEXT 'ő' COLOR purple  )
+    ) )
 
-; A layoutok természetesen többször is használhatóak, pl. két non-wide mellett ugyanaz a wide
-ADDLAYOUT ( ID lay3 color green )
-ADDBOARD ( ID lay3 PORTRAIT lay3 LANDSCAPE lay2w LOCK)
+; accented part of kinesa special
+; #############################################
 
-; Persze ez is megy. És itt is lehet azonos az azonosító
-ADDLAYOUT ( ID lay4 ALIGN evens COLOR pink )
-ADDBOARD ( ID lay4 LAYOUT lay4 ) 
+LET ( kinesaacc2 BLOCK (
+    BUTTON ( TEXT 'í' COLOR rose )
+ SKIP 4
+    BUTTON ( TEXT 'á' COLOR rose )
+ DR    BUTTON ( TEXT 'é' COLOR rose )
+ DR    BUTTON ( TEXT 'ó' COLOR purple  )
+     BUTTON ( TEXT 'ú' COLOR rose  )
+ DL L    BUTTON ( TEXT 'ö' COLOR purple  )
+     BUTTON ( TEXT 'ü' COLOR rose  )
+ DL L    BUTTON ( TEXT 'ő' COLOR purple  )
+     BUTTON ( TEXT 'ű' COLOR rose  )
+    ) )
 
-ADDLAYOUT ( ID lay5 COLOR darkpink ASBOARD )
-ADDLAYOUT ( ID lay6 COLOR purple ASBOARD TURNON (SHIFT) )
+; rare part of kinesa
+; #############################################
 
+LET ( kinesarare BLOCK (
+    SINGLE ( TEXT 'q' COLOR brown TWIN ONSTAY)
+ DL    SINGLE ( TEXT 'w' COLOR brown CAPITAL ONSTAY)
+    SINGLE ( TEXT 'x' COLOR brown REPEAT ONCIRCLE)
+    ) )
 
-;
-; *** FILLING UP LAYOUTS WITH DATA ***
-;
+; reverse rare part of kinesa
+; #############################################
 
-; A default érték minden további title-re vonatkozik
-DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 0 SIZE 600 BOLD ITALICS )
+LET ( kinesarever BLOCK (
+    BUTTON ( TEXT 'q' COLOR brown )
+    BUTTON ( TEXT 'x' COLOR brown )
+ DL    BUTTON ( TEXT 'w' COLOR brown )
+    ) )
 
-; A board-ok közötti ugrás a SWITCH utasítással történik
-; Ha a BOARD külön nem rendelkezik, akkor itt is beállíthatjuk a LOCK paramétert
-; A 'BACK' speciális érték, visszavisz a korábbi board-ra.
-; Ha az aktuális board lock-olt, akkor az előzőre, ami szintén lock-olt lesz.
-; Ha az aktuális nem lock-olt, akkor az utolsó lock-olt-ra.
-; FONTOS! Ha olyan board-ra váltunk, ami korábban már szerepelt, akkor arra térünk vissza -
-; vagyis mindig a legrövidebb út számít a START board irányában.
+; rare2 part of kinesa
+; ############################################
 
-; A 'váltosort' label-ként definiáljuk, mert minden boardra rákerül
-LET ( jump BLOCK (
-  SWITCH ( BOARD lay1 CAPSSTATE )
-  SWITCH ( BOARD lay2 CAPSSTATE )
-  SWITCH ( BOARD lay3 CAPSSTATE )
-  SWITCH ( BOARD lay4 CAPSSTATE )
-  SWITCH ( BOARD lay5 CAPSSTATE )
-  SWITCH ( BOARD lay6 LOCK CAPSSTATE )
-  SWITCH ( BOARD BACK CAPSSTATE )
-))
+LET ( kinesarare2 BLOCK (
+    BUTTON ( TEXT 'q' COLOR brown )
+DR    BUTTON ( TEXT 'w' COLOR brown )
+DL    BUTTON ( TEXT 'x' COLOR brown )
+    ) )
 
-; Mivel ez sokszor szerepel, itt is csinálunk label-t
-; Érdekes, hogy a draft token egyszerre lehet keyword és label is. Ennek az az oka,
-; hogy először mindig a keyword kerül kiértékelésre, s csak ha az nincs, akkor a label.
+; net
+; #############################################
 
-DEFINE ( bdraft BUTTON ( COLOR red DRAFT ADDTITLE ( NONBOLD NONITALICS) ) )
+LET ( net BLOCK (
+    BUTTON ( TEXT '@' COLOR blue )
+ DL    BUTTON ( TEXT '\\' COLOR blue )
+    BUTTON ( TEXT '_' COLOR blue )
+    ) )
 
-BLOCK ( LAYOUT lay1 COLUMN 1 ROW 1
-    BUTTON ( TEXT "Lay1" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( bdraft )
-      )
-BLOCK ( LAYOUT lay2 COLUMN 1 ROW 1
-    BUTTON ( TEXT "Lay2" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( DRAFT COLOR red ADDTITLE (NONBOLD NONITALICS)) 
-    ; BUTTON ( bdraft )
-      )
-BLOCK ( LAYOUT lay2w COLUMN 1 ROW 1
-    BUTTON ( TEXT "Lay2w" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( bdraft )
-      )
-BLOCK ( LAYOUT lay3 COLUMN 1 ROW 1
-    BUTTON ( TEXT "Lay3" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( bdraft )
-      )
-BLOCK ( LAYOUT lay4 COLUMN 1 ROW 1
-    BUTTON ( TEXT "Lay4" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( bdraft )
-      )
-BLOCK ( LAYOUT lay5 COLUMN 1 ROW 1
-    BUTTON ( TEXT "Lay5" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( bdraft )
-      )
-BLOCK ( LAYOUT lay6 COLUMN 1 ROW 1
-    BUTTON ( TEXT "Lay6" ADDTITLE (NONBOLD NONITALICS))
-    BUTTON ( bdraft )
-      )
+; numeric circular
+; #############################################
 
-; Ha a ROW paraméter negatív, akkor a legalsó sortól kezdi a számítást
-BLOCK ( LAYOUT lay1 COLUMN 1 ROW -1 jump )
-BLOCK ( LAYOUT lay2 COLUMN 2 ROW -1 jump )
-BLOCK ( LAYOUT lay2w COLUMN 1 ROW -1 jump )
-BLOCK ( LAYOUT lay3 COLUMN 1 ROW -1 jump )
-BLOCK ( LAYOUT lay4 COLUMN 1 ROW -1 jump )
-BLOCK ( LAYOUT lay5 COLUMN 1 ROW -1 jump )
-BLOCK ( LAYOUT lay6 COLUMN 1 ROW -1 jump )
+LET ( numcirc BLOCK (
+    BUTTON ( TEXT '0' COLOR fuchsia )
+ DR    BUTTON ( TEXT '1' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "" north ) )
+ DR    BUTTON ( TEXT '2' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "abc" north ) )
+ DR    BUTTON ( TEXT '3' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "def" north ) )
+ DR    BUTTON ( TEXT '4' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "ghi" north ) )
+    BUTTON ( TEXT '5' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "jkl" north ) )
+    BUTTON ( TEXT '6' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "mno" north ) )
+    BUTTON ( TEXT '7' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "pqrs" north ) )
+    BUTTON ( TEXT '8' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "tuv" north ) )
+    BUTTON ( TEXT '9' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "wxyz" north ) )
+    BUTTON ( TEXT '.' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "ABR" north ) )
+    ) )
+    
+; numeric cube
+; #############################################
 
-BLOCK ( LAYOUT lay1 COLUMN 1 ROW 2
-    R
-    SINGLE ( FIRST ( TEXT "Single" ) )
-    SINGLE ( FIRST ( TEXT "Repeat" ) REPEAT )
-    DOUBLE ( FIRST ( TEXT "double" ) SECOND ( TEXT "DOUBLE" ) )
-    ALTERNATE ( FIRST ( TEXT "alt" ) SECOND ( TEXT "ALT" ) )
-    MULTI ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") )
-    BUTTON ( CAPITALIZE )
-      )
+LET ( numcube BLOCK (
+    BUTTON ( TEXT '1' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "" north ) )
+    BUTTON ( TEXT '2' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "abc" north ) )
+    BUTTON ( TEXT '3' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "def" north ) )
+ CRR    BUTTON ( TEXT '4' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "ghi" north ) )
+    BUTTON ( TEXT '5' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "jkl" north ) )
+    BUTTON ( TEXT '6' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "mno" north ) )
+ CRR    BUTTON ( TEXT '7' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "pqrs" north ) )
+    BUTTON ( TEXT '8' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "tuv" north ) )
+    BUTTON ( TEXT '9' COLOR fuchsia ADDTITLE ( south ) 
+        ADDTITLE ( TEXT "wxyz" north ) )
+ CRR    R
+    BUTTON ( TEXT '0' COLOR fuchsia )
+    ; ADDTITLE ( ) ADDTITLE ( TEXT '’' north ) )
+    ) )
 
-BLOCK ( LAYOUT lay1 COLUMN 1 ROW 3
-    BUTTON ( TEXT "Single" ONSTAY )
-    BUTTON ( TEXT "Repeat" REPEAT ONCIRCLE )
-    DOUBLE ( TEXT "double" SECOND ( TEXT "DOUBLE" ) ONSTAY )
-    ALTERNATE ( TEXT "alt" SECOND ( TEXT "ALT" ) ONSTAY )
-    MULTI ( ADD( TEXT "v" ) ADD ( TEXT "w" ) ADD ( TEXT "www") ONSTAY )
-    LIST ( TEXT "List" AUTOSPACE AROUND ERASESPACE AROUND ADDTEXT "List all data" ADDTEXT "List's of other data" ADDTEXT "Some more data" SECOND ( TEXT "secondary") )
-    BUTTON ( TOGGLE AUTOFUNC ADDTITLE (SHOW AUTOFUNC ) )
-      )
+; joystick
+; #############################################
 
-BLOCK ( LAYOUT lay1 COLUMN 3 ROW 1
-    ENTER ( REPEAT AUTOCAPS ON )
-    SPACETRAVEL ( )
-    BUTTON ( BACKSPACE REPEAT)
-    BUTTON ( DELETE REPEAT)
-    BUTTON ( SETTINGS)
-      )
-      
-LET ( valami BUTTON ( COLOR YELLOW ADDTITLE ( YOFFSET 600 ) ))      
-BLOCK ( LAYOUT lay1 COLUMN 2 ROW 4
-    BUTTON ( TEXT "A" )
-    BUTTON ( TEXT "B" ADDTITLE () ADDTITLE ( YOFFSET 300 ) )
-    BUTTON ( TEXT "C" ADDTITLE () valami)
-    BUTTON ( TEXT "D" valami ADDTITLE () )
+LET ( joy BLOCK (
+    META ( SHIFT LOCK ADDTITLE ( script ) COLOR white )
+ UR SKIP 2
+    BUTTON ( KEY KEYDPADUP REPEAT
+        ADDTITLE ( TEXT '▲' script COLOR black ) COLOR gray )
+ DL    BUTTON ( KEY KEYDPADLEFT REPEAT
+        ADDTITLE ( TEXT '◀' script COLOR black ) COLOR gray )
+    BUTTON ( KEY KEYDPADRIGHT REPEAT 
+        ADDTITLE ( TEXT '▶' script COLOR black ) COLOR gray ) 
+ DL    BUTTON ( KEY KEYDPADDOWN REPEAT 
+        ADDTITLE ( TEXT '▼' script COLOR black ) COLOR gray )
+    ) )
+
+LET ( joycp BLOCK (
+    joy
+ UL UR UL UR
+    BUTTON ( KEY 'C' TURNON ( CTRL ) TURNOFF ( SHIFT ) 
+        ADDTITLE ( TEXT "COPY" script COLOR white ) COLOR blue )
+    BUTTON ( KEY 'V' TURNON ( CTRL ) TURNOFF ( SHIFT ) 
+        ADDTITLE ( TEXT "PASTE" script COLOR white ) COLOR blue )
+    ) )
+
+; #############################################    
+    
+LET ( newjoy BLOCK (
+	BUTTON ( PARA LEFT REPEAT
+		ADDTITLE ( TEXT "◀¶" COLOR black ) COLOR silver )
+	BUTTON ( KEY KEYDPADUP REPEAT
+		ADDTITLE ( TEXT '▲'
+		SIZE 1000 YOFFSET -200 COLOR black )
+		ADDTITLE ( TEXT "KEY" BOLD
+		SIZE 600 YOFFSET 200 COLOR black ) COLOR gray )
+	BUTTON ( PARA RIGHT REPEAT
+		ADDTITLE ( TEXT "¶▶" COLOR black ) COLOR silver )
+	META ( SHIFT LOCK ADDTITLE ( TEXT "Shift" script ) COLOR white )
+CRL
+	BUTTON ( WORD LEFT REPEAT 
+		ADDTITLE ( TEXT "◀◀" COLOR black ) COLOR silver )
+	BUTTON ( LEFT REPEAT 
+		ADDTITLE ( TEXT '◀' COLOR black ) COLOR gray )
+	BUTTON ( RIGHT  REPEAT
+		ADDTITLE ( TEXT '▶' COLOR black ) COLOR gray )
+	BUTTON ( WORD RIGHT REPEAT
+		ADDTITLE ( TEXT "▶▶" COLOR black ) COLOR silver )
+CRR	
+	BUTTON ( TOP
+		ADDTITLE ( TEXT '⇱' COLOR black ) COLOR silver )
+	BUTTON ( KEY KEYDPADDOWN REPEAT 
+		ADDTITLE ( TEXT '▼'
+		SIZE 1000 YOFFSET 200 COLOR black ) 
+		ADDTITLE ( TEXT "KEY" BOLD
+		SIZE 600 YOFFSET -200 COLOR black ) COLOR gray )
+	BUTTON ( BOTTOM
+		ADDTITLE ( TEXT '⇲' COLOR black ) COLOR silver )
+	BUTTON ( TOGGLE CURSOR
+		ADDTITLE ( TEXT "Cur" script ) 
+		COLOR white )
+
+;	BUTTON ( KEY KEYDPADLEFT REPEAT
+;		ADDTITLE ( TEXT '◀' COLOR black ) COLOR gray )
+;	BUTTON ( KEY KEYDPADRIGHT REPEAT 
+;		ADDTITLE ( TEXT '▶' COLOR black ) COLOR gray ) 
+	) ) 
+    
+; #############################################
+
+ADDMODIFY (ID charsacc IGNORESPACE 
+   ROLLS (
+   "aáAÁ"
+   "bßB"
+   "c¢©C"
+   "dD"
+   "eé€EÉ"
+   "f£F"
+   "gG" 
+   "hH"
+   "iíIÍ"
+   "jJ"
+   "kK" 
+   "lL"
+   "mµM"
+   "nN"
+   "oóöőOÓÖŐ"
+   "p§P¶"
+   "qQ"
+   "r®R"
+   "s$S"
+   "tT"
+   "uúüűUÚÜŰ"
+   "v¤V"
+   "wW"
+   "xX"
+   "y¥Y"
+   "zZ"
+   "({[<«"
+   ")}]>»"
+   "\"„”"
+   "\'’"
+   ".?!…"
+   ",;:"
+   "-–"
+   "/÷"
+   "+±†‡"
+   "%‰"
+   "*×"
+   "0°"
+   " ‑" ; non-breaking space and non breaking hyphen.
+   "#`~^") ) ; Special symbols, rarely needed
+
+; #############################################
+
+ADDLAYOUT ( ID switch HEXAGONAL ALIGN odds ROWS 5 HALFCOLUMNS 15 ASBOARD START )
+
+BLOCK ( LAYOUT switch COLUMN 1 ROW 1
+  BUTTON ( SETTINGS COLOR white ADDTITLE ( script ))
+  BUTTON ( DRAFT COLOR red ADDTITLE ( script ))
+  ENTER ()
+  SINGLE ( TOGGLE AUTOFUNC ADDTITLE ( SHOW AUTOFUNC ) )
+  crr
+  SWITCH ( BOARD lit )
+  SWITCH ( BOARD prog )
+  SWITCH ( BOARD mini )
+  SWITCH ( BOARD make )
+  crr
+  SWITCH ( BOARD lay1 )
+  SWITCH ( BOARD lay2 )
+  SWITCH ( BOARD lay3 )
+  crl
+  SINGLE ( RUN "jp.sblo.pandora.jota" )
+  SINGLE ( RUN "org.madore.android.unicodeMap" )
+  PROGRAM ( ONSTAY )
+  PROGRAM ( RUN "jp.sblo.pandora.jota" ONSTAY )
+  )
+  
+; #############################################
+
+ADDLAYOUT ( ID lit COLUMNS 12 ROWS 7 ALIGN odds )
+ADDBOARD ( ID lit LAYOUT lit LOCK )
+DEFAULT ( BLOCK (LAYOUT lit COLUMN 1 ) )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lit" ) COLOR magenta ))
+
+BLOCK ( ROW 1 COLUMN 4 kinesacentr )
+BLOCK ( ROW 1 COLUMN 3 kinesaaccent )
+BLOCK ( ROW 1 COLUMN 2 kinesarare )
+BLOCK ( ROW 6 COLUMN 11 net )
+BLOCK ( ROW 3 COLUMN 1 numcirc )
+BLOCK ( ROW 6 COLUMN 10 joy )
+
+BLOCK ( ROW 1 COLUMN 1 BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" script ) COLOR white ) )
+BLOCK ( ROW 1 COLUMN 9 BUTTON ( BACKSPACE REPEAT ADDTITLE ( script ) COLOR white ) )
+BLOCK ( ROW 1 COLUMN 12 BUTTON ( DELETE REPEAT ADDTITLE ( script ) COLOR white ) )
+BLOCK ( ROW 2 COLUMN 10 ENTER ( ADDTITLE ( script ) COLOR white  ERASESPACE AROUND AUTOCAPS ON) )
+BLOCK ( ROW 5 COLUMN 1 
+    META ( CTRL ADDTITLE ( script ) COLOR white )
+ DR    META ( CAPS ADDTITLE ( script ) COLOR white )
+ DR    MODIFY ( ROLL charsacc ADDTITLE ( TEXT '↺' script SIZE 1200 ) COLOR white )
+    )
+
+BLOCK ( ROW 1 COLUMN 10
+    BUTTON ( TEXT '?' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON)
+    BUTTON ( TEXT '=' COLOR khaki ERASESPACE AROUND AUTOSPACE AROUND)
+ CRR    BUTTON ( TEXT '!' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON)
+    BUTTON ( TEXT '*' COLOR green )
+    BUTTON ( TEXT '/' COLOR green )
+ CRL    BUTTON ( TEXT '–' COLOR orange ERASESPACE AROUND AUTOSPACE AROUND)
+    BUTTON ( TEXT '-' COLOR green ADDTITLE ( south ) )
+    BUTTON ( TEXT '+' COLOR green ADDTITLE ( south ) )
+ CRL    BUTTON ( TEXT '.' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON)
+    BUTTON ( TEXT ':' COLOR khaki ERASESPACE AROUND AUTOSPACE AFTER)
+    BUTTON ( TEXT '…' COLOR khaki ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON)
+ CRL    BUTTON ( TEXT ',' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER)
+    BUTTON ( TEXT ';' COLOR khaki ERASESPACE AROUND AUTOSPACE AFTER)
+    BUTTON ( TEXT ' ' COLOR fuchsia )
     )
     
-; lay2 - speciális billentyűk
+BLOCK ( ROW 6 COLUMN 4
+    BUTTON ( TEXT '„' COLOR khaki ADDTITLE ( south ) ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT '”' COLOR khaki ADDTITLE ( south ) ERASESPACE AROUND AUTOSPACE AFTER )
+    BUTTON ( TEXT '(' COLOR orange ADDTITLE ( south ) ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT ')' COLOR orange ADDTITLE ( south ) ERASESPACE AROUND AUTOSPACE AFTER )
+    BUTTON ( TEXT '\'' COLOR khaki ADDTITLE ( south ) )
+    BUTTON ( TEXT '\"' COLOR khaki ADDTITLE ( south ) )
+    )
+    
+; #############################################
 
-BLOCK ( LAYOUT lay2 COLUMN 3 ROW 1
-    ENTER ( REPEAT )
-    BUTTON ( TIME )
-    BUTTON ( TIME FORMAT ("yy.MM.dd") ERASESPACE AROUND AUTOSPACE AROUND)
-    BUTTON ( SETTINGS)
-    META ( SHIFT COLOR white )
-      )
-      
-BLOCK ( LAYOUT lay2 COLUMN 2 ROW 2 
-	BUTTON ( LEFT CURSOR BEGIN REPEAT )
-	BUTTON ( RIGHT CURSOR BEGIN REPEAT  )	
-	BUTTON ( LEFT REPEAT )
-	BUTTON ( RIGHT  REPEAT )	
-	BUTTON ( LEFT CURSOR END REPEAT  )
-	BUTTON ( RIGHT CURSOR END REPEAT  )
-	MEMORY ( AUTOSPACE AROUND )
-	
-crl	BUTTON ( WORD LEFT CURSOR BEGIN REPEAT )
-	BUTTON ( WORD RIGHT CURSOR BEGIN REPEAT  )	
-	BUTTON ( WORD LEFT REPEAT )
-	BUTTON ( WORD RIGHT  REPEAT )	
-	BUTTON ( WORD LEFT CURSOR END REPEAT  )
-	BUTTON ( WORD RIGHT CURSOR END REPEAT  )	
-	BUTTON ( TOGGLE CURSOR COLOR green )
-	
-crr	BUTTON ( PARA LEFT CURSOR BEGIN REPEAT )
-	BUTTON ( PARA RIGHT CURSOR BEGIN REPEAT  )	
-	BUTTON ( PARA LEFT REPEAT )
-	BUTTON ( PARA RIGHT  REPEAT )	
-	BUTTON ( PARA LEFT CURSOR END REPEAT  )
-	BUTTON ( PARA RIGHT CURSOR END REPEAT  )	
-	MEMORY ( TEXT " Hi guys!")
-	
-crl	BUTTON ( SELECTALL )
-	BUTTON ( TOP )
-	BUTTON ( BOTTOM )
-	BUTTON ( KEY KEYDPADUP REPEAT
-		ADDTITLE ( TEXT '▲' COLOR black ) COLOR gray )
-	BUTTON ( KEY KEYDPADLEFT REPEAT
-		ADDTITLE ( TEXT '◀' COLOR black ) COLOR gray )
-	BUTTON ( KEY KEYDPADRIGHT REPEAT 
-		ADDTITLE ( TEXT '▶' COLOR black ) COLOR gray ) 
-	BUTTON ( KEY KEYDPADDOWN REPEAT 
-		ADDTITLE ( TEXT '▼' COLOR black ) COLOR gray )
+; prog - [`] [^] [~] [$] are not used 
+ADDLAYOUT ( ID prog COLUMNS 13 ROWS 6 ALIGN evens )
+ADDBOARD ( ID prog LAYOUT prog LOCK )
+DEFAULT (BLOCK (LAYOUT prog COLUMN 1) )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lock" ) COLOR magenta ))
+    
+BLOCK ( ROW 1 COLUMN 4 kinesacentr )
+BLOCK ( ROW 1 COLUMN 2 kinesarever )
+;SPACETRAVEL ( COLOR pink OVERWRITE )
+BLOCK ( ROW 5 COLUMN 12 net )
+BLOCK ( ROW 2 COLUMN 1 numcirc )
+BLOCK ( ROW 5 COLUMN 11 joy )
+
+BLOCK ( ROW 1 COLUMN 8 
+    BUTTON ( BACKSPACE REPEAT ADDTITLE ( script ) COLOR white )
+    BUTTON ( TEXT '?' COLOR yellow )
+    BUTTON ( TEXT ':' COLOR yellow )
+    BUTTON ( TEXT '<' COLOR khaki )
+    BUTTON ( TEXT '=' COLOR khaki )
+    BUTTON ( TEXT '>' COLOR khaki )
+    BUTTON ( DELETE REPEAT ADDTITLE ( script ) COLOR white )
+    CRR
+    ENTER ( ADDTITLE ( script ) COLOR white )
+    BUTTON ( TEXT '!' COLOR khaki )
+    BUTTON ( TEXT '|' COLOR khaki )
+    BUTTON ( TEXT '&' COLOR khaki )
+    BUTTON ( TEXT '*' COLOR green )
+    BUTTON ( TEXT '/' COLOR green )
+    CRR
+    BUTTON ( TEXT ";\n" ADDTITLE ( TEXT ";" ) COLOR orange )
+    BUTTON ( TEXT "{\n" ADDTITLE ( TEXT "{" ) COLOR orange )
+    BUTTON ( TEXT "}\n" ADDTITLE ( TEXT "}" ) COLOR orange )
+    BUTTON ( TEXT '-' COLOR green )
+    BUTTON ( TEXT '+' COLOR green )
+    BUTTON ( TEXT '%' COLOR khaki )
+    CRL
+    BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" script ) COLOR white )
+    BUTTON ( TEXT '[' COLOR khaki )
+    BUTTON ( TEXT ']' COLOR khaki )
+    BUTTON ( TEXT '\'' COLOR khaki )
+    BUTTON ( TEXT '\"' COLOR khaki )
+    CRL
+    BUTTON ( TEXT '#' COLOR rose )
+    BUTTON ( TEXT '(' COLOR khaki )
+    BUTTON ( TEXT ')' COLOR khaki )
+    DR
+    BUTTON ( TEXT ',' COLOR khaki )
+    )
+    
+BLOCK ( ROW 4 COLUMN 1
+    META ( CTRL ADDTITLE ( script ) COLOR white )
+    DR
+    META ( CAPS ADDTITLE ( script ) COLOR white )
+    DR
+    MODIFY ( ROLL charsacc ADDTITLE ( TEXT '↺' script SIZE 1200 ) COLOR white )
+    )
+
+; #############################################
+
+ADDLAYOUT ( ID mini HALFCOLUMNS 15 ROWS 5 ALIGN evens )
+DEFAULT (BLOCK (LAYOUT mini COLUMN 1) )
+BLOCK ( ROW 1 COLUMN 2 SWITCH ( BACK ADDTITLE ( link TEXT "Mini" ) COLOR magenta ))
+
+BLOCK ( ROW 1 COLUMN 3 kinesacentr )
+BLOCK ( ROW 2 COLUMN 1 
+    BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" script ) COLOR white ERASESPACE AROUND AUTOCAPS HOLD )
+     DR DL    
+     META ( CAPS ADDTITLE ( script ) COLOR white )
+     DR
+     MODIFY ( ROLL charsacc ADDTITLE ( TEXT "o↺ő" script ) COLOR white )
+    )
+
+BLOCK ( ROW 1 COLUMN 7 
+    BUTTON ( BACKSPACE REPEAT ADDTITLE ( script ) COLOR white )
+    BUTTON ( TIME FORMAT("[yy.MM.dd]" ) ADDTITLE ( script ) COLOR white ERASESPACE AROUND AUTOSPACE AROUND)
+    DL    
+    ENTER ( ADDTITLE ( script ) COLOR white ERASESPACE AROUND AUTOCAPS ON )
+    DR
+    SWITCH ( BOARD minisigns ADDTITLE ( TEXT "&#?" link ) COLOR magenta )
+    DL
+    BUTTON ( TEXT '.' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON )
+    DL
+    BUTTON ( TEXT ',' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER ) 
+    SWITCH ( BOARD minimaths LOCK ADDTITLE ( TEXT "123" link ) COLOR magenta ) 
+    )
+
+ADDLAYOUT ( ID wmini WIDE HALFCOLUMNS 24 ROWS 5 ALIGN odds )
+DEFAULT (BLOCK (LAYOUT wmini COLUMN 1 ) )
+BLOCK ( ROW 1 SWITCH ( BACK ADDTITLE ( link TEXT "Mini" ) COLOR magenta ))
+
+BLOCK ( ROW 1 COLUMN 4 kinesacentr )
+BLOCK ( ROW 1 COLUMN 3 kinesaaccent )
+BLOCK ( ROW 1 COLUMN 2 kinesarare )
+BLOCK ( ROW 4 COLUMN 12 net )
+
+BLOCK ( ROW 1 COLUMN 9 
+    BUTTON ( BACKSPACE REPEAT ADDTITLE ( script ) COLOR white )
+    BUTTON ( TEXT '?' COLOR khaki ERASESPACE AROUND    AUTOSPACE AFTER AUTOCAPS ON )
+    BUTTON ( TEXT '\"' COLOR khaki)    
+    BUTTON ( DELETE REPEAT ADDTITLE ( script ) COLOR white )
+    CRR
+    ENTER ( ADDTITLE ( script ) COLOR white ERASESPACE AROUND AUTOCAPS ON )
+    BUTTON ( TEXT '!' COLOR khaki ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON )
+    BUTTON ( TEXT '-' COLOR khaki)
+    CRR
+    SWITCH ( BOARD minisigns ADDTITLE ( TEXT "&#?" link ) COLOR magenta )
+    BUTTON ( TEXT '(' COLOR orange ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT ')' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER )
+    CRL
+    BUTTON ( TEXT '.' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON )
+    BUTTON ( TEXT ':' COLOR khaki ERASESPACE AROUND AUTOSPACE AFTER )
+    CRL
+    BUTTON ( TEXT ',' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER ) 
+    SWITCH ( BOARD minimaths LOCK ADDTITLE ( TEXT "123" link ) COLOR magenta )
+    )
+    
+BLOCK ( ROW 3 COLUMN 1
+    BUTTON ( TEXT '\t' ADDTITLE ( TEXT "TAB" script ) COLOR white ERASESPACE AROUND AUTOCAPS HOLD )
+    DR
+    META ( CAPS ADDTITLE ( script ) COLOR white )
+    DR
+    MODIFY ( ROLL charsacc ADDTITLE ( TEXT "o↺ő" script ) COLOR white )
+    )
+    
+ADDBOARD ( ID mini PORTRAIT mini LANDSCAPE wmini LOCK )
+
+; #############################################
+
+ADDLAYOUT ( ID minimaths HALFCOLUMNS 15 ROWS 5 ALIGN evens )
+DEFAULT (BLOCK (LAYOUT minimaths ) )
+
+BLOCK ( ROW 1 COLUMN 2 kinesarare )
+BLOCK ( ROW 1 COLUMN 3 numcube )
+BLOCK ( ROW 4 COLUMN 4 joycp )
+
+BLOCK ( ROW 1 COLUMN 6
+    BUTTON ( BACKSPACE REPEAT ADDTITLE ( script ) COLOR white )
+    DR
+    ENTER ( REPEAT ADDTITLE ( script ) COLOR white )
+    BUTTON ( TEXT ' ' REPEAT COLOR pink )
+    DR
+    SWITCH ( BOARD minisigns ADDTITLE ( TEXT "&#?" link ) COLOR magenta )
+    DL DR
+    SWITCH ( BACK LOCK ADDTITLE ( TEXT "BACK" link ) COLOR magenta )
+    )
+
+BLOCK ( ROW 3 COLUMN 2
+    BUTTON ( TEXT '*' COLOR green )
+    BUTTON ( TEXT '/' COLOR green )
+    CRL
+    BUTTON ( TEXT '=' COLOR khaki )
+    BUTTON ( TEXT '-' COLOR green ) 
+    BUTTON ( TEXT '+' COLOR green )
+    CRR
+    BUTTON ( TEXT '#' COLOR khaki )
+    BUTTON ( TEXT '(' COLOR orange )
+    BUTTON ( TEXT ')' COLOR orange )
+    BUTTON ( TEXT ',' COLOR rose )
+    BUTTON ( TEXT '.' COLOR rose ADDTITLE ( south ) ADDTITLE ( TEXT "ABR" north ) )
+    )
+    
+ADDLAYOUT ( ID wminimaths WIDE HEXAGONAL HALFCOLUMNS 24 ROWS 5 ALIGN odds )
+DEFAULT (BLOCK (LAYOUT wminimaths ) )
+
+BLOCK ( ROW 1 COLUMN 7 numcube )
+BLOCK ( ROW 4 COLUMN 9 joycp )
+
+BLOCK ( ROW 1 COLUMN 10
+    BUTTON ( BACKSPACE REPEAT ADDTITLE ( script ) COLOR white )
+    DR
+    ENTER ( REPEAT ADDTITLE ( script ) COLOR white )
+    BUTTON ( TEXT ' ' REPEAT COLOR pink )
+    DR
+    SWITCH ( BOARD minisigns    ADDTITLE ( TEXT "&#?" link ) COLOR magenta )
+    DL DR
+    SWITCH ( BACK LOCK ADDTITLE ( TEXT "BACK" link ) COLOR magenta )
+    )
+
+BLOCK ( ROW 1 COLUMN 2
+    BUTTON ( TEXT '<' COLOR khaki )
+    BUTTON ( TEXT '=' COLOR khaki )
+    BUTTON ( TEXT '>' COLOR khaki )
+    BUTTON ( TEXT '\'' COLOR khaki )
+    BUTTON ( TEXT '?' COLOR rose ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON )
+    CRL
+    BUTTON ( TEXT '*' COLOR green )
+    BUTTON ( TEXT '/' COLOR green )
+    BUTTON ( TEXT '|' COLOR khaki )
+    BUTTON ( TEXT '&' COLOR khaki )
+    BUTTON ( TEXT '\"' COLOR khaki )
+    BUTTON ( TEXT '!' COLOR rose ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON )
+    CRL
+    BUTTON ( TEXT '#' COLOR khaki )
+    BUTTON ( TEXT '-' COLOR green )
+    BUTTON ( TEXT '+' COLOR green )
+    BUTTON ( TEXT '–' COLOR rose )
+    BUTTON ( TEXT '{' COLOR khaki ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT '}' COLOR khaki ERASESPACE AROUND AUTOSPACE AFTER )
+    BUTTON ( TEXT '$' )
+    CRR
+    BUTTON ( TEXT '%' COLOR khaki )
+    BUTTON ( TEXT '’' COLOR orange )
+    BUTTON ( TEXT '…' COLOR rose )
+    BUTTON ( TEXT '[' COLOR khaki )
+    BUTTON ( TEXT ']' COLOR khaki )
+    BUTTON ( TEXT ';' COLOR rose ) 
+    BUTTON ( TEXT '^' )
+    CRL
+    MODIFY ( ROLL charsacc ADDTITLE ( TEXT "o↺ő" script ) COLOR white )
+    BUTTON ( TEXT '„' COLOR orange ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT '”' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER )
+    BUTTON ( TEXT '(' COLOR orange ) 
+    BUTTON ( TEXT ')' COLOR orange )
+    BUTTON ( TEXT ':' COLOR rose )
+    BUTTON ( TEXT '`' )
+    BUTTON ( TEXT '~' )
+    BUTTON ( TEXT ',' COLOR rose )
+    BUTTON ( TEXT '.' COLOR rose ADDTITLE ( south ) ADDTITLE ( TEXT "ABR" north ) )
+    )
+
+ADDBOARD ( ID minimaths PORTRAIT minimaths LANDSCAPE wminimaths LOCK )
+
+; #############################################
+
+ADDLAYOUT ( ID minisigns HEXAGONAL HALFCOLUMNS 15 ROWS 5 ALIGN evens )
+DEFAULT (BLOCK (LAYOUT minisigns ) )
+BLOCK ( ROW 4 COLUMN 7 net )
+BLOCK ( ROW 1 COLUMN 2
+    BUTTON ( TEXT '<' COLOR khaki )
+    BUTTON ( TEXT '=' COLOR khaki )
+    BUTTON ( TEXT '>' COLOR khaki )
+    BUTTON ( TEXT '„' COLOR orange ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT '”' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER )
+    BUTTON ( TEXT '?' COLOR rose ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON )
+    BUTTON ( TEXT '’' COLOR orange )
+    CRL
+    BUTTON ( TEXT '*' COLOR green )
+    BUTTON ( TEXT '/' COLOR green )
+    BUTTON ( TEXT '|' COLOR khaki )
+    BUTTON ( TEXT '&' COLOR khaki )
+    BUTTON ( TEXT '\'' COLOR khaki )
+    BUTTON ( TEXT '\"' COLOR khaki )
+    BUTTON ( TEXT '!' COLOR rose ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON )
+    CRR
+    BUTTON ( TEXT '-' COLOR green )
+    BUTTON ( TEXT '+' COLOR green )
+    BUTTON ( TEXT '–' COLOR rose )
+    BUTTON ( TEXT '{' COLOR khaki ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT '}' COLOR khaki ERASESPACE AROUND AUTOSPACE AFTER )
+    BUTTON ( TEXT '.' COLOR rose ADDTITLE ( south ) ADDTITLE ( TEXT "ABR" north ) )
+    BUTTON ( TEXT 0 ADDTITLE ( TEXT "BACK" link ) COLOR magenta ) 
+    CRL
+    BUTTON ( TEXT '#' COLOR khaki )
+    BUTTON ( TEXT '%' COLOR khaki )
+    BUTTON ( TEXT '…' COLOR rose ERASESPACE AROUND AUTOSPACE AFTER AUTOCAPS ON )
+    BUTTON ( TEXT '[' COLOR khaki ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT ']' COLOR khaki ERASESPACE AROUND AUTOSPACE AFTER )
+    BUTTON ( TEXT ':' COLOR rose ERASESPACE AROUND AUTOSPACE AFTER )
+    CRR
+    BUTTON ( TEXT '`' )
+    BUTTON ( TEXT '~' )
+    BUTTON ( TEXT '(' COLOR orange ERASESPACE AROUND AUTOSPACE BEFORE )
+    BUTTON ( TEXT ')' COLOR orange ERASESPACE AROUND AUTOSPACE AFTER )
+    BUTTON ( TEXT ';' COLOR rose ERASESPACE AROUND AUTOSPACE AFTER )
+    )
+ADDBOARD ( ID minisigns LAYOUT minisigns )
+
+; #############################################
+
+DEFAULT ( BLOCK () )
+ADDLAYOUT ( ID make HEXAGONAL ALIGN evens ROWS 7 HALFCOLUMNS 20 ASBOARD LOCK )
+
+LET ( comm ADDTITLE ( YOFFSET 0 SIZE 700 COLOR black) )
+LET ( asp BUTTON ( AUTOSPACE AROUND ) )
+LET ( sp BUTTON ( ERASESPACE AROUND AUTOSPACE AROUND ) )
+
+LET ( attic ADDTITLE ( SIZE 700 YOFFSET -300 ) ) 
+LET ( cellar ADDTITLE (SIZE 700 YOFFSET 300) )
+
+BLOCK ( ROW 1 COLUMN 2 
+	SWITCH ( BACK ADDTITLE ( link TEXT "Make" ) COLOR magenta ))
+
+BLOCK ( ROW 2 COLUMN 2
+	SWITCH ( BOARD gen ADDTITLE ( link TEXT "Gen" ) COLOR magenta ) 
+	SWITCH ( BOARD lit ADDTITLE ( link TEXT "Lit" ) COLOR magenta )
+	SWITCH ( BOARD colors ADDTITLE ( link TEXT "Color" ) COLOR magenta )
 	)
 
-
-
-    
-; A landscape lay2-n a korábbi pozícionálások kipróbálása van
-
-DEFAULT BUTTON ( COLOR green )
-
-LET ( zold BUTTON ( COLOR green ) )
-LET ( piros BUTTON ( COLOR red ) )
-
-LET ( abc BLOCK ( 
-	BUTTON ( TEXT "A") 
-	BUTTON ( TEXT "B") 
-	BUTTON ( TEXT "C") ))
-
-LET ( def BLOCK ( 
-	UR
-	BUTTON ( TEXT "D") 
-	DR
-	BUTTON ( TEXT "E") 
-	UR
-	BUTTON ( TEXT "F") 
-	DR ))
-
-LET ( ghi BLOCK ( 
-	BUTTON ( TEXT "G") 
-	BUTTON ( TEXT "H") 
-	BUTTON ( TEXT "I") ))
-
-
-BLOCK ( LAYOUT lay2w COLUMN 1 ROW 4
-    BUTTON ( TEXT "->" ) crl Button ( text "crl" ) home crr Button ( text "crr" ) skip (2) abc r def r ghi crr Button ( text "crr" )
-      )
-
-
-BLOCK ( LAYOUT lay2w COLUMN 5 ROW 2
-    BUTTON ( TEXT "1" zold )
-    SKIP 2
-    BUTTON ( TEXT "N" zold )
-    HOME
-    DR
-    BUTTON ( TEXT "DR" piros )
-    HOME
-    DL
-    BUTTON ( TEXT "DL" piros )
-    HOME
-    UR
-    BUTTON ( TEXT "UR" piros )
-    HOME
-    UL
-    BUTTON ( TEXT "UL" piros )
-    HOME
-    R
-    BUTTON ( TEXT "R" piros )
-    HOME
-    L
-    BUTTON ( TEXT "L" piros )
-      )
-    
-BLOCK ( LAYOUT lay2w COLUMN 11 ROW 2
-    BUTTON ( TEXT "0" zold )
-    UL
-    BUTTON ( TEXT "1" piros )
-    R
-    BUTTON ( TEXT "2" piros )
-    DR
-    BUTTON ( TEXT "3" piros )
-    DL
-    BUTTON ( TEXT "4" piros )
-    L
-    BUTTON ( TEXT "5" piros )
-    UL
-    BUTTON ( TEXT "6" piros )
-      )
-      
-; lay3 skip teszt
-
-LET ( bl BLOCK ( 
-	SKIP 1
-	BUTTON ( TEXT "BL" COLOR red)
-	SKIP 1
-	))
+BLOCK ( ROW 2 COLUMN 1
+	BUTTON ( TEXT '\t' COMBINE KEY KEYTAB
+		ADDTITLE ( TEXT "⇥" script ) COLOR white ) 
+	)
  
-
-BLOCK ( LAYOUT lay3 COLUMN 3 ROW 2 BUTTON ( TEXT '>' ) )
-
-BLOCK ( LAYOUT lay3 COLUMN 4 ROW 2 
-	BUTTON ( TEXT '1' COLOR yellow)
-	bl
-	BUTTON ( TEXT '2' COLOR yellow) 
-	)
-
-BLOCK ( LAYOUT lay3 COLUMN 3 ROW 3 BUTTON ( TEXT '>' ) )
-
-BLOCK ( LAYOUT lay3 COLUMN 4 ROW 3 
-	BUTTON ( TEXT '1' COLOR yellow) 
-	R
-	SKIP 2
-	BUTTON ( TEXT '2' COLOR yellow) 
-	)
-
-BLOCK ( LAYOUT lay3 COLUMN 3 ROW 4 BUTTON ( TEXT '>' ) )
-
-BLOCK ( LAYOUT lay3 COLUMN 4 ROW 4 
-	SKIP 1
-	BUTTON ( TEXT '1' COLOR yellow) 
-	SKIP 1
-	BUTTON ( TEXT '2' COLOR yellow) 
-	)
-
-; lay4 findfree pozícionálás.
-
-DEFAULT ( BUTTON ( COLOR yellow ))
-BLOCK ( LAYOUT lay4 COLUMN 3 ROW 1
-	BUTTON ( TEXT "a")
-	SKIP 1
-	BUTTON ( TEXT "b")
-	SKIP 1
-	BUTTON ( TEXT "c")
-	HOME
-	FINDFREE
-	BUTTON ( TEXT "f" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "g" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "h" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "i" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "j" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "k" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "l" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "m" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "n" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "o" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "p" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "q" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "r" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "f" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "g" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "h" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "i" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "j" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "k" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "l" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "m" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "n" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "o" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "p" COLOR gray)
-	FINDFREE
-	BUTTON ( TEXT "q" COLOR gray)
+BLOCK ( ROW 2 COLUMN 5
+	BUTTON ( BACKSPACE REPEAT
+		ADDTITLE ( script ) COLOR white )
+	BUTTON ( KEY 'C' TURNON ( CTRL ) TURNOFF ( SHIFT ) 
+		ADDTITLE ( TEXT "COPY" script COLOR white ) COLOR blue )
+dl	ENTER ( REPEAT AUTOCAPS ON
+		ADDTITLE (  script ) COLOR white )
+dl  	SPACETRAVEL (
+		ADDTITLE ( script ) COLOR white)
+	BUTTON ( KEY 'V' TURNON ( CTRL ) TURNOFF ( SHIFT ) 
+		ADDTITLE ( TEXT "PASTE" script COLOR white ) COLOR blue )   
 	)
 	
-; lay5 - extend
-DEFAULT ( BUTTON ( COLOR rose ))
+BLOCK ( ROW 1 COLUMN 3
+	MEMORY ( asp ADDTITLE ( SIZE 500 ) COLOR yellow ONSTAY )
+	MEMORY ( asp ADDTITLE ( SIZE 500 ) COLOR yellow ONSTAY )
+	MEMORY ( asp ADDTITLE ( SIZE 500 ) COLOR yellow ONSTAY )
+	MEMORY ( asp ADDTITLE ( SIZE 500 ) COLOR yellow ONSTAY )
+	MEMORY ( asp ADDTITLE ( SIZE 500 ) COLOR yellow ONSTAY )
+	MEMORY ( asp ADDTITLE ( SIZE 500 ) COLOR yellow ONSTAY )
+	MEMORY ( asp ADDTITLE ( SIZE 500 ) COLOR yellow ONSTAY )
+	MEMORY ( asp ADDTITLE ( SIZE 500 ) COLOR yellow ONSTAY )
+	) 
+BLOCK ( ROW 2 COLUMN 7 newjoy )
 
-BLOCK ( LAYOUT lay5 COLUMN 2 ROW 2
-	BUTTON ( TEXT "a")
-	BUTTON ( TEXT "b")
-	BUTTON ( TEXT "c")
+BLOCK ( ROW 3 COLUMN 1
+findfree	LIST ( ADDTITLE ( comm TEXT "Button"  ) 
+		TEXT "BUTTON ( )\n"
+		ADDTEXT "BUTTON ( TEXT \"\" )\n"
+		ADDTEXT "BUTTON ( FIRST () SECOND () )\n"
+		ADDTEXT "BUTTON ( FIRST ( TEXT \"\" ) SECOND ( TEXT \"\" ) )\n"
+		COLOR yellow  
 		)
-BLOCK ( LAYOUT lay5 COLUMN 2 ROW 2
-	R
-	EXTEND ( COLOR green )
-	EXTEND ( COLOR red )
+findfree	LIST ( ADDTITLE ( comm TEXT "Single"  ) 
+		TEXT "SINGLE ( )\n"
+		ADDTEXT "SINGLE ( TEXT \"\" )\n"
+		COLOR yellow  
 		)
-				
-BLOCK ( LAYOUT lay5 COLUMN 2 ROW 3
-	BUTTON ( TEXT "a")
-	BUTTON ( TEXT "b")
-	BUTTON ( TEXT "c")
-	BUTTON ( TEXT "d")
-	BUTTON ( TEXT "e")
+findfree	LIST ( ADDTITLE ( cellar TEXT "Double"  )
+		ADDTITLE ( attic TEXT "Alter"  )
+		TEXT "DOUBLE ( FIRST () SECOND () )\n"
+		ADDTEXT "DOUBLE ( FIRST ( TEXT \"\" ) SECOND ( TEXT \"\" ) )\n"
+		ADDTEXT "ALTERNATE ( FIRST () SECOND () )\n"
+		ADDTEXT "ALTERNATE ( FIRST ( TEXT \"\" ) SECOND ( TEXT \"\" ) )\n"
+		COLOR yellow  
 		)
-
-DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET -600 SIZE 400 )
-
-BLOCK ( LAYOUT lay5 COLUMN 2 ROW 3
-	EXTEND ( ADDTITLE (TEXT "1"))
-	EXTEND ( ADDTITLE (TEXT "2"))
-	EXTEND ( ADDTITLE (TEXT "3") COLOR yellow)
-	EXTEND ( ADDTITLE (TEXT "4") COLOR green )
-	EXTEND ( ADDTITLE (TEXT "5") COLOR red )
-		)
-
-DEFAULT ADDTITLE ( XOFFSET 0 YOFFSET 0 SIZE 1000 )
-		
-BLOCK ( LAYOUT lay5 COLUMN 2 ROW 4
-	BUTTON ( TEXT "d")
-	BUTTON ( TEXT "a")
-	BUTTON ( TEXT "l")
-		)
-		
-BLOCK ( LAYOUT lay5 COLUMN 2 ROW 4
-	EXTEND ( SECOND (TEXT "dbl"))
-	EXTEND ( TOALTERNATE SECOND (TEXT "alt"))
-	EXTEND ( TOMULTI ADD ( TEXT "1" ) ADD ( TEXT "2" ) ADD (TEXT "3"))
+findfree	LIST ( ADDTITLE ( comm TEXT "List"  ) 
+		TEXT "LIST ( TEXT \"\" ADDTEXT \"\" )\n"
+		ADDTEXT "LIST ( TEXT \"\" ADDTEXT \"\" ADDTEXT \"\" )\n"
+		ADDTEXT "LIST ( TEXT \"\" ADDTEXT \"\" ADDTEXT \"\"  ADDTEXT \"\")\n"
+		COLOR yellow  
 		)		
-
-; lay6 - combined packets
-
-BLOCK ( LAYOUT lay6 COLUMN 2 ROW 2
-	META ( SHIFT )
-	BUTTON ( TEXT "text")
-	BUTTON ( KEY 'K')
-	BUTTON ( COMBINE TEXT "text" KEY 'K')
-	BUTTON ( COMBINE BACKSPACE KEY KEYDEL )
-	BUTTON ( COMBINE DELETE KEY KEYFWDEL)
-	BUTTON ( COMBINE TEXT '\t' KEY KEYTAB ADDTITLE ( TEXT "TAB" ) )
+findfree	LIST ( ADDTITLE ( cellar TEXT "Mem" )
+		ADDTITLE ( attic TEXT "Prog" ) 
+		TEXT "MEMORY ()\n"
+		ADDTEXT "PROGRAM ( )\n"
+		ADDTEXT "PROGRAM ( RUN \"\" )\n"
+		COLOR yellow  
 		)
+findfree	LIST ( ADDTITLE ( comm TEXT "Mod"  ) 
+		TEXT "MODIFY ( ROLL  )\n"
+		ADDTEXT "MODIFY ( ROLL  REVERSE )\n"
+		COLOR yellow  )
+findfree	LIST ( ADDTITLE ( comm TEXT "Enter"  ) 
+		TEXT "ENTER ( )\n"
+		ADDTEXT "ENTER ( REPEAT )\n"
+		COLOR yellow  )
+findfree	LIST ( ADDTITLE ( comm TEXT "SpcT"  ) 
+		TEXT "SPACETRAVEL ()\n"
+		ADDTEXT "SPACETRAVEL ( SECOND () )\n"
+		COLOR yellow  
+		)
+		
+findfree	LIST ( asp ADDTITLE ( comm TEXT "Title"  ) 
+		TEXT "ADDTITLE ( TEXT \"\" )"
+		ADDTEXT "ADDTITLE ( TEXT \"\" XOFFSET YOFFSET SIZE )"
+		ADDTEXT "ADDTITLE ( GETSECOND XOFFSET YOFFSET SIZE )"
+		ADDTEXT "ADDTITLE ( SHOW ENTER XOFFSET YOFFSET SIZE )"
+		ADDTEXT "ADDTITLE ( SHOW AUTOFUNC XOFFSET YOFFSET SIZE )"
+		COLOR blue )
+findfree	LIST ( asp ADDTITLE ( comm TEXT "Bold"  ) 
+		TEXT "BOLD"
+		ADDTEXT "ITALICS"
+		ADDTEXT "NONBOLD"
+		ADDTEXT "NONITALICS"
+		COLOR blue )
+		
+findfree	LIST ( ADDTITLE ( comm TEXT "Meta"  ) 
+		TEXT "META ( CAPS )\n"
+		ADDTEXT "META ( SHIFT )\n"
+		ADDTEXT "META ( CTRL )\n"
+		ADDTEXT "META ( ALT )\n"
+		COLOR pink )
+findfree	LIST ( ADDTITLE ( comm TEXT "Switch"  ) 
+		TEXT "SWITCH ( BOARD )\n"
+		ADDTEXT "SWITCH ( BACK )\n"
+		ADDTEXT "SWITCH ( BOARD  CAPSSTATE )\n"
+		ADDTEXT "SWITCH ( BACK CAPSSTATE )\n"
+		COLOR pink )
+
+findfree	LIST ( ADDTITLE ( cellar TEXT "Add" )
+		ADDTITLE ( attic TEXT "Packet") 
+		TEXT "ADD ()"
+		ADDTEXT "ADDTEXT ()"
+		TEXT "FIRST ()"
+		ADDTEXT "SECOND()"
+		COLOR khaki  )
+
+findfree	LIST ( ADDTITLE ( comm TEXT "Rep" sp ) 
+		TEXT "REPEAT"
+		ADDTEXT "TWIN"
+		ADDTEXT "CAPITAL"
+		COLOR khaki  
+		)
+findfree	LIST ( ADDTITLE ( comm TEXT "Fin"  ) 
+		TEXT "ONSTAY"
+		ADDTEXT "ONCIRCLE"
+		ADDTEXT "OVERWRITE"
+		COLOR khaki  )
+
+findfree	LIST ( ADDTITLE ( comm TEXT "Modif"  ) 
+		TEXT "ADDMODIFY (ID ADDROLL( \"\" ) ) IGNORESPACE )\n"
+		ADDTEXT "ADDMODIFY (ID ROLLS( \"\" ) IGNORESPACE )\n"
+		COLOR yellow )
+
+findfree	LIST ( ADDTITLE ( comm TEXT "Extend"  ) 
+		TEXT "EXTEND ( )"
+		ADDTEXT "EXTEND ( TODOUBLE SECOND () )"
+		ADDTEXT "EXTEND ( TOALTERNATE SECOND () )"
+		ADDTEXT "EXTEND ( TOLIST ADD() )"
+		COLOR yellow )
+						
+findfree	SINGLE ( ADDTITLE ( comm TEXT "Text"  ) 
+		TEXT "TEXT \"\""
+		COLOR fuchsia )
+findfree	LIST ( ADDTITLE ( comm TEXT "ACaps"  ) 
+		TEXT "AUTOCAPS ON"
+		ADDTEXT "AUTOCAPS OFF"
+		ADDTEXT "AUTOCAPS WAIT"
+		ADDTEXT "AUTOCAPS HOLD"
+		TEXT "STRINGCAPS"
+		COLOR fuchsia )
+findfree	LIST ( ADDTITLE ( comm TEXT "EraSp"  ) 
+		TEXT "ERASESPACE AROUND"
+		ADDTEXT "ERASESPACE AFTER"
+		ADDTEXT "ERASESPACE BEFORE"
+		COLOR fuchsia )
+findfree	LIST ( ADDTITLE ( comm TEXT "AutoSp"  ) 
+		TEXT "AUTOSPACE AROUND"
+		ADDTEXT "AUTOSPACE AFTER"
+		ADDTEXT "AUTOSPACE BEFORE"
+		COLOR fuchsia )
+findfree	LIST ( ADDTITLE ( comm TEXT "Time"  ) 
+		TEXT "TIME"
+		ADDTEXT "TIME FORMAT \"\" "
+		ADDTEXT "TIME FORMAT \"yy.MM.dd\" "
+		COLOR fuchsia )
+		
+
+findfree	LIST ( ADDTITLE ( comm TEXT "Func"  ) 
+		TEXT "BACKSPACE"
+		ADDTEXT "DELETE"
+		ADDTEXT "CAPITALIZE"
+		ADDTEXT "SELECTALL"
+		ADDTEXT "DRAFT"
+		ADDTEXT "SETTINGS"
+		ADDTEXT "TOGGLE AUTOFUNC"
+		ADDTEXT "TOGGLE CURSOR"
+		COLOR brown )
+		
+findfree	LIST ( ADDTITLE ( comm TEXT "Key"  ) 
+		TEXT "KEY \'\'"
+		ADDTEXT "KEY"
+		ADDTEXT "KEY TURNON ( CTRL )"
+		COLOR rose )
+findfree	LIST ( ADDTITLE ( comm TEXT "Turn"  ) 
+		TEXT "TURNON ( )"
+		ADDTEXT "TURNOFF ( )"
+		ADDTEXT "TURNON ( CAPS SHIFT CTRL ALT )"
+		ADDTEXT "TURNOFF ( CAPS SHIFT CTRL ALT )"
+		COLOR rose )
+findfree	LIST ( ADDTITLE ( comm TEXT "Meta"  ) 
+		TEXT "CAPS"
+		ADDTEXT "SHIFT"
+		ADDTEXT "CTRL"
+		ADDTEXT "ALT"
+		COLOR rose )
+findfree	SINGLE ( ADDTITLE ( comm TEXT "Comb"  ) 
+		TEXT "COMBINE"
+		COLOR pink )		
+		
+findfree	LIST ( ADDTITLE ( comm TEXT "Dir"  ) 
+		TEXT "LEFT"
+		ADDTEXT "RIGHT"
+		ADDTEXT "TOP"
+		ADDTEXT "BOTTOM"
+		COLOR khaki  )				
+findfree	LIST ( ADDTITLE ( comm TEXT "Word"  ) 
+		TEXT "WORD"
+		ADDTEXT "PARA"
+		COLOR khaki  )
+findfree	LIST ( ADDTITLE ( comm TEXT "Curs"  ) 
+		TEXT "CURSOR LAST"
+		ADDTEXT "CURSOR BEGIN"
+		ADDTEXT "CURSOR END"
+		COLOR khaki  )
+findfree	LIST ( ADDTITLE ( comm TEXT "Select"  ) 
+		TEXT "SELECT IFSHIFT"
+		ADDTEXT "SELECT ALWAYS"
+		ADDTEXT "SELECT NEVER"
+		COLOR khaki  )
+
+findfree	SINGLE ( ADDTITLE ( comm COLOR white ) 
+		HELP
+		COLOR red )
+		
+	)
+
+
+; #############################################
+
+ADDLAYOUT ( ID gen ALIGN odds ROWS 5 HALFCOLUMNS 20 ASBOARD )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Gen" ) COLOR magenta ))
+	
+BLOCK ( ROW 2 COLUMN 7
+	BUTTON ( TEXT "SKIP" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "UL" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "UR" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "FINDFREE" ADDTITLE ( TEXT "FFREE" comm ) COLOR green )
+	crr
+	BUTTON ( TEXT "L" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "HOME" ADDTITLE ( comm ) COLOR green )	
+	BUTTON ( TEXT "R" ADDTITLE ( comm ) COLOR green )
+	crl
+	BUTTON ( TEXT "CRL" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "DL" ADDTITLE ( comm ) COLOR green )	
+	BUTTON ( TEXT "DR" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "CRR" ADDTITLE ( comm ) COLOR green )
+	)
+
+BLOCK ( ROW 2
+findfree 	SINGLE ( ADDTITLE ( comm TEXT "Ver" ) 
+		TEXT "COAT ( 1000 )\n\n" COLOR fuchsia 
+		)
+findfree 	SINGLE ( ADDTITLE ( comm TEXT "Head" ) 
+		TEXT "NAME \"\"\nVERSION \"\"\nAUTHOR \"\"\nADDTAGS ( \"\"... )\nDESCRIPTION \"\"\n; DOCFILE \"file\"\n; DOCURI \"uri\"\n\n"  COLOR fuchsia 
+		)
+findfree 	SINGLE ( ADDTITLE ( comm TEXT "Font" ) 
+		TEXT "FONT \"file\"\nLOCALE ( LANGUAGE \"\" COUNTRY \"\" VARIANT \"\" )\n\n"  COLOR fuchsia 
+		)
+findfree 	SINGLE ( ADDTITLE ( comm TEXT "Color" ) 
+		TEXT "METACOLOR \nLOCKCOLOR \nAUTOCOLOR\n TOUCHCOLOR\n STROKECOLOR\n\n"  COLOR fuchsia 
+		)
+findfree 	SINGLE ( ADDTITLE ( comm TEXT "ShowT" ) 
+		TEXT 
+		"SHOWTITLES (\n    ENTERTEXT \"\"\n    GOTEXT \"\"\n    SEARCHTEXT \"\"\n    SENDTEXT \"\"\n    NEXTTEXT \"\"\n"_ "    DONETEXT \"\"\n    PREVTEXT \"\"\n    NONETEXT \"\"\n    UNKNOWNTEXT \"\"\n"_
+		"    AUTOFUNCON \"\"\n    AUTOFUNCOFF \"\" )\n" COLOR fuchsia
+		)
+findfree 	SINGLE ( ADDTITLE ( comm TEXT "Stop" ) 
+		TEXT "STOP" COLOR fuchsia 
+		)    
+findfree 	LIST ( ADDTITLE ( comm TEXT "Board" )
+		TEXT "ADDBOARD ( ID PORTRAIT LANDSCAPE )"
+		ADDTEXT "ADDBOARD ( ID LAYOUT )"  COLOR fuchsia 
+		)
+findfree 	DOUBLE ( ADDTITLE ( comm TEXT "Lock" ) 
+		TEXT "LOCK" SECOND (TEXT "START") COLOR fuchsia 
+		)
+findfree 	LIST ( ADDTITLE ( comm TEXT "Layout"  )
+		TEXT "ADDLAYOUT ( ID  HEXAGONAL HALFCOLUMNS  ROWS  ALIGN ODDS"
+		ADDTEXT "ADDLAYOUT ( ID  HEXAGONAL HALFCOLUMNS  ROWS  ALIGN EVENS"  COLOR fuchsia  
+		)
+findfree	SINGLE ( ADDTITLE ( comm TEXT "Monitor" ) 
+		TEXT "MONITOR ( LAYOUT SIZE )"
+		COLOR khaki  
+		)		
+findfree 	DOUBLE ( ADDTITLE ( comm TEXT "Wide" ) 
+		TEXT "WIDE" SECOND (TEXT "ASBOARD") COLOR fuchsia 
+		)
+findfree 	LIST ( ADDTITLE ( comm TEXT "Turn" )
+		TEXT "TURNON ( CAPS SHIFT CTRL ALT )"
+		ADDTEXT "TURNOFF ( CAPS SHIFT CTRL ALT )"  COLOR fuchsia 
+		)
+findfree 	LIST ( ADDTITLE ( comm TEXT "Block" )
+		TEXT "BLOCK (\n    )"
+		ADDTEXT "BLOCK ( LAYOUT ROW COLUMN\n    )"  COLOR fuchsia 
+		)
+	)
+   
+	
+; #############################################
+
+ADDLAYOUT ( ID colors ALIGN odds ROWS 5 HALFCOLUMNS 20 ASBOARD )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Color" ) COLOR magenta ))
+BLOCK ( ROW 2 COLUMN 2
+	BUTTON ( TEXT "COLOR black" ADDTITLE ( comm TEXT "Black" COLOR white ) COLOR black )
+	BUTTON ( TEXT "COLOR red" ADDTITLE ( comm TEXT "Red" COLOR yellow ) COLOR red)
+	BUTTON ( TEXT "COLOR green" ADDTITLE ( comm TEXT "Green") COLOR green )
+	BUTTON ( TEXT "COLOR blue" ADDTITLE ( comm TEXT "Blue") COLOR blue )
+	BUTTON ( TEXT "COLOR yellow" ADDTITLE ( comm TEXT "Yellow") COLOR yellow )
+	crr
+	BUTTON ( TEXT "COLOR gray" ADDTITLE ( comm TEXT "Gray" COLOR white ) COLOR gray )
+	BUTTON ( TEXT "COLOR rose" ADDTITLE ( comm TEXT "Rose") COLOR rose )
+	BUTTON ( TEXT "COLOR pink" ADDTITLE ( comm TEXT "Pink") COLOR pink )
+	BUTTON ( TEXT "COLOR khaki" ADDTITLE ( comm TEXT "Khaki") COLOR khaki)
+	BUTTON ( TEXT "COLOR brown" ADDTITLE ( comm TEXT "Brown") COLOR brown )
+	crl
+	BUTTON ( TEXT "COLOR white" ADDTITLE ( comm TEXT "White") COLOR white )
+	BUTTON ( TEXT "COLOR fuchsia" ADDTITLE ( comm TEXT "Fuchs.") COLOR fuchsia )
+	BUTTON ( TEXT "COLOR purple" ADDTITLE ( comm TEXT "Purple") COLOR purple )
+	BUTTON ( TEXT "COLOR magenta" ADDTITLE ( comm TEXT "Magen." COLOR fuchsia ) COLOR magenta )
+	BUTTON ( TEXT "COLOR orange" ADDTITLE ( comm TEXT "Orange") COLOR orange)
+	)
+	
+BLOCK ( ROW 2 COLUMN 7
+	BUTTON ( TEXT "SKIP" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "UL" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "UR" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "FINDFREE" ADDTITLE ( TEXT "FFREE" comm ) COLOR green )
+	crr
+	BUTTON ( TEXT "L" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "HOME" ADDTITLE ( comm ) COLOR green )	
+	BUTTON ( TEXT "R" ADDTITLE ( comm ) COLOR green )
+	crl
+	BUTTON ( TEXT "CRL" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "DL" ADDTITLE ( comm ) COLOR green )	
+	BUTTON ( TEXT "DR" ADDTITLE ( comm ) COLOR green )
+	BUTTON ( TEXT "CRR" ADDTITLE ( comm ) COLOR green )
+	)
+	
+; #############################################
+  
+ADDLAYOUT ( ID lay1p HEXAGONAL ALIGN odds ROWS 5 HALFCOLUMNS 15 ) 
+DEFAULT ( BLOCK ( LAYOUT lay1p COLUMN 1 ) )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lay1" ) COLOR magenta ))
+
+ADDLAYOUT ( ID lay1l HEXAGONAL WIDE ALIGN odds ROWS 5 HALFCOLUMNS 15 ) 
+DEFAULT ( BLOCK ( LAYOUT lay1l COLUMN 1 ) )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lay1" ) COLOR magenta ))
+
+ADDBOARD  ( ID lay1 PORTRAIT lay1p LANDSCAPE lay1l LOCK )
+
+; #############################################
+
+ADDLAYOUT ( ID lay2p HEXAGONAL ALIGN odds ROWS 5 HALFCOLUMNS 15 ) 
+DEFAULT ( BLOCK ( LAYOUT lay2p COLUMN 1 ) )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lay2" ) COLOR magenta ))
+
+ADDLAYOUT ( ID lay2l HEXAGONAL WIDE ALIGN odds ROWS 5 HALFCOLUMNS 15 ) 
+DEFAULT ( BLOCK ( LAYOUT lay2l COLUMN 1 ) )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lay2" ) COLOR magenta ))
+
+ADDBOARD  ( ID lay2 PORTRAIT lay2p LANDSCAPE lay2l LOCK )
+
+; #############################################
+
+ADDLAYOUT ( ID lay3p HEXAGONAL ALIGN odds ROWS 5 HALFCOLUMNS 15 color 0nk ) 
+DEFAULT ( BLOCK ( LAYOUT lay3p COLUMN 1 ) )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lay3" ) COLOR magenta ))
+
+ADDLAYOUT ( ID lay3l HEXAGONAL WIDE ALIGN odds ROWS 5 HALFCOLUMNS 15 ) 
+DEFAULT ( BLOCK ( LAYOUT lay3l COLUMN 1 ) )
+BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lay3" ) COLOR magenta ))
+
+ADDBOARD  ( ID lay3 PORTRAIT lay3p LANDSCAPE lay3l LOCK )
+
+let (logo block (
+	button (text 'x' addtitle (text 'Ω' color 0cff6 yoffset 500) color 0c0f9)
+	button (text 'x' addtitle (text 'צ' color 0cfcc yoffset 500) color 0c99f)
+	crl
+	button (text 'x' addtitle (text 'स' color 0c99f xoffset 500) color 0cfcc)
+	button (text 'x' addtitle (text "BestBoard" size 1000 yoffset 50) color 0c0c0)
+	button (text 'x' addtitle (text 'ቜ' color 0c9cf xoffset -500) color 0ccf9)
+	crr
+	button (text 'x' addtitle (text 'ゑ' color 0ccf9 yoffset -200) color 0c9cf)
+	button (text 'x' addtitle (text 'ණ' color 0c0f9 yoffset -200) color 0cff6)
+	) )
+
+block ( logo layout lay3p row 2 column 2 )
+
+
+; #############################################
 
 STOP
+   
