@@ -22,27 +22,29 @@ import org.lattilad.bestboard.R;
  */
 public class WebViewActivity extends Activity
     {
+    // Extra of Intents
+    static final public String ASSET = "ASSET";
+    static final public String FILE = "FILE";
+    static final public String WORK = "WORK";
+
+    static final public String SEARCH = "SEARCH";
+
     private WebView webView;
     private ProgressBar progressBar;
-    private RelativeLayout toolbar;
+    private RelativeLayout toolLayout;
+
+    private String searchText = null;
+
 
     public void onCreate(Bundle savedInstanceState)
         {
         super.onCreate(savedInstanceState);
 
-        //webView = new WebView( this );
-        //setContentView(webView);
-
-        //setContentView(webView);
-
         setContentView(R.layout.web_view_activity);
+
         webView = (WebView) findViewById(R.id.webView);
-
-        toolbar = (RelativeLayout) findViewById(R.id.toolbar);
-
-        progressBar = (ProgressBar) findViewById(R.id.progress);
-        // progressBar.setMax( 100 ); // this is the default value
-
+        toolLayout = (RelativeLayout) findViewById(R.id.tool);
+        progressBar = (ProgressBar) findViewById(R.id.progress); // default max value = 100
         findViewById(R.id.back).setOnClickListener(
                 new View.OnClickListener()
                 {
@@ -52,7 +54,6 @@ public class WebViewActivity extends Activity
                     webView.goBack();
                     }
                 });
-
         findViewById(R.id.forth).setOnClickListener(
                 new View.OnClickListener()
                 {
@@ -63,66 +64,59 @@ public class WebViewActivity extends Activity
                     }
                 });
 
-        // webView.setVerticalFadingEdgeEnabled( true );
-        // webView.setVerticalScrollBarEnabled(true);
-        // webView.setScrollbarFadingEnabled( true );
-
-        webView.getSettings().setJavaScriptEnabled(true);
-        // webView.loadUrl("http://www.google.com");
-
-        final Activity activity = this;
-
-        webView.setWebChromeClient(new WebChromeClient()
-        {
-        public void onProgressChanged(WebView view, int progress)
-            {
-            // Activities and WebViews measure progress with different scales.
-            // The progress meter will automatically disappear when we reach 100%
-            // activity.setTitle("Loading...");
-            progressBar.setProgress( progress );
-            }
-        });
-
-
-        final String searchText = "ERROR";
-
-        webView.setWebViewClient(new WebViewClient()
-        {
-        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl)
-            {
-            Toast.makeText(WebViewActivity.this, description, Toast.LENGTH_SHORT).show();
-            }
-
-        @Override
-        public void onPageStarted(WebView view, String url, Bitmap favicon)
-            {
-            progressBar.setVisibility(View.VISIBLE);
-            }
-
-            // http://stackoverflow.com/a/32720167
-        @Override
-        public void onPageFinished(WebView view, String url)
-            {
-            progressBar.setVisibility( View.GONE );
-
-            if (searchText != null && !searchText.equals(""))
-                {
-                webView.findAllAsync(searchText);
-
-/*              int i = webView.findAll(searchText);
-                Toast.makeText(getApplicationContext(), "Found " + i + " results !", Toast.LENGTH_SHORT).show();
-                try
-                    {
-                    Method m = WebView.class.getMethod("setFindIsUp", Boolean.TYPE);
-                    m.invoke(webView, true);
-                    }
-                catch (Throwable ignored) { }
-*/
-                }
-            }
-        });
-
+        // It is needed only for real web-pages
+        // webView.getSettings().setJavaScriptEnabled(true);
         webView.getSettings().setBuiltInZoomControls(true);
+
+        webView.setWebChromeClient(
+                new WebChromeClient()
+                    {
+                    public void onProgressChanged(WebView view, int progress)
+                        {
+                        progressBar.setProgress( progress ); // default max value = 100
+                        }
+                    });
+
+        webView.setWebViewClient(
+                new WebViewClient()
+                        {
+                        public void onReceivedError(WebView view, int errorCode, String description, String failingUrl)
+                            {
+                            Toast.makeText(WebViewActivity.this, description, Toast.LENGTH_SHORT).show();
+                            }
+
+                        @Override
+                        public void onPageStarted(WebView view, String url, Bitmap favicon)
+                            {
+                            progressBar.setVisibility(View.VISIBLE);
+                            }
+
+                        // http://stackoverflow.com/a/32720167
+                        @Override
+                        public void onPageFinished(WebView view, String url)
+                            {
+                            progressBar.setVisibility( View.GONE );
+
+                            if (searchText != null && !searchText.equals(""))
+                                {
+                                webView.findAllAsync(searchText);
+                                }
+                            }
+                        });
+
+        // extra: ASSET
+        if
+
+//        webView.loadUrl("file:///android_asset/help.html");
+
+        // extra: WORK
+
+        // extra: FILE
+
+        // data: uri
+
+        // extra: SEARCH
+
 
       // webView.getSettings().setAllowFileAccess(true); // true by default
 /*        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
@@ -135,7 +129,6 @@ public class WebViewActivity extends Activity
             }
 
 */
-//        webView.loadUrl("file:///android_asset/help.html");
 
         Uri data = getIntent().getData();
 
@@ -148,13 +141,12 @@ public class WebViewActivity extends Activity
             {
             webView.loadData(getIntent().toString(), "text/html", "UTF-8");
             }
-
-
-
-
         }
 
-/*    @Override
+    /**
+     * BACK functions like BACK on the toolbar, but at the last step this BACK can exit
+     */
+    @Override
     public void onBackPressed()
         {
         if(webView.canGoBack() )
@@ -166,9 +158,9 @@ public class WebViewActivity extends Activity
             super.onBackPressed();
             }
         }
-*/
 
-/*    @Override
+/*  This method is not necessary, onBackPressed is better
+    @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
         {
         // Check if the key event was the Back button and if there's history
@@ -183,6 +175,7 @@ public class WebViewActivity extends Activity
         }
 */
 
+    // options menu contains only a dummy menu entry
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
         {
@@ -191,32 +184,35 @@ public class WebViewActivity extends Activity
         return true;
         }
 
+    // option menu is be never displayed,
+    // but menu button toggles toolbar visibility
+    // this way no real menu button is needed - all menu activations will toggle the toolbar
     @Override
     public boolean onPrepareOptionsMenu(Menu menu)
         {
         super.onPrepareOptionsMenu(menu);
-
-        toolbar.setVisibility( toolbar.getVisibility() == View.VISIBLE ?
+        toolLayout.setVisibility( toolLayout.getVisibility() == View.VISIBLE ?
                 View.GONE : View.VISIBLE );
-
         return false;
         }
 
+    // This is not needed, because there is only a dummy entry
     @Override
     public boolean onOptionsItemSelected(MenuItem item)
         {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
+/*
         int id = item.getItemId();
 
-    switch (id)
-        {
-        case R.id.dummy_menu:
-            Toast.makeText(getApplicationContext(), "About menu item pressed", Toast.LENGTH_SHORT).show();
-            break;
-        }
-
+        switch (id)
+            {
+            case R.id.dummy_menu:
+                Toast.makeText(getApplicationContext(), "About menu item pressed", Toast.LENGTH_SHORT).show();
+                break;
+            }
+*/
         return super.onOptionsItemSelected(item);
         }
 
