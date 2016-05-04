@@ -1,20 +1,26 @@
 package org.lattilad.bestboard.webview;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
+import android.preference.PreferenceManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.lattilad.bestboard.R;
+
+import java.io.File;
 
 /**
  * Simple webview to show html text
@@ -32,8 +38,7 @@ public class WebViewActivity extends Activity
     private WebView webView;
     private ProgressBar progressBar;
     private RelativeLayout toolLayout;
-
-    private String searchText = null;
+    private EditText filter;
 
 
     public void onCreate(Bundle savedInstanceState)
@@ -45,13 +50,15 @@ public class WebViewActivity extends Activity
         webView = (WebView) findViewById(R.id.webView);
         toolLayout = (RelativeLayout) findViewById(R.id.tool);
         progressBar = (ProgressBar) findViewById(R.id.progress); // default max value = 100
+        filter = (EditText) findViewById(R.id.filter);
+
         findViewById(R.id.back).setOnClickListener(
                 new View.OnClickListener()
                 {
                 @Override
                 public void onClick(View v)
                     {
-                    webView.goBack();
+                    webView.findNext(false); // goBack();
                     }
                 });
         findViewById(R.id.forth).setOnClickListener(
@@ -60,7 +67,7 @@ public class WebViewActivity extends Activity
                 @Override
                 public void onClick(View v)
                     {
-                    webView.goForward();
+                    webView.findNext( true ); // goForward();
                     }
                 });
 
@@ -70,12 +77,12 @@ public class WebViewActivity extends Activity
 
         webView.setWebChromeClient(
                 new WebChromeClient()
+                {
+                public void onProgressChanged(WebView view, int progress)
                     {
-                    public void onProgressChanged(WebView view, int progress)
-                        {
-                        progressBar.setProgress( progress ); // default max value = 100
-                        }
-                    });
+                    progressBar.setProgress(progress); // default max value = 100
+                    }
+                });
 
         webView.setWebViewClient(
                 new WebViewClient()
@@ -97,50 +104,70 @@ public class WebViewActivity extends Activity
                             {
                             progressBar.setVisibility( View.GONE );
 
-                            if (searchText != null && !searchText.equals(""))
+                            String searchText = filter.getText().toString();
+                            if ( !searchText.equals("") )
                                 {
                                 webView.findAllAsync(searchText);
                                 }
                             }
                         });
 
-        // extra: ASSET
-        if
+        String string = null;
+        Uri uri;
 
-//        webView.loadUrl("file:///android_asset/help.html");
+        // extra: ASSET
+        if ( ( string = getIntent().getStringExtra(ASSET) ) != null )
+            {
+            string = "file:///android_asset/" + string;
+            }
 
         // extra: WORK
+        else if ( ( string = getIntent().getStringExtra(WORK) ) != null &&
+                Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
+            {
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+            String directoryName =
+                    sharedPrefs.getString( getString( R.string.descriptor_directory_key ),
+                            getString( R.string.descriptor_directory_default ));
+            File directoryFile = new File( Environment.getExternalStorageDirectory(), directoryName );
+
+            string = Uri.fromFile( new File( directoryFile, string ) ).toString();
+            }
 
         // extra: FILE
+        else if ( ( string = getIntent().getStringExtra(FILE) ) != null &&
+                Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
+            {
+            string = Uri.fromFile( new File( Environment.getExternalStorageDirectory(), string ) ).toString();
+            }
 
         // data: uri
+        else if ( ( uri = getIntent().getData() ) != null )
+            {
+            string = uri.toString();
+            }
+
+        if ( string != null )
+            {
+            webView.loadUrl( string );
+            }
+        else
+            {
+            String customHtml = "<html><body>No uri can be found!</body></html>";
+            webView.loadData( customHtml, "text/html", "UTF-8");
+            }
 
         // extra: SEARCH
-
-
-      // webView.getSettings().setAllowFileAccess(true); // true by default
-/*        if (!Environment.getExternalStorageState().equals(Environment.MEDIA_MOUNTED))
+        if ( ( string = getIntent().getStringExtra(SEARCH) ) != null )
             {
-            Log.d("TAG", "No SDCARD");
+            filter.setText( string );
+            toolLayout.setVisibility( View.VISIBLE );
             }
         else
             {
-            webView.loadUrl("file://"+Environment.getExternalStorageDirectory()+"/_bestboard/coat.log");
+            toolLayout.setVisibility( View.GONE );
             }
 
-*/
-
-        Uri data = getIntent().getData();
-
-        if (data != null)
-            {
-            webView.loadUrl(data.toString());
-            }
-        // String customHtml = "<html><body><h1>Hello, WebView</h1></body></html>";
-        else
-            {
-            webView.loadData(getIntent().toString(), "text/html", "UTF-8");
-            }
         }
 
     /**
