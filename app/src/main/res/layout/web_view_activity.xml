@@ -48,8 +48,8 @@
         android:layout_above="@id/tool"
         android:layout_alignWithParentIfMissing="true"/>
 
-    <WebView
-        android:id="@+id/webView"
+    <FrameLayout
+        android:id="@+id/webViewFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
