@@ -65,11 +65,11 @@ public class WebViewActivity extends Activity
         setContentView(R.layout.web_view_activity);
 
         webViewFrame = (FrameLayout)findViewById(R.id.webViewFrame);
-        progressBar = (ProgressBar) findViewById(R.id.progress); // default max value = 100
+        progressBar = (ProgressBar) findViewById(R.id.progressBar); // default max value = 100
         progressBar.setVisibility( View.GONE );
         // Cannot be sure, if page is loaded, so no progress bar is shown after config change
-        searchBar = (RelativeLayout) findViewById(R.id.tool);
-        searchText = (EditText) findViewById(R.id.filter);
+        searchBar = (RelativeLayout) findViewById(R.id.searchBar);
+        searchText = (EditText) findViewById(R.id.search);
 
         // Initialize the WebView at new starts
         if (webView == null)
@@ -209,17 +209,21 @@ public class WebViewActivity extends Activity
                 @Override
                 public void onTextChanged(CharSequence s, int start, int before, int count)
                     {
-                    webView.findAllAsync( s.toString() );
+                    webView.findAllAsync(s.toString());
                     }
 
                 @Override
-                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+                public void beforeTextChanged(CharSequence s, int start, int count, int after)
+                    {
+                    }
 
                 @Override
-                public void afterTextChanged(Editable s) {}
+                public void afterTextChanged(Editable s)
+                    {
+                    }
                 });
 
-        searchBar.setVisibility( searchBarEnabled ? View.VISIBLE : View.GONE );
+        searchBar.setVisibility(searchBarEnabled ? View.VISIBLE : View.GONE);
         searchText.setText( retainedSearchText );
         }
 

@@ -157,7 +157,7 @@ public class FileChooserActivity extends FragmentActivity
 	    // erre két lehetőség lenne
 	    // 1. újra leválogatjuk a könyvtárat (lassú)
 	    // 2. adapter saját filterével a teljes leválogatott könyvtárat szűkítjük tovább (ez a megvalósított)
-        filter = (EditText)findViewById( R.id.filter );
+        filter = (EditText)findViewById( R.id.search);
         filter.addTextChangedListener( new TextWatcher() 
     		{
 			@Override

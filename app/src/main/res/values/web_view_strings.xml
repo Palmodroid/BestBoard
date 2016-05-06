@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="web_view_filter_hint">Filter</string>
-    <string name="web_view_search">Search</string>
+    <string name="web_view_search_hint">Search</string>
     <string name="web_view_back">Back</string>
     <string name="web_view_forth">Forth</string>
-    <string name="web_view_dummy">Dummy menu</string>
 
 </resources>

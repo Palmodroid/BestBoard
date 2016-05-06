@@ -4,7 +4,7 @@
                 android:layout_height="match_parent">
 
     <RelativeLayout
-        android:id="@+id/tool"
+        android:id="@+id/searchBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
@@ -27,13 +27,13 @@
             android:layout_toStartOf="@+id/forth"/>
 
         <EditText
-            android:id="@+id/filter"
+            android:id="@+id/search"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:maxLines="1"
             android:scrollHorizontally="true"
             android:inputType="text"
-            android:hint="@string/web_view_filter_hint"
+            android:hint="@string/web_view_search_hint"
             android:layout_toLeftOf="@+id/back"
             android:layout_toStartOf="@+id/back"
             android:layout_alignParentLeft="true"
@@ -42,11 +42,11 @@
     </RelativeLayout>
 
     <ProgressBar
-        android:id="@+id/progress"
+        android:id="@+id/progressBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         style="?android:attr/progressBarStyleHorizontal"
-        android:layout_above="@id/tool"
+        android:layout_above="@id/searchBar"
         android:layout_alignWithParentIfMissing="true"/>
 
     <FrameLayout
@@ -54,7 +54,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_alignParentTop="true"
-        android:layout_above="@id/progress"
+        android:layout_above="@id/progressBar"
         android:layout_alignWithParentIfMissing="true"/>
 
 </RelativeLayout>
