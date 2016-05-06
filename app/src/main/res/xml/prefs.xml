@@ -2,6 +2,16 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
 
 	<PreferenceCategory
+		android:title="@string/prefs_help">
+
+		<Preference
+			android:key="@string/help_key"
+			android:title="@string/help_title"
+			android:summary="@string/help_summary" />
+
+	</PreferenceCategory>
+
+	<PreferenceCategory
 		android:title="@string/prefs_descriptor">
 
 		<EditTextPreference

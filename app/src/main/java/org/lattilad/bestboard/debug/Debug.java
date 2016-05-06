@@ -14,11 +14,11 @@ import org.lattilad.bestboard.scribe.Scribe;
 public class Debug
 	{
 	// Constants for PRIMARY configuration
-    private static final String LOG_TAG = "SCRIBE_BEST";
+    public static final String LOG_TAG = "SCRIBE_BEST";
 
 	// Constants for SECONDARY configuration
-    private static final String coatLogFileName = "coat.log";
-    private static final String LOG_TAG_COAT = "SCRIBE_COAT";
+    public static final String coatLogFileName = "coat.log";
+    public static final String LOG_TAG_COAT = "SCRIBE_COAT";
 
     public static final String tokenLogFileName = "token.log";
     public static final String LOG_TAG_TOKEN = "TOKEN";
@@ -42,6 +42,7 @@ public class Debug
     public static final int TEXT = 990;
     public static final int CURSOR = 990;
     public static final int TIMER = 990;
+    public static final int WEBVIEW = 990;
 
 
     public static final int LAYOUTSTATE = 60;

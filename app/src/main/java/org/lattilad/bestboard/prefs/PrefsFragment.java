@@ -1,6 +1,7 @@
 package org.lattilad.bestboard.prefs;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
@@ -13,6 +14,7 @@ import org.lattilad.bestboard.Ignition;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.webview.WebViewActivity;
 
 import java.io.File;
 
@@ -1013,6 +1015,20 @@ public class PrefsFragment extends PreferenceFragment
         addPreferencesFromResource(R.xml.prefs);
 
         // Preference as button - only click behavior is used
+        findPreference(getString(R.string.help_key)).
+                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                    {
+                    // getActivity() cannot be null, when button is displayed
+                    Intent intent = new Intent( getActivity(), WebViewActivity.class);
+                    intent.putExtra( WebViewActivity.WORK, "help.html");
+                    getActivity().startActivity(intent);
+                    return true;
+                    }
+                });
+
         findPreference(getString(R.string.descriptor_reload_key)).
                 setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
                 {

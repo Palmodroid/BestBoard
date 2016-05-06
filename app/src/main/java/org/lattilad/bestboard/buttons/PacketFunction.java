@@ -106,7 +106,7 @@ public class PacketFunction extends Packet
             intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
             //intent.addFlags( Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT );
             //intent.addFlags( Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY );
-            intent.addFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
+            //intent.addFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
             //intent.addFlags( Intent.FLAG_FROM_BACKGROUND );
 
             softBoardData.softBoardListener.getApplicationContext().startActivity(intent);
@@ -151,11 +151,12 @@ public class PacketFunction extends Packet
         else if (functionCode == Commands.TOKEN_HELP )
             {
             Intent intent = new Intent( softBoardData.softBoardListener.getApplicationContext(), WebViewActivity.class);
-            intent.setData(Uri.parse("http://lattilad.org/"));
+            intent.putExtra( WebViewActivity.WORK, "help.html");
+            //intent.setData(Uri.parse("http://lattilad.org/"));
             intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
             //intent.addFlags( Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT );
             //intent.addFlags( Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY );
-            intent.addFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
+            //  intent.addFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
             //intent.addFlags( Intent.FLAG_FROM_BACKGROUND );
             softBoardData.softBoardListener.getApplicationContext().startActivity(intent);
             }

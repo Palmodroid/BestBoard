@@ -20,6 +20,7 @@ import org.lattilad.bestboard.parser.SoftBoardParser;
 import org.lattilad.bestboard.parser.SoftBoardParser.SoftBoardParserListener;
 import org.lattilad.bestboard.prefs.PrefsFragment;
 import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.webview.WebViewActivity;
 
 import java.io.File;
 
@@ -371,6 +372,19 @@ public class SoftBoardService extends InputMethodService implements
             Scribe.debug( Debug.SERVICE,  warning );
             // Warning should be shown!
             Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
+
+            // Display coat.log
+            Intent intent = new Intent( this, WebViewActivity.class);
+            intent.putExtra( WebViewActivity.WORK, Debug.coatLogFileName);
+            intent.putExtra( WebViewActivity.SEARCH, "ERROR");
+            //intent.setData(Uri.parse("http://lattilad.org/"));
+            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            //intent.addFlags( Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT );
+            //intent.addFlags( Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY );
+            //  intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+            //intent.addFlags( Intent.FLAG_FROM_BACKGROUND );
+            startActivity(intent);
+
             }
         // parsing finished without errors, but this is not the first parsing!
         else if ( this.softBoardProcessor != null )

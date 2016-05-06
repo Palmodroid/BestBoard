@@ -8,8 +8,9 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
-import android.view.Menu;
-import android.view.MenuItem;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
@@ -22,6 +23,8 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import org.lattilad.bestboard.R;
+import org.lattilad.bestboard.debug.Debug;
+import org.lattilad.bestboard.scribe.Scribe;
 
 import java.io.File;
 
@@ -36,14 +39,16 @@ import java.io.File;
  */
 public class WebViewActivity extends Activity
     {
-    // Layout elements
+    // Retained layout elements
     private WebView webView;
+    private boolean searchBarEnabled = false;
+    private String retainedSearchText = "";
+
+    // Changing layout elements
     private FrameLayout webViewFrame;
-
     private ProgressBar progressBar;
-    private RelativeLayout toolLayout;
-    private EditText filter;
-
+    private RelativeLayout searchBar;
+    private EditText searchText;
 
     // Extra of Intents
     static final public String ASSET = "ASSET";
@@ -52,16 +57,19 @@ public class WebViewActivity extends Activity
 
     static final public String SEARCH = "SEARCH";
 
+
     protected void initContentView( )
         {
+        Scribe.locus(Debug.WEBVIEW);
+
         setContentView(R.layout.web_view_activity);
 
-        toolLayout = (RelativeLayout) findViewById(R.id.tool);
+        webViewFrame = (FrameLayout)findViewById(R.id.webViewFrame);
         progressBar = (ProgressBar) findViewById(R.id.progress); // default max value = 100
-        filter = (EditText) findViewById(R.id.filter);
-
-        // Retrieve WebView placeholder
-        webViewFrame = ((FrameLayout)findViewById(R.id.webViewFrame));
+        progressBar.setVisibility( View.GONE );
+        // Cannot be sure, if page is loaded, so no progress bar is shown after config change
+        searchBar = (RelativeLayout) findViewById(R.id.tool);
+        searchText = (EditText) findViewById(R.id.filter);
 
         // Initialize the WebView at new starts
         if (webView == null)
@@ -77,10 +85,7 @@ public class WebViewActivity extends Activity
             webView.setScrollbarFadingEnabled(true);
             webView.getSettings().setLoadsImagesAutomatically(true);
 
-            // Load the URLs inside the WebView, not in the external web browser
-            webView.setWebViewClient(new WebViewClient());
-
-            // Load a page
+            // Load the starting page
             String string = null;
             Uri uri;
 
@@ -127,12 +132,12 @@ public class WebViewActivity extends Activity
                 }
 
             // extra: SEARCH
-            if ( ( string = getIntent().getStringExtra(SEARCH) ) != null )
-                filter.setText( string );
+            if ( ( string = getIntent().getStringExtra(SEARCH) ) != null && !string.equals("") )
+                {
+                retainedSearchText = string;
+                searchBarEnabled = true;
+                }
             }
-
-        String searchText = filter.getText().toString();
-        toolLayout.setVisibility(searchText.equals("") ? View.GONE : View.VISIBLE );
 
         // Attach the WebView to its placeholder
         webViewFrame.addView(webView);
@@ -177,6 +182,8 @@ public class WebViewActivity extends Activity
                 @Override
                 public void onPageStarted(WebView view, String url, Bitmap favicon)
                     {
+                    Scribe.locus(Debug.WEBVIEW);
+
                     progressBar.setVisibility(View.VISIBLE);
                     }
 
@@ -184,9 +191,11 @@ public class WebViewActivity extends Activity
                 @Override
                 public void onPageFinished(WebView view, String url)
                     {
+                    Scribe.locus(Debug.WEBVIEW);
+
                     progressBar.setVisibility(View.GONE);
 
-                    String searchText = filter.getText().toString();
+                    String searchText = WebViewActivity.this.searchText.getText().toString();
                     if (!searchText.equals(""))
                         {
                         webView.findAllAsync(searchText);
@@ -194,11 +203,31 @@ public class WebViewActivity extends Activity
                     }
                 });
 
+        searchText.addTextChangedListener(
+                new TextWatcher()
+                {
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count)
+                    {
+                    webView.findAllAsync( s.toString() );
+                    }
+
+                @Override
+                public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+                @Override
+                public void afterTextChanged(Editable s) {}
+                });
+
+        searchBar.setVisibility( searchBarEnabled ? View.VISIBLE : View.GONE );
+        searchText.setText( retainedSearchText );
         }
 
 
     protected void onCreate(Bundle savedInstanceState)
         {
+        Scribe.locus(Debug.WEBVIEW);
+
         super.onCreate(savedInstanceState);
         initContentView();
         }
@@ -207,7 +236,10 @@ public class WebViewActivity extends Activity
     @Override
     public void onConfigurationChanged(Configuration newConfig)
         {
+        Scribe.locus(Debug.WEBVIEW);
+
         if (webView != null)    webViewFrame.removeView(webView);
+        retainedSearchText = searchText.getText().toString();
 
         super.onConfigurationChanged(newConfig);
 
@@ -218,6 +250,8 @@ public class WebViewActivity extends Activity
     @Override
     protected void onSaveInstanceState(Bundle outState)
         {
+        Scribe.locus(Debug.WEBVIEW);
+
         super.onSaveInstanceState(outState);
 
         // Save the state of the WebView
@@ -228,6 +262,8 @@ public class WebViewActivity extends Activity
     @Override
     protected void onRestoreInstanceState(Bundle savedInstanceState)
         {
+        Scribe.locus(Debug.WEBVIEW);
+
         super.onRestoreInstanceState(savedInstanceState);
 
         // Restore the state of the WebView
@@ -252,63 +288,23 @@ public class WebViewActivity extends Activity
         }
 
 
-/*  This method is not necessary, onBackPressed is better
     @Override
     public boolean onKeyDown(int keyCode, KeyEvent event)
         {
-        // Check if the key event was the Back button and if there's history
-        if ((keyCode == KeyEvent.KEYCODE_BACK) && webView.canGoBack())
+        if ( keyCode == KeyEvent.KEYCODE_MENU )
             {
-            webView.goBack();
+            if (searchBarEnabled)
+                {
+                searchBarEnabled = false;
+                searchBar.setVisibility(View.GONE);
+                }
+            else
+                {
+                searchBarEnabled = true;
+                searchBar.setVisibility(View.VISIBLE);
+                }
             return true;
             }
-        // If it wasn't the Back key or there's no web page history, bubble up to the default
-        // system behavior (probably exit the activity)
         return super.onKeyDown(keyCode, event);
-        }
-*/
-
-
-    // options menu contains only a dummy menu entry
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-        {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.web_view_menu, menu);
-        return true;
-        }
-
-
-    // option menu is be never displayed,
-    // but menu button toggles toolbar visibility
-    // this way no real menu button is needed - all menu activations will toggle the toolbar
-    @Override
-    public boolean onPrepareOptionsMenu(Menu menu)
-        {
-        super.onPrepareOptionsMenu(menu);
-        toolLayout.setVisibility( toolLayout.getVisibility() == View.VISIBLE ?
-                View.GONE : View.VISIBLE );
-        return false;
-        }
-
-
-    // This is not needed, because there is only a dummy entry
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-        {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-/*
-        int id = item.getItemId();
-
-        switch (id)
-            {
-            case R.id.dummy_menu:
-                Toast.makeText(getApplicationContext(), "About menu item pressed", Toast.LENGTH_SHORT).show();
-                break;
-            }
-*/
-        return super.onOptionsItemSelected(item);
         }
     }
