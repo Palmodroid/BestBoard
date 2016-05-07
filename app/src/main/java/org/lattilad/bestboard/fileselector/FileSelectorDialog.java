@@ -15,7 +15,7 @@ import android.widget.Toast;
 /**
  * File-selector dialog
  */
-public class FileChooserDialog extends DialogFragment
+public class FileSelectorDialog extends DialogFragment
     {
     public static enum Type
         {
@@ -24,47 +24,47 @@ public class FileChooserDialog extends DialogFragment
         CREATE_FILE
         }
 
-    public static FileChooserDialog showNewDialog( FragmentActivity activity, Type type )
+    public static FileSelectorDialog showNewDialog( FragmentActivity activity, Type type )
         {
         return showNewDialog( activity, type, null );
         }
 
-    public static FileChooserDialog showNewDialog( FragmentActivity activity, Type type, String text)
+    public static FileSelectorDialog showNewDialog( FragmentActivity activity, Type type, String text)
         {
-        FileChooserDialog fileChooserDialog;
+        FileSelectorDialog fileSelectorDialog;
         FragmentManager fragmentManager = activity.getSupportFragmentManager();
 
         // Any open dialog should be closed...
-        fileChooserDialog = (FileChooserDialog) fragmentManager.findFragmentByTag( "DIALOG" );
-        if ( fileChooserDialog != null )
-            fileChooserDialog.dismiss();
+        fileSelectorDialog = (FileSelectorDialog) fragmentManager.findFragmentByTag( "DIALOG" );
+        if ( fileSelectorDialog != null )
+            fileSelectorDialog.dismiss();
 
         // and a new one should be open and show
-        fileChooserDialog = new FileChooserDialog();
+        fileSelectorDialog = new FileSelectorDialog();
 
         Bundle args = new Bundle();
         args.putSerializable("TYPE", type);
         args.putString("TEXT", text);
-        fileChooserDialog.setArguments(args);
+        fileSelectorDialog.setArguments(args);
 
-        fileChooserDialog.show( activity.getSupportFragmentManager(), "DIALOG");
+        fileSelectorDialog.show( activity.getSupportFragmentManager(), "DIALOG");
 
-        return fileChooserDialog;
+        return fileSelectorDialog;
         }
 
-    FileChooserActivity fileChooserActivity;
+    FileSelectorActivity fileSelectorActivity;
 
     @Override
     public void onAttach(Activity activity)
         {
         super.onAttach(activity);
 
-        if ( activity instanceof FileChooserActivity)
+        if ( activity instanceof FileSelectorActivity)
             Toast.makeText( activity, "FileChooserActivity a tipusa", Toast.LENGTH_SHORT ).show();
         else
             Toast.makeText( activity, "Csak Activity a tipusa", Toast.LENGTH_SHORT ).show();
 
-        fileChooserActivity = (FileChooserActivity) activity;
+        fileSelectorActivity = (FileSelectorActivity) activity;
         }
 
     @Override
@@ -86,11 +86,11 @@ public class FileChooserDialog extends DialogFragment
                     {
                     public void onClick(DialogInterface dialog, int which)
                         {
-                        fileChooserActivity.onDialogPositiveResult( type, null );
+                        fileSelectorActivity.onDialogPositiveResult( type, null );
                         }
                    });
 
-                FileChooserDialog.this.setCancelable( false );
+                FileSelectorDialog.this.setCancelable( false );
                 break;
                 }
 
@@ -106,7 +106,7 @@ public class FileChooserDialog extends DialogFragment
                     {
                     public void onClick(DialogInterface dialog, int which)
                         {
-                        fileChooserActivity.onDialogPositiveResult( type, name.getText().toString() );
+                        fileSelectorActivity.onDialogPositiveResult( type, name.getText().toString() );
                         }
                    });
 
@@ -127,7 +127,7 @@ public class FileChooserDialog extends DialogFragment
                     {
                     public void onClick(DialogInterface dialog, int which)
                         {
-                        fileChooserActivity.onDialogPositiveResult( type, name.getText().toString() );
+                        fileSelectorActivity.onDialogPositiveResult( type, name.getText().toString() );
                         }
                     });
 

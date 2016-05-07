@@ -1,5 +1,6 @@
 package org.lattilad.bestboard.prefs;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -9,10 +10,12 @@ import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.preference.PreferenceManager;
+import android.widget.Toast;
 
 import org.lattilad.bestboard.Ignition;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.debug.Debug;
+import org.lattilad.bestboard.fileselector.FileSelectorActivity;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.webview.WebViewActivity;
 
@@ -909,6 +912,8 @@ public class PrefsFragment extends PreferenceFragment
         // Originally all preferences handled as invalid
         directoryPreference.setSummary( getString( R.string.descriptor_directory_summary_invalid ) );
         filePreference.setSummary( getString( R.string.descriptor_file_summary_invalid ) );
+
+        Scribe.debug(Debug.PREF, "Reload disabled!");
         reloadPreference.setEnabled( false );
 
         // Working directory is checked
@@ -945,6 +950,7 @@ public class PrefsFragment extends PreferenceFragment
         filePreference.setSummary( getString( R.string.descriptor_file_summary ) + " " +
                 fileFile.getAbsolutePath() );
 
+        Scribe.debug( Debug.PREF, "Reload enabled!");
         reloadPreference.setEnabled( true );
 
         return true;
@@ -1001,6 +1007,49 @@ public class PrefsFragment extends PreferenceFragment
      ** STANDARD METHODS CONNECT FRAGMENT TO ANDROID SYSTEM
      **/
 
+    private static final int FILE_SELECTOR_REQUEST = 1;
+
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+        {
+        Scribe.locus( Debug.PREF );
+
+        if (requestCode == FILE_SELECTOR_REQUEST)
+            {
+            if (resultCode == Activity.RESULT_OK)
+                {
+                //String result=data.getStringExtra("RESULT");
+
+                //visszateres data reszben
+                String result = data.getData().getPath();
+                Toast.makeText(getActivity(), "File Clicked: " + result, Toast.LENGTH_LONG).show();
+
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+
+                String fileName = data.getStringExtra(FileSelectorActivity.FILE_NAME);
+                if (fileName != null)
+                    editor.putString(getString(R.string.descriptor_file_key), fileName);
+
+                String subDirectory = data.getStringExtra(FileSelectorActivity.DIRECTORY_SUB_PATH);
+                if (subDirectory != null)
+                    editor.putString(getString(R.string.descriptor_directory_key), subDirectory);
+
+                editor.apply();
+
+                Scribe.debug(Debug.PREF, sharedPrefs.getString(getString(R.string.descriptor_file_key), ""));
+                Scribe.debug(Debug.PREF, sharedPrefs.getString(getString(R.string.descriptor_directory_key), ""));
+
+                performAction(PREFS_ACTION_RELOAD);
+                }
+            else if (resultCode == Activity.RESULT_CANCELED)
+                {
+                Toast.makeText(getActivity(), "- C A N C E L -", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }
+
+
     /**
      * Preferences are initialized
      * @param savedInstanceState - not used
@@ -1008,8 +1057,8 @@ public class PrefsFragment extends PreferenceFragment
     @Override
     public void onCreate(Bundle savedInstanceState)
         {
-        super.onCreate( savedInstanceState );
-        Scribe.locus( Debug.PREF );
+        super.onCreate(savedInstanceState);
+        Scribe.locus(Debug.PREF);
 
         // Load preferences from resources
         addPreferencesFromResource(R.xml.prefs);
@@ -1023,8 +1072,27 @@ public class PrefsFragment extends PreferenceFragment
                     {
                     // getActivity() cannot be null, when button is displayed
                     Intent intent = new Intent( getActivity(), WebViewActivity.class);
-                    intent.putExtra( WebViewActivity.WORK, "help.html");
-                    getActivity().startActivity(intent);
+                    intent.putExtra( WebViewActivity.WORK, "help.html" );
+                    startActivity(intent);
+                    return true;
+                    }
+                });
+
+        findPreference(getString(R.string.descriptor_select_key)).
+                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                {
+                @Override
+                public boolean onPreferenceClick(Preference preference)
+                    {
+                    SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                    String directoryName =
+                            sharedPrefs.getString( getString( R.string.descriptor_directory_key ),
+                                    getString( R.string.descriptor_directory_default ));
+                    Intent intent = new Intent();
+                    intent.setClass(getActivity(), FileSelectorActivity.class);
+                    intent.putExtra( FileSelectorActivity.DIRECTORY_SUB_PATH, directoryName);
+                    // intent.putExtra( FileSelectorActivity.FILE_ENDING, ".txt");
+                    startActivityForResult(intent, FILE_SELECTOR_REQUEST);
                     return true;
                     }
                 });
@@ -1058,6 +1126,7 @@ public class PrefsFragment extends PreferenceFragment
                             (EditTextPreference)findPreference( getString(R.string.descriptor_file_key) );
                     descriptorFilePreference.setText( getString( R.string.descriptor_file_default ) );
 
+                    performAction(PREFS_ACTION_RELOAD);
                     Scribe.debug(Debug.PREF, "Directory and descriptor file are reset to their default values. ");
                     return true;
                     }
@@ -1077,11 +1146,6 @@ public class PrefsFragment extends PreferenceFragment
 
         // Prepare dialog messages
         prepareIntPrefsDialogMessage();
-
-        // Preferences (descriptor file) is checked and summaries are updated
-        checkPrefs(PreferenceManager.getDefaultSharedPreferences(getActivity()),
-                "", true);
-
         }
 
 
@@ -1094,7 +1158,12 @@ public class PrefsFragment extends PreferenceFragment
     public void onResume()
         {
         super.onResume();
-        Scribe.locus( Debug.PREF );
+        Scribe.locus(Debug.PREF);
+
+        // Preferences (descriptor file) is checked and summaries are updated
+        // Needed here, because preferences could change during pause or in onActivityResult
+        checkPrefs(PreferenceManager.getDefaultSharedPreferences(getActivity()),
+                "", true);
 
         // Change listener is registered
         PreferenceManager.getDefaultSharedPreferences( getActivity() )
@@ -1130,7 +1199,8 @@ public class PrefsFragment extends PreferenceFragment
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPrefs, String key)
         {
-        checkPrefs( sharedPrefs, key, false );
+        Scribe.locus( Debug.PREF );
+        checkPrefs(sharedPrefs, key, false);
         }
 
     }

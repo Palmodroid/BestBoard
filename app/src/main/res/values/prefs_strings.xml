@@ -12,6 +12,10 @@
 
     <string name="prefs_descriptor">Descriptor file</string>
 
+    <string name="descriptor_select_key">select</string>
+    <string name="descriptor_select_title">File selector</string>
+    <string name="descriptor_select_summary">Select descriptor file and working directory</string>
+
     <string name="descriptor_directory_key">directory</string>
     <string name="descriptor_directory_title">Name of working directory </string>
     <string name="descriptor_directory_summary">Working directory: </string>

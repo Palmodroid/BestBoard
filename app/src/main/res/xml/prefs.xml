@@ -14,6 +14,11 @@
 	<PreferenceCategory
 		android:title="@string/prefs_descriptor">
 
+		<Preference
+			android:key="@string/descriptor_select_key"
+			android:title="@string/descriptor_select_title"
+			android:summary="@string/descriptor_select_summary" />
+
 		<EditTextPreference
 			android:key="@string/descriptor_directory_key"
 			android:title="@string/descriptor_directory_title"

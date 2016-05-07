@@ -26,7 +26,7 @@ public class Debug
     // Settings of debug levels - only EVEN numbers!
     private static final int LIMIT = 500;
 
-    public static final int PREF = 10;
+    public static final int PREF = 990;
     public static final int LAYOUT = 20;
     public static final int TOUCH = 24;
     public static final int TOUCH_VERBOSE = 24;
@@ -43,7 +43,7 @@ public class Debug
     public static final int CURSOR = 990;
     public static final int TIMER = 990;
     public static final int WEBVIEW = 990;
-
+    public static final int SELECTOR = 990;
 
     public static final int LAYOUTSTATE = 60;
     public static final int CAPSSTATE = 60;
