@@ -720,9 +720,9 @@ public class SoftBoardProcessor implements
         return softBoardService.getApplicationContext();
         }
 
-    public void startSoftBoardParser()
+    public void startSoftBoardParser( String coatFileName )
         {
-        softBoardService.startSoftBoardParser();
+        softBoardService.startSoftBoardParser( coatFileName );
         }
 
 

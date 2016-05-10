@@ -1024,6 +1024,7 @@ public class PrefsFragment extends PreferenceFragment
                 String result = data.getData().getPath();
                 Toast.makeText(getActivity(), "File Clicked: " + result, Toast.LENGTH_LONG).show();
 
+/*
                 SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
                 SharedPreferences.Editor editor = sharedPrefs.edit();
 
@@ -1036,9 +1037,20 @@ public class PrefsFragment extends PreferenceFragment
                     editor.putString(getString(R.string.descriptor_directory_key), subDirectory);
 
                 editor.apply();
+*/
 
-                Scribe.debug(Debug.PREF, sharedPrefs.getString(getString(R.string.descriptor_file_key), ""));
-                Scribe.debug(Debug.PREF, sharedPrefs.getString(getString(R.string.descriptor_directory_key), ""));
+                String subDirectory = data.getStringExtra(FileSelectorActivity.DIRECTORY_SUB_PATH);
+                EditTextPreference descriptorDirectoryPreference =
+                        (EditTextPreference)findPreference( getString(R.string.descriptor_directory_key) );
+                descriptorDirectoryPreference.setText( subDirectory );
+
+                String fileName = data.getStringExtra(FileSelectorActivity.FILE_NAME);
+                EditTextPreference descriptorFilePreference =
+                        (EditTextPreference)findPreference( getString(R.string.descriptor_file_key) );
+                descriptorFilePreference.setText( fileName );
+
+//                Scribe.debug(Debug.PREF, sharedPrefs.getString(getString(R.string.descriptor_file_key), ""));
+//                Scribe.debug(Debug.PREF, sharedPrefs.getString(getString(R.string.descriptor_directory_key), ""));
 
                 performAction(PREFS_ACTION_RELOAD);
                 }

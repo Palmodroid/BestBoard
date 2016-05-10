@@ -54,6 +54,7 @@ public class WebViewActivity extends Activity
     static final public String ASSET = "ASSET";
     static final public String FILE = "FILE";
     static final public String WORK = "WORK";
+    static final public String WEB = "WEB";
 
     static final public String SEARCH = "SEARCH";
 
@@ -84,6 +85,7 @@ public class WebViewActivity extends Activity
             webView.setScrollBarStyle(WebView.SCROLLBARS_OUTSIDE_OVERLAY);
             webView.setScrollbarFadingEnabled(true);
             webView.getSettings().setLoadsImagesAutomatically(true);
+            webView.getSettings().setDefaultTextEncodingName("utf-8");
 
             // Load the starting page
             String string = null;
@@ -113,6 +115,15 @@ public class WebViewActivity extends Activity
                     Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
                 {
                 string = Uri.fromFile( new File( Environment.getExternalStorageDirectory(), string ) ).toString();
+                }
+
+            // extra: WEB
+            else if ( ( string = getIntent().getStringExtra(WEB) ) != null )
+                {
+                if (!string.startsWith("https://") && !string.startsWith("http://"))
+                    {
+                    string = "http://" + string;
+                    }
                 }
 
             // data: uri

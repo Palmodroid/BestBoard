@@ -27,10 +27,12 @@ import org.lattilad.bestboard.buttons.PacketCombine;
 import org.lattilad.bestboard.buttons.PacketField;
 import org.lattilad.bestboard.buttons.PacketFunction;
 import org.lattilad.bestboard.buttons.PacketKey;
+import org.lattilad.bestboard.buttons.PacketLoad;
 import org.lattilad.bestboard.buttons.PacketMove;
 import org.lattilad.bestboard.buttons.PacketRun;
 import org.lattilad.bestboard.buttons.PacketText;
 import org.lattilad.bestboard.buttons.PacketTextTime;
+import org.lattilad.bestboard.buttons.PacketWebView;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
@@ -45,6 +47,7 @@ import org.lattilad.bestboard.utils.ExternalDataException;
 import org.lattilad.bestboard.utils.KeyValuePair;
 import org.lattilad.bestboard.utils.SinglyLinkedList;
 import org.lattilad.bestboard.utils.Trilean;
+import org.lattilad.bestboard.webview.WebViewActivity;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -1130,23 +1133,41 @@ public class MethodsForCommands
             return new PacketFunction( softBoardData, Commands.TOKEN_SELECTALL);
         if ( parameters.remove(Commands.TOKEN_CHANGECASE) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_CHANGECASE);
-        if ( parameters.remove(Commands.TOKEN_DRAFT) != null )
-            return new PacketFunction( softBoardData, Commands.TOKEN_DRAFT);
+        if ( parameters.remove(Commands.TOKEN_RELOAD) != null )
+            return new PacketFunction( softBoardData, Commands.TOKEN_RELOAD);
         if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_SETTINGS);
         if ( parameters.remove(Commands.TOKEN_HELP) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_HELP);
 
-        // packetRun will continue evaluation
-        return packetRun( parameters );
+        // packetWebView will continue evaluation
+        return packetWithStringParameter(parameters);
         }
 
 
+    public Packet packetWithStringParameter(ExtendedMap<Long, Object> parameters)
+        {
+        String string;
+        if ((string = (String) parameters.remove(Commands.TOKEN_HTML)) != null)
+            return new PacketWebView(softBoardData, WebViewActivity.FILE, string);
+        if ((string = (String) parameters.remove(Commands.TOKEN_WEB)) != null)
+            return new PacketWebView(softBoardData, WebViewActivity.WEB, string);
+        if ((string = (String) parameters.remove(Commands.TOKEN_LOAD)) != null)
+            return new PacketLoad(softBoardData, string);
+
+        // packetRun will continue evaluation
+        return packetRun(parameters);
+        }
+
+
+    // Because of program button, packetRun should finish evaluation
     public PacketRun packetRun( ExtendedMap<Long, Object> parameters )
         {
         String string;
         if ((string = (String) parameters.remove(Commands.TOKEN_RUN)) != null)
             return new PacketRun(softBoardData, string);
+
+        // packetRun finishes whole evaluation
         return null;
         }
 
@@ -1205,7 +1226,7 @@ public class MethodsForCommands
             cursorType = SoftBoardProcessor.CURSOR_BEGIN;
         else if (temp == Commands.TOKEN_END)
             cursorType = SoftBoardProcessor.CURSOR_END;
-        else if (temp == Commands.TOKEN_LAST)
+        else if (temp == Commands.TOKEN_RECENT)
             ; // default remains
         else if (temp != -1L)
             tokenizer.error("PACKET", R.string.data_cursor_bad_parameter);

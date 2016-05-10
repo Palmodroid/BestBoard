@@ -316,7 +316,7 @@ ADDLAYOUT ( ID switch HEXAGONAL ALIGN odds ROWS 5 HALFCOLUMNS 15 ASBOARD START )
 
 BLOCK ( LAYOUT switch COLUMN 1 ROW 1
   BUTTON ( SETTINGS COLOR white ADDTITLE ( script ))
-  BUTTON ( DRAFT COLOR red ADDTITLE ( script ))
+  BUTTON ( RELOAD COLOR red ADDTITLE ( script ))
   ENTER ()
   SINGLE ( TOGGLE AUTOFUNC ADDTITLE ( SHOW AUTOFUNC ) )
   crr
@@ -844,7 +844,7 @@ findfree	LIST ( ADDTITLE ( comm TEXT "Func"  )
 		ADDTEXT "DELETE"
 		ADDTEXT "CAPITALIZE"
 		ADDTEXT "SELECTALL"
-		ADDTEXT "DRAFT"
+		ADDTEXT "RELOAD"
 		ADDTEXT "SETTINGS"
 		ADDTEXT "TOGGLE AUTOFUNC"
 		ADDTEXT "TOGGLE CURSOR"
@@ -882,7 +882,7 @@ findfree	LIST ( ADDTITLE ( comm TEXT "Word"  )
 		ADDTEXT "PARA"
 		COLOR khaki  )
 findfree	LIST ( ADDTITLE ( comm TEXT "Curs"  ) 
-		TEXT "CURSOR LAST"
+		TEXT "CURSOR RECENT"
 		ADDTEXT "CURSOR BEGIN"
 		ADDTEXT "CURSOR END"
 		COLOR khaki  )
@@ -931,7 +931,7 @@ findfree 	SINGLE ( ADDTITLE ( comm TEXT "Font" )
 		TEXT "FONT \"file\"\nLOCALE ( LANGUAGE \"\" COUNTRY \"\" VARIANT \"\" )\n\n"  COLOR fuchsia 
 		)
 findfree 	SINGLE ( ADDTITLE ( comm TEXT "Color" ) 
-		TEXT "METACOLOR \nLOCKCOLOR \nAUTOCOLOR\n TOUCHCOLOR\n STROKECOLOR\n\n"  COLOR fuchsia 
+		TEXT "ACTIVECOLOR \nLOCKCOLOR \nAUTOCOLOR\n TOUCHCOLOR\n STROKECOLOR\n\n"  COLOR fuchsia 
 		)
 findfree 	SINGLE ( ADDTITLE ( comm TEXT "ShowT" ) 
 		TEXT 
@@ -1033,6 +1033,13 @@ DEFAULT ( BLOCK ( LAYOUT lay2l COLUMN 1 ) )
 BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lay2" ) COLOR magenta ))
 
 ADDBOARD  ( ID lay2 PORTRAIT lay2p LANDSCAPE lay2l LOCK )
+
+block ( layout lay2p row 2 column 2 
+  SINGLE ( WEB "lattilad.org" )
+  SINGLE ( HTML "A.txt" )
+  SINGLE ( LOAD "testa.txt" )
+  SINGLE ( LOAD "testz.txt" )
+  )
 
 ; #############################################
 

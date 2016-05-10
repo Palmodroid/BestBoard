@@ -18,6 +18,7 @@ import android.widget.Toast;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.SoftBoardParser;
 import org.lattilad.bestboard.parser.SoftBoardParser.SoftBoardParserListener;
+import org.lattilad.bestboard.prefs.PrefsActivity;
 import org.lattilad.bestboard.prefs.PrefsFragment;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.webview.WebViewActivity;
@@ -66,7 +67,7 @@ public class SoftBoardService extends InputMethodService implements
                 {
                 case PrefsFragment.PREFS_ACTION_RELOAD:
                     Scribe.note( Debug.SERVICE,  "SERVICE: get notification to reload descriptor." );
-                    startSoftBoardParser();
+                    startSoftBoardParser( null );
                     break;
 
                 case PrefsFragment.PREFS_ACTION_RECALCULATE:
@@ -182,7 +183,7 @@ public class SoftBoardService extends InputMethodService implements
         PreferenceManager.getDefaultSharedPreferences( this ).registerOnSharedPreferenceChangeListener(this);
 
         // Start the first parsing
-        startSoftBoardParser();
+        startSoftBoardParser( null );
         }
 
 
@@ -214,7 +215,7 @@ public class SoftBoardService extends InputMethodService implements
      * Stops any previous parsing, and starts a new parse.
      * As a result a completely new soft-layout will be created.
      */
-    public void startSoftBoardParser()
+    public void startSoftBoardParser( final String coatFileName )
         {
         // sd-card is not ready, waiting for MEDIA_MOUNTED broadcast
         if ( !Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
@@ -234,7 +235,7 @@ public class SoftBoardService extends InputMethodService implements
                 @Override
                 public void onReceive(Context context, Intent intent)
                     {
-                    SoftBoardService.this.startSoftBoardParser();
+                    SoftBoardService.this.startSoftBoardParser( coatFileName );
                     }
                 };
 
@@ -260,10 +261,18 @@ public class SoftBoardService extends InputMethodService implements
                         getString( R.string.descriptor_directory_default ));
         File directoryFile = new File( Environment.getExternalStorageDirectory(), directoryName );
 
-        coatFileName =
-                sharedPrefs.getString( getString( R.string.descriptor_file_key ),
-                        getString( R.string.descriptor_file_default ));
-        File coatFileFile = new File( directoryFile, coatFileName );
+        if ( coatFileName == null )
+            {
+            this.coatFileName =
+                    sharedPrefs.getString(getString(R.string.descriptor_file_key),
+                            getString(R.string.descriptor_file_default));
+            }
+        else
+            {
+            // preferences are NOT changed, so draft will bring back to the main keyboard!
+            this.coatFileName = coatFileName;
+            }
+        File coatFileFile = new File( directoryFile, this.coatFileName );
 
         // Any previous parsing should stop now
         if ( softBoardParser != null )  softBoardParser.cancel(false);
@@ -348,6 +357,11 @@ public class SoftBoardService extends InputMethodService implements
         Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
 
         softBoardParser = null;
+
+        Intent intent = new Intent( this, PrefsActivity.class);
+        intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+        startActivity(intent);
+
         }
 
 

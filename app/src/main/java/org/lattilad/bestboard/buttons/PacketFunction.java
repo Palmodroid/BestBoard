@@ -1,7 +1,6 @@
 package org.lattilad.bestboard.buttons;
 
 import android.content.Intent;
-import android.net.Uri;
 
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.parser.Commands;
@@ -48,7 +47,7 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_BACKSPACE )
             return "BS";
 
-        if ( functionCode == Commands.TOKEN_DRAFT )
+        if ( functionCode == Commands.TOKEN_RELOAD)
             return "DRAFT";
 
         if ( functionCode == Commands.TOKEN_SETTINGS )
@@ -90,9 +89,9 @@ public class PacketFunction extends Packet
             softBoardData.softBoardListener.deleteCharBeforeCursor(1);
             }
 
-        else if ( functionCode == Commands.TOKEN_DRAFT )
+        else if ( functionCode == Commands.TOKEN_RELOAD)
             {
-            softBoardData.softBoardListener.startSoftBoardParser();
+            softBoardData.softBoardListener.startSoftBoardParser( null );
             }
 
         else if (functionCode == Commands.TOKEN_SETTINGS )

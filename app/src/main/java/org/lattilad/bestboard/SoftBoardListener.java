@@ -72,6 +72,6 @@ public interface SoftBoardListener
     String getWordOrSelected();
     void changeLastWordOrSelected( String newText, boolean restoreCursor );
 
-    void startSoftBoardParser();
+    void startSoftBoardParser( String coatFileName );
     }
 

@@ -45,7 +45,7 @@ public class Commands
     public static final long TOKEN_COUNTRY = 0x791c65f9aL;
     public static final long TOKEN_VARIANT = 0x12b1368887L;
 
-    public static final long TOKEN_METACOLOR = 0x478ed1032506L;
+    public static final long TOKEN_ACTIVECOLOR = 0xb0be7c077b1cbdL;
     public static final long TOKEN_LOCKCOLOR = 0x45300a4413a0L;
     public static final long TOKEN_AUTOCOLOR = 0x229aefe38af0L;
     public static final long TOKEN_TOUCHCOLOR = 0xdb3133d220b23L;
@@ -127,13 +127,16 @@ public class Commands
 
     public static final long TOKEN_DELETE = 0x375d443cL;
     public static final long TOKEN_BACKSPACE = 0x240879d29871L;
-    public static final long TOKEN_DRAFT = 0x189da4dL;
+    public static final long TOKEN_RELOAD = 0x713aee9cL;
     public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
     public static final long TOKEN_SELECTALL = 0x5ab4faaa9d61L;
     public static final long TOKEN_CHANGECASE = 0x5c19ec2779e2bL;
     public static final long TOKEN_HELP = 0xe71acL;
 
     public static final long TOKEN_RUN = 0x194cfL;
+    public static final long TOKEN_HTML = 0xec204L;
+    public static final long TOKEN_WEB = 0x1ad30L;
+    public static final long TOKEN_LOAD = 0x11bcf7L;
 
     public static final long TOKEN_TOGGLE = 0x7a99172fL;
     public static final long TOKEN_TURNON = 0x7b4d533bL;
@@ -150,7 +153,7 @@ public class Commands
     public static final long TOKEN_PARA = 0x148bffL;
     public static final long TOKEN_CURSOR = 0x3509a5d7L;
     public static final long TOKEN_SELECT = 0x755cd451L;
-    public static final long TOKEN_LAST = 0x1174c3L;
+    public static final long TOKEN_RECENT = 0x7133c64eL;
     public static final long TOKEN_BEGIN = 0x146bcb1L;
     public static final long TOKEN_END = 0x14e3dL;
     public static final long TOKEN_ALWAYS = 0x2bc78e36L;
@@ -385,7 +388,7 @@ public class Commands
                 TOKEN_DOCFILE,
                 TOKEN_DOCURI,
                 TOKEN_LOCALE,
-                TOKEN_METACOLOR,
+                TOKEN_ACTIVECOLOR,
                 TOKEN_LOCKCOLOR,
                 TOKEN_AUTOCOLOR,
                 TOKEN_TOUCHCOLOR,
@@ -415,7 +418,7 @@ public class Commands
         add(TOKEN_COUNTRY, PARAMETER_STRING);
         add(TOKEN_VARIANT, PARAMETER_STRING);
 
-        add(TOKEN_METACOLOR, PARAMETER_COLOR).method("setMetaColor");
+        add(TOKEN_ACTIVECOLOR, PARAMETER_COLOR).method("setMetaColor");
         add(TOKEN_LOCKCOLOR, PARAMETER_COLOR).method("setLockColor");
         add(TOKEN_AUTOCOLOR, PARAMETER_COLOR).method("setAutoColor");
         add(TOKEN_TOUCHCOLOR, PARAMETER_COLOR).method("setTouchColor");
@@ -545,7 +548,7 @@ public class Commands
                 TOKEN_KEY,
                 TOKEN_TURNON, TOKEN_TURNOFF,
                 TOKEN_DELETE, TOKEN_BACKSPACE, TOKEN_TOGGLE, TOKEN_SELECTALL, TOKEN_CHANGECASE,
-                TOKEN_DRAFT, TOKEN_SETTINGS, TOKEN_HELP, TOKEN_RUN,
+                TOKEN_RELOAD, TOKEN_SETTINGS, TOKEN_HELP, TOKEN_RUN, TOKEN_HTML, TOKEN_WEB, TOKEN_LOAD,
                 TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
                 TOKEN_COMBINE,
@@ -571,13 +574,16 @@ public class Commands
 
         add(TOKEN_DELETE, PARAMETER_FLAG);
         add(TOKEN_BACKSPACE, PARAMETER_FLAG);
-        add(TOKEN_DRAFT, PARAMETER_FLAG);
+        add(TOKEN_RELOAD, PARAMETER_FLAG);
         add(TOKEN_SETTINGS, PARAMETER_FLAG);
         add(TOKEN_TOGGLE, PARAMETER_KEYWORD);
         add(TOKEN_SELECTALL, PARAMETER_FLAG);
         add(TOKEN_CHANGECASE, PARAMETER_FLAG);
         add(TOKEN_HELP, PARAMETER_FLAG);
         add(TOKEN_RUN, PARAMETER_STRING);
+        add(TOKEN_HTML, PARAMETER_STRING);
+        add(TOKEN_WEB, PARAMETER_STRING);
+        add(TOKEN_LOAD, PARAMETER_STRING);
 
         add(TOKEN_TOP, PARAMETER_FLAG);
         add(TOKEN_LEFT, PARAMETER_FLAG);
