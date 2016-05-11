@@ -3,6 +3,7 @@
  
 	<string name="parser_starting">"Parsing started…"</string>
     <string name="parser_no_coat_file">"Could not find coat file…"</string>
+    <string name="parser_coat_file">"Parsing: "</string>
     <string name="parser_coat_file_invalid">"Coat file is not valid! Needed Coat version:"</string>
     <string name="parser_coat_file_ok">"Coat file verification OK. Coat version:"</string>
     <string name="parser_file_parsing_started">"Parsing of descriptor file has started."</string>

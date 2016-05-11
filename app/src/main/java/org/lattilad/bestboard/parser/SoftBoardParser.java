@@ -39,12 +39,14 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      **/
 
     /** IN: Layout descriptor file source contains layout data in human readable coat format */
-    private File descriptorFile;
+    private File directoryFile;
+
+    private String descriptorFileName;
 
 
     /** OUT: Softboard's data generated from descriptor file on the background thread */
 
-    // parseDescriptorFile creates tokenizer - temporary
+    // parseDescriptorFile creates tokenizer - temporary and can change because of INCLUDE
     private Tokenizer tokenizer;
 
     public Tokenizer getTokenizer()
@@ -67,6 +69,10 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         }
 
     // (Static) Commands class is needed, too
+
+    // number of errors are collected here
+    private int errorSummary = 0;
+
 
     /**
      * Methods needed by parsing phase (during data-load).
@@ -159,16 +165,18 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * because there are parameters with different types.
      * http://stackoverflow.com/questions/16765415/should-i-give-params-to-the-constructor-or-to-asynctask-executeparams
      * @param caller SoftBoardService implementing SoftBoardParserListener
-     * @param descriptorFile descriptor (coat) file
+     * @param directoryFile working directory
+     * @param descriptorFileName descriptor (coat) file
      */
-    public SoftBoardParser(SoftBoardParserListener caller, File descriptorFile)
+    public SoftBoardParser(SoftBoardParserListener caller, File directoryFile, String descriptorFileName)
         {
         super();
 
         Scribe.locus( Debug.PARSER );
 
         this.caller = caller;
-        this.descriptorFile = descriptorFile;
+        this.directoryFile = directoryFile;
+        this.descriptorFileName = descriptorFileName;
         }
 
 
@@ -186,7 +194,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
         try
             {
-            return parseDescriptorFile( descriptorFile );
+            parseMainDescriptorFile( );
+            return errorSummary;
             }
         catch (TaskCancelledException tce)
             {
@@ -234,44 +243,140 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      **                                   P A R S E R  P A R T                                   **
      **********************************************************************************************/
 
+
     /**
-     * Tokenizer stream is created from descriptor file.
-     * Parser methods work on this tokenizer.
-     * @param descriptorFile descriptor (coat) file
-     * @return number of non-critical errors (0 - ok)
-     * @throws TaskCancelledException background thread was cancelled by the caller
-     * @throws FileNotFoundException descriptor (coat) file missing
-     * @throws IOException  descriptor (coat) file reading fails
-     * @throws InvalidCoatFileException descriptor file is not valid (COAT should be the first token!)
+     * Parsing of a coat descriptor file always starts here.
+     * All data structures are filled up, and parsing is started.
+     * After parsing all data structures are finished.
+     * @throws TaskCancelledException
+     * @throws IOException
+     * @throws InvalidCoatFileException
+     * @throws ExternalDataException
      */
-    public int parseDescriptorFile(File descriptorFile) throws TaskCancelledException, IOException, InvalidCoatFileException, ExternalDataException
+    public void parseMainDescriptorFile() throws TaskCancelledException, IOException, InvalidCoatFileException, ExternalDataException
         {
         Scribe.locus( Debug.PARSER );
 
         Scribe.clear_secondary(); // Secondary config will store data from ONE run
         Scribe.note_secondary(caller.getApplicationContext().getString(R.string.parser_starting));
 
+        File descriptorFile = new File( directoryFile, descriptorFileName );
         // Descriptor file check
-        if ( descriptorFile==null || !descriptorFile.exists() || !descriptorFile.isFile())
+        if ( !descriptorFile.exists() || !descriptorFile.isFile())
             {
             Scribe.error_secondary(caller.getApplicationContext().getString(R.string.parser_no_coat_file));
             throw new FileNotFoundException();
             }
 
+        // START PARSING OF MAIN DESCRIPTOR FILE
+        long startTime = System.nanoTime();
+
+        // Prepare data classes
+        labels = Commands.createLabels();
+        defaults = new ExtendedMap<>();
+        softBoardData = new SoftBoardData( );
+
+        methodsForCommands = new MethodsForCommands( softBoardData, this );
+        methodsForCommands.createDefaults();
+
+        // Parse main file
+        parseDescriptorFile( descriptorFile );
+
+        // Finish data classes
+
+        // Typeface should be set for TitleDescriptor and all layouts
+        if ( methodsForCommands.typefaceFile != null )
+            {
+            try
+                {
+                Typeface typeface = Typeface.createFromFile(methodsForCommands.typefaceFile);
+                note(R.string.data_typeface, typeface.toString());
+                TitleDescriptor.setTypeface(typeface);
+
+                for (Layout layout : methodsForCommands.layouts.values())
+                    {
+                    layout.setMonitorTypeface(typeface);
+                    }
+                }
+            catch (Exception e)
+                {
+                error(R.string.data_typeface_missing, methodsForCommands.typefaceFile.toString());
+                }
+            }
+        // if no file is given, then softBoardData constructor will delete static typeface,
+        // so no need to set default null values
+
+        if ( softBoardData.firstLayout == null )
+            {
+            throw new ExternalDataException("No layout!");
+            }
+
+        // if no root board is specified,
+        // then a new board is created (id: 1L) using the first non-wide layout.
+        // This new board will be used as root.
+        if  ( !softBoardData.boardTable.isRootBoardDefined() )
+            {
+            softBoardData.boardTable.addBoard( 1L, softBoardData.firstLayout, true );
+            softBoardData.boardTable.defineRootBoard( 1L );
+            error(R.string.data_primary_board_missing, "");
+            }
+
+        // FINISH PARSING OF MAIN DESCRIPTOR FILE
+        long endTime = System.nanoTime();
+
+        Scribe.note( Debug.TIMER, "Time for parsing: " +
+                ((endTime - startTime) / 1000000) + " msec");
+        }
+
+
+    /** error withot tokenizer */
+    private void error( int messageResource, String value )
+        {
+        errorSummary++;
+        Scribe.error_secondary( caller.getApplicationContext().getString( messageResource ) +
+                " " + value);
+        }
+
+
+    /** note without tokenizer */
+    private void note( int messageResource, String value )
+        {
+        Scribe.note_secondary( caller.getApplicationContext().getString( messageResource ) +
+                " " + value);
+        }
+
+
+    /**
+     * Tokenizer stream is created from descriptor file.
+     * Parser methods work on this tokenizer.
+     * @param descriptorFile descriptor (coat) file
+     * @throws TaskCancelledException background thread was cancelled by the caller
+     * @throws FileNotFoundException descriptor (coat) file missing
+     * @throws IOException  descriptor (coat) file reading fails
+     * @throws InvalidCoatFileException descriptor file is not valid (COAT should be the first token!)
+     */
+    public void parseDescriptorFile(File descriptorFile) throws TaskCancelledException, IOException, InvalidCoatFileException, ExternalDataException
+        {
+        Scribe.locus( Debug.PARSER );
+
+        Scribe.note_secondary(caller.getApplicationContext().getString(R.string.parser_coat_file) + descriptorFileName);
+
         BufferedReader reader = null;
+        Tokenizer tokenizerBackup = tokenizer;
 
         try
             {
             reader = new BufferedReader( new InputStreamReader( new FileInputStream( descriptorFile ), "UTF-8" ) );
+            // "external" tokenizer is needed for MethodsForCommands
             tokenizer = new Tokenizer( caller.getApplicationContext(), reader );
 
-            long startTime = System.nanoTime();
             parseSoftBoard();
-            long endTime = System.nanoTime();
 
-            Scribe.note( Debug.TIMER, "Time for parsing: " +
-                    ((endTime - startTime) / 1000000) + " msec");
+            // Both error types (from the tokenizer and from the parser) shoud be counted
+            errorSummary += tokenizer.getErrorCount();
 
+            // tokenizer remains if Expection occurs, but no further tokens are needed then
+            tokenizer = tokenizerBackup;
             }
 
         // TaskCancelledException, IOException, InvalidCoatFileException are not cached,
@@ -291,9 +396,6 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                     }
                 }
             }
-
-        // Both error counts (from the tokenizer and from the parser) will be returned
-        return tokenizer.getErrorCount();
         }
 
 
@@ -325,13 +427,6 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             tokenizer.note(R.string.parser_coat_file_ok, String.valueOf(Commands.COAT_VERSION));
             }
 
-        labels = Commands.createLabels();
-        defaults = new ExtendedMap<>();
-        softBoardData = new SoftBoardData( );
-
-        methodsForCommands = new MethodsForCommands( softBoardData, this );
-        methodsForCommands.createDefaults();
-
         try
             {
             tokenizer.note( R.string.parser_file_parsing_started );
@@ -346,44 +441,6 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             tokenizer.error( R.string.parser_addsoftboard_data_missing );
             }
 
-        // This was originally the SoftBoardData.parserFinished();
-
-        // Typeface should be set for TitleDescriptor and all layouts
-        if ( methodsForCommands.typefaceFile != null )
-            {
-            try
-                {
-                Typeface typeface = Typeface.createFromFile(methodsForCommands.typefaceFile);
-                tokenizer.note(R.string.data_typeface, typeface.toString());
-                TitleDescriptor.setTypeface(typeface);
-
-                for (Layout layout : methodsForCommands.layouts.values())
-                    {
-                    layout.setMonitorTypeface(typeface);
-                    }
-                }
-            catch (Exception e)
-                {
-                tokenizer.error(R.string.data_typeface_missing, methodsForCommands.typefaceFile.toString());
-                }
-            }
-        // if no file is given, then softBoardData constructor will delete static typeface,
-        // so no need to set default null values
-
-        if ( softBoardData.firstLayout == null )
-            {
-            throw new ExternalDataException("No layout!");
-            }
-
-        // if no root board is specified,
-        // then a new board is created (id: 1L) using the first non-wide layout.
-        // This new board will be used as root.
-        if  ( !softBoardData.boardTable.isRootBoardDefined() )
-            {
-            softBoardData.boardTable.addBoard( 1L, softBoardData.firstLayout, true );
-            softBoardData.boardTable.defineRootBoard( 1L );
-            tokenizer.error(R.string.data_primary_board_missing);
-            }
         }
 
 
@@ -405,7 +462,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
     private ExtendedMap<Long, Object> parseComplexParameter( long parsedCommandCode,
                                                              Commands.Data parsedCommandData,
                                                              boolean useDefaults )
-            throws IOException
+            throws IOException, ExternalDataException, InvalidCoatFileException,
+            TaskCancelledException
         {
         Scribe.debug(Debug.PARSER, "Parsing of parameters of [" + Tokenizer.regenerateKeyword(parsedCommandCode) + "] complex command has started.");
 
@@ -664,6 +722,17 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 Scribe.debug( Debug.PARSER, "[" + commandString + "] creates label." );
 
                 parseLabelParameter(false);
+                continue;
+
+                // no method to call; no result to return
+                }
+
+            // Parameter-command has COAT parameter
+            else if ( commandData.getParameterType() == Commands.PARAMETER_COAT )
+                {
+                Scribe.debug( Debug.PARSER, "[" + commandString + "] includes an other coat file." );
+                // A complete new coat file is loaded - then parsing returns to the previous coat file
+                parseCoatParameter();
                 continue;
 
                 // no method to call; no result to return
@@ -1165,6 +1234,26 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
 
     /**
+     * Parses parameters after INCLUDE coat command.
+     * @throws IOException (coat) file reading fails
+     */
+    private void parseCoatParameter( )
+            throws IOException, ExternalDataException, InvalidCoatFileException,
+            TaskCancelledException
+        {
+        // parse one parameter file name
+        File coatFile;
+
+        if ((coatFile = (File)parseOneParameter( Commands.PARAMETER_FILE )) != null )
+            {
+            // Current parsing stops here temporary
+            parseDescriptorFile( coatFile );
+            // And returns after finishing the incuded one
+            }
+        }
+
+
+    /**
      * Parses parameters after LET command.
      * Parameters are special labelkey-labelvalue pairs, where labelkey is a keyword,
      * and labelvalue is one of TYPE_STRING, TYPE_CHARACTER, TYPE_INTEGER token.
@@ -1173,7 +1262,9 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * @param denyOverwrite if true then overwrite causes error
      * @throws IOException (coat) file reading fails
      */
-    private void parseLabelParameter( boolean denyOverwrite ) throws IOException
+    private void parseLabelParameter( boolean denyOverwrite )
+            throws IOException, ExternalDataException, InvalidCoatFileException,
+            TaskCancelledException
         {
         // key part
         long key = 0L;
@@ -1336,7 +1427,9 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * Parameter is a complex parameter-command, allowed in ALLOWED_AS_LABEL[]
      * @throws IOException (coat) file reading fails
      */
-    private void parseDefaultParameter() throws IOException
+    private void parseDefaultParameter()
+            throws IOException, ExternalDataException, InvalidCoatFileException,
+            TaskCancelledException
         {
         // type part
         long type = 0L;
@@ -1454,7 +1547,9 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
      * OR null if complex is not valid
      * @throws IOException
      */
-    private ExtendedMap<Long, Object> parseComplexValue(long commandCode, String commandString) throws IOException
+    private ExtendedMap<Long, Object> parseComplexValue(long commandCode, String commandString)
+            throws IOException, ExternalDataException, InvalidCoatFileException,
+            TaskCancelledException
         {
         ExtendedMap<Long, Object> result = null;
         Commands.Data commandData;

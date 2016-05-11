@@ -22,6 +22,7 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.lattilad.bestboard.Ignition;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -97,19 +98,6 @@ public class WebViewActivity extends Activity
                 string = "file:///android_asset/" + string;
                 }
 
-            // extra: WORK
-            else if ( ( string = getIntent().getStringExtra(WORK) ) != null &&
-                    Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
-                {
-                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
-                String directoryName =
-                        sharedPrefs.getString( getString( R.string.descriptor_directory_key ),
-                                getString( R.string.descriptor_directory_default ));
-                File directoryFile = new File( Environment.getExternalStorageDirectory(), directoryName );
-
-                string = Uri.fromFile( new File( directoryFile, string ) ).toString();
-                }
-
             // extra: FILE
             else if ( ( string = getIntent().getStringExtra(FILE) ) != null &&
                     Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
@@ -131,6 +119,24 @@ public class WebViewActivity extends Activity
                 {
                 string = uri.toString();
                 }
+
+            // THIS IS HERE ALSO FOR THE DEFAULT HELP !!
+            // extra: WORK or default help
+            else if ( Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
+                {
+                if ( (string = getIntent().getStringExtra(WORK) ) == null )
+                    string = "help.html";
+
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+                String directoryName =
+                        sharedPrefs.getString( getString( R.string.descriptor_directory_key ),
+                                getString( R.string.descriptor_directory_default ));
+                File directoryFile = new File( Environment.getExternalStorageDirectory(), directoryName );
+
+                string = Uri.fromFile( new File( directoryFile, string ) ).toString();
+                }
+            // END FOR DEFAULT HELP !!
+
 
             if ( string != null )
                 {
@@ -242,6 +248,9 @@ public class WebViewActivity extends Activity
     protected void onCreate(Bundle savedInstanceState)
         {
         Scribe.locus(Debug.WEBVIEW);
+
+        // Ignition is needed at every entry points - ?? Egy köztes activity maybe ??
+        Ignition.start( this );
 
         super.onCreate(savedInstanceState);
         initContentView();

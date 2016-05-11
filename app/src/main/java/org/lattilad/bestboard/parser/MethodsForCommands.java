@@ -62,30 +62,29 @@ import java.util.Map;
 public class MethodsForCommands
     {
     /**
-     * Tokenizer (from SoftBoardParser) is needed for messaging during data-load.
-     * It should be cleared, after data-load is ready.
-     */
-    private Tokenizer tokenizer;
-
-
-    /**
      * Defaults (from SoftBoardParser) is needed for messaging during data-load.
      * It should be cleared, after data-load is ready.
      */
     private ExtendedMap< Long, ExtendedMap< Long, Object>> defaults;
 
+    /** SoftBoardParser is needed to reach actual tokenizer() */
+    private SoftBoardParser softBoardParser;
 
-    /**
-     * SoftBoardData will be populated during the parsing process
-     */
+    /** SoftBoardData will be populated during the parsing process */
     private SoftBoardData softBoardData;
 
 
     public MethodsForCommands( SoftBoardData softBoardData, SoftBoardParser softBoardParser )
         {
         this.softBoardData = softBoardData;
-        this.tokenizer = softBoardParser.getTokenizer();
+        this.softBoardParser = softBoardParser;
         this.defaults = softBoardParser.getDefaults();
+        }
+    
+    
+    private Tokenizer tokenizer()
+        {
+        return softBoardParser.getTokenizer();
         }
 
 
@@ -154,21 +153,21 @@ public class MethodsForCommands
     public void setName( Object stringParameter )
         {
         softBoardData.name = (String) stringParameter;
-        tokenizer.note(R.string.data_name, softBoardData.name );
+        tokenizer().note(R.string.data_name, softBoardData.name );
         }
 
     /** Set softboard's version * VERSION (int) */
     public void setVersion( Object intParameter )
         {
         softBoardData.version = (int)intParameter;
-        tokenizer.note(R.string.data_version, String.valueOf(softBoardData.version));
+        tokenizer().note(R.string.data_version, String.valueOf(softBoardData.version));
         }
 
     /** Set softboard's author * AUTHOR (string) */
     public void setAuthor( Object stringParameter )
         {
         softBoardData.author = (String)stringParameter;
-        tokenizer.note(R.string.data_author, softBoardData.author );
+        tokenizer().note(R.string.data_author, softBoardData.author );
         }
 
     /** Add softboard's tags * ADDTAGS (string-list) */
@@ -178,7 +177,7 @@ public class MethodsForCommands
         for (Object item: stringListParameter)
             {
             softBoardData.tags.add( (String) item );
-            tokenizer.note( R.string.data_tags, (String) item );
+            tokenizer().note( R.string.data_tags, (String) item );
             }
         }
 
@@ -186,7 +185,7 @@ public class MethodsForCommands
     public void setDescription( Object stringParameter )
         {
         softBoardData.description = (String)stringParameter;
-        tokenizer.note(R.string.data_description, softBoardData.description );
+        tokenizer().note(R.string.data_description, softBoardData.description );
         }
 
     /**
@@ -197,7 +196,7 @@ public class MethodsForCommands
     public void setDocFile( Object fileParameter )
         {
         softBoardData.docFile = (File)fileParameter;
-        tokenizer.note(R.string.data_docfile, softBoardData.docFile.toString() );
+        tokenizer().note(R.string.data_docfile, softBoardData.docFile.toString() );
         }
 
     /**
@@ -208,7 +207,7 @@ public class MethodsForCommands
     public void setDocUri( Object stringParameter )
         {
         softBoardData.docUri = (String)stringParameter;
-        tokenizer.note(R.string.data_docuri, softBoardData.docUri );
+        tokenizer().note(R.string.data_docuri, softBoardData.docUri );
         }
 
     /**
@@ -223,42 +222,42 @@ public class MethodsForCommands
         String variant = (String)parameters.remove(Commands.TOKEN_VARIANT, "");
 
         softBoardData.locale = new Locale( language, country, variant);
-        tokenizer.note(R.string.data_locale, String.valueOf(softBoardData.locale) );
+        tokenizer().note(R.string.data_locale, String.valueOf(softBoardData.locale) );
         }
 
     /** Set color of touched meta keys * METACOLOR (color) */
     public void setMetaColor(Object colorParameter)
         {
         softBoardData.metaColor = (int)colorParameter;
-        tokenizer.note(R.string.data_metacolor, Integer.toHexString( softBoardData.metaColor));
+        tokenizer().note(R.string.data_metacolor, Integer.toHexString( softBoardData.metaColor));
         }
 
     /** Set color of locked meta keys * LOCKCOLOR (color) */
     public void setLockColor(Object colorParameter)
         {
         softBoardData.lockColor = (int)colorParameter;
-        tokenizer.note(R.string.data_lockcolor, Integer.toHexString( softBoardData.lockColor));
+        tokenizer().note(R.string.data_lockcolor, Integer.toHexString( softBoardData.lockColor));
         }
 
     /** Set color of locked meta keys * AUTOCOLOR (color) */
     public void setAutoColor(Object colorParameter)
         {
         softBoardData.autoColor = (int)colorParameter;
-        tokenizer.note(R.string.data_autocolor, Integer.toHexString( softBoardData.autoColor));
+        tokenizer().note(R.string.data_autocolor, Integer.toHexString( softBoardData.autoColor));
         }
 
     /** Set color of touched button * TOUCHCOLOR (color) */
     public void setTouchColor(Object colorParameter)
         {
         softBoardData.touchColor = (int)colorParameter;
-        tokenizer.note(R.string.data_touchcolor, Integer.toHexString( softBoardData.touchColor));
+        tokenizer().note(R.string.data_touchcolor, Integer.toHexString( softBoardData.touchColor));
         }
 
     /** Set color of stroke * STROKECOLOR (color) */
     public void setStrokeColor(Object colorParameter)
         {
         softBoardData.strokeColor = (int)colorParameter;
-        tokenizer.note(R.string.data_strokecolor, Integer.toHexString( softBoardData.strokeColor));
+        tokenizer().note(R.string.data_strokecolor, Integer.toHexString( softBoardData.strokeColor));
         }
 
     /** Set typeface of title font from file * TITLEFONT (file) */
@@ -269,12 +268,12 @@ public class MethodsForCommands
         try
             {
             Typeface typeface = Typeface.createFromFile( (File)fileParameter );
-            tokenizer.note( R.string.data_typeface, typeface.toString() );
+            tokenizer().note( R.string.data_typeface, typeface.toString() );
             TitleDescriptor.setTypeface(typeface);
             }
         catch (Exception e)
             {
-            tokenizer.error(R.string.data_typeface_missing, fileParameter.toString());
+            tokenizer().error(R.string.data_typeface_missing, fileParameter.toString());
             }
         */
         }
@@ -343,7 +342,7 @@ public class MethodsForCommands
         Long id = (Long)parameters.remove( Commands.TOKEN_ID );
         if (id == null)
             {
-            tokenizer.error( "ADDBOARD", R.string.data_board_no_id);
+            tokenizer().error( "ADDBOARD", R.string.data_board_no_id);
             return;
             }
 
@@ -358,18 +357,18 @@ public class MethodsForCommands
             Layout layout = layouts.get( layoutId );
             if ( layout == null )
                 {
-                tokenizer.error( "LAYOUT", R.string.data_no_layout,
-                        Tokenizer.regenerateKeyword( (long)layoutId));
+                tokenizer().error( "LAYOUT", R.string.data_no_layout,
+                        tokenizer().regenerateKeyword( (long)layoutId));
                 return;
                 }
 
             if ( softBoardData.boardTable.addBoard(id, layout, locked) )
                 {
-                tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_board_id_overwritten);
+                tokenizer().error(tokenizer().regenerateKeyword(id), R.string.data_board_id_overwritten);
                 }
 
-            tokenizer.note( Tokenizer.regenerateKeyword(id), R.string.data_board_id_set,
-                    Tokenizer.regenerateKeyword( (long)layoutId));
+            tokenizer().note( tokenizer().regenerateKeyword(id), R.string.data_board_id_set,
+                    tokenizer().regenerateKeyword( (long)layoutId));
             }
 
         // no LAYOUT is given, so PORTRAIT AND LANDSCAPE is needed
@@ -384,13 +383,13 @@ public class MethodsForCommands
                 portrait = layouts.get( portraitId );
                 if ( portrait == null )
                     {
-                    tokenizer.error( "PORTRAIT", R.string.data_no_layout,
-                            Tokenizer.regenerateKeyword( (long)portraitId));
+                    tokenizer().error( "PORTRAIT", R.string.data_no_layout,
+                            tokenizer().regenerateKeyword( (long)portraitId));
                     }
                 }
             else
                 {
-                tokenizer.error( Tokenizer.regenerateKeyword(id), R.string.data_board_portrait_missing);
+                tokenizer().error( tokenizer().regenerateKeyword(id), R.string.data_board_portrait_missing);
                 }
 
             Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
@@ -401,13 +400,13 @@ public class MethodsForCommands
                 landscape = layouts.get( landscapeId );
                 if ( landscape == null )
                     {
-                    tokenizer.error( "LANDSCAPE", R.string.data_no_layout,
-                            Tokenizer.regenerateKeyword( (long)landscapeId));
+                    tokenizer().error( "LANDSCAPE", R.string.data_no_layout,
+                            tokenizer().regenerateKeyword( (long)landscapeId));
                     }
                 }
             else
                 {
-                tokenizer.error( Tokenizer.regenerateKeyword(id), R.string.data_board_landscape_missing);
+                tokenizer().error( tokenizer().regenerateKeyword(id), R.string.data_board_landscape_missing);
                 }
 
             // only if both parameters are ok
@@ -416,7 +415,7 @@ public class MethodsForCommands
 
             if ( softBoardData.boardTable.addBoard(id, portrait, landscape, locked) )
                 {
-                tokenizer.error(Tokenizer.regenerateKeyword(id), R.string.data_board_id_overwritten);
+                tokenizer().error(tokenizer().regenerateKeyword(id), R.string.data_board_id_overwritten);
                 }
             }
 
@@ -457,7 +456,7 @@ public class MethodsForCommands
         id = (Long)parameters.remove( Commands.TOKEN_ID );
         if (id == null)
             {
-            tokenizer.error( "ADDLAYOUT", R.string.data_layout_no_id);
+            tokenizer().error( "ADDLAYOUT", R.string.data_layout_no_id);
             return;
             }
 
@@ -478,7 +477,7 @@ public class MethodsForCommands
                 }
             else
                 {
-                tokenizer.error(Tokenizer.regenerateKeyword((long) id),
+                tokenizer().error(tokenizer().regenerateKeyword((long) id),
                         R.string.data_columns_missing);
                 return;
                 }
@@ -487,7 +486,7 @@ public class MethodsForCommands
         temp = parameters.remove( Commands.TOKEN_ROWS );
         if (temp == null)
             {
-            tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
+            tokenizer().error( tokenizer().regenerateKeyword( (long)id),
                     R.string.data_rows_missing );
             return;
             }
@@ -505,7 +504,7 @@ public class MethodsForCommands
         else if ( alignFlag == Commands.TOKEN_EVENS )
             oddRowsAligned = false;
         else if ( alignFlag != -1L )
-            tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
+            tokenizer().error( tokenizer().regenerateKeyword( (long)id),
                     R.string.data_align_bad_parameter );
 
         color = (int)parameters.remove(Commands.TOKEN_COLOR, DEFAULT_LAYOUT_COLOR);
@@ -530,7 +529,7 @@ public class MethodsForCommands
                 else if ( (long)keyword == Commands.TOKEN_CAPS )
                     metaStates[ LayoutStates.META_CAPS ] = Trilean.TRUE;
                 else
-                    tokenizer.error("TURNON", R.string.data_meta_bad_parameter );
+                    tokenizer().error("TURNON", R.string.data_meta_bad_parameter );
                 }
             }
 
@@ -548,7 +547,7 @@ public class MethodsForCommands
                 else if ( (long)keyword == Commands.TOKEN_CAPS )
                     metaStates[ LayoutStates.META_CAPS ] = Trilean.FALSE;
                 else
-                    tokenizer.error("TURNOFF", R.string.data_meta_bad_parameter );
+                    tokenizer().error("TURNOFF", R.string.data_meta_bad_parameter );
                 }
             }
 
@@ -575,11 +574,11 @@ public class MethodsForCommands
 
             if ( layouts.put(id, layout) != null )
                 {
-                tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
+                tokenizer().error( tokenizer().regenerateKeyword( (long)id),
                         R.string.data_layout_overwritten );
                 }
 
-            tokenizer.note( Tokenizer.regenerateKeyword( (long)id),
+            tokenizer().note( tokenizer().regenerateKeyword( (long)id),
                     R.string.data_layout_added,
                     layout.toString());
 
@@ -601,7 +600,7 @@ public class MethodsForCommands
             }
         catch (ExternalDataException ede)
             {
-            tokenizer.error( Tokenizer.regenerateKeyword( (long)id),
+            tokenizer().error( tokenizer().regenerateKeyword( (long)id),
                     R.string.data_layout_error);
             }
         }
@@ -683,21 +682,21 @@ public class MethodsForCommands
                         {
                         if ((boolean)parameters.remove(Commands.TOKEN_OVERWRITE, false))
                             {
-                            tokenizer.note(R.string.data_button_overwritten,
+                            tokenizer().note(R.string.data_button_overwritten,
                                     layout.toString());
                             }
                         else
                             {
-                            tokenizer.error(R.string.data_button_overwritten,
+                            tokenizer().error(R.string.data_button_overwritten,
                                     layout.toString());
                             }
                         }
-                    tokenizer.note( ((Button)action.getValue()).name, R.string.data_button_added,
+                    tokenizer().note( ((Button)action.getValue()).name, R.string.data_button_added,
                             layout.toString());
                     }
                 catch (ExternalDataException ede)
                     {
-                    tokenizer.error( ((Button)action.getValue()).name, R.string.data_button_error,
+                    tokenizer().error( ((Button)action.getValue()).name, R.string.data_button_error,
                             layout.toString());
                     }
 
@@ -726,7 +725,7 @@ public class MethodsForCommands
 
                 if ( button == null )
                     {
-                    tokenizer.error( "EXTEND", R.string.data_button_not_exist );
+                    tokenizer().error( "EXTEND", R.string.data_button_not_exist );
                     }
                 else
                     {
@@ -757,7 +756,7 @@ public class MethodsForCommands
                                 if ( buttonList != null )
                                     button = buttonList;
                                 else
-                                    tokenizer.error("EXTEND", R.string.data_button_extended_invalid_list);
+                                    tokenizer().error("EXTEND", R.string.data_button_extended_invalid_list);
                                 }
                             // button should be written back
                             try
@@ -792,14 +791,14 @@ public class MethodsForCommands
 
                         if (error)
                             {
-                            tokenizer.error("EXTEND", R.string.data_button_extended_invalid);
+                            tokenizer().error("EXTEND", R.string.data_button_extended_invalid);
                             }
                         }
 
                     if ( buttonExtension.color != null )
                         {
                         button.setColor( buttonExtension.color );
-                        tokenizer.note("EXTEND", R.string.data_button_color_changed);
+                        tokenizer().note("EXTEND", R.string.data_button_color_changed);
                         }
 
                     if ( buttonExtension.titleList != null )
@@ -842,7 +841,7 @@ public class MethodsForCommands
                             titles.add(showTitle);
 
                         button.setTitles(titles);
-                        tokenizer.note( "EXTEND", R.string.data_button_titles_extended);
+                        tokenizer().note( "EXTEND", R.string.data_button_titles_extended);
                         }
 
                     if ( button instanceof ButtonMainTouch )
@@ -850,12 +849,12 @@ public class MethodsForCommands
                         if ( buttonExtension.onStay )
                             {
                             ((ButtonMainTouch) button).setOnStay();
-                            tokenizer.note("EXTEND", R.string.data_button_extended_onstay);
+                            tokenizer().note("EXTEND", R.string.data_button_extended_onstay);
                             }
                         else if ( buttonExtension.onCircle )
                             {
                             ((ButtonMainTouch) button).setOnCircle();
-                            tokenizer.note("EXTEND", R.string.data_button_extended_oncircle);
+                            tokenizer().note("EXTEND", R.string.data_button_extended_oncircle);
                             }
                         }
                     }
@@ -990,14 +989,14 @@ public class MethodsForCommands
             }
         else if ( defaultKey != NO_DEFAULT_KEY ) // both TEXT and default -> override default
             {
-            tokenizer.error("PACKET", R.string.data_send_packet_key_override);
+            tokenizer().error("PACKET", R.string.data_send_packet_key_override);
             }
 
         if ( temp != NO_DEFAULT_KEY )
             {
             // TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT
             packet = new PacketKey( softBoardData, temp,
-                    LayoutStates.generateBinaryHardState(tokenizer, parameters));
+                    LayoutStates.generateBinaryHardState(tokenizer(), parameters));
             }
 
         return packet;
@@ -1036,7 +1035,7 @@ public class MethodsForCommands
             }
         else if ( defaultText != null ) // both TEXT and default -> override default
             {
-            tokenizer.note("PACKET", R.string.data_send_packet_text_override);
+            tokenizer().note("PACKET", R.string.data_send_packet_text_override);
             }
 
         if (temp != null)
@@ -1056,7 +1055,7 @@ public class MethodsForCommands
             else if ( autoFlag == Commands.TOKEN_OFF )
                 ; // default remains
             else if ( autoFlag != -1L )
-                tokenizer.error("PACKET", R.string.data_autocaps_bad_parameter );
+                tokenizer().error("PACKET", R.string.data_autocaps_bad_parameter );
 
             autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOSPACE, -1L);
             if ( autoFlag == Commands.TOKEN_BEFORE )
@@ -1066,7 +1065,7 @@ public class MethodsForCommands
             else if ( autoFlag == Commands.TOKEN_AROUND )
                 autoSpace = PacketText.AUTO_SPACE_BEFORE | PacketText.AUTO_SPACE_AFTER;
             else if ( autoFlag != -1L )
-                tokenizer.error("PACKET", R.string.data_autospace_bad_parameter );
+                tokenizer().error("PACKET", R.string.data_autospace_bad_parameter );
 
             autoFlag = (long)parameters.remove(Commands.TOKEN_ERASESPACE, -1L);
             if ( autoFlag == Commands.TOKEN_BEFORE )
@@ -1076,7 +1075,7 @@ public class MethodsForCommands
             else if ( autoFlag == Commands.TOKEN_AROUND )
                 autoSpace |= PacketText.ERASE_SPACES_BEFORE | PacketText.ERASE_SPACES_AFTER;
             else if ( autoFlag != -1L )
-                tokenizer.error("PACKET", R.string.data_erasespaces_bad_parameter );
+                tokenizer().error("PACKET", R.string.data_erasespaces_bad_parameter );
 
             if (temp instanceof String)
                 {
@@ -1126,7 +1125,7 @@ public class MethodsForCommands
                 return new PacketFunction(softBoardData, Commands.TOKEN_CURSOR);
             if ( temp == Commands.TOKEN_AUTOFUNC )
                 return new PacketFunction(softBoardData, Commands.TOKEN_AUTOFUNC);
-            tokenizer.error("TOGGLE", R.string.data_toggle_bad_parameter);
+            tokenizer().error("TOGGLE", R.string.data_toggle_bad_parameter);
             return null;
             }
         if ( parameters.remove(Commands.TOKEN_SELECTALL) != null )
@@ -1229,7 +1228,7 @@ public class MethodsForCommands
         else if (temp == Commands.TOKEN_RECENT)
             ; // default remains
         else if (temp != -1L)
-            tokenizer.error("PACKET", R.string.data_cursor_bad_parameter);
+            tokenizer().error("PACKET", R.string.data_cursor_bad_parameter);
 
         temp = (long) parameters.remove(Commands.TOKEN_SELECT, -1L);
         if (temp == Commands.TOKEN_ALWAYS)
@@ -1239,7 +1238,7 @@ public class MethodsForCommands
         else if (temp == Commands.TOKEN_IFSHIFT)
             ; // default remains
         else if (temp != -1L)
-            tokenizer.error("PACKET", R.string.data_select_bad_parameter);
+            tokenizer().error("PACKET", R.string.data_select_bad_parameter);
 
         // Complete packetKey will be NOT null
         // BUT if SEND is missing, it will generate it, and will consume remaining parameters
@@ -1292,7 +1291,7 @@ public class MethodsForCommands
                 }
             else
                 {
-                tokenizer.error("COMBINE", R.string.data_packet_combine_missing );
+                tokenizer().error("COMBINE", R.string.data_packet_combine_missing );
                 }
             }
 
@@ -1381,7 +1380,7 @@ public class MethodsForCommands
             else if ( show == Commands.TOKEN_AUTOFUNC )
                 type = SoftBoardShow.AUTO_FUNC;
             else if ( show != -1L )
-                tokenizer.error("SHOWTITLE", R.string.data_showtitle_bad_parameter);
+                tokenizer().error("SHOWTITLE", R.string.data_showtitle_bad_parameter);
             }
 
         return new TitleDescriptor( type, xOffset, yOffset, size, bold, italics, color );
@@ -1432,7 +1431,7 @@ public class MethodsForCommands
             }
         else
             {
-            tokenizer.error("META", R.string.data_meta_unknown_meta_state);
+            tokenizer().error("META", R.string.data_meta_unknown_meta_state);
             return setEmpty( parameters );
             }
 
@@ -1611,7 +1610,7 @@ public class MethodsForCommands
 
     public Button setEmpty( ExtendedMap<Long, Object> parameters )
         {
-        tokenizer.error("BUTTON", R.string.data_button_function_missing);
+        tokenizer().error("BUTTON", R.string.data_button_function_missing);
         return completeButton( new Button(), parameters);
         }
 
@@ -1786,7 +1785,7 @@ public class MethodsForCommands
         id = (Long) parameters.remove( Commands.TOKEN_ID );
         if ( id == null )
             {
-            tokenizer.error("ADDMODIFY", R.string.data_modify_no_id );
+            tokenizer().error("ADDMODIFY", R.string.data_modify_no_id );
             return;
             }
 
@@ -1832,27 +1831,27 @@ public class MethodsForCommands
 
         if (counter > 1)
             {
-            tokenizer.error( Tokenizer.regenerateKeyword( id ),
+            tokenizer().error( tokenizer().regenerateKeyword( id ),
                     R.string.data_modify_one_allowed );
             }
 
         // No roll could be added!
         if ( empty )
             {
-            tokenizer.error( Tokenizer.regenerateKeyword( id ),
+            tokenizer().error( tokenizer().regenerateKeyword( id ),
                     R.string.data_modify_no_rolls );
             return;
             }
 
         if ( softBoardData.modify.get( id ) != null )
             {
-            tokenizer.error( Tokenizer.regenerateKeyword( id ),
+            tokenizer().error( tokenizer().regenerateKeyword( id ),
                     R.string.data_modify_overwritten );
             }
 
         softBoardData.modify.put( id, mod );
 
-        tokenizer.note( Tokenizer.regenerateKeyword( id ),
+        tokenizer().note( tokenizer().regenerateKeyword( id ),
                 R.string.data_modify_added );
         }
 
@@ -1868,8 +1867,8 @@ public class MethodsForCommands
         Layout layout = layouts.get( layoutId );
         if ( layout == null )
             {
-            tokenizer.error( "LAYOUT", R.string.data_no_layout,
-                    Tokenizer.regenerateKeyword( (long)layoutId));
+            tokenizer().error( "LAYOUT", R.string.data_no_layout,
+                    tokenizer().regenerateKeyword( (long)layoutId));
             return;
             }
 

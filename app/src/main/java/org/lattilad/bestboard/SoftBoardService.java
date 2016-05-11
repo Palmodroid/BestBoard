@@ -272,12 +272,11 @@ public class SoftBoardService extends InputMethodService implements
             // preferences are NOT changed, so draft will bring back to the main keyboard!
             this.coatFileName = coatFileName;
             }
-        File coatFileFile = new File( directoryFile, this.coatFileName );
 
         // Any previous parsing should stop now
         if ( softBoardParser != null )  softBoardParser.cancel(false);
 
-        softBoardParser = new SoftBoardParser(this, coatFileFile );
+        softBoardParser = new SoftBoardParser(this, directoryFile, this.coatFileName );
         softBoardParser.execute();
 
         // SoftBoard returns in softBoardParserFinished() after parsing

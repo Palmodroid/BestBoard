@@ -31,6 +31,8 @@ public class Commands
     public static final long TOKEN_LET = 0x1726fL;
     public static final long TOKEN_DEFINE = 0x3758b594L;
 
+    public static final long TOKEN_INCLUDE = 0xb2133400eL;
+
     // Token codes for complex parameter-commands - POSITIVE VALUES !!
     public static final long TOKEN_NAME = 0x12ff90L;
     public static final long TOKEN_VERSION = 0x12c1c6d964L;
@@ -302,6 +304,10 @@ public class Commands
     public final static long PARAMETER_FLAG = 0x20L;        // Stores Boolean.TRUE
     public final static long PARAMETER_FLAG_FALSE = 0x21L;  // Stores Boolean.FALSE
 
+
+    private final static long SYSTEM_PARAMETERS = 0x40;
+
+
     // Default parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
     public final static long PARAMETER_DEFAULT = 0x41L;
 
@@ -311,6 +317,9 @@ public class Commands
     // Label parameter - POSITIVE VALUES, ABOVE LIST AND BELOW NO-PARAMETER TYPES !!
     // Same as label, but change existing label without error
     public final static long PARAMETER_CHANGE_LABEL = 0x43L;
+
+    // Includes parsing of a new coat file inside current parsing
+    public final static long PARAMETER_COAT = 0x60L;
 
     // Special "messages" are not real parameters, but messages to the parser
     // Messages - POSITIVE VALUES, ABOVE ONE AND BELOW NO-PARAMETER TYPES !!
@@ -376,6 +385,7 @@ public class Commands
                 TOKEN_LET,
                 TOKEN_DEFINE,
                 TOKEN_DEFAULT,
+                TOKEN_INCLUDE,
 
                 TOKEN_ADDMODIFY,
                 TOKEN_MONITOR,
@@ -403,6 +413,8 @@ public class Commands
         add(TOKEN_DEFAULT, new long[]{PARAMETER_DEFAULT});
         add(TOKEN_LET, new long[]{PARAMETER_CHANGE_LABEL});
         add(TOKEN_DEFINE, new long[]{PARAMETER_LABEL});
+
+        add(TOKEN_INCLUDE, new long[]{PARAMETER_COAT});
 
         add(TOKEN_NAME, PARAMETER_STRING).method("setName");
         add(TOKEN_VERSION, PARAMETER_INT).method("setVersion");
@@ -1456,12 +1468,12 @@ public class Commands
                 // Parameter-command has LIST parameter - result
                 else if (getParameterType() <= (Commands.PARAMETER_KEYWORD | Commands.PARAMETER_MOD_LIST))
                     method = MethodsForCommands.class.getDeclaredMethod(methodName, List.class);
-                // Parameter-command has LABEL parameter
-                else if (getParameterType() == Commands.PARAMETER_LABEL)
-                // Parameter-command has NO parameters - no parameters
-                    method = null;
-                else // FLAG or NO parameters
+                // Parameter command is a FLAG etc. or NO parameters
+                else if (getParameterType() <= Commands.SYSTEM_PARAMETERS || getParameterType() == NO_PARAMETERS )
                     method = MethodsForCommands.class.getDeclaredMethod(methodName);
+                // Parameter-command is a "system" parameter
+                else
+                    method = null;
                 }
             catch (NoSuchMethodException e)
                 {
