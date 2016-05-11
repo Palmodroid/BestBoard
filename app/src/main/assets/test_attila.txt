@@ -1,0 +1,1614 @@
+﻿; begin fejléc
+coat (1000)
+name "Kinesa, blokkos"
+version 41
+author "LAttilaD"
+description "Menü. Ötféle felső sor (számjegyek, cseh betűk, módosítók) és kétféle szimbólumkiosztás. Clipboard. Görög, cirill, örmény. Quong, Asteon, Atomik."
+; end
+; begin színek
+let (space 0cffc0c0)
+let (kinesa 0cffe580)
+let (czm 0cb2ff80)
+let (vfb 0c80ffb2)
+let (ouou 0c80e5ff)
+let (qwx 0cc0c0ff)
+
+let (shift 0c8080ff)
+let (delete 0cf8f)
+let (enter 0cff4)
+let (special 0c1a6600)
+let (casebutton 0cEDBA68)
+let (cellarcolor 0cff80ff)
+
+let (punct1 0cf1daf5)
+let (punct2 0cf5f0c9)
+let (punct3 0cf5e4a2)
+let (punct4 0cf0cc40)
+let (punct5 0cd2d9c7)
+let (punct6 0cb2d6fb)
+
+let (arrowv 0cf5ac78)
+let (arrowh 0c65cf85)
+
+let (clipcolor 0c963)
+
+let (digit 0c8b4513)
+let (czech1 0cdac5b5)
+let (czech2 0cccffb2)
+let (czech3 0cccec67)
+let (dia1 0c368c20)
+let (dia2 0c267c10)
+let (dia3 0c469c30)
+
+let (swcolor 0cf60)
+
+let (archgrkcolor 0cED8EE2)
+let (modgrkcolor 0cEDC98E)
+let (armcolor 0c8C5473)
+
+let (normal_back 0c6)
+let (burma_back 0c6)
+let (symbol_back 0c946647)
+let (arrows_back 0c844038)
+let (cesky_back 0c7A3D3D)
+let (czsym_back 0c963D2B)
+let (diacrit_back 0c476647)
+let (sydia_back 0c796647)
+let (greek_back 0c09c)
+let (cyr_back 0c669)
+let (armen_back 0c030)
+let (quong_back 0c966)
+; end
+; begin defaultok
+font "hunglingtesz.ttf"
+;default (
+;	addtitle (size 2000 yoffset 250)
+;)
+; 	begin Enter
+let (entertext "✔")
+showtitles (
+	entertext (entertext)
+	gotext (entertext)
+	searchtext (entertext)
+	sendtext (entertext)
+	nexttext (entertext)
+	donetext (entertext)
+	prevtext (entertext)
+	nonetext (entertext)
+	unknowntext (entertext)
+        )
+; end
+; end
+; begin slotok
+let (loft addtitle (yoffset -500 size 800 color shift))
+let (cellar addtitle (yoffset 750 size 800 color cellarcolor))
+let (shiftcenter addtitle (color shift))
+let (cellarcenter addtitle (color cellarcolor))
+let (modifier addtitle (color 0ce6ffad))
+let (greektitle addtitle (size 2000 color 0c00c))
+let (transliter addtitle (size 800 yoffset -600 color   0cff0))
+; end
+; begin blokkok
+; 	begin Kinesa
+let (kinesablock
+	block (
+		spacetravel ( text ' ' color space autocaps hold erasespace around)
+	dl	button (text 'k' color kinesa second (text "kk"))
+		button (text 'i' color kinesa second (text "ii"))
+	ur	button (text 'n' color kinesa second (text "nn"))
+	ul	button (text 'e' color kinesa second (text "ee"))
+	l	button (text 's' color kinesa second (text "ss"))
+	dl	button (text 'a' color kinesa second (text "aa"))
+	dl	button (text 'o' color czm second (text "oo"))
+	dr	button (text 'p' color czm second (text "pp"))
+		button (text 'u' color czm second (text "uu"))
+		button (text 'd' color czm second (text "dd"))
+	ur button (text 'g' color czm second (text "gg"))
+	ur	button (text 'y' color czm second (text "yy"))
+	ul	button (text 't' color czm second (text "tt"))
+	ul button (text 'm' color czm second (text "mm"))
+	l	button (text 'z' color czm second (text "zz"))
+	l	button (text 'c' color czm second (text "cc"))
+	dl	button (text 'l' color czm second (text "ll"))
+	dl	button (text 'r' color czm second (text "rr"))
+	dl	button (text 'j' color vfb second (text "jj"))
+	dr	button (text 'h' color vfb second (text "hh"))
+	ul ul	button (text 'b' color vfb second (text "bb"))
+	ur	button (text 'f' color vfb second (text "ff"))
+	ur	button (text 'v' color vfb second (text "vv"))
+	skip 3
+		button (text 'á' color vfb second (text "áá"))
+	dr	button (text 'é' color vfb second (text "éé"))
+	dr	button (text 'í' color vfb second (text "íí"))
+	dl	button (text 'ó' color vfb second (text "óó"))
+	dl	button (text 'ú' color vfb second (text "úú"))
+	skip -4
+		button (text 'ű' color ouou second (text "űű"))
+	ul	button (text 'ő' color ouou second (text "őő"))
+	ur ul	button (text 'ü' color ouou second (text "üü"))
+	ur	button (text 'ö' color ouou second (text "öö"))
+	l	button (text 'q' color qwx second (text "qq"))
+	dl	button (text 'w' color qwx second (text "ww"))
+	dr	button (text 'x' color qwx second (text "xx"))
+	)
+)
+; 	end
+; 	begin Kinesa Symbol
+let (kinesasymbol
+	block (
+		button (text '©' color space addtitle (shiftcenter))
+	dl	button (text '¡' color kinesa addtitle (shiftcenter))
+		button (text '¿' color kinesa addtitle (shiftcenter))
+	ur	button (text '®' color kinesa addtitle (shiftcenter))
+	ul	button (text '§' color kinesa addtitle (shiftcenter))
+	l	button (text '°' color kinesa addtitle (shiftcenter))
+	dl	button (text '£' color kinesa addtitle (shiftcenter))
+	dl	button (text '·' color czm addtitle (shiftcenter))
+	dr	button (text '¼' color czm addtitle (shiftcenter))
+		button (text '½' color czm addtitle (shiftcenter))
+		button (text '¾' color czm addtitle (shiftcenter))
+	ur button (text '×' color czm addtitle (shiftcenter))
+	ur	button (text '÷' color czm addtitle (shiftcenter))
+	ul	button (text '~' color czm addtitle (shiftcenter))
+	ul button (text '}' color czm addtitle (shiftcenter))
+	l	button (text '{' color czm addtitle (shiftcenter))
+	l	button (text '|' color czm addtitle (shiftcenter))
+	dl	button (text '`' color czm addtitle (shiftcenter))
+	dl	button (text '"' color czm addtitle (shiftcenter))
+	dl	button (text "'" color vfb addtitle (shiftcenter))
+	dr	button (text '^' color vfb addtitle (shiftcenter))
+	ul ul	button (text '¥' color vfb addtitle (shiftcenter))
+	ur	button (text '¶' color vfb addtitle (shiftcenter))
+	ur	button (text '±' color vfb addtitle (shiftcenter))
+	skip 3
+		button (text ' ' color vfb addtitle (text "hair" shiftcenter))
+	dr	button (text '—' color vfb addtitle (shiftcenter))
+	dr	button (text '‘' color vfb addtitle (shiftcenter))
+	dl	button (text '‚' color vfb addtitle (shiftcenter))
+	dl	button (text '‟' color vfb addtitle (shiftcenter))
+	skip -4
+		button (text '†' color ouou addtitle (shiftcenter))
+	ul	button (text '‡' color ouou addtitle (shiftcenter))
+	ur ul	button (text '•' color ouou addtitle (shiftcenter))
+	ur	button (text '‹' color ouou addtitle (shiftcenter))
+	l	button (text '›' color qwx addtitle (shiftcenter))
+	dl	button (text '‰' color qwx addtitle (shiftcenter))
+	dr	button (text '€' color qwx addtitle (shiftcenter))
+	)
+)
+; 	end
+; 	begin Kinesa Arrow
+let (kinesaarrow
+	block (
+		button (text '↹' color space addtitle (cellarcenter))
+	dl	button (text '←' color kinesa addtitle (cellarcenter))
+		button (text '→' color kinesa addtitle (cellarcenter))
+	ur	button (text '↑' color kinesa addtitle (cellarcenter))
+	ul	button (text '↓' color kinesa addtitle (cellarcenter))
+	l	button (text '↔' color kinesa addtitle (cellarcenter))
+	dl	button (text '↕' color kinesa addtitle (cellarcenter))
+	dl	button (text '↖' color czm addtitle (cellarcenter))
+	dr	button (text '↗' color czm addtitle (cellarcenter))
+		button (text '↘' color czm addtitle (cellarcenter))
+		button (text '↙' color czm addtitle (cellarcenter))
+	ur button (text '↤' color czm addtitle (cellarcenter))
+	ur	button (text '↦' color czm addtitle (cellarcenter))
+	ul	button (text '↥' color czm addtitle (cellarcenter))
+	ul button (text '↧' color czm addtitle (cellarcenter))
+	l	button (text '↞' color czm addtitle (cellarcenter))
+	l	button (text '↠' color czm addtitle (cellarcenter))
+	dl	button (text '↟' color czm addtitle (cellarcenter))
+	dl	button (text '↡' color czm addtitle (cellarcenter))
+	dl	button (text '↰' color vfb addtitle (cellarcenter))
+	dr	button (text '↱' color vfb addtitle (cellarcenter))
+	ul ul	button (text '↳' color vfb addtitle (cellarcenter))
+	ur	button (text '↲' color vfb addtitle (cellarcenter))
+	ur	button (text '↴' color vfb addtitle (cellarcenter))
+	skip 3
+		button (text '↵' color vfb addtitle (cellarcenter))
+	dr	button (text '↶' color vfb addtitle (cellarcenter))
+	dr	button (text '↷' color vfb addtitle (cellarcenter))
+	dl	button (text '↺' color vfb addtitle (cellarcenter))
+	dl	button (text '↻' color vfb addtitle (cellarcenter))
+	skip -4
+		button (text '↯' color ouou addtitle (cellarcenter))
+	ul	button (text '⇐' color ouou addtitle (cellarcenter))
+	ur ul	button (text '⇒' color ouou addtitle (cellarcenter))
+	ur	button (text '⇑' color ouou addtitle (cellarcenter))
+	l	button (text '⇓' color qwx addtitle (cellarcenter))
+	dl	button (text '⇔' color qwx addtitle (cellarcenter))
+	dr	button (text '⇕' color qwx addtitle (cellarcenter))
+	)
+)
+; 	end
+; 	begin Kinesa Extend
+let (kinesaextend
+	block (
+		extend (addtitle (loft text '©'))
+	dl	extend (addtitle (loft text '¡'))
+		extend (addtitle (loft text '¿'))
+	ur	extend (addtitle (loft text '®'))
+	ul	extend (addtitle (loft text '§'))
+	l	extend (addtitle (loft text '°'))
+	dl	extend (addtitle (loft text '£'))
+	dl	extend (addtitle (loft text '·'))
+	dr	extend (addtitle (loft text '¼'))
+		extend (addtitle (loft text '½'))
+		extend (addtitle (loft text '¾'))
+	ur extend (addtitle (loft text '×'))
+	ur	extend (addtitle (loft text '÷'))
+	ul	extend (addtitle (loft text '~'))
+	ul extend (addtitle (loft text '}'))
+	l	extend (addtitle (loft text '{'))
+	l	extend (addtitle (loft text '|'))
+	dl	extend (addtitle (loft text '`'))
+	dl	extend (addtitle (loft text '"'))
+	dl	extend (addtitle (loft text "'"))
+	dr	extend (addtitle (loft text '^'))
+	ul ul	extend (addtitle (loft text '¥'))
+	ur	extend (addtitle (loft text '¶'))
+	ur	extend (addtitle (loft text '±'))
+	skip 3
+		extend (addtitle (loft text "hair"))
+	dr	extend (addtitle (loft text '—'))
+	dr	extend (addtitle (loft text '‘'))
+	dl	extend (addtitle (loft text '‚'))
+	dl	extend (addtitle (loft text '‟'))
+	skip -4
+		extend (addtitle (loft text '†'))
+	ul	extend (addtitle (loft text '‡'))
+	ur ul	extend (addtitle (loft text '•'))
+	ur	extend (addtitle (loft text '‹'))
+	l	extend (addtitle (loft text '›'))
+	dl	extend (addtitle (loft text '‰'))
+	dr	extend (addtitle (loft text '€'))
+home
+		extend (addtitle (cellar text '↹'))
+	dl	extend (addtitle (cellar text '←'))
+		extend (addtitle (cellar text '→'))
+	ur	extend (addtitle (cellar text '↑'))
+	ul	extend (addtitle (cellar text '↓'))
+	l	extend (addtitle (cellar text '↔'))
+	dl	extend (addtitle (cellar text '↕'))
+	dl	extend (addtitle (cellar text '↖'))
+	dr	extend (addtitle (cellar text '↗'))
+		extend (addtitle (cellar text '↘'))
+		extend (addtitle (cellar text '↙'))
+	ur extend (addtitle (cellar text '↤'))
+	ur	extend (addtitle (cellar text '↦'))
+	ul	extend (addtitle (cellar text '↥'))
+	ul extend (addtitle (cellar text '↧'))
+	l	extend (addtitle (cellar text '↞'))
+	l	extend (addtitle (cellar text '↠'))
+	dl	extend (addtitle (cellar text '↟'))
+	dl	extend (addtitle (cellar text '↡'))
+	dl	extend (addtitle (cellar text '↰'))
+	dr	extend (addtitle (cellar text '↱'))
+	ul ul	extend (addtitle (cellar text '↳'))
+	ur	extend (addtitle (cellar text '↲'))
+	ur	extend (addtitle (cellar text '↴'))
+	skip 3
+		extend (addtitle (cellar text '↵'))
+	dr	extend (addtitle (cellar text '↶'))
+	dr	extend (addtitle (cellar text '↷'))
+	dl	extend (addtitle (cellar text '↺'))
+	dl	extend (addtitle (cellar text '↻'))
+	skip -4
+		extend (addtitle (cellar text '↯'))
+	ul	extend (addtitle (cellar text '⇐'))
+	ur ul	extend (addtitle (cellar text '⇒'))
+	ur	extend (addtitle (cellar text '⇑'))
+	l	extend (addtitle (cellar text '⇓'))
+	dl	extend (addtitle (cellar text '⇔'))
+	dr	extend (addtitle (cellar text '⇕'))
+	)
+)
+; 	end
+; 	begin funkcióbillentyűk
+let (funcblock
+	block (
+		meta (caps color shift
+			addtitle (text "CAPS" size 800 yoffset -300 color 0cfe0)
+			addtitle (text "SHIFT" size 800 yoffset 400 color 0cfe0)
+		)
+		button (backspace repeat color delete addtitle (text "🚑" size 1500))
+		meta ( caps lock color shift 
+			addtitle (text "CAPS" xoffset -700 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "LOCK" xoffset -700 yoffset 400 size 500 color 0cfe0)
+		)
+dl		enter ( color enter erasespace around autocaps on
+			addtitle (size 2000)
+		)
+dl dr dr
+		modify ( roll case color casebutton 
+			addtitle (text "$1f4bc" size 1000 xoffset -700)
+		)
+	)
+)
+; 	end
+; 	begin Draft, Settings
+let (draftblock
+	block (
+		button (draft color special addtitle (text "Draft" size 700 xoffset 600))
+ur ul
+		button (settings color special addtitle (text "Set" size 800 xoffset 800))
+	)
+)
+; 	end
+; 	begin írásjelek
+; 		begin felső sor
+let (uprow
+	block (
+		button (text "!" erasespace around autospace after autocaps on color punct1
+			addtitle ()
+			addtitle (loft text '['))
+		button (text '?' erasespace around autospace after autocaps on color punct1
+			addtitle ()
+			addtitle (loft text ']'))
+		button (text '-' color punct1
+			addtitle ()
+			addtitle (loft text '('))
+		button (text '…' color punct1
+			addtitle ()
+			addtitle (loft text ')'))
+		button (text '–' erasespace around autospace around autocaps hold color punct2
+			addtitle ()
+			addtitle (loft text '#'))
+		button (text ',' erasespace around autospace after autocaps off color punct3
+			addtitle ()
+			addtitle (loft text '+'))
+		button (text '.' erasespace around autospace after autocaps on color punct4
+			addtitle ()
+			addtitle (loft text '*'))
+	)
+)
+let (symuprow
+	block (
+		button (text "[" erasespace after color punct1
+			addtitle (shiftcenter))
+		button (text ']' erasespace before color punct1
+			addtitle (shiftcenter))
+		button (text '(' erasespace after color punct1
+			addtitle (shiftcenter))
+		button (text ')' erasespace before color punct1
+			addtitle (shiftcenter))
+		button (text '#' color punct2
+			addtitle (shiftcenter))
+		button (text '+' color punct3
+			addtitle (shiftcenter))
+		button (text '*' color punct4
+			addtitle (shiftcenter))
+	)
+)
+; 		end
+; 		begin bal csoport
+let (leftrow
+	block (
+		button (text '’' color punct1
+			addtitle ()
+			addtitle (loft text '='))
+dl dr	button (text '„' erasespace around autospace before autocaps hold color punct3
+			addtitle ()
+			addtitle (loft text '»'))
+dl 	button (text '.' color punct6
+			addtitle (text ".̺͆")
+			addtitle (loft text "–̺͆"))
+		button (text '”' erasespace around autospace after autocaps hold color punct3
+			addtitle ()
+			addtitle (loft text '«'))
+dl		button (text ':' erasespace around autospace after color punct3
+			addtitle ()
+			addtitle (loft text '&'))
+		button (text ';' erasespace around autospace after color punct3
+			addtitle ()
+			addtitle (loft text '“'))
+	)
+)
+let (symleftrow
+	block (
+		button (text '=' color punct1
+			addtitle (shiftcenter))
+dl dr	button (text '»' color punct3
+			addtitle (shiftcenter))
+dl 	button (text '–' color punct6
+			addtitle (shiftcenter))
+		button (text '«' color punct3
+			addtitle (shiftcenter))
+dl		button (text '&' color punct3
+			addtitle (shiftcenter))
+		button (text '“' color punct3
+			addtitle (shiftcenter))
+	)
+)
+; 		end
+; 		begin jobb csoport
+let (rightrow
+	block (
+		button (text '@' color punct5
+			addtitle ()
+			addtitle (loft text '_'))
+		button (text '<' color punct5
+			addtitle ()
+			addtitle (loft text '$'))
+		button (text '/' color punct5
+			addtitle ()
+			addtitle (loft text '\\'))
+ur		button (text '>' color punct5
+			addtitle ()
+			addtitle (loft text '%'))
+	)
+)
+let (symrightrow
+	block (
+		button (text '_' color punct5
+			addtitle (shiftcenter))
+		button (text '$' color punct5
+			addtitle (shiftcenter))
+		button (text '\\' color punct5
+			addtitle (shiftcenter))
+ur		button (text '%' color punct5
+			addtitle (shiftcenter))
+	)
+)
+; 		end
+; 	end
+; 	begin kurzornyilak
+let (arrows
+	block (
+		button (key keydpadup repeat addtitle (text '↑') color arrowv)
+		button (key keydpaddown repeat addtitle (text '↓') color arrowv)
+		button (key keydpadleft repeat addtitle (text '←') color arrowh)
+		button (key keydpadright repeat addtitle (text '→') color arrowh)
+	)
+)
+; 	end
+; 	begin számjegyek
+let (digits
+	block (
+		button (text '0' color digit)
+		button (text '1' color digit)
+		button (text '2' color digit)
+		button (text '3' color digit)
+		button (text '4' color digit)
+		button (text '5' color digit)
+		button (text '6' color digit)
+		button (text '7' color digit)
+		button (text '8' color digit)
+		button (text '9' color digit)
+	)
+)
+; 	end
+;	begin clipboard
+let (clipboard
+	block (
+		button (turnon(ctrl) key 'v' color clipcolor addtitle (text "Paste"))
+	dr	button (turnon(ctrl) key 'x' color clipcolor addtitle (text "Cut"))
+		button (turnon(ctrl) key 'c' color clipcolor addtitle (text "Copy"))
+	)
+)
+;	end
+; 	begin cseh
+let (czrow
+	block (
+		button (text 'ď' color czech1)
+		button (text 'ň' color czech1)
+		button (text 'ť' color czech1)
+		button (text 'ě' color czech2)
+		button (text 'ů' color czech2)
+		button (text 'ý' color czech2)
+		button (text 'č' color czech3)
+		button (text 'ř' color czech3)
+		button (text 'š' color czech3)
+		button (text 'ž' color czech3)
+	)
+)
+; 	end
+; 	begin diakritikus
+let (diarow1
+	block (
+		 modify ( roll  acute color dia1 addtitle (text 'ˊ' modifier))
+		 modify ( roll  grave color dia2 addtitle (text 'ˋ' modifier))
+		 modify ( roll  trema color dia3 addtitle (text '¨' modifier))
+		 modify ( roll  tilde color dia1 addtitle (text '˜' modifier))
+		 modify ( roll  hacek color dia2 addtitle (text 'ˇ' modifier))
+		 modify ( roll  circumflex color dia3 addtitle (text 'ˆ' modifier))
+		 modify ( roll  macron color dia1 addtitle (text 'ˉ' modifier))
+		 modify ( roll  ogonek color dia2 addtitle (text '˛' modifier))
+		 modify ( roll  dot color dia3 addtitle (text '˙' modifier))
+		 modify ( roll  dotbelow color dia1 addtitle (text '.' modifier))
+	)
+)
+let (diarow2
+	block (
+		 modify ( roll  eaccent color dia1 addtitle (text '' modifier))
+		 modify ( roll  horn  color dia2 addtitle (text '̉' modifier))
+		 modify ( roll  stroke color dia3 addtitle (text '/' modifier))
+		 modify ( roll  ring color dia1 addtitle (text '˚' modifier))
+		 modify ( roll  ringbelow color dia2 addtitle (text '˳' modifier))
+		 modify ( roll  breve color dia3 addtitle (text '˘' modifier))
+		 modify ( roll  doublegrave color dia1 addtitle (text '̏' modifier))
+		 modify ( roll  upside color dia2 addtitle (text 'ɔ' modifier))
+		 modify ( roll  special color dia3 addtitle (text 'ß' modifier))
+		 modify ( roll  invbreve color dia1 addtitle (text '̑' modifier))
+	)
+)
+let (diarow3
+	block (
+		 modify ( roll  diaindex color dia3 addtitle (text '²' modifier))
+		 modify ( roll  down color dia1 addtitle (text '˯' modifier))
+		 modify ( roll  up color dia2 addtitle (text '˰' modifier))
+		 modify ( roll  left color dia3 addtitle (text '˱' modifier))
+		 modify ( roll  right color dia1 addtitle (text '˲' modifier))
+		 modify ( roll  smile color dia2 addtitle (text '̮' modifier))
+		 modify ( roll  sad color dia3 addtitle (text '̯' modifier))
+		 modify ( roll  misc color dia1 addtitle (text '̱' modifier))
+	)
+)
+; 	end
+
+; 	begin görög
+let (greek
+	block (
+		 modify ( roll  oxia color archgrkcolor addtitle (text '´' greektitle))
+		 modify ( roll  varia color archgrkcolor addtitle (text '`' greektitle))
+		button (text 'ψ' color vfb)
+		button (text 'γ' color czm)
+		button (text 'η' color czm)
+		button (text 'δ' color czm)
+		 modify ( roll  tonos color modgrkcolor addtitle (text '´' greektitle))
+		crl
+		 modify ( roll  psili color archgrkcolor addtitle (text '᾿' greektitle))
+		 modify ( roll  dasia color archgrkcolor addtitle (text '῾' greektitle))
+		button (text 'χ' color vfb)
+		button (text 'σ' color czm)
+		button (text 'α' color kinesa)
+		button (text 'τ' color kinesa)
+		button (text 'ν' color czm)
+		 modify ( roll  diaeresis color modgrkcolor addtitle (text '¨' greektitle))
+		crr
+		 modify ( roll  perispomeni color archgrkcolor addtitle (text '῀' greektitle))
+		button (text 'φ' color vfb)
+		button (text 'κ' color czm)
+		button (text 'ο' color kinesa)
+		 spacetravel (  color space autocaps hold)
+		button (text 'ι' color kinesa)
+		button (text 'μ' color czm)
+		button (text 'ζ' color vfb)
+		crr
+		 modify ( roll  ipogegrameni color archgrkcolor
+			addtitle (text 'ι' greektitle yoffset 500))
+		button (text 'θ' color vfb)
+		button (text 'υ' color czm)
+		button (text 'ς' color kinesa)
+		button (text 'ε' color kinesa)
+		button (text 'π' color czm)
+		button (text 'ξ' color vfb)
+		crr
+		button (text '·' color qwx)
+		button (text 'ϑ' color ouou)
+		button (text 'ρ' color czm)
+		button (text 'λ' color czm)
+		button (text 'ω' color czm)
+		button (text 'β' color vfb)
+	)
+)
+; 	end
+;	begin cirill
+let (cyrill
+	block (
+		button (text 'э' color qwx)
+		button (text 'ц' color ouou)
+		button (text 'ы' color vfb)
+		button (text 'п' color czm)
+		button (text 'д' color czm)
+		button (text 'ь' color czm)
+		button (text 'і' color vfb)
+		skip 1
+		button (text 'ґ' color qwx)
+		crl l l
+		button (text 'є' color qwx addtitle (xoffset 500))
+		button (text 'ќ' color qwx)
+		button (text 'ѕ' color qwx)
+		button (text 'щ' color ouou)
+		button (text 'ю' color vfb)
+		button (text 'у' color czm)
+		button (text 'т' color kinesa)
+		button (text 'о' color kinesa)
+		button (text 'м' color czm)
+		button (text 'г' color vfb)
+		button (text 'ї' color ouou)
+		button (text 'ѓ' color qwx addtitle (xoffset -500))
+		crl l
+		button (text 'џ' color qwx)
+		skip 1
+		button (text 'ф' color ouou)
+		button (text 'ш' color vfb)
+		button (text 'б' color czm)
+		button (text 'и' color kinesa)
+		 spacetravel (  color space autocaps hold)
+		button (text 'н' color kinesa)
+		button (text 'к' color czm)
+		button (text 'з' color vfb)
+		button (text 'ў' color ouou)
+		crl skip 2
+		button (text 'ё' color ouou)
+		button (text 'х' color vfb)
+		button (text 'я' color czm)
+		button (text 'е' color kinesa)
+		button (text 'а' color kinesa)
+		button (text 'р' color czm)
+		button (text 'ч' color vfb)
+		button (text 'њ' color ouou)
+		button (text 'ћ' color qwx addtitle (xoffset -500))
+		crl
+		button (text 'љ' color qwx)
+		skip 2
+		button (text 'ъ' color ouou)
+		button (text 'ж' color vfb)
+		button (text 'с' color czm)
+		button (text 'л' color czm)
+		button (text 'в' color czm)
+		button (text 'й' color vfb)
+		skip 1
+		button (text 'ђ' color qwx)
+		crr
+		button (text 'ѐ' color qwx)
+		button (text 'ѝ' color qwx)
+		skip 7
+		button (text 'ј' color qwx)
+	)
+)
+;	end
+; 	begin örmény
+let (armen
+	block (
+		button (text 'ա' color armcolor addtitle () addtitle (text 'a' transliter))
+		button (text 'բ' color armcolor addtitle () addtitle (text 'b' transliter))
+		button (text 'գ' color armcolor addtitle () addtitle (text 'g' transliter))
+		button (text 'դ' color armcolor addtitle () addtitle (text 'd' transliter))
+		button (text 'ե' color armcolor addtitle () addtitle (text "jɛ" transliter))
+		button (text 'զ' color armcolor addtitle () addtitle (text 'z' transliter))
+		button (text 'է' color armcolor addtitle () addtitle (text "ɛː" transliter))
+		crl l
+		button (text 'ը' color armcolor addtitle () addtitle (text 'ə' transliter))
+		button (text 'թ' color armcolor addtitle () addtitle (text "tʰ" transliter))
+		button (text 'ժ' color armcolor addtitle () addtitle (text 'ʒ' transliter))
+		button (text 'ի' color armcolor addtitle () addtitle (text 'i' transliter))
+		button (text 'լ' color armcolor addtitle () addtitle (text 'l' transliter))
+		button (text 'խ' color armcolor addtitle () addtitle (text 'χ' transliter))
+		button (text 'ծ' color armcolor addtitle () addtitle (text 'ʦ' transliter))
+		button (text 'կ' color armcolor addtitle () addtitle (text 'k' transliter))
+		button (text 'հ' color armcolor addtitle () addtitle (text 'h' transliter))
+		crl l
+		button (text 'և' color armcolor addtitle () addtitle (text "ev" transliter))
+		skip 1
+		button (text 'ձ' color armcolor addtitle () addtitle (text 'ʣ' transliter))
+		button (text 'ղ' color armcolor addtitle () addtitle (text 'ʁ' transliter))
+		button (text 'ճ' color armcolor addtitle () addtitle (text 'ʧ' transliter))
+		 spacetravel (  color space autocaps hold erasespace around)
+		button (text 'մ' color armcolor addtitle () addtitle (text 'm' transliter))
+		button (text 'յ' color armcolor addtitle () addtitle (text 'j' transliter))
+		button (text 'ն' color armcolor addtitle () addtitle (text 'n' transliter))
+		button (text 'շ' color armcolor addtitle () addtitle (text 'ʃ' transliter))
+		crr skip 1
+		button (text 'ո' color armcolor addtitle () addtitle (text "vo" transliter))
+		button (text 'չ' color armcolor addtitle () addtitle (text "ʧʰ" transliter))
+		button (text 'պ' color armcolor addtitle () addtitle (text 'p' transliter))
+		button (text 'ջ' color armcolor addtitle () addtitle (text 'ʤ' transliter))
+		button (text 'ռ' color armcolor addtitle () addtitle (text 'ɾ' transliter))
+		button (text 'ս' color armcolor addtitle () addtitle (text 's' transliter))
+		button (text 'վ' color armcolor addtitle () addtitle (text 'v' transliter))
+		crl l
+		button (text 'օ' color armcolor addtitle () addtitle (text 'o' transliter))
+		skip 2
+		button (text 'տ' color armcolor addtitle () addtitle (text 't' transliter))
+		button (text 'ր' color armcolor addtitle () addtitle (text 'ɹ' transliter))
+		button (text 'ց' color armcolor addtitle () addtitle (text "ʦʰ" transliter))
+		button (text 'ւ' color armcolor addtitle () addtitle (text 'w' transliter))
+		button (text 'փ' color armcolor addtitle () addtitle (text "pʰ" transliter))
+		button (text 'ք' color armcolor addtitle () addtitle (text "kʰ" transliter))
+		crr l
+		button (text "ու" color armcolor addtitle () addtitle (text 'u' transliter))
+		button (text 'ֆ' color armcolor addtitle () addtitle (text 'f' transliter))
+	)
+)
+;	end
+;	begin Quong
+let (quong
+	block (
+		 spacetravel (  color space autocaps hold erasespace around)
+	dl	button (text 't' color kinesa second (text "tt"))
+		button (text 'a' color kinesa second (text "aa"))
+	ur	button (text 's' color kinesa second (text "ss"))
+	ul	button (text 'i' color kinesa second (text "ii"))
+	l	button (text 'd' color kinesa second (text "dd"))
+	dl	button (text 'e' color kinesa second (text "ee"))
+	dl	button (text 'h' color czm second (text "hh"))
+	ul	button (text 'v' color czm second (text "vv"))
+	l	button (text 'j' color czm second (text "jj"))
+	ur	button (text 'b' color czm second (text "bb"))
+	ul	button (text 'q' color czm second (text "qq"))
+		button (text 'u' color czm second (text "uu"))
+	dr	button (text 'r' color czm second (text "rr"))
+	ur button (text 'o' color czm second (text "oo"))
+		button (text 'n' color czm second (text "nn"))
+		button (text 'g' color czm second (text "gg"))
+		button (text 'z' color czm second (text "zz"))
+	dl	button (text 'm' color czm second (text "mm"))
+		button (text 'x' color vfb second (text "xx"))
+	dl	button (text 'p' color vfb second (text "pp"))
+		button (text 'f' color vfb second (text "ff"))
+	dl	button (text 'y' color vfb second (text "yy"))
+	l	button (text 'l' color vfb second (text "ll"))
+	dr	button (text 'k' color vfb second (text "kk"))
+	l	button (text 'c' color vfb second (text "cc"))
+	l	button (text 'w' color vfb second (text "ww"))
+	)
+)
+;	end
+;	begin Asteon
+let (asteon
+	block (
+		 spacetravel (  color space autocaps hold erasespace around)
+	dl	button (text 'a' color kinesa second (text "aa"))
+	ul	button (text 's' color kinesa second (text "ss"))
+	ur	button (text 't' color kinesa second (text "tt"))
+		button (text 'e' color kinesa second (text "ee"))
+	dr	button (text 'o' color kinesa second (text "oo"))
+	dl	button (text 'n' color kinesa second (text "nn"))
+	dl	button (text 'b' color kinesa second (text "bb"))
+	l	button (text 'm' color kinesa second (text "mm"))
+	l	button (text 'u' color kinesa second (text "uu"))
+	ur	button (text 'k' color kinesa second (text "kk"))
+	l	button (text 'y' color kinesa second (text "yy"))
+	ul	button (text 'p' color kinesa second (text "pp"))
+		button (text 'l' color kinesa second (text "ll"))
+	ul	button (text 'j' color kinesa second (text "jj"))
+	ul	button (text 'x' color kinesa second (text "xx"))
+		button (text 'v' color kinesa second (text "vv"))
+	dr	button (text 'w' color kinesa second (text "ww"))
+	ur	button (text 'c' color kinesa second (text "cc"))
+		button (text 'h' color kinesa second (text "hh"))
+		button (text 'd' color kinesa second (text "dd"))
+		button (text 'z' color kinesa second (text "zz"))
+	dl	button (text 'r' color kinesa second (text "rr"))
+		button (text "ph" color kinesa second (text "pph"))
+	dl	button (text 'f' color kinesa second (text "ff"))
+		button (text "ck" color kinesa second (text "cck"))
+	dl	button (text "sh" color kinesa second (text "ssh"))
+	l	button (text 'i' color kinesa second (text "ii"))
+	dl	button (text 'g' color kinesa second (text "gg"))
+		button (text "qu" color kinesa second (text "qqu"))
+	)
+)
+;	end
+;	begin Atomik
+let (atomik
+	block (
+		 spacetravel (  color space autocaps hold erasespace around)
+	dl	button (text 't' color kinesa second (text "tt"))
+	l	button (text 'h' color kinesa second (text "hh"))
+	l	button (text 'j' color kinesa second (text "jj"))
+	ul	button (text 'f' color kinesa second (text "ff"))
+		button (text 'l' color kinesa second (text "ll"))
+		button (text 'e' color kinesa second (text "ee"))
+	ul	button (text 'a' color czm second (text "aa"))
+	l	button (text 'c' color czm second (text "cc"))
+	ul	button (text 'b' color czm second (text "bb"))
+		button (text 'k' color czm second (text "kk"))
+		button (text 'd' color czm second (text "dd"))
+		button (text 'g' color czm second (text "gg"))
+	dl	button (text 'n' color czm second (text "nn"))
+		button (text 'i' color czm second (text "ii"))
+		button (text 'm' color czm second (text "mm"))
+		button (text 'q' color czm second (text "qq"))
+	dr	button (text 'x' color czm second (text "xx"))
+	l	button (text 'y' color czm second (text "yy"))
+	l	button (text 's' color vfb second (text "ss"))
+	dl	button (text 'o' color vfb second (text "oo"))
+		button (text 'p' color vfb second (text "pp"))
+		button (text 'v' color vfb second (text "vv"))
+	dr	button (text 'z' color vfb second (text "zz"))
+	l	button (text 'w' color vfb second (text "ww"))
+	l	button (text 'u' color vfb second (text "uu"))
+	l	button (text 'r' color vfb second (text "rr"))
+	)
+)
+;	end
+; end blokkok
+; begin layoutok
+;	begin menü
+addlayout (id menulayout
+	columns 8 rows 2 align odds turnoff (caps ) asboard color normal_back)
+;	end
+; 	begin kinesa
+addlayout (id basic start
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color normal_back)
+addlayout (id cesky
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color cesky_back)
+addlayout (id diacrit1
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color diacrit_back)
+addlayout (id diacrit2
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color diacrit_back)
+addlayout (id diacrit3
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color diacrit_back)
+; 	end
+;	begin quong
+addlayout (id quongly
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color quong_back
+)
+;	end
+;	begin asteon
+addlayout (id asteonly
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color quong_back
+)
+;	end
+;	begin atomik
+addlayout (id atomikly
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color quong_back
+)
+;	end
+; 	begin symbol
+addlayout (id symbol
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color symbol_back)
+addlayout (id cz_symbol
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color czsym_back)
+addlayout (id sydiacrit1
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color sydia_back)
+addlayout (id sydiacrit2
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color sydia_back)
+addlayout (id sydiacrit3
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color sydia_back)
+; 	end
+; 	begin arrows
+addlayout (id arrows
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color arrows_back)
+addlayout (id cz_arrows
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color czsym_back)
+addlayout (id ardiacrit1
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color sydia_back)
+addlayout (id ardiacrit2
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color sydia_back)
+addlayout (id ardiacrit3
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color sydia_back)
+;	end
+;	begin görög
+addlayout (id greekly
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color greek_back)
+;	end
+;	begin cirill
+addlayout (id cyrillic
+	halfcolumns 22 rows 8 align odds turnoff (caps ) asboard color cyr_back)
+;	end
+;	begin örmény
+addlayout (id armenian
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color armen_back)
+;	end
+;	begin burmai
+addlayout (id burmese
+	halfcolumns 20 rows 8 align odds turnoff (caps ) asboard color burma_back)
+;	end
+; end
+; begin blokkok elhelyezése
+; 	begin kinesa
+default (block (layout basic))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesablock row 5 column 7)
+block (kinesaextend row 5 column 7)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout cesky))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesablock row 5 column 7)
+block (kinesaextend row 5 column 7)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (czrow row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout diacrit1))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesablock row 5 column 7)
+block (kinesaextend row 5 column 7)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow1 row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout diacrit2))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesablock row 5 column 7)
+block (kinesaextend row 5 column 7)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow2 row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout diacrit3))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesablock row 5 column 7)
+block (kinesaextend row 5 column 7)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow3 row 1 column 1)
+block (clipboard row 7 column 1)
+; 	end
+; 	begin symbol
+default (block (layout symbol))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesasymbol row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout cz_symbol))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesasymbol row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (czrow row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout sydiacrit1))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesasymbol row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow1 row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout sydiacrit2))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesasymbol row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow2 row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout sydiacrit3))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesasymbol row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow3 row 1 column 1)
+block (clipboard row 7 column 1)
+; 	end
+; 	begin arrows
+default (block (layout arrows))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesaarrow row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout cz_arrows))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesaarrow row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (czrow row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout ardiacrit1))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesaarrow row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow1 row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout ardiacrit2))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesaarrow row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow2 row 1 column 1)
+block (clipboard row 7 column 1)
+
+default (block (layout ardiacrit3))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (kinesaarrow row 5 column 7)
+block (symuprow row 2 column 2)
+block (symleftrow row 3 column 2)
+block (symrightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (diarow3 row 1 column 1)
+block (clipboard row 7 column 1)
+; 	end
+;	begin görög
+default (block (layout greekly))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (greek row 3 column 3)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+;	end
+;	begin cirill
+default (block (layout cyrillic))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (cyrill row 3 column 3)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+;	end
+;	begin örmény
+default (block (layout armenian))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (armen row 3 column 3)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+; 	end
+;	begin quong
+default (block (layout quongly))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (quong row 5 column 7)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+block (clipboard row 7 column 1)
+;	end
+;	begin asteon
+default (block (layout asteonly))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (asteon row 5 column 7)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+block (clipboard row 7 column 1)
+;	end
+;	begin atomik
+default (block (layout atomikly))
+
+block (draftblock row 8 column 1)
+block (funcblock row 2 column 9)
+block (atomik row 5 column 6)
+block (uprow row 2 column 2)
+block (leftrow row 3 column 2)
+block (rightrow row 8 column 8)
+block (arrows row 8 column 4)
+block (digits row 1 column 1)
+block (clipboard row 7 column 1)
+;	end
+; end
+; begin switchek
+; 	begin felső sor
+block (layout basic row 2 column 1
+	 switch ( board  cesky lock color swcolor addtitle (text 'Č' xoffset 500))
+)
+block (layout cesky row 2 column 1
+	 switch ( board  diacrit1 lock color swcolor addtitle (text 'ṣ' xoffset 500))
+)
+block (layout diacrit1 row 2 column 1
+	 switch ( board  diacrit2 lock color swcolor addtitle (text 'ȓ' xoffset 500))
+)
+block (layout diacrit2 row 2 column 1
+	 switch ( board  diacrit3 lock color swcolor addtitle (text 'ḏ' xoffset 500))
+)
+block (layout diacrit3 row 2 column 1
+	 switch ( board  basic lock color swcolor addtitle (text '0' xoffset 500))
+)
+
+block (layout symbol row 2 column 1
+	 switch ( board  cz_symbol lock color swcolor addtitle (text '0' xoffset 500))
+)
+block (layout cz_symbol row 2 column 1
+	 switch ( board  sydiacrit1 lock color swcolor addtitle (text 'ṣ' xoffset 500))
+)
+block (layout sydiacrit1 row 2 column 1
+	 switch ( board  sydiacrit2 lock color swcolor addtitle (text 'ȓ' xoffset 500))
+)
+block (layout sydiacrit2 row 2 column 1
+	 switch ( board  sydiacrit3 lock color swcolor addtitle (text 'ḏ' xoffset 500))
+)
+block (layout sydiacrit3 row 2 column 1
+	 switch ( board  symbol lock color swcolor addtitle (text '*' xoffset 500))
+)
+
+block (layout arrows row 2 column 1
+	 switch ( board  cz_arrows lock color swcolor addtitle (text '0' xoffset 500))
+)
+block (layout cz_arrows row 2 column 1
+	 switch ( board  ardiacrit1 lock color swcolor addtitle (text 'ṣ' xoffset 500))
+)
+block (layout ardiacrit1 row 2 column 1
+	 switch ( board  ardiacrit2 lock color swcolor addtitle (text 'ȓ' xoffset 500))
+)
+block (layout ardiacrit2 row 2 column 1
+	 switch ( board  ardiacrit3 lock color swcolor addtitle (text 'ḏ' xoffset 500))
+)
+block (layout ardiacrit3 row 2 column 1
+	 switch ( board  arrows lock color swcolor addtitle (text '*' xoffset 500))
+)
+; 	end
+; 	begin Symbol Shift
+; 		begin basic–symbol–arrows
+block (layout basic row 4 column 11
+	 switch ( board  symbol color swcolor
+			addtitle (text "SYMBOL" xoffset -700 yoffset -300 size 300 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -700 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout symbol row 4 column 11
+	 switch ( board  arrows color swcolor
+			addtitle (text "ARROW" xoffset -700 yoffset -300 size 400 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -700 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout arrows row 4 column 11
+	 switch ( board  basic color swcolor
+			addtitle (text "LETTER" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+; 		end
+; 		begin cesky–cz_symbol–cz_arrows
+block (layout cesky row 4 column 11
+	 switch ( board  cz_symbol color swcolor
+			addtitle (text "SYMBOL" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout cz_symbol row 4 column 11
+	 switch ( board  cz_arrows color swcolor
+			addtitle (text "ARROW" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout cz_arrows row 4 column 11
+	 switch ( board  cesky color swcolor
+			addtitle (text "LETTER" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+; 		end
+; 		begin diacrit 1
+block (layout diacrit1 row 4 column 11
+	 switch ( board  sydiacrit1 color swcolor
+			addtitle (text "SYMBOL" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout sydiacrit1 row 4 column 11
+	 switch ( board  ardiacrit1 color swcolor
+			addtitle (text "ARROW" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout ardiacrit1 row 4 column 11
+	 switch ( board  diacrit1 color swcolor
+			addtitle (text "LETTER" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+; 		end
+; 		begin diacrit 2
+block (layout diacrit2 row 4 column 11
+	 switch ( board  sydiacrit2 color swcolor
+			addtitle (text "SYMBOL" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout sydiacrit2 row 4 column 11
+	 switch ( board  ardiacrit2 color swcolor
+			addtitle (text "ARROW" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout ardiacrit2 row 4 column 11
+	 switch ( board  diacrit2 color swcolor
+			addtitle (text "LETTER" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+; 		end
+; 		begin diacrit 3
+block (layout diacrit3 row 4 column 11
+	 switch ( board  sydiacrit3 color swcolor
+			addtitle (text "SYMBOL" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout sydiacrit3 row 4 column 11
+	 switch ( board  ardiacrit3 color swcolor
+			addtitle (text "ARROW" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout ardiacrit3 row 4 column 11
+	 switch ( board  diacrit3 color swcolor
+			addtitle (text "LETTER" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+; 		end
+;		begin quong, asteon
+block (layout quongly row 4 column 11
+	 switch ( board  symbol color swcolor
+			addtitle (text "SYMBOL" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+block (layout asteonly row 4 column 11
+	 switch ( board  symbol color swcolor
+			addtitle (text "SYMBOL" xoffset -500 yoffset -300 size 500 color 0cfe0)
+			addtitle (text "SHIFT" xoffset -500 yoffset 400 size 500 color 0cfe0)
+		)
+)
+;	end
+; 	end
+;	begin nyelv
+let (menuswitch
+	block (
+		 switch ( board  menulayout lock color swcolor
+			addtitle (text "$1f3b9" xoffset 500))
+	)
+)
+; 	end
+; 	begin menü
+block (menuswitch layout basic row 4 column 1)
+block (menuswitch layout cesky row 4 column 1)
+block (menuswitch layout diacrit1 row 4 column 1)
+block (menuswitch layout diacrit2 row 4 column 1)
+block (menuswitch layout diacrit3 row 4 column 1)
+block (menuswitch layout symbol row 4 column 1)
+block (menuswitch layout cz_symbol row 4 column 1)
+block (menuswitch layout sydiacrit1 row 4 column 1)
+block (menuswitch layout sydiacrit2 row 4 column 1)
+block (menuswitch layout sydiacrit3 row 4 column 1)
+block (menuswitch layout arrows row 4 column 1)
+block (menuswitch layout cz_arrows row 4 column 1)
+block (menuswitch layout ardiacrit1 row 4 column 1)
+block (menuswitch layout ardiacrit2 row 4 column 1)
+block (menuswitch layout ardiacrit3 row 4 column 1)
+block (menuswitch layout greekly row 4 column 1)
+block (menuswitch layout cyrillic row 4 column 1)
+block (menuswitch layout armenian row 4 column 1)
+block (menuswitch layout quongly row 4 column 1)
+block (menuswitch layout asteonly row 4 column 1)
+block (menuswitch layout atomikly row 4 column 1)
+
+block (layout menulayout row 1 column 1
+	 switch ( board  basic lock color swcolor addtitle (text 'D'))
+	 switch ( board  greekly lock color swcolor addtitle (text 'Δ'))
+	 switch ( board  cyrillic lock color swcolor addtitle (text 'Д'))
+	 switch ( board  armenian lock color swcolor addtitle (text 'Թ'))
+	 switch ( board  quongly lock color swcolor addtitle (text "Quong" size 1000))
+	 switch ( board  asteonly lock color swcolor addtitle (text "Asteon" size 1000))
+	 switch ( board  atomikly lock color swcolor addtitle (text "Atomik" size 1000))
+	 switch ( board  test lock color swcolor addtitle (text "T" size 1000))
+
+crr
+Button (text '✂')
+Button (text "📄")
+Button (text "🛀")
+Button (text "📱")
+Button (text "🚨")
+Button (text "🐸")
+Button (text "🐶")
+Button (text "🐭")
+)
+;	end
+;	end
+; begin módosítók táblázata
+;   begin latin
+;		begin acute
+addmodify (id acute ignorespace rolls (
+"ā" "š" "ž" "AÁ" "CĆ" "" "" "åǻ" "EÉ" "j" "" "GǴ" "IÍ" "KḰ" "LĹ" "MḾ" "NŃ" "q" "x" "" "" "" "OÓ" "PṔ" "RŔ" "SŚ" "UÚ" "V" "WẂ" "YÝ" "ZŹ" "aá" "b" "cć" "eé" "gǵ" "ií" "kḱ" "lĺ" "mḿ" "nń" "oó" "pṕ" "rŕ" "sś" "ṣ" "t" "uú" "v" "wẃ" "yý" "zź" "~" "ÂẤ" "ÆǼ" "ÊẾ" "ÔỐ" "ÕṌ" "Ö" "ØǾ" "ÜǗ" "ß" "âấ" "ä" "æǽ" "êế" "ë" "î" "ôố" "õṍ" "ö" "ŏ" "" "" "øǿ" "üǘ" "ĂẮ" "ăắ" "ą" "č" "ĒḖ" "ēḗ" "ę" "ė" "ī" "ŋ" "ŌṒ" "ōṓ" "ţ" "ŨṸ" "ũṹ" "ƠỚ" "ơớ" "ƯỨ" "ưứ" "ǫ" "ǭ" "ǹ" "ɛ" "ɢ" "ɵ" "ʒ" "ʙ" "β" "δ" "χ" "ṛ" "ṠṤ" "ṡṥ" "ṭ" "ọ" "ḁ" "" "" "" "" "" "ḛ" "" "" "" "ḭ" "" "" "" "" "ǭ" "" "" "" "" "" "" "" "" "" "" "" "" "ã" "ẽ" "ĩ" "į" "ų" "à" "è" "ì" "ò" "ù" "û"
+))
+; end
+;		begin grave
+addmodify (id grave ignorespace rolls (
+"AÀ" "EÈ" "IÌ" "NǸ" "OÒ" "UÙ" "WẀ" "YỲ" "Z" "aà" "eè" "g" "iì" "j" "k" "l" "m" "nǹ" "oò" "p" "r" "s" "" "" "t" "uù" "wẁ" "yỳ" "z" "ÂẦ" "ÊỀ" "ÔỒ" "âầ" "ä" "å" "êề" "ë" "ôồ" "ö" "ü" "ĂẰ" "ăằ" "ĒḔ" "ēḕ" "ę" "ľ" "ń" "ŌṐ" "ōṑ" "ś" "ƠỜ" "ơờ" "ƯỪ" "ưừ" "ǫ" "ȧ" "ȯ" "ə" "ɛ" "ɯ" "β" "δ" "л" "ḱ" "ṕ" "ẹ" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "á" "é" "í" "ó" "ú" "û" "î" "ï"
+))
+; end
+;		begin trema
+addmodify (id trema ignorespace rolls (
+"aä" "eë" "g" "hḧ" "iï" "j" "n" "oö" "tẗ" "uü" "v" "wẅ" "xẍ" "yÿ" "AÄ" "EË" "HḦ" "IÏ" "OÖ" "UÜ" "WẄ" "XẌ" "YŸ" "ūǖṻ" "" "ī" "" "" "ô" "ÍḮ" "Ó" "ÕṎ" "ÙǛ" "ÚǗ" "à" "á" "è" "é" "ê" "íḯ" "ò" "ó" "" "õṏ" "ùǜ" "úǘ" "û" "ĀǞ" "āǟ" "ă" "ē" "ę" "ŌȪ" "ōȫ" "ŏ" "ŪǕṺ" "ŭ" "ǓǙ" "ǔǚ" "ẽ" "ọ" "ụ" "" "" "" "" "" "ḙ" "" "" "ḛ" "" "" "" "" "" "" "" "" "" "" "" "" ""
+))
+; end
+;		begin tilde
+addmodify (id tilde ignorespace rolls (
+"AÃ" "EẼ" "IĨ" "NÑ" "OÕ" "UŨ" "VṼ" "YỸ" "aã" "eẽ" "iĩ" "j" "lɫ" "m" "nñ" "oõ" "p" "uũ" "vṽ" "w" "yỹ" "ę" "ÊỄ" "ÓṌ" "ÚṸ" "âẫ" "êễ" "ë" "óṍ" "ôỗ" "úṹ" "ĂẴ" "ăẵ" "ŋ" "ŌȬ" "ōȭ" "ƠỠ" "ơỡ" "ƯỮ" "ưữ" "ˊ" "" "r" "b" "á" "é" "í"
+))
+; end
+;		begin hacek
+addmodify (id hacek ignorespace rolls (
+"ś" "ź" "AǍ" "CČ" "DĎ" "EĚ" "GǦ" "HȞ" "IǏ" "KǨ" "LĽ" "NŇ" "OǑ" "RŘ" "SŠ" "TŤ" "UǓ" "ZŽ" "aǎ" "cč" "dď" "eě" "gǧ" "hȟ" "iǐ" "jǰ" "kǩ" "lľ" "nň" "oǒ" "rř" "sš" "tť" "uǔ" "zž" "ć" "ē" "ƷǮ" "ə" "ʒǯ" "ṠṦ" "ṡṧ" "ṣ" "ẓ" "" "" "" "" "" "" "" "" "üǚ" "" "ζ" "κ" "λ" "ξ" "π" "σ" "τ" "Ζ" "Κ" "Λ" "Ξ" "Π" "Σ" "Τ"
+))
+; end
+;		begin circumflex
+addmodify (id circumflex ignorespace rolls (
+"aâ" "cĉ" "eê" "gĝ" "hĥ" "iî" "jĵ" "oô" "sŝ" "uû" "wŵ" "yŷ" "zẑ" "AÂ" "CĈ" "EÊ" "GĜ" "HĤ" "IÎ" "JĴ" "OÔ" "SŜ" "UÛ" "WŴ" "YŶ" "ZẐ" "ę" "" "ÀẦ" "ÁẤ" "ÃẪ" "ÈỀ" "ÉẾ" "ÒỒ" "ÓỐ" "ÕỖ" "ö" "àầ" "áấ" "ãẫ" "æ" "èề" "éế" "ë" "í" "òồ" "óố" "õỗ" "ü" "ą" "ȧ" "ə" "ɛ" "ẠẬ" "ạậ" "ẢẨ" "ảẩ" "ẸỆ" "ẹệ" "ẺỂ" "ē" "ẻể" "ẼỄ" "ẽễ" "ỌỘ" "ọộ" "ỎỔ" "ỏổ"
+))
+; end
+;		begin macron
+addmodify (id macron ignorespace rolls (
+"aā" "d" "eē" "gḡ" "iī" "j" "k" "l" "m" "n" "oō" "p" "r" "s" "uū" "w" "yȳ" "AĀ" "EĒ" "GḠ" "IĪ" "OŌ" "UŪ" "YȲ" "iī" "á" "èḕ" "üǖṻ" "ă" "" "" "ï" "ə" "ạ" "" "" "ẹ" "ÆǢ" "ÉḖ" "ÒṐ" "ÓṒ" "ÕȬ" "ÜǕ" "ä" "å" "æǣ" "éḗ" "ë" "ê" "í" "" "òṑ" "óṓ" "õȭ" "öȫ" "ė" "ę" "ě" "ĭ" "ŏ" "ţ" "ŭ" "ǫǭ" "ǻ" "ȧǡ" "ȮȰ" "ȯȱ" "ɛ" "ɜ" "ɯ" "χ" "ḶḸ" "ḷḹ" "ṚṜ" "ṛṝ" "ọ" "ụ" "ḁ" "" "" "" "" "ḙ" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "d" "" "" "ú" "à" "ì" "ò" "ù" "â" "î" "ô" "û"
+))
+; end
+;		begin ogonek
+addmodify (id ogonek ignorespace rolls (
+"aą" "cç" "dḑ" "eęȩ" "gģ" "hḩ" "iį" "kķ" "lļ" "nņ" "oǫ" "rŗ" "sş" "tţ" "uų" "AĄ" "CÇ" "DḐ" "EĘȨ" "GĢ" "HḨ" "IĮ" "KĶ" "LĻ" "NŅ" "OǪ" "RŖ" "SŞ" "TŢ" "UŲ" "kķ" "tţ" "ḗ" "ŏ" "" "" "ê" "ȏ" "á" "â" "è" "é" "ë" "ò" "ó" "ĆḈ" "ćḉ" "ē" "ĔḜ" "ĕḝ" "ŌǬ" "ōǭ" "š" "ȇ" "ȏ" "ə" "" "" "" "ẽ" "ṓ" "í" "ú"
+))
+; end
+;		begin dot
+addmodify (id dot ignorespace rolls (
+"AȦ" "BḂ" "CĊ" "DḊ" "EĖ" "FḞ" "GĠ" "HḢ" "Iİ" "" "LĿ" "MṀ" "NṄ" "OȮ" "PṖ" "RṘ" "SṠ" "TṪ" "WẆ" "XẊ" "YẎ" "ZŻ" "aȧ" "bḃ" "cċ" "dḋ" "eė" "fḟ" "gġ" "hḣ" "iı" "jȷ" "lŀ" "mṁ" "nṅ" "oȯ" "pṗ" "rṙ" "sṡ" "tṫ" "u" "v" "wẇ" "xẋ" "yẏ" "zż" "à" "â" "ò" "ù" "āǡ" "āǡ" "ă" "é" "ē" "ĕ" "ŌȰ" "ōȱ" "ŏ" "ŚṤ" "śṥ" "ŠṦ" "šṧ" "ū" "ſẛ" "ʒ" "ṢṨ" "ṣṩ" "" "" "" "" "" "" "" "" "" "" "" "" "" "" "" ""
+))
+; end
+;		begin dotbelow
+addmodify (id dotbelow ignorespace rolls (
+"aạ" "bḅ" "c" "dḍ" "eẹ" "hḥ" "iị" "kḳ" "lḷ" "mṃ" "nṇ" "oọ" "rṛ" "sṣ" "tṭ" "uụ" "vṿ" "wẉ" "yỵ" "zẓ" "AẠ" "BḄ" "DḌ" "EẸ" "HḤ" "IỊ" "KḲ" "LḶ" "MṂ" "NṆ" "OỌ" "RṚ" "SṢ" "TṬ" "UỤ" "VṾ" "WẈ" "YỴ" "ZẒ" "ā" "ē" "ś" "ÂẬ" "ÊỆ" "ÔỘ" "á" "âậ" "è" "é" "êệ" "î" "ó" "ôộ" "ö" "ü" "ĂẶ" "ăặ" "č" "ē" "ō" "ŕ" "ś" "š" "ū" "ž" "ƠỢ" "ơợ" "ƯỰ" "ưự" "ȇ" "ȏ" "ȧ" "ɒ" "ə" "δ" "ḺḸ" "ḻḹ" "ṞṜ" "ṟṝ" "ṠṨ" "ṡṩ" "" "" "" "" "ṓ"
+))
+; end
+;		begin eaccent
+addmodify (id eaccent ignorespace rolls (
+"O" "U" "V" "a" "e" "i" "j" "y" "o" "u" "v" "w" "ú"
+))
+; end
+;		begin horn
+addmodify (id horn ignorespace rolls (
+"OƠỎỞ" "oơỏở" "AẢ" "EẺ" "IỈ" "YỶ" "aả" "eẻ" "iỉ" "w" "yỷ" "ÂẨ" "ÊỂ" "ÓỚ" "ÔỔ" "ÕỠ" "ÚỨ" "âẩ" "êể" "óớ" "ôổ" "õỡ" "úứ" "ĂẲ" "ăẳ" "ŨỮ" "ũữ" "ỌỢ" "ọợ" "ỤỰ" "ụự" "UƯỦỬ" "uưủử"
+))
+; end
+;		begin stroke
+addmodify (id stroke ignorespace rolls (
+"oøɵ" "OØƟ" "ö" "0" "DÐ" "GǤ" "HĦ" "IƗ" "LŁ" "TŦ" "ZƵ" "bƀ" "dđ" "gǥ" "hħ" "lł" "tŧ" "zƶ" "ÓǾ" "ò" "óǿ" "ō" "" "iɨ" "ʃʄ" "uʉ"
+))
+; end
+;		begin ring
+addmodify (id ring ignorespace rolls (
+"AÅ" "UŮ" "aå" "e" "i" "uů" "wẘ" "W" "yẙ" "ÁǺ" "à" "áǻ" "ā" "ę" "ī" "ə" "" "" "" ""
+))
+; end
+;		begin ringbelow
+addmodify (id ringbelow ignorespace rolls (
+"AḀ" "aḁ" "e" "i" "l" "m" "u" "n" "r" "s" "v" "á" "ë" "ā" "ľ" "ł" "ȋ" "ɒ" "ə" "" ""
+))
+; end
+;		begin breve
+addmodify (id breve ignorespace rolls (
+"ā" "AĂ" "EĔ" "GĞ" "IĬ" "ǫ" "OŎ" "UŬ" "aă" "eĕ" "gğ" "iĭ" "j" "k" "l" "n" "oŏ" "p" "r" "s" "t" "uŭ" "w" "y" "ÀẰ" "ÁẮ" "ÃẴ" "àằ" "áắ" "ãẵ" "ä" "ö" "ü" "ė" "ī" "ľ" "ń" "ō" "ū" "ȧ" "ȯ" "ó" "ý" "ẃ" "ɛ" "ɯ" "β" "л" "ḿ" "ẠẶ" "ạặ" "ẢẲ" "ảẳ" "" "" "" "" "" "" "" "" "" "" ""
+))
+; end
+;		begin doublegrave
+addmodify (id doublegrave ignorespace rolls (
+"AȀ" "EȄ" "IȈ" "OȌŐ" "RȐ" "UȔŰ" "V" "aȁ" "eȅ" "g" "iȉ" "n" "" "" "oȍő" "rȑ" "uȕű" "v" "w" "y" "" ""
+))
+; end
+;		begin upside
+addmodify (id upside ignorespace rolls (
+"’‛‘" "2" "CƆ" "EƎƏ" "aɒɐ" "ē" "cɔ" "eə" "i" "mɯ" "ä" "å" "è" "é" "" "ê" "ö" "ü" "ė" "ę" "ě" "ȃ" "" "ȇ" "ȋ" "ȧ" "ɛɜ" "←→" "↑↓" "" "" "" "" "" "" "" "sƨ" "sƧ" "ʒƹ" "ƷƸ" "fɟ" "ɛɜ" "hɥ" "rɹ" "ʀʁ" "ʃʅ" "tʇ" "vʌ" "wʍ" "yʎ" "ʔʕʖ"
+))
+; end
+;		begin special
+addmodify (id special ignorespace rolls (
+"2½" "3ɜ" "8" "AÆ" "BƁ" "DƊ" "EƐ" "GƓ" "KƘ" "" "ȏ" "NŊ" "OŒ" "TÞƬ" "YƳ" "ZƷ" "aæɑ" "bɓʙ" "cɕʗ" "dð" "eɛ" "fſ" "gɣɠɢ" "hɦɧʜ" "kƙ" "lɬ" "nŋɲɴ" "oœ" "pƥ" "q" "sßʂʃʄʅʆ" "tþʈƭ" "vʋ" "x×" "yƴʏ" "zʒʐʑʓ" "|ǁǂʘ" "ÁǼ" "áǽ" "â" "" "è" "é" "ê" "ñ" "ò" "ó" "ö" "ĀǢ" "āǣ" "ď" "ē" "ĕ" "ń" "ō" "ŏ" "ź" "ż" "žǯ" "ǵ" "ḍ" "ḟẛ" "" "" "" "" "" "" "" "" "" "ḫ" "4¼¾" "iɪ" "ɯɰ" "mɱ" "ɹɺɻ" "rɾʀɿɼɽ" "uʊ" "?ʔ"
+))
+; end
+;		begin invbreve
+addmodify (id invbreve ignorespace rolls (
+"AȂ" "EȆ" "IȊ" "OȎ" "RȒ" "UȖ" "aȃ" "eȇ" "iȋ" "" "oȏ" "rȓ" "ǫ" "s" "uȗ" "ę" "ɒ" "ə" "ṣ" "ẹ" "" "" ""
+))
+; end
+;		begin down
+addmodify (id down ignorespace rolls (
+"a" "e" "h" "i" "o" "u" "è" "ë" "í" "ò" "ó" "ö" "ù" "ú" "ü" "ē" "ī" "ĭ" "ō" "ū" "ȯ" "ə" "" "ȱ" "ű" "å"
+))
+; end
+;		begin up
+addmodify (id up ignorespace rolls (
+"DḒ" "EḘ" "LḼ" "NṊ" "TṰ" "UṶ" "a" "dḓ" "eḙ" "" "ȫ" "ő" "lḽ" "nṋ" "o" "s" "tṱ" "uṷ" "á" "ä" "è" "é" "ë" "ò" "ó" "ö" "ā" "ă" "ē" "ō" "ŏ" "ū" "ŭ" "ȧ" "ȯ" "ə" "" "" "" "" "ȱ" "" "" ""
+))
+; end
+;		begin left
+addmodify (id left ignorespace rolls (
+"a" "e" "i" "k" "l" "s" "u" "z" "ä" "ḱ" "è" "é" "ì" "d" "ö" "ü" "ē" "ō" "ũ" "ǖ" "ȧ" "ɛ" "ɢ" "γ" "χ" "" "" "ŋ"
+))
+; end
+;		begin right
+addmodify (id right ignorespace rolls (
+"a" "e" "i" "n" "o" "s" "t" "u" "á" "é" "í" "ó" "ú" "à" "è" "ì" "ò" "ù" "â" "ê" "î" "ô" "û" "ä" "ë" "ï" "ö" "ü" "ā" "" "š" "ł" "ō" "ū" "ŭ" "ȧ" "ə" "ɛ" "ḱ" "" "" "" "" "" "" "" "" "" "" "" "" ""
+))
+; end
+;		begin smile
+addmodify (id smile ignorespace rolls (
+"HḪ" "a" "e" "hḫ" "i" "l" "o" "u" "é" "" "" "ä" "è" "ë" "ì" "ā" "ē" "ī" "ĭ" "ȧ" "ȯ" "ɛ" "ϑ" "л" "ẹ" "" "ǡ" "" "" "χ"
+))
+; end
+;		begin sad
+addmodify (id sad ignorespace rolls (
+"a" "e" "h" "i" "o" "u" "ì" "ö" "ü" "ë" "ő" "v" "é" "w" "ə" "ė" "ĭ" "ɛ" "ɯ" "ī" ""
+))
+; end
+;		begin misc
+addmodify (id misc ignorespace rolls (
+"BḆ" "DḎ" "EḚ" "IḬ" "KḴ" "LḺ" "NṈ" "RṞ" "TṮ" "UṴṲ" "ZẔ" "a" "bḇ" "dḏ" "eḛ" "hẖ" "iḭ" "kḵ" "lḻ" "nṉ" "o" "p" "" "rṟ" "s" "tṯ" "uṵṳ" "x" "zẕ" "á" "å" "é" "ë" "í" "ò" "ô" "ó" "ö" "ā" "ō" "ŏ" "ȧ" "ȫ" "ə" "δ" "ǡ" ""
+))
+; end
+;		begin diaindex
+addmodify (id diaindex ignorespace rolls (
+"f" "i" "ə" "(" "A" "E" "G" "a" "ë" "b" "c" "d" "e" "g" "h" "0⁰₀" "1¹₁" "2²₂" "3³₃" "4⁴₄" "5⁵₅" "6⁶₆" "7⁷₇" "8⁸₈" "9⁹₉" "β" "ə" "m" "n" "o" "r" "s" "t" "u" "x" "æ" "ó" "ö" "ü" "ă" "ő" "ś" "ť" "ȧ" "ɛ" "ɯ" "γ" "ṇ" "" "" "" "" ""
+))
+; end
+;		begin case
+addmodify (id case ignorespace rolls (
+"aA" "bB" "cC" "dD" "eE" "fF" "gG" "hH" "iI" "jJ" "kK" "lL" "mM" "nN" "oO" "pP" "qQ" "rR" "sS" "tT" "uU" "vV" "wW" "xX" "yY" "zZ" "áÁ" "âÂ" "äÄ" "ąĄ" "ćĆ" "čČ" "ďĎ" "éÉ" "èÈ" "ëË" "êÊ" "ěĚ" "ęĘ" "íÍ" "îÎ" "ïÏ" "ĺĹ" "ľĽ" "łŁ" "ńŃ" "ňŇ" "óÓ" "ôÔ" "öÖ" "őŐ" "ŕŔ" "řŘ" "śŚ" "šŠ" "ťŤ" "úÚ" "üÜ" "űŰ" "ůŮ" "ýÝ" "źŹ" "žŽ" "żŻ"
+))
+;end
+;  end
+;   begin görög
+ADDMODIFY (ID tonos ROLLS (
+	"αά" "εέ" "ηή" "ιί" "ϊΐ" "οό" "υύ" "ϋΰ" "ωώ"
+	"ΑΆ" "ΕΈ" "ΗΉ" "ΙΊ" "Ϊΐ" "ΟΌ" "ΥΎ" "Ϋΰ" "ΩΏ"
+))
+ADDMODIFY (ID diaeresis ROLLS (
+	"ιϊ" "ίΐ" "υϋ" "ύΰ"
+	"ίΐ" "ὶῒ" "ύΰ" "ὺῢ" "ῖῗ" "ῦῧ"
+	"ΙΪ" "ΥΫ"
+))
+ADDMODIFY (ID oxia ROLLS (
+	"αά" "εέ" "ηή" "ιί" "οό" "υύ" "ωώ"
+	"ἁἅ" "ἀἄ" "ἑἕ" "ἐἔ" "ἡἥ" "ἠἤ" "ἱἵ" "ἰἴ" "ὁὅ" "ὀὄ" "ὑὕ" "ὐὔ" "ὡὥ" "ὠὤ"
+	"ᾳᾴ" "ῃῄ" "ῳῴ"
+	"ᾁᾅ" "ᾑᾕ" "ᾡᾥ"
+	"ᾀᾄ" "ᾐᾔ" "ᾠᾤ"
+	"ΑΆ" "ΕΈ" "ΗΉ" "ΙΊ" "ΟΌ" "ΥΎ" "ΩΏ"
+	"ἉἍ" "ἈἌ" "ἙἝ" "ἘἜ" "ἩἭ" "ἨἬ" "ἹἽ" "ἸἼ" "ὉὍ" "ὈὌ" "ὙὝ" "ὩὭ" "ὨὬ"
+	"ᾉᾍ" "ᾙᾝ" "ᾩᾭ"
+	"ᾈᾌ" "ᾘᾜ" "ᾨᾬ"
+))
+ADDMODIFY (ID varia ROLLS (
+	"αὰ" "εὲ" "ηὴ" "ιὶ" "οὸ" "υὺ" "ωὼ"
+	"ἁἃ" "ἀἂ" "ἑἓ" "ἐἒ" "ἡἣ" "ἠἢ" "ἱἳ" "ἰἲ" "ὁὃ" "ὀὂ" "ὑὓ" "ὐὒ" "ὡὣ" "ὠὢ"
+	"ᾳᾲ" "ῃῂ" "ῳῲ"
+	"ᾁᾃ" "ᾑᾓ" "ᾡᾣ"
+	"ᾀᾂ" "ᾐᾒ" "ᾠᾢ"
+	"ΑᾺ" "ΕῈ" "ΗῊ" "ΙῚ" "ΟῸ" "ΥῪ" "ΩῺ"
+	"ἉἋ" "ἈἊ" "ἙἛ" "ἘἚ" "ἩἫ" "ἨἪ" "ἹἻ" "ἸἺ" "ὉὋ" "ὈὊ" "ὙὛ" "ὩὫ" "ὨὪ"
+	"ᾉᾋ" "ᾙᾛ" "ᾩᾫ"
+	"ᾈᾊ" "ᾘᾚ" "ᾨᾪ"
+))
+ADDMODIFY (ID perispomeni ROLLS (
+	"αᾶ" "ηῆ" "ιῖ" "υῦ" "ωῶ"
+	"ἁἇ" "ἀἆ" "ἡἧ" "ἠἦ" "ἱἷ" "ἰἶ" "ὑὗ" "ὐὖ" "ὡὧ" "ὠὦ"
+	"ᾳᾷ" "ῃῇ" "ῳῷ"
+	"ᾁᾇ" "ᾑᾗ" "ᾡᾧ"
+	"ᾀᾆ" "ᾐᾖ" "ᾠᾦ"
+	"ἉἏ" "ἈἎ" "ἩἯ" "ἨἮ" "ἹἿ" "ἸἾ" "ὙὟ" "ὐὖ" "ὩὯ" "ὨὮ"
+	"ᾉᾏ" "ᾙᾟ" "ᾩᾯ"
+	"ᾈᾎ" "ᾘᾞ" "ᾨᾮ"
+))
+ADDMODIFY (ID dasia ROLLS (
+	"αἁ" "εἑ" "ηἡ" "ιἱ" "οὁ" "υὑ" "ωὡ" "ρῥ"
+	"άἅ" "ὰἃ" "έἕ" "ὲἓ" "ήἥ" "ὴἣ" "ίἵ" "ὶἳ" "όὅ" "ὸὃ" "ύὕ" "ὺὓ" "ώὥ" "ὼὣ"
+	"ᾶἇ" "ῆἧ" "ῖἷ" "ῦὗ" "ῶὧ"
+	"ᾳᾁ" "ῃᾑ" "ῳᾡ"
+	"ᾴᾅ" "ῄᾕ" "ῴᾥ"
+	"ᾲᾃ" "ῂᾓ" "ῲᾣ"
+	"ᾷᾇ" "ῇᾗ" "ῷᾧ"
+	"ΑἉ" "ΕἙ" "ΗἩ" "ΙἹ" "ΟὉ" "ΥὙ" "ΩὩ"
+	"ΆἍ" "ᾺἋ" "ΈἝ" "ῈἛ" "ΉἭ" "ῊἫ" "ΊἽ" "ῚἻ" "ΌὍ" "ῸὋ" "ΎὝ" "ῪὛ" "ΏὭ" "ῺὫ"
+	"ᾼᾉ" "ῌᾙ" "ῼᾩ"
+))
+ADDMODIFY (ID psili ROLLS (
+	"αἀ" "εἐ" "ηἠ" "ιἰ" "οὀ" "υὐ" "ωὠ" "ρῤ"
+	"άἄ" "ὰἂ" "έἔ" "ὲἒ" "ήἤ" "ὴἢ" "ίἴ" "ὶἲ" "όὄ" "ὸὂ" "ύὔ" "ὺὒ" "ώὤ" "ὼὢ"
+	"ᾶἆ" "ῆἦ" "ῖἶ" "ῦὖ" "ῶὦ"
+	"ᾳᾀ" "ῃᾐ" "ῳᾠ"
+	"ᾴᾄ" "ῄᾔ" "ῴᾤ"
+	"ᾲᾂ" "ῂᾒ" "ῲᾢ"
+	"ᾷᾆ" "ῇᾖ" "ῷᾦ"
+	"ΑἈ" "ΕἘ" "ΗἨ" "ΙἸ" "ΟὈ" "ΩὨ"
+	"ΆἌ" "ᾺἊ" "ΈἜ" "ῈἚ" "ΉἬ" "ῊἪ" "ΊἼ" "ῚἺ" "ΌὌ" "ῸὊ" "ΏὬ" "ῺὪ"
+	"ᾼᾈ" "ῌᾘ" "ῼᾨ"
+))
+ADDMODIFY (ID ipogegrameni ROLLS (
+	"αᾳ" "ηῃ" "ωῳ"
+	"άᾴ" "ήῄ" "ώῴ"
+	"ὰᾲ" "ὴῂ" "ὼῲ"
+	"ἁᾁ" "ἡᾑ" "ὡᾡ"
+	"ἀᾀ" "ἠᾐ" "ὠᾠ"
+	"ᾶᾷ" "ῆῇ" "ῶῷ"
+	"ἅᾅ" "ἥᾕ" "ὥᾥ"
+	"ἄᾄ" "ἤᾔ" "ὤᾤ"
+	"ἃᾃ" "ἣᾓ" "ὣᾣ"
+	"ἂᾂ" "ἢᾒ" "ὢᾢ"
+	"ἇᾇ" "ἧᾗ" "ὧᾧ"
+	"ἆᾆ" "ἦᾖ" "ὦᾦ"
+	"Αᾼ" "Ηῌ" "Ωῼ"
+	"Ἁᾉ" "Ἡᾙ" "Ὡᾩ"
+	"Ἀᾈ" "Ἠᾘ" "Ὠᾨ"
+	"Ἅᾍ" "Ἥᾝ" "Ὥᾭ"
+	"Ἄᾌ" "Ἤᾜ" "Ὤᾬ"
+	"Ἃᾋ" "Ἣᾛ" "Ὣᾫ"
+	"Ἂᾊ" "Ἢᾚ" "Ὢᾪ"
+	"Ἇᾏ" "Ἧᾟ" "Ὧᾯ"
+	"Ἆᾎ" "Ἦᾞ" "Ὦᾮ"
+))
+;   end
+; end

@@ -1,0 +1,22 @@
+﻿coat (1000)
+font "Asap-Regular.ttf"
+let (logo
+block (
+	button (text 'x' addtitle (text 'Ω' color 0cff6 yoffset 500) color 0c0f9)
+	button (text 'x' addtitle (text 'ණ'  color 0cfcc yoffset 500) color 0c99f)
+	crl
+	button (text 'x' addtitle (text 'צ' color 0c99f xoffset 900) color 0cfcc)
+	button (text 'x' 
+		addtitle (text "Best’s" BOLD size 750 yoffset -380) 
+		addtitle (text "Board" BOLD size 750 yoffset 180) 
+		addtitle (text "beta" ITALICS size 400 yoffset 620) 
+		color 0c0c0)
+	button (text 'x' addtitle (text 'ቜ' color 0c9cf xoffset -900) color 0ccf9)
+	crr
+	button (text 'x' addtitle (text 'ゑ' color 0ccf9 yoffset -500) color 0c9cf)
+	button (text 'x' addtitle (text 'स' color 0c0f9 yoffset -500) color 0cff6)
+)
+)
+addlayout (id logolayout start
+halfcolumns 6 rows 3 align odds asboard color 0nk)
+block (logo layout logolayout row 1 column 1)

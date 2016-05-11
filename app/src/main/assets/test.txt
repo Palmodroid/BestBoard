@@ -1041,6 +1041,14 @@ block ( layout lay2p row 2 column 2
   SINGLE ( LOAD "testz.txt" )
   )
 
+block ( layout lay2p row 3 column 2 
+  SINGLE ( CHANGECASE ( LOWER UPPER SENTENCE ) )
+  SINGLE ( CHANGECASE ( LOWER UPPER ) )
+  SINGLE ( CHANGECASE ( UPPER SENTENCE ) )
+  SINGLE ( CHANGECASE ( SENTENCE ) )
+  SINGLE ( CHANGECASE ( ) )
+  )
+
 ; #############################################
 
 ADDLAYOUT ( ID lay3p HEXAGONAL ALIGN odds ROWS 5 HALFCOLUMNS 15 color 0nk ) 
@@ -1053,19 +1061,7 @@ BLOCK ( ROW -1 SWITCH ( BACK ADDTITLE ( link TEXT "Lay3" ) COLOR magenta ))
 
 ADDBOARD  ( ID lay3 PORTRAIT lay3p LANDSCAPE lay3l LOCK )
 
-let (logo block (
-	button (text 'x' addtitle (text 'Ω' color 0cff6 yoffset 500) color 0c0f9)
-	button (text 'x' addtitle (text 'צ' color 0cfcc yoffset 500) color 0c99f)
-	crl
-	button (text 'x' addtitle (text 'स' color 0c99f xoffset 500) color 0cfcc)
-	button (text 'x' addtitle (text "BestBoard" size 1000 yoffset 50) color 0c0c0)
-	button (text 'x' addtitle (text 'ቜ' color 0c9cf xoffset -500) color 0ccf9)
-	crr
-	button (text 'x' addtitle (text 'ゑ' color 0ccf9 yoffset -200) color 0c9cf)
-	button (text 'x' addtitle (text 'ණ' color 0c0f9 yoffset -200) color 0cff6)
-	) )
-
-block ( logo layout lay3p row 2 column 2 )
+INCLUDE ( "test_include.txt" )
 
 
 ; #############################################
