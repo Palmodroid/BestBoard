@@ -14,16 +14,27 @@ public class StringUtils
      * @param locale locale
      * @return new string with uppercase character on the first position
      */
-    public static String toUpperFirst( String string, Locale locale )
+    public static String toSentenceCase(String string, Locale locale )
         {
         if ( string.length() <= 1 )
             {
             return string.toUpperCase( locale );
             }
 
-        char c[] = string.toCharArray();
-        c[0] = String.valueOf( c[0] ).toUpperCase( locale ).charAt( 0 );
-        return new String(c);
+        char c[] = string.toLowerCase( locale ).toCharArray();
+
+        // Find the first letter
+        for (int counter = 0; counter < c.length; counter++)
+            {
+            if ( Character.isLetter(c[counter]) )
+                {
+                c[counter] = String.valueOf( c[counter] ).toUpperCase( locale ).charAt( 0 );
+                return new String(c);
+                }
+            }
+
+        // no letter can be found
+        return string;
         }
 
     /**
@@ -111,7 +122,7 @@ public class StringUtils
     public static final int UNKNOWN_CASE = -1;
     public static final int LOWER_CASE = 1;
     public static final int MIXED_CASE = 2;
-    public static final int FIRST_UPPER_CASE = 3;
+    public static final int SENTENCE_CASE = 3;
     public static final int UPPER_CASE = 4;
 
     public static int checkStringCase( String string )
@@ -124,8 +135,8 @@ public class StringUtils
      * UNKNOWN_CASE - no letters in the string
      * LOWER_CASE - all letters are lower case
      * UPPER_CASE - all letters are upper case
-     * FIRST_UPPER_CASE - first letter is uppercase, but all others are lowercase
-     * MICED_CASE - mixed lower case and upper case letters
+     * SENTENCE_CASE - first letter is uppercase, but all others are lowercase
+     * MIXED_CASE - mixed lower case and upper case letters
      * @param string string to check
      * @param maxLength max. characters to check
      * @return case-type
@@ -163,7 +174,7 @@ public class StringUtils
         else if (firstLetter == UPPER_CASE)
             {
             if (lowerCaseLetters == 0) return UPPER_CASE; // Even if one character long
-            if (upperCaseLetters == 0) return FIRST_UPPER_CASE;
+            if (upperCaseLetters == 0) return SENTENCE_CASE;
             }
         else // firstLetter == LOWER_CASE
             {

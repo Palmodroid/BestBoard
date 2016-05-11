@@ -132,8 +132,12 @@ public class Commands
     public static final long TOKEN_RELOAD = 0x713aee9cL;
     public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
     public static final long TOKEN_SELECTALL = 0x5ab4faaa9d61L;
-    public static final long TOKEN_CHANGECASE = 0x5c19ec2779e2bL;
     public static final long TOKEN_HELP = 0xe71acL;
+
+    public static final long TOKEN_CHANGECASE = 0x5c19ec2779e2bL;
+    public static final long TOKEN_LOWER = 0x26cc5bdL;
+    public static final long TOKEN_UPPER = 0x36ec6a4L;
+    public static final long TOKEN_SENTENCE = 0x273a20603b8L;
 
     public static final long TOKEN_RUN = 0x194cfL;
     public static final long TOKEN_HTML = 0xec204L;
@@ -590,12 +594,20 @@ public class Commands
         add(TOKEN_SETTINGS, PARAMETER_FLAG);
         add(TOKEN_TOGGLE, PARAMETER_KEYWORD);
         add(TOKEN_SELECTALL, PARAMETER_FLAG);
-        add(TOKEN_CHANGECASE, PARAMETER_FLAG);
         add(TOKEN_HELP, PARAMETER_FLAG);
         add(TOKEN_RUN, PARAMETER_STRING);
         add(TOKEN_HTML, PARAMETER_STRING);
         add(TOKEN_WEB, PARAMETER_STRING);
         add(TOKEN_LOAD, PARAMETER_STRING);
+
+        add(TOKEN_CHANGECASE, new long[]{
+                TOKEN_LOWER, TOKEN_UPPER, TOKEN_SENTENCE })
+                .method("packetChangeCase").allowAsLabel().allowAsDefault();
+
+        add(TOKEN_LOWER, PARAMETER_FLAG);
+        add(TOKEN_UPPER, PARAMETER_FLAG);
+        add(TOKEN_SENTENCE, PARAMETER_FLAG);
+
 
         add(TOKEN_TOP, PARAMETER_FLAG);
         add(TOKEN_LEFT, PARAMETER_FLAG);

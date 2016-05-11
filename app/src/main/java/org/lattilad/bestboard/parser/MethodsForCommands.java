@@ -23,6 +23,7 @@ import org.lattilad.bestboard.buttons.ButtonSingle;
 import org.lattilad.bestboard.buttons.ButtonSpaceTravel;
 import org.lattilad.bestboard.buttons.ButtonSwitch;
 import org.lattilad.bestboard.buttons.Packet;
+import org.lattilad.bestboard.buttons.PacketChangeCase;
 import org.lattilad.bestboard.buttons.PacketCombine;
 import org.lattilad.bestboard.buttons.PacketField;
 import org.lattilad.bestboard.buttons.PacketFunction;
@@ -1113,25 +1114,23 @@ public class MethodsForCommands
      */
     public Packet packetFunction( ExtendedMap<Long, Object> parameters )
         {
-        Long temp;
+        Object temp;
 
         if ( parameters.remove(Commands.TOKEN_DELETE) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_DELETE);
         if ( parameters.remove(Commands.TOKEN_BACKSPACE) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_BACKSPACE);
-        if ( (temp = (Long)parameters.remove(Commands.TOKEN_TOGGLE)) != null )
+        if ( (temp = parameters.remove(Commands.TOKEN_TOGGLE)) != null )
             {
-            if ( temp == Commands.TOKEN_CURSOR )
+            if ( (Long)temp == Commands.TOKEN_CURSOR )
                 return new PacketFunction(softBoardData, Commands.TOKEN_CURSOR);
-            if ( temp == Commands.TOKEN_AUTOFUNC )
+            if ( (Long)temp == Commands.TOKEN_AUTOFUNC )
                 return new PacketFunction(softBoardData, Commands.TOKEN_AUTOFUNC);
             tokenizer().error("TOGGLE", R.string.data_toggle_bad_parameter);
             return null;
             }
         if ( parameters.remove(Commands.TOKEN_SELECTALL) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_SELECTALL);
-        if ( parameters.remove(Commands.TOKEN_CHANGECASE) != null )
-            return new PacketFunction( softBoardData, Commands.TOKEN_CHANGECASE);
         if ( parameters.remove(Commands.TOKEN_RELOAD) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_RELOAD);
         if ( parameters.remove(Commands.TOKEN_SETTINGS) != null )
@@ -1139,20 +1138,15 @@ public class MethodsForCommands
         if ( parameters.remove(Commands.TOKEN_HELP) != null )
             return new PacketFunction( softBoardData, Commands.TOKEN_HELP);
 
-        // packetWebView will continue evaluation
-        return packetWithStringParameter(parameters);
-        }
+        if ((temp = parameters.remove(Commands.TOKEN_HTML)) != null)
+            return new PacketWebView(softBoardData, WebViewActivity.FILE, (String)temp);
+        if ((temp = parameters.remove(Commands.TOKEN_WEB)) != null)
+            return new PacketWebView(softBoardData, WebViewActivity.WEB, (String)temp);
+        if ((temp = parameters.remove(Commands.TOKEN_LOAD)) != null)
+            return new PacketLoad(softBoardData, (String)temp);
 
-
-    public Packet packetWithStringParameter(ExtendedMap<Long, Object> parameters)
-        {
-        String string;
-        if ((string = (String) parameters.remove(Commands.TOKEN_HTML)) != null)
-            return new PacketWebView(softBoardData, WebViewActivity.FILE, string);
-        if ((string = (String) parameters.remove(Commands.TOKEN_WEB)) != null)
-            return new PacketWebView(softBoardData, WebViewActivity.WEB, string);
-        if ((string = (String) parameters.remove(Commands.TOKEN_LOAD)) != null)
-            return new PacketLoad(softBoardData, string);
+        if ((temp = parameters.remove(Commands.TOKEN_CHANGECASE)) != null)
+            return (PacketChangeCase)temp;
 
         // packetRun will continue evaluation
         return packetRun(parameters);
@@ -1253,6 +1247,17 @@ public class MethodsForCommands
         packet = new PacketMove( softBoardData, moveType, cursorType, selectionType, packetKey );
 
         return packet;
+        }
+
+
+    // Creates PacketChangeCase from complex parameter
+    public PacketChangeCase packetChangeCase(ExtendedMap<Long, Object> parameters )
+        {
+        return new PacketChangeCase( softBoardData,
+                parameters.remove( Commands.TOKEN_LOWER ) != null,
+                parameters.remove( Commands.TOKEN_UPPER ) != null,
+                parameters.remove( Commands.TOKEN_SENTENCE ) != null
+                );
         }
 
 

@@ -1,10 +1,10 @@
 package org.lattilad.bestboard.buttons;
 
-import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
-import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.CapsState;
+import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.utils.HardKey;
 import org.lattilad.bestboard.utils.StringUtils;
 
@@ -124,7 +124,7 @@ public class PacketText extends Packet
 
             case 1:
                 softBoardData.softBoardListener.sendString(
-                        StringUtils.toUpperFirst( stringToSend, softBoardData.locale ), autoSpace );
+                        StringUtils.toSentenceCase( stringToSend, softBoardData.locale ), autoSpace );
                 break;
 
             default: // case 2:
