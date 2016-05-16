@@ -155,17 +155,18 @@ public class PacketText extends Packet
             if ( state == CapsState.META_OFF )
                 {
                 capsState = 0;
-
                 }
-            else if ( state == CapsState.META_LOCK || stringCaps )
+            else if ( state == CapsState.META_LOCK )
                 {
                 capsState = 2;
-
                 }
-            else // state == IN_TOUCH || META_ON || AUTOCAPS_ON
+            else if ( state == CapsState.AUTOCAPS_ON && !softBoardData.autoFuncEnabled )
                 {
-                capsState = 1;
-
+                capsState = 0;
+                }
+            else // state == IN_TOUCH || META_ON || AUTOCAPS_ON with enabled autoFunc
+                {
+                capsState = stringCaps ? 2 : 1;
                 }
 
             sendString( );
@@ -193,9 +194,9 @@ public class PacketText extends Packet
     public void release()
     	{
         // If needed, this could be a standalone method, called when touch releases the button
-        if (softBoardData.autoFuncEnabled)
-        	( (CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS] ).setAutoCapsState( autoCaps );
-        Scribe.debug(Debug.TEXT, "PacketText released, autocaps state is set.");
+       	( (CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS] ).setAutoCapsState( autoCaps );
+        Scribe.debug(Debug.TEXT, "PacketText released, autocaps state is set to " +
+                softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS].getState());
         }
     }
 

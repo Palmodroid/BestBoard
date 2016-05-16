@@ -5,8 +5,8 @@ import android.graphics.Canvas;
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
-import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.CapsState;
+import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.ExternalDataException;
 
@@ -81,7 +81,8 @@ public class ButtonMeta extends ButtonMultiTouch implements Cloneable
             drawButtonBackground(canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
 
         // It is only needed by CAPS, but all meta-buttons will know it.
-        else if ( layout.softBoardData.layoutStates.metaStates[type].getState() == CapsState.AUTOCAPS_ON)
+        else if ( layout.softBoardData.autoFuncEnabled &&
+                layout.softBoardData.layoutStates.metaStates[type].getState() == CapsState.AUTOCAPS_ON )
             drawButtonBackground(canvas, layout.softBoardData.autoColor, layout.layoutXOffset, layout.layoutYOffset);
 
         else
