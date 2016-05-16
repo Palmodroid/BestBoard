@@ -14,6 +14,26 @@ public class StringUtils
      * @param locale locale
      * @return new string with uppercase character on the first position
      */
+    public static String toUpperOnlyFirst( String string, Locale locale )
+        {
+        if ( string.length() <= 1 )
+            {
+            return string.toUpperCase( locale );
+            }
+
+        char c[] = string.toCharArray();
+        c[0] = String.valueOf( c[0] ).toUpperCase( locale ).charAt( 0 );
+        return new String(c);
+        }
+
+
+    /**
+     * Change the first character of the string to uppercase, and all others to lower case.
+     * String.toUpperCase( locale ) method is used.
+     * @param string string to change CANNOT BE NULL
+     * @param locale locale
+     * @return new string with uppercase character on the first, and lower case on all other positions
+     */
     public static String toSentenceCase(String string, Locale locale )
         {
         if ( string.length() <= 1 )

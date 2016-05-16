@@ -124,7 +124,7 @@ public class PacketText extends Packet
 
             case 1:
                 softBoardData.softBoardListener.sendString(
-                        StringUtils.toSentenceCase( stringToSend, softBoardData.locale ), autoSpace );
+                        StringUtils.toUpperOnlyFirst( stringToSend, softBoardData.locale ), autoSpace );
                 break;
 
             default: // case 2:

@@ -39,6 +39,8 @@ public class PacketChangeCase extends Packet
      *
      *                  mixed v
      * lower -> sentence -> upper ->
+     *
+     * !! This function cannot turn back string to its original case !!
      */
     @Override
     public void send()
