@@ -147,6 +147,9 @@ public class SoftBoardProcessor implements
     /** UndoCounter increases after each operation, so multi-touch operations can check validity */
     private long undoCounter = 0L;
 
+    private int undoLength = -1;
+
+
     /** Temporary variable to store string to be send */
     private StringBuilder sendBuilder = new StringBuilder();
 
@@ -293,6 +296,10 @@ public class SoftBoardProcessor implements
         // Real cursor position always should be updated
         realCursor[0] = newSelStart;
         realCursor[1] = newSelEnd;
+
+        // undolength is checked ONLY if undostring is NOT null -
+        // in these cases undolength will be always positive
+        undoLength = newSelStart-oldSelStart;
 
         Scribe.debug(Debug.TEXT,
                 "Real Start: " + realCursor[0] +
@@ -482,6 +489,8 @@ public class SoftBoardProcessor implements
 
         undoString = string;
         undoCounter++;
+        undoLength = -1;
+
         modifyCalculatedCursor(calculatedCursor[0] + string.length());
         textBeforeCursor.sendString(string);
         textAfterCursor.invalidate();
@@ -500,12 +509,31 @@ public class SoftBoardProcessor implements
             {
             if (isStoreTextEnabled() || textBeforeCursor.compare( ic, undoString )) // compare do reset also
                 {
+                Scribe.error( "UNDO SENDSTRING: " + undoString);
                 sendDelete(ic, -undoString.length());
                 return true;
                 }
+
             // törlés már nem volt sikeres
             undoString = null;
+
+            if ( undoLength == -1 ) // sendString was not accepted by editor
+                {
+                Scribe.error( "SENDSTRING WAS NOT ACCEPTED, UNDO IS NULL");
+                return true;
+                }
+
+            // !! Not sure, if this could work !!
+            if ( undoLength > 0 ) // sendString was not accepted by editor
+                {
+                sendDelete(ic, -undoLength);
+                Scribe.error( "SENDSTRING WAS NOT COMPLETELY ACCEPTED, UNDO LENGTH IS: " + undoLength);
+                return true;
+                }
+
             }
+
+        Scribe.error( "UNDO IS NOT POSSIBLE");
         return false;
         }
 
