@@ -517,19 +517,24 @@ public class SoftBoardProcessor implements
             // törlés már nem volt sikeres
             undoString = null;
 
-            if ( undoLength == -1 ) // sendString was not accepted by editor
+            // complete sendString was not accepted by editor - cursor was not moved
+            if ( undoLength == -1 )
                 {
                 Scribe.error( "SENDSTRING WAS NOT ACCEPTED, UNDO IS NULL");
                 return true;
                 }
 
-            // !! Not sure, if this could work !!
-            if ( undoLength > 0 ) // sendString was not accepted by editor
+            // THIS COULD NOT WORK !!
+            // partial sendString was not accepted by editor - cursor was moved less then string-length
+            // It works after write - wait - undo periods (first modification),
+            // but during ...undo - write periods (further mod.) onUpdateSeletion arrives too late.
+            // It thinks, that cursor was not moved at all.
+            /* if ( undoLength > 0 )
                 {
                 sendDelete(ic, -undoLength);
                 Scribe.error( "SENDSTRING WAS NOT COMPLETELY ACCEPTED, UNDO LENGTH IS: " + undoLength);
                 return true;
-                }
+                } */
 
             }
 
