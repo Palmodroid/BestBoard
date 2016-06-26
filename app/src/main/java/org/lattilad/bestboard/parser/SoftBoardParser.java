@@ -15,6 +15,7 @@ import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.ArrayUtils;
 import org.lattilad.bestboard.utils.Bit;
+import org.lattilad.bestboard.utils.ExtendedList;
 import org.lattilad.bestboard.utils.ExtendedMap;
 import org.lattilad.bestboard.utils.ExternalDataException;
 import org.lattilad.bestboard.utils.KeyValuePair;
@@ -27,9 +28,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.InvocationTargetException;
 import java.security.InvalidKeyException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+//import java.util.ArrayList;
 
 
 public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
@@ -492,7 +494,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         // Before the cycles DEFAULT VALUES populates returnParameters
         if ( useDefaults && defaults.containsKey( parsedCommandCode ) )
                 {
-                returnParameters.putAll( (ExtendedMap<Long, Object>)(defaults.get(parsedCommandCode)).clone() );
+                returnParameters.putAll( (ExtendedMap<Long, Object>)(defaults.get(parsedCommandCode)).getCopy() );
                 Scribe.debug(Debug.PARSER, "Default values (label) for [" + Tokenizer.regenerateKeyword(parsedCommandCode) +
                         "] are found: [" + returnParameters + "]");
                 }
@@ -538,15 +540,15 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                                     }
                                 else // MULTIPLE
                                     {
-                                    ArrayList<KeyValuePair> list =
-                                            (ArrayList<KeyValuePair>) returnParameters.get(entry.getKey());
+                                    ExtendedList<KeyValuePair> list =
+                                            (ExtendedList<KeyValuePair>) returnParameters.get(entry.getKey());
 
                                     if (list == null)
                                         {
-                                        list = new ArrayList<KeyValuePair>();
+                                        list = new ExtendedList<KeyValuePair>();
                                         returnParameters.put(entry.getKey(), list);
                                         }
-                                    list.addAll((ArrayList<KeyValuePair>) (entry.getValue()));
+                                    list.addAll((ExtendedList<KeyValuePair>) (entry.getValue()));
                                     }
                                 }
                             }
@@ -868,12 +870,12 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 else // MULTIPLE
                     {
                     groupCode = Bit.setSignedBitOn( groupCode );
-                    ArrayList<KeyValuePair> list;
+                    ExtendedList<KeyValuePair> list;
 
-                    list = (ArrayList<KeyValuePair>)returnParameters.get( groupCode );
+                    list = (ExtendedList<KeyValuePair>)returnParameters.get( groupCode );
                     if ( list == null )
                         {
-                        list = new ArrayList<KeyValuePair>();
+                        list = new ExtendedList<KeyValuePair>();
                         returnParameters.put( groupCode, list);
                         }
 
@@ -959,7 +961,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         {
         String forParameter = tokenizer.getStringToken();
 
-        List<Object> result = new ArrayList<>();
+        List<Object> result = new ExtendedList<Object>();
         Object element;
 
         // 1st token is obligatory OPENING-BRACKET

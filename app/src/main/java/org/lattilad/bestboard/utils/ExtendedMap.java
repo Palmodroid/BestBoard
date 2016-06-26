@@ -1,17 +1,36 @@
 package org.lattilad.bestboard.utils;
 
+import org.lattilad.bestboard.parser.Tokenizer;
+
 import java.util.Iterator;
 import java.util.Map;
-
-import org.lattilad.bestboard.parser.Tokenizer;
 
 /**
  * ExtendedMap with extended get method for HashMap.
  * The default value is returned if the map does not contain a value or
  * the value is null for the provided key.
  */
-public class ExtendedMap<K, V> extends java.util.HashMap<K, V>
+public class ExtendedMap<K, V> extends java.util.HashMap<K, V> implements ExtendedCopy
     {
+
+    @Override
+    public ExtendedMap<K, V> getCopy()
+        {
+        ExtendedMap<K, V> mapCopy = new ExtendedMap<>();
+
+        V value;
+
+        for ( Entry<K, V> entry : this.entrySet() )
+        	{
+            mapCopy.put (entry.getKey(),
+            	( entry.getValue() instanceof ExtendedCopy ) ?
+            	        (V)((ExtendedCopy)entry.getValue()).getCopy() :
+                        entry.getValue() );
+			}
+
+        return mapCopy;
+        }
+
 
     public ExtendedMap()
         {
@@ -28,7 +47,7 @@ public class ExtendedMap<K, V> extends java.util.HashMap<K, V>
         super(initialCapacity, loadFactor);
         }
 
-    public ExtendedMap(Map t)
+    public ExtendedMap(Map<? extends K, ? extends V> t)
         {
         super(t);
         }
@@ -40,7 +59,7 @@ public class ExtendedMap<K, V> extends java.util.HashMap<K, V>
      * @param defaultValue default value to return if key is not found
      * @return value that is associated with key
      */
-    public V remove(Object key, V defaultValue)
+    public V remove(Long key, V defaultValue)
         {
         V value = remove(key);
         return ( value != null ) ? value : defaultValue;
