@@ -1687,7 +1687,7 @@ public class MethodsForCommands
             ExtendedMap<Long, Object> defaultTitle;
             if (defaults.containsKey(Commands.TOKEN_ADDTITLE))
                 {
-                defaultTitle = (ExtendedMap<Long, Object>) (defaults.get(Commands.TOKEN_ADDTITLE)).getCopy();
+                defaultTitle = defaults.get(Commands.TOKEN_ADDTITLE).getCopy();
                 }
             else
                 {

@@ -489,15 +489,19 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
         // Parameter list (results of the called methods of the parameter-commands) will be returned to the caller
         // Every cycle can give a new item to returnParameters
-        ExtendedMap<Long, Object> returnParameters = new ExtendedMap<>();
+        ExtendedMap<Long, Object> returnParameters;
 
         // Before the cycles DEFAULT VALUES populates returnParameters
         if ( useDefaults && defaults.containsKey( parsedCommandCode ) )
-                {
-                returnParameters.putAll( (ExtendedMap<Long, Object>)(defaults.get(parsedCommandCode)).getCopy() );
-                Scribe.debug(Debug.PARSER, "Default values (label) for [" + Tokenizer.regenerateKeyword(parsedCommandCode) +
-                        "] are found: [" + returnParameters + "]");
-                }
+            {
+            returnParameters = defaults.get(parsedCommandCode).getCopy();
+            Scribe.debug(Debug.PARSER, "Default values (label) for [" + Tokenizer.regenerateKeyword(parsedCommandCode) +
+                    "] are found: [" + returnParameters + "]");
+            }
+        else
+            {
+            returnParameters = new ExtendedMap<>();
+            }
 
         // iterate the parameter-commands of the caller
         while (true)
@@ -524,7 +528,11 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
 
                         if ( parsedCommandData.isLabelTypeAllowed( labels.getTypeOfSelected() ))
                             {
-                            // label key is given as commandCode, while type is the parsed commandCode
+
+// !!!! THIS SHOULD BE REVIWED !!!! WHAT ABOUT EXTENDED COPY ???? //
+// returnParameters.addCopy ( labels.getValueOfSelected - which is a complex list )
+
+                            // label key is given as commandCode, while type is the parsed commandCode !! forwardParameters is used only as a tromporary storage here
                             forwardParameters = (ExtendedMap<Long, Object>) labels.getValueOfSelected(); // .get( commandCode, parsedCommandCode );
 
                             Scribe.debug( Debug.PARSER, "[" + commandString + "] is identified as a label. Value: [" +
