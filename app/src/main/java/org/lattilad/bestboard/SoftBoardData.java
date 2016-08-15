@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.util.LongSparseArray;
 import android.view.inputmethod.EditorInfo;
 
+import org.lattilad.bestboard.abbreviation.Abbreviations;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
@@ -284,6 +285,8 @@ public class SoftBoardData
 
     public SoftBoardShow softBoardShow;
 
+    public Abbreviations abbreviations;
+
 
     /*
      * Whether auto functions are enabled
@@ -351,6 +354,10 @@ public class SoftBoardData
      ** STARTING (CONSTRUCTOR) AND ENDING OF PARSING PHASE
      **/
 
+    /**
+     * Constructor is called BEFORE parsing
+     * Connect() is called AFTER parsing, when SoftBoardProcessor starts
+     */
     public SoftBoardData( )
         {
         // static variables should be deleted!!
@@ -359,11 +366,12 @@ public class SoftBoardData
         layoutStates = new LayoutStates();
         boardTable = new BoardTable();
         softBoardShow = new SoftBoardShow( this );
+        abbreviations = new Abbreviations();
         }
 
     /**
-     * SoftBoardProcessor finishes data population
-     * Definies default TitleSlots
+     * SoftBoardParser finishes data population
+     * Defines default TitleSlots
      * @param softBoardListener to connect with service
      */
     public void connect(SoftBoardListener softBoardListener)

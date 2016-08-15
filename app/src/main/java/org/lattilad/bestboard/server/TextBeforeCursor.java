@@ -4,6 +4,7 @@ import android.view.inputmethod.InputConnection;
 
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.utils.SimpleReader;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,7 +12,7 @@ import java.util.List;
 /**
  * Class to store text before cursor.
  */
-public class TextBeforeCursor
+public class TextBeforeCursor implements SimpleReader
     {
     /**
      * PartialString stores a String, but its length can be decreased.
@@ -122,6 +123,38 @@ public class TextBeforeCursor
 
 
     /**
+     * Differences between reset() reset(ic) and invalidate():
+     * - invalidate(): puffer is cleared
+     * - reset(): ic is get every time
+     * - reset(ic):  ic is used e.g. in blocks
+     * ?? if storeText is NOT allowed, then no text is stored, so why to clear it?
+     */
+    public void reset()
+        {
+        reset( null );
+        }
+
+
+    /**
+     * If store-text is enabled, then same as rewind: stored text will be read once more
+     * If store-text is disabled, then text will be invalidated, and re-read before the next read
+     */
+    public void reset( InputConnection ic )
+        {
+        inputConnection = ic;
+        // if text is not stored, then every read should re-read text from editor
+        if ( !connection.isStoreTextEnabled() )
+            {
+            // same as invalidate
+            text.clear();
+            textLength = 0;
+            textReady = false;
+            }
+        rewind();
+        }
+
+
+    /**
      * If text is no longer identical with stored text (eg. cursor position changed),
      * then stored text should be cleared.
      * Reader is no longer valid, it will be reset, too.
@@ -165,30 +198,6 @@ public class TextBeforeCursor
         textReady = true;
 
         Scribe.debug( Debug.TEXT, "TEXT: Stored text before cursor synchronized: " + toString());
-        }
-
-
-    public void reset()
-        {
-        reset( null );
-        }
-
-    /**
-     * If store-text is enabled, then same as rewind: stored text will be read once more
-     * If store-text is disabled, then text will be invalidated, and re-read before the next read
-     */
-    public void reset( InputConnection ic )
-        {
-        inputConnection = ic;
-        // if text is not stored, then every read should re-read text from editor
-        if ( !connection.isStoreTextEnabled() )
-            {
-            // same as invalidate
-            text.clear();
-            textLength = 0;
-            textReady = false;
-            }
-        rewind();
         }
 
 

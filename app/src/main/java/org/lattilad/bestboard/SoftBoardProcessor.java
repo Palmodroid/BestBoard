@@ -13,6 +13,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
+import org.lattilad.bestboard.abbreviation.Abbreviations;
 import org.lattilad.bestboard.buttons.PacketText;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.prefs.PrefsFragment;
@@ -148,6 +149,9 @@ public class SoftBoardProcessor implements
     private long undoCounter = 0L;
 
     private int undoLength = -1;
+
+    /** abbrevCounter == -1 if abbrev is not allowed, undoCounter of the last sendString, if abbrev is needed **/
+    private long abbrevCounter = 0L;
 
 
     /** Temporary variable to store string to be send */
@@ -344,6 +348,22 @@ public class SoftBoardProcessor implements
             checkEnabledAfter = System.nanoTime() + (long)elongationPeriod * 1000000L;
             Scribe.debug(Debug.CURSOR, "Check is enabled after: " + checkEnabledAfter);
             }
+
+        // ABBREV
+        if ( abbrevCounter == undoCounter )
+            {
+            textBeforeCursor.reset();
+            String string = "[" + (char)(textBeforeCursor.read()) + (char)(textBeforeCursor.read()) + (char)(textBeforeCursor.read()) + (char)(textBeforeCursor.read()) + (char)(textBeforeCursor.read()) + "]";
+            Scribe.error("ABBREV: " + string);
+            Abbreviations.Entry entry = softBoardData.abbreviations.lookup( textBeforeCursor );
+            if ( entry == null )
+                Scribe.note(" No entry was found. ");
+            else
+                {
+                changeStringBeforeCursor( entry.ending.length(), entry.expanded);
+                Scribe.note(" Entry: " + entry.expanded);
+                }
+            }
         }
 
 
@@ -474,11 +494,23 @@ public class SoftBoardProcessor implements
         return processCounter == undoCounter;
         }
 
+
     /*****************************************
      * LOW LEVEL TEXT PROCESSING
      * Itt minden metódusnak szüksége van az InputConnection-re, ÉS
      * Minden méret char-ban van megadva (és nem code-point-ban)
      *****************************************/
+
+
+    /**
+     * TextBeforeCursor.reset(ic) needs it (e.g. modify)
+     * Implementing IC independent methods would be a better choise !!
+     * @return current input connection CAN BE NULL !
+     */
+    public InputConnection getInputConnection()
+        {
+        return softBoardService.getCurrentInputConnection();
+        }
 
 
     private void sendString( InputConnection ic, String string )
@@ -490,6 +522,10 @@ public class SoftBoardProcessor implements
         undoString = string;
         undoCounter++;
         undoLength = -1;
+
+        // ABBREV
+        if ( abbrevCounter >= 0L )
+            abbrevCounter = undoCounter; // last process was string, abbrev check is needed
 
         modifyCalculatedCursor(calculatedCursor[0] + string.length());
         textBeforeCursor.sendString(string);
@@ -1136,7 +1172,7 @@ public class SoftBoardProcessor implements
             sendBuilder.setLength(0);
             if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoFuncEnabled)
                 {
-                textBeforeCursor.reset();
+                textBeforeCursor.reset(ic);
                 if ( !StringUtils.isWhiteSpace(textBeforeCursor.read()) )
                     sendBuilder.append(' ');
                 }
@@ -1531,7 +1567,7 @@ public class SoftBoardProcessor implements
                 String string;
                 int c;
 
-                textBeforeCursor.reset();
+                textBeforeCursor.reset( ic );
                 lastWordLengthBeforeCursor = 0;
                 while (!StringUtils.isWhiteSpace(c = getTextBeforeCursor().read()) && c != -1) // -1 is NOT whitespace !!
                     {
