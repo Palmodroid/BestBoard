@@ -23,6 +23,7 @@ public class Abbreviations
         public String ending;
         public String expanded;
 
+        // Should be similar to compare, but it doesn't stop after ending
         @Override
         public int compareTo(Entry another)
             {
@@ -60,6 +61,9 @@ public class Abbreviations
         abbreviations.add( new Entry ("tiz","ttttttttt"));
         abbreviations.add( new Entry ("ttttttttten1","eeeeeeeeeee"));
         abbreviations.add( new Entry ("ttttttttten22","kkkkkkkkkkk"));
+        abbreviations.add( new Entry ("abc","def"));
+        abbreviations.add( new Entry ("def","ghi"));
+        abbreviations.add( new Entry ("ghi","abc"));
 
         Collections.sort( abbreviations );
 

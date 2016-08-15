@@ -349,20 +349,22 @@ public class SoftBoardProcessor implements
             Scribe.debug(Debug.CURSOR, "Check is enabled after: " + checkEnabledAfter);
             }
 
-        // ABBREV
-        if ( abbrevCounter == undoCounter )
+        Abbreviations.Entry firstEntry = null;
+        // ABBREV - recursive
+        while ( abbrevCounter == undoCounter )
             {
-            textBeforeCursor.reset();
-            String string = "[" + (char)(textBeforeCursor.read()) + (char)(textBeforeCursor.read()) + (char)(textBeforeCursor.read()) + (char)(textBeforeCursor.read()) + (char)(textBeforeCursor.read()) + "]";
-            Scribe.error("ABBREV: " + string);
             Abbreviations.Entry entry = softBoardData.abbreviations.lookup( textBeforeCursor );
-            if ( entry == null )
-                Scribe.note(" No entry was found. ");
-            else
-                {
-                changeStringBeforeCursor( entry.ending.length(), entry.expanded);
-                Scribe.note(" Entry: " + entry.expanded);
-                }
+
+            if ( entry == null )        // no entry - stop
+                break;
+
+            changeStringBeforeCursor( entry.ending.length(), entry.expanded);
+
+            if ( entry == firstEntry )  // entry was already used - prevent infinite loops
+                break;
+
+            if ( firstEntry == null )   // set first entry to detect infinite loops
+                firstEntry = entry;
             }
         }
 
