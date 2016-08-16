@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-import org.lattilad.bestboard.abbreviation.Abbreviations;
+import org.lattilad.bestboard.abbreviation.Abbrev;
 import org.lattilad.bestboard.buttons.PacketText;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.prefs.PrefsFragment;
@@ -349,11 +349,11 @@ public class SoftBoardProcessor implements
             Scribe.debug(Debug.CURSOR, "Check is enabled after: " + checkEnabledAfter);
             }
 
-        Abbreviations.Entry firstEntry = null;
+        Abbrev.Entry firstEntry = null;
         // ABBREV - recursive
         while ( abbrevCounter == undoCounter )
             {
-            Abbreviations.Entry entry = softBoardData.abbreviations.lookup( textBeforeCursor );
+            Abbrev.Entry entry = softBoardData.abbreviations.lookUp( textBeforeCursor );
 
             if ( entry == null )        // no entry - stop
                 break;

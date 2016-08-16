@@ -8,6 +8,7 @@ import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.SoftBoardShow;
+import org.lattilad.bestboard.abbreviation.Abbrev;
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonAlternate;
 import org.lattilad.bestboard.buttons.ButtonDouble;
@@ -53,6 +54,7 @@ import org.lattilad.bestboard.webview.WebViewActivity;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -1858,6 +1860,67 @@ public class MethodsForCommands
 
         tokenizer().note( tokenizer().regenerateKeyword( id ),
                 R.string.data_modify_added );
+        }
+
+
+    public void addAbbrev( ExtendedMap<Long, Object> parameters )
+        {
+        Long id;
+
+        id = (Long) parameters.remove( Commands.TOKEN_ID );
+        if ( id == null )
+            {
+            tokenizer().error("ADDABBREV", R.string.data_abbrev_no_id );
+            return;
+            }
+
+        Abbrev abbrev = softBoardData.abbreviations.addAbbrev( id );
+        boolean start = (parameters.remove( Commands.TOKEN_START ) != null);
+
+        List<Object> entries = (List) parameters.remove( Commands.TOKEN_ENTRIES );
+        if ( entries != null )
+            {
+            // PARAMETER_STRING_LIST gives only non-null String items
+            Iterator iterator = entries.iterator();
+            String ending;
+            String expanded;
+
+            while (iterator.hasNext())
+                {
+                ending = (String) iterator.next();
+                if (!iterator.hasNext())
+                    {
+                    tokenizer().error(Tokenizer.regenerateKeyword(id), R.string.data_abbrev_bad_entry, ending);
+                    break;
+                    }
+                expanded = (String) iterator.next();
+                abbrev.add( ending, expanded );
+
+                Scribe.note("ABBREV: " + ending + "/" + expanded);
+                }
+            }
+
+// JOBB AZ EMPTY, MERT AZ ÜRES BEÍRÁST IS LÁTJA!
+
+        // Check emptiness!
+        if ( softBoardData.abbreviations.checkEmptiness( id ) )
+            {
+            tokenizer().error(Tokenizer.regenerateKeyword( id ), R.string.data_abbrev_no_entries );
+            return;
+            }
+
+        /*
+        if ( softBoardData.modify.get( id ) != null )
+            {
+            tokenizer().error( tokenizer().regenerateKeyword( id ),
+                    R.string.data_modify_overwritten );
+            }
+
+        softBoardData.modify.put( id, mod );
+
+        tokenizer().note( tokenizer().regenerateKeyword( id ),
+                R.string.data_modify_added );
+                */
         }
 
 

@@ -71,6 +71,9 @@
     <string name="data_modify_no_rolls">"Modify has no valid rolls!"</string>
     <string name="data_modify_overwritten">"Previous modification data is overwritten!"</string>
     <string name="data_modify_added">"Modification data is added."</string>
+    <string name="data_abbrev_no_id">"Collection of abbreviations has no ID!"</string>
+    <string name="data_abbrev_no_entries">"Collection of abbreviations has no valid entries!"</string>
+    <string name="data_abbrev_bad_entry">"Entry has no text:"</string>
     <string name="data_primary_board_missing">"Root board is not defined, sentence non-wide layout is used."</string>
 
 </resources>

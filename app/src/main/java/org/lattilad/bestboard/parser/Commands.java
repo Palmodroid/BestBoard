@@ -263,6 +263,12 @@ public class Commands
     public static final long TOKEN_IGNORESPACE = 0x13b2fae0bc2c2ceL;
     // public static final long TOKEN_REVERSE = 0x105e77189aL;
 
+    public static final long TOKEN_ADDABBREV = 0x21196688325bL;
+    // public static final long TOKEN_ID = 0x102a6L;
+    public static final long TOKEN_ENTRIES = 0x8bf664820L;
+    // public static final long TOKEN_START = 0x3385de2L;
+
+
     public static final long TOKEN_MONITOR = 0xd8a451b16L;
     // public static final long TOKEN_LAYOUT = 0x5805f907L;
     // public static final long TOKEN_SIZE = 0x17098aL;
@@ -392,6 +398,7 @@ public class Commands
                 TOKEN_INCLUDE,
 
                 TOKEN_ADDMODIFY,
+                TOKEN_ADDABBREV,
                 TOKEN_MONITOR,
 
                 TOKEN_NAME,
@@ -840,6 +847,12 @@ public class Commands
         add(TOKEN_ADDROLL, (PARAMETER_STRING | PARAMETER_MOD_LIST)).method("addRollHelper");
         add(TOKEN_ROLLS, (PARAMETER_STRING | PARAMETER_MOD_LIST));
         add(TOKEN_IGNORESPACE, PARAMETER_FLAG);
+
+        add(TOKEN_ADDABBREV, new long[]{
+                TOKEN_ID, TOKEN_ENTRIES, TOKEN_START }).method("addAbbrev");
+        // TOKEN_ID is already defined
+        add(TOKEN_ENTRIES, (PARAMETER_STRING | PARAMETER_MOD_LIST));
+        // TOKEN_START is already defined
 
         add(TOKEN_MONITOR, new long[]{
                 TOKEN_LAYOUT,
