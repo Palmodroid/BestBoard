@@ -361,17 +361,17 @@ public class MethodsForCommands
             if ( layout == null )
                 {
                 tokenizer().error( "LAYOUT", R.string.data_no_layout,
-                        tokenizer().regenerateKeyword( (long)layoutId));
+                        Tokenizer.regenerateKeyword( (long)layoutId));
                 return;
                 }
 
             if ( softBoardData.boardTable.addBoard(id, layout, locked) )
                 {
-                tokenizer().error(tokenizer().regenerateKeyword(id), R.string.data_board_id_overwritten);
+                tokenizer().error(Tokenizer.regenerateKeyword(id), R.string.data_board_id_overwritten);
                 }
 
-            tokenizer().note( tokenizer().regenerateKeyword(id), R.string.data_board_id_set,
-                    tokenizer().regenerateKeyword( (long)layoutId));
+            tokenizer().note( Tokenizer.regenerateKeyword(id), R.string.data_board_id_set,
+                    Tokenizer.regenerateKeyword( (long)layoutId));
             }
 
         // no LAYOUT is given, so PORTRAIT AND LANDSCAPE is needed
@@ -387,12 +387,12 @@ public class MethodsForCommands
                 if ( portrait == null )
                     {
                     tokenizer().error( "PORTRAIT", R.string.data_no_layout,
-                            tokenizer().regenerateKeyword( (long)portraitId));
+                            Tokenizer.regenerateKeyword( (long)portraitId));
                     }
                 }
             else
                 {
-                tokenizer().error( tokenizer().regenerateKeyword(id), R.string.data_board_portrait_missing);
+                tokenizer().error( Tokenizer.regenerateKeyword(id), R.string.data_board_portrait_missing);
                 }
 
             Long landscapeId = (Long)parameters.remove( Commands.TOKEN_LANDSCAPE );
@@ -404,12 +404,12 @@ public class MethodsForCommands
                 if ( landscape == null )
                     {
                     tokenizer().error( "LANDSCAPE", R.string.data_no_layout,
-                            tokenizer().regenerateKeyword( (long)landscapeId));
+                            Tokenizer.regenerateKeyword( (long)landscapeId));
                     }
                 }
             else
                 {
-                tokenizer().error( tokenizer().regenerateKeyword(id), R.string.data_board_landscape_missing);
+                tokenizer().error( Tokenizer.regenerateKeyword(id), R.string.data_board_landscape_missing);
                 }
 
             // only if both parameters are ok
@@ -418,7 +418,7 @@ public class MethodsForCommands
 
             if ( softBoardData.boardTable.addBoard(id, portrait, landscape, locked) )
                 {
-                tokenizer().error(tokenizer().regenerateKeyword(id), R.string.data_board_id_overwritten);
+                tokenizer().error(Tokenizer.regenerateKeyword(id), R.string.data_board_id_overwritten);
                 }
             }
 
@@ -480,7 +480,7 @@ public class MethodsForCommands
                 }
             else
                 {
-                tokenizer().error(tokenizer().regenerateKeyword((long) id),
+                tokenizer().error(Tokenizer.regenerateKeyword((long) id),
                         R.string.data_columns_missing);
                 return;
                 }
@@ -489,7 +489,7 @@ public class MethodsForCommands
         temp = parameters.remove( Commands.TOKEN_ROWS );
         if (temp == null)
             {
-            tokenizer().error( tokenizer().regenerateKeyword( (long)id),
+            tokenizer().error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_rows_missing );
             return;
             }
@@ -507,7 +507,7 @@ public class MethodsForCommands
         else if ( alignFlag == Commands.TOKEN_EVENS )
             oddRowsAligned = false;
         else if ( alignFlag != -1L )
-            tokenizer().error( tokenizer().regenerateKeyword( (long)id),
+            tokenizer().error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_align_bad_parameter );
 
         color = (int)parameters.remove(Commands.TOKEN_COLOR, DEFAULT_LAYOUT_COLOR);
@@ -577,11 +577,11 @@ public class MethodsForCommands
 
             if ( layouts.put(id, layout) != null )
                 {
-                tokenizer().error( tokenizer().regenerateKeyword( (long)id),
+                tokenizer().error( Tokenizer.regenerateKeyword( (long)id),
                         R.string.data_layout_overwritten );
                 }
 
-            tokenizer().note( tokenizer().regenerateKeyword( (long)id),
+            tokenizer().note( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_layout_added,
                     layout.toString());
 
@@ -603,7 +603,7 @@ public class MethodsForCommands
             }
         catch (ExternalDataException ede)
             {
-            tokenizer().error( tokenizer().regenerateKeyword( (long)id),
+            tokenizer().error( Tokenizer.regenerateKeyword( (long)id),
                     R.string.data_layout_error);
             }
         }
@@ -1838,27 +1838,27 @@ public class MethodsForCommands
 
         if (counter > 1)
             {
-            tokenizer().error( tokenizer().regenerateKeyword( id ),
+            tokenizer().error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_modify_one_allowed );
             }
 
         // No roll could be added!
         if ( empty )
             {
-            tokenizer().error( tokenizer().regenerateKeyword( id ),
+            tokenizer().error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_modify_no_rolls );
             return;
             }
 
         if ( softBoardData.modify.get( id ) != null )
             {
-            tokenizer().error( tokenizer().regenerateKeyword( id ),
+            tokenizer().error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_modify_overwritten );
             }
 
         softBoardData.modify.put( id, mod );
 
-        tokenizer().note( tokenizer().regenerateKeyword( id ),
+        tokenizer().note( Tokenizer.regenerateKeyword( id ),
                 R.string.data_modify_added );
         }
 
@@ -1874,9 +1874,10 @@ public class MethodsForCommands
             return;
             }
 
-        Abbrev abbrev = softBoardData.abbreviations.addAbbrev( id );
         boolean start = (parameters.remove( Commands.TOKEN_START ) != null);
-
+        
+        Abbrev abbrev = new Abbrev();
+        boolean empty = true;
         List<Object> entries = (List) parameters.remove( Commands.TOKEN_ENTRIES );
         if ( entries != null )
             {
@@ -1895,32 +1896,27 @@ public class MethodsForCommands
                     }
                 expanded = (String) iterator.next();
                 abbrev.add( ending, expanded );
-
-                Scribe.note("ABBREV: " + ending + "/" + expanded);
+                empty = false;
+                // Scribe.note("ABBREV: " + ending + "/" + expanded);
                 }
             }
-
-// JOBB AZ EMPTY, MERT AZ ÜRES BEÍRÁST IS LÁTJA!
-
+        
         // Check emptiness!
-        if ( softBoardData.abbreviations.checkEmptiness( id ) )
+        if ( empty )
             {
             tokenizer().error(Tokenizer.regenerateKeyword( id ), R.string.data_abbrev_no_entries );
             return;
             }
 
-        /*
-        if ( softBoardData.modify.get( id ) != null )
+        // returns true if previous collection was overwritten
+        if ( softBoardData.abbreviations.add( id, abbrev ) )
             {
-            tokenizer().error( tokenizer().regenerateKeyword( id ),
-                    R.string.data_modify_overwritten );
+            tokenizer().error( Tokenizer.regenerateKeyword( id ),
+                    R.string.data_abbrev_overwritten );
             }
 
-        softBoardData.modify.put( id, mod );
-
-        tokenizer().note( tokenizer().regenerateKeyword( id ),
-                R.string.data_modify_added );
-                */
+        tokenizer().note( Tokenizer.regenerateKeyword( id ),
+                R.string.data_abbrev_added );
         }
 
 
@@ -1936,7 +1932,7 @@ public class MethodsForCommands
         if ( layout == null )
             {
             tokenizer().error( "LAYOUT", R.string.data_no_layout,
-                    tokenizer().regenerateKeyword( (long)layoutId));
+                    Tokenizer.regenerateKeyword( (long)layoutId));
             return;
             }
 

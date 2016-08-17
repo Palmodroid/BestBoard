@@ -73,7 +73,9 @@
     <string name="data_modify_added">"Modification data is added."</string>
     <string name="data_abbrev_no_id">"Collection of abbreviations has no ID!"</string>
     <string name="data_abbrev_no_entries">"Collection of abbreviations has no valid entries!"</string>
-    <string name="data_abbrev_bad_entry">"Entry has no text:"</string>
+    <string name="data_abbrev_bad_entry">"Entry has no expanded text:"</string>
+    <string name="data_abbrev_overwritten">"Previous collection of abbreviations is overwritten!"</string>
+    <string name="data_abbrev_added">"Collection of abbreviations is added."</string>
     <string name="data_primary_board_missing">"Root board is not defined, sentence non-wide layout is used."</string>
 
 </resources>

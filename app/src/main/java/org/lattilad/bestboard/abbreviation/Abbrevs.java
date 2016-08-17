@@ -7,30 +7,18 @@ public class Abbrevs
     {
     private Map<Long, Abbrev> abbrevs = new HashMap<>();
 
-    public Abbrev addAbbrev( Long id )
+    private Abbrev workingAbbrev = new Abbrev();
+
+
+    public boolean add( Long id, Abbrev abbrev )
         {
-        Abbrev abbrev = abbrevs.get( id );
-        if ( abbrev == null )
-            {
-            abbrev = new Abbrev();
-            abbrevs.put( id, abbrev );
-            }
-        return abbrev;
+        return abbrevs.put( id, abbrev ) != null;
         }
 
-    public Abbrev getAbbrev( Long id )
-        {
-        return abbrevs.get( id );
-        }
+    // start?
 
-    public boolean checkEmptiness( Long id )
+    public Abbrev getAbbrev()
         {
-        // id cannot be null!!
-        if ( abbrevs.get( id ).isEmpty() )
-            {
-            abbrevs.remove( id );
-            return true;
-            }
-        return false;
+        return workingAbbrev;
         }
     }
