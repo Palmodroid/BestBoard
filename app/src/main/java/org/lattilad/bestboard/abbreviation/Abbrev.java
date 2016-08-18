@@ -6,6 +6,7 @@ import org.lattilad.bestboard.utils.SimpleReader;
 import org.lattilad.bestboard.utils.StringReverseReader;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 
@@ -19,16 +20,23 @@ public class Abbrev
         entries.add( new Entry( ending, expanded ));
         }
 
+    public void clear()
+        {
+        entries.clear();
+        }
 
     public void addAll( Abbrev abbrev )
         {
-        entries.addAll( abbrev.entries );
+        if ( abbrev != null )
+            entries.addAll( abbrev.entries );
         }
 
-    public boolean isEmpty()
+
+    public void sort()
         {
-        return entries.isEmpty();
+        Collections.sort( entries );
         }
+
 
     public Entry lookUp(SimpleReader reader)
         {

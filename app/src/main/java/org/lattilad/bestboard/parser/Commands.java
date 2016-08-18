@@ -229,6 +229,9 @@ public class Commands
 
     public static final long TOKEN_PROGRAM = 0xf61900e6aL;
 
+    public static final long TOKEN_ABBREV = 0x2a99b1b3L;
+    public static final long TOKEN_IDS = 0x1623eL;
+
     public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
 
     public static final long TOKEN_ENTER = 0x1a3c13eL;
@@ -279,7 +282,7 @@ public class Commands
     // public static final long TOKEN_COLOR = 0x16b2be3L;
 
     public static final long TOKEN_STOP = 0x1742d1L;
-
+    // ?? public static final long TOKEN_BREAK = 0x150bd0dL;
 
     // Complex parameter types - ABOVE POSITIVE 0xFFFF (Tokenizer.TOKEN_CODE_SHIFT)
     // Complex parameter - Multiple modifier - BELOW NEGATIVE 0xFFFF
@@ -522,6 +525,7 @@ public class Commands
                 TOKEN_SPACETRAVEL | PARAMETER_MOD_MULTIPLE,
                 TOKEN_MEMORY | PARAMETER_MOD_MULTIPLE,
                 TOKEN_PROGRAM | PARAMETER_MOD_MULTIPLE,
+                TOKEN_ABBREV | PARAMETER_MOD_MULTIPLE,
                 TOKEN_ENTER | PARAMETER_MOD_MULTIPLE,
                 TOKEN_META | PARAMETER_MOD_MULTIPLE,
                 TOKEN_SWITCH | PARAMETER_MOD_MULTIPLE,
@@ -758,6 +762,13 @@ public class Commands
                 TOKEN_RUN }))
                 .method("setProgram").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
+
+        add(TOKEN_ABBREV, ArrayUtils.concat(buttonArray, new long[]{
+                TOKEN_IDS }))
+                .method("setAbbrev").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON});
+        add(TOKEN_IDS, (PARAMETER_KEYWORD | PARAMETER_MOD_LIST));
+
 
         add(TOKEN_META, new long[]{
                 TOKEN_CAPS,

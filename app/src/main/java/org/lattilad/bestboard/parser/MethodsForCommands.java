@@ -10,6 +10,7 @@ import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.SoftBoardShow;
 import org.lattilad.bestboard.abbreviation.Abbrev;
 import org.lattilad.bestboard.buttons.Button;
+import org.lattilad.bestboard.buttons.ButtonAbbrev;
 import org.lattilad.bestboard.buttons.ButtonAlternate;
 import org.lattilad.bestboard.buttons.ButtonDouble;
 import org.lattilad.bestboard.buttons.ButtonEnter;
@@ -1456,6 +1457,15 @@ public class MethodsForCommands
             }
         }
 
+    public Button setAbbrev( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "Abbreviation Button is defined");
+
+        // Packet with default cannot be null!
+        return completeMainTouchButton( new ButtonAbbrev( (List) parameters.remove( Commands.TOKEN_IDS ) ),
+                parameters);
+        }
+
     public Button setProgram( ExtendedMap<Long, Object> parameters )
         {
         Scribe.debug(Debug.DATA, "Program Button is defined");
@@ -1909,7 +1919,7 @@ public class MethodsForCommands
             }
 
         // returns true if previous collection was overwritten
-        if ( softBoardData.abbreviations.add( id, abbrev ) )
+        if ( softBoardData.abbreviations.add( id, abbrev, start ) )
             {
             tokenizer().error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_abbrev_overwritten );

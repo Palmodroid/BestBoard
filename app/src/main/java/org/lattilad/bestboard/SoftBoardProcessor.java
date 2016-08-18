@@ -353,7 +353,7 @@ public class SoftBoardProcessor implements
         // ABBREV - recursive
         while ( abbrevCounter == undoCounter )
             {
-            Entry entry = softBoardData.abbreviations.getAbbrev().lookUp( textBeforeCursor );
+            Entry entry = softBoardData.abbreviations.get().lookUp( textBeforeCursor );
 
             if ( entry == null )        // no entry - stop
                 break;
