@@ -122,6 +122,8 @@ public class Commands
 
     public static final long TOKEN_TEXT = 0x17b9c8L;
     public static final long TOKEN_FIELD = 0x1bc2d9cL;
+    public static final long TOKEN_VARIA = 0x37fd2d7L;
+    //public static final long TOKEN_NO = 0x1036aL;
     public static final long TOKEN_KEY = 0x16d1bL;
     public static final long TOKEN_COMBINE = 0x790d8163bL;
     public static final long TOKEN_TIME = 0x17cd86L;
@@ -271,6 +273,15 @@ public class Commands
     public static final long TOKEN_ENTRIES = 0x8bf664820L;
     // public static final long TOKEN_START = 0x3385de2L;
 
+    public static final long TOKEN_ADDVARIA = 0xe5051e7c5fL;
+    public static final long TOKEN_ADDGROUP = 0xe5037e9badL;
+    // public static final long TOKEN_ID = 0x102a6L;
+    public static final long TOKEN_CODE = 0xac8a2L;
+    public static final long TOKEN_LEGENDS = 0xcc736c644L;
+    public static final long TOKEN_LEGEND = 0x586a3cb4L;
+    public static final long TOKEN_NO = 0x1036aL;
+    // public static final long TOKEN_TEXT = 0x17b9c8L;
+    public static final long TOKEN_TITLE = 0x34cdb02L;
 
     public static final long TOKEN_MONITOR = 0xd8a451b16L;
     // public static final long TOKEN_LAYOUT = 0x5805f907L;
@@ -402,6 +413,7 @@ public class Commands
 
                 TOKEN_ADDMODIFY,
                 TOKEN_ADDABBREV,
+                TOKEN_ADDVARIA,
                 TOKEN_MONITOR,
 
                 TOKEN_NAME,
@@ -568,6 +580,7 @@ public class Commands
         long[] packetArray = new long[]{
                 TOKEN_TEXT,
                 // TOKEN_FIELD,
+                TOKEN_VARIA, TOKEN_NO,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
@@ -596,6 +609,8 @@ public class Commands
 
         add(TOKEN_TEXT, PARAMETER_TEXT);
         add(TOKEN_FIELD, PARAMETER_TEXT);
+        add(TOKEN_VARIA, PARAMETER_KEYWORD);
+        add(TOKEN_NO, PARAMETER_INT);
         add(TOKEN_KEY, PARAMETER_INT);
         add(TOKEN_COMBINE, PARAMETER_FLAG);
 
@@ -699,7 +714,7 @@ public class Commands
                 /* TOKEN_KEY,
                 TOKEN_FORCECAPS, TOKEN_FORCESHIFT, TOKEN_FORCECTRL, TOKEN_FORCEALT,
                 TOKEN_DO */}).method("packet").allowAsLabel().allowAsDefault()
-                .labels(new long[]{TOKEN_PACKET});;
+                .labels(new long[]{TOKEN_PACKET});
 
         add(TOKEN_LIST, ArrayUtils.concat(buttonArray, new long[]{
                 TOKEN_TEXT,
@@ -864,6 +879,21 @@ public class Commands
         // TOKEN_ID is already defined
         add(TOKEN_ENTRIES, (PARAMETER_STRING | PARAMETER_MOD_LIST));
         // TOKEN_START is already defined
+
+        add(TOKEN_ADDVARIA, new long[]{
+                TOKEN_ID, TOKEN_ADDGROUP }).method("addVaria");
+        add(TOKEN_ADDGROUP, new long[]{
+                TOKEN_CODE,
+                TOKEN_LEGENDS,
+                TOKEN_LEGEND | PARAMETER_MOD_MULTIPLE }).method("addVariaGroup");
+        add(TOKEN_CODE, PARAMETER_TEXT );
+        add(TOKEN_LEGENDS, (PARAMETER_STRING | PARAMETER_MOD_LIST));
+        add(TOKEN_LEGEND, new long[]{
+                TOKEN_NO, TOKEN_TEXT, TOKEN_TITLE }).method("addVariaLegend");
+        // TOKEN_NO is already defined
+        // TOKEN_TEXT is already defined
+        add(TOKEN_TITLE, PARAMETER_TEXT );
+
 
         add(TOKEN_MONITOR, new long[]{
                 TOKEN_LAYOUT,
