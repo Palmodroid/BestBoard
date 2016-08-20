@@ -13,8 +13,9 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-import org.lattilad.bestboard.abbreviation.Entry;
 import org.lattilad.bestboard.buttons.PacketText;
+import org.lattilad.bestboard.codetext.AbbreviationEntry;
+import org.lattilad.bestboard.codetext.Entry;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.prefs.PrefsFragment;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -353,17 +354,20 @@ public class SoftBoardProcessor implements
         // ABBREV - recursive
         while ( abbrevCounter == undoCounter )
             {
-            Entry entry = softBoardData.abbreviations.get().lookUp( textBeforeCursor );
+            Entry entry = softBoardData.codeTextProcessor.getAbbreviation().lookUp( textBeforeCursor );
 
             if ( entry == null )        // no entry - stop
                 break;
 
-            changeStringBeforeCursor( entry.ending.length(), entry.expanded);
+            if ( entry instanceof AbbreviationEntry )
+                {
+                changeStringBeforeCursor(entry.getCode().length(), ((AbbreviationEntry) entry).getExpanded());
+                }
 
-            if ( entry == firstEntry )  // entry was already used - prevent infinite loops
+            if ( entry == firstEntry)  // abbreviationEntry was already used - prevent infinite loops
                 break;
 
-            if ( firstEntry == null )   // set first entry to detect infinite loops
+            if ( firstEntry == null )   // set first abbreviationEntry to detect infinite loops
                 firstEntry = entry;
             }
         }

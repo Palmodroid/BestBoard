@@ -36,7 +36,7 @@ public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
     public void drawButtonChangingPart(Canvas canvas)
         {
         // Call super if show-title is needed
-        if ( layout.softBoardData.abbreviations.activeButton == this )
+        if ( layout.softBoardData.codeTextProcessor.activeButton == this )
             {
             drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
             drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
@@ -46,15 +46,15 @@ public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
     @Override
     public void mainTouchStart(boolean isTouchDown)
         {
-        if ( layout.softBoardData.abbreviations.activeButton == this )
+        if ( layout.softBoardData.codeTextProcessor.activeButton == this )
             {
-            layout.softBoardData.abbreviations.activeButton = null;
-            layout.softBoardData.abbreviations.start( idList );
+            layout.softBoardData.codeTextProcessor.activeButton = null;
+            layout.softBoardData.codeTextProcessor.startAbbreviation( idList );
             }
         else
             {
-            layout.softBoardData.abbreviations.activeButton = this;
-            layout.softBoardData.abbreviations.stop();
+            layout.softBoardData.codeTextProcessor.activeButton = this;
+            layout.softBoardData.codeTextProcessor.stopAbbreviation();
             }
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }

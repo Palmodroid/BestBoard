@@ -8,7 +8,7 @@ import android.preference.PreferenceManager;
 import android.util.LongSparseArray;
 import android.view.inputmethod.EditorInfo;
 
-import org.lattilad.bestboard.abbreviation.Abbrevs;
+import org.lattilad.bestboard.codetext.CodeTextProcessor;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
@@ -285,7 +285,7 @@ public class SoftBoardData
 
     public SoftBoardShow softBoardShow;
 
-    public Abbrevs abbreviations;
+    public CodeTextProcessor codeTextProcessor;
 
 
     /*
@@ -366,7 +366,7 @@ public class SoftBoardData
         layoutStates = new LayoutStates();
         boardTable = new BoardTable();
         softBoardShow = new SoftBoardShow( this );
-        abbreviations = new Abbrevs();
+        codeTextProcessor = new CodeTextProcessor();
         }
 
     /**

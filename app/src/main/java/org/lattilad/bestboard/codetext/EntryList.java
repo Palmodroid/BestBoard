@@ -1,5 +1,4 @@
-package org.lattilad.bestboard.abbreviation;
-
+package org.lattilad.bestboard.codetext;
 
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.SimpleReader;
@@ -9,26 +8,28 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-
-public class Abbrev
+/**
+ * Created by Beothe on 2016.08.19..
+ */
+public class EntryList
     {
     private List<Entry> entries = new ArrayList<>();
 
 
-    public void add( String ending, String expanded )
+    public void add( Entry entry )
         {
-        entries.add( new Entry( ending, expanded ));
+        entries.add( entry );
+        }
+
+    public void addAll( EntryList entryList )
+        {
+        if ( entryList != null )
+            entries.addAll( entryList.entries );
         }
 
     public void clear()
         {
         entries.clear();
-        }
-
-    public void addAll( Abbrev abbrev )
-        {
-        if ( abbrev != null )
-            entries.addAll( abbrev.entries );
         }
 
 
@@ -57,10 +58,10 @@ public class Abbrev
             middle = first + (last - first)/2;
 
             reader.reset();
-            stringReverseReader.setString( entries.get(middle).ending );
-            cmp = Entry.compare( reader, stringReverseReader);
+            stringReverseReader.setString( entries.get(middle).getCode() );
+            cmp = AbbreviationEntry.compare( reader, stringReverseReader);
 
-            builder.append("[").append(entries.get(middle).ending).append("/")
+            builder.append("[").append(entries.get(middle).getCode()).append("/")
                     .append(cmp).append("/")
                     .append(first).append("-")
                     .append(middle).append("-")
@@ -88,4 +89,3 @@ public class Abbrev
         }
 
     }
-

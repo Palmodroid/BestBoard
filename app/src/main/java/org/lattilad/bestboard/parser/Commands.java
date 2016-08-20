@@ -875,10 +875,9 @@ public class Commands
         add(TOKEN_IGNORESPACE, PARAMETER_FLAG);
 
         add(TOKEN_ADDABBREV, new long[]{
-                TOKEN_ID, TOKEN_ENTRIES, TOKEN_START }).method("addAbbrev");
+                TOKEN_ID, TOKEN_ENTRIES }).method("addAbbrev");
         // TOKEN_ID is already defined
         add(TOKEN_ENTRIES, (PARAMETER_STRING | PARAMETER_MOD_LIST));
-        // TOKEN_START is already defined
 
         add(TOKEN_ADDVARIA, new long[]{
                 TOKEN_ID, TOKEN_ADDGROUP }).method("addVaria");

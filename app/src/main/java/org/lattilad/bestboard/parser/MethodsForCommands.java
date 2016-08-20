@@ -8,7 +8,6 @@ import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.SoftBoardShow;
-import org.lattilad.bestboard.abbreviation.Abbrev;
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonAbbrev;
 import org.lattilad.bestboard.buttons.ButtonAlternate;
@@ -37,6 +36,8 @@ import org.lattilad.bestboard.buttons.PacketText;
 import org.lattilad.bestboard.buttons.PacketTextTime;
 import org.lattilad.bestboard.buttons.PacketWebView;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
+import org.lattilad.bestboard.codetext.AbbreviationEntry;
+import org.lattilad.bestboard.codetext.EntryList;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
 import org.lattilad.bestboard.modify.ModifyChar;
@@ -1884,9 +1885,7 @@ public class MethodsForCommands
             return;
             }
 
-        boolean start = (parameters.remove( Commands.TOKEN_START ) != null);
-        
-        Abbrev abbrev = new Abbrev();
+        EntryList abbreviation = new EntryList();
         boolean empty = true;
         List<Object> entries = (List) parameters.remove( Commands.TOKEN_ENTRIES );
         if ( entries != null )
@@ -1905,7 +1904,7 @@ public class MethodsForCommands
                     break;
                     }
                 expanded = (String) iterator.next();
-                abbrev.add( ending, expanded );
+                abbreviation.add( new AbbreviationEntry(ending, expanded) );
                 empty = false;
                 // Scribe.note("ABBREV: " + ending + "/" + expanded);
                 }
@@ -1919,7 +1918,7 @@ public class MethodsForCommands
             }
 
         // returns true if previous collection was overwritten
-        if ( softBoardData.abbreviations.add( id, abbrev, start ) )
+        if ( softBoardData.codeTextProcessor.addAbbreviation( id, abbreviation ) )
             {
             tokenizer().error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_abbrev_overwritten );

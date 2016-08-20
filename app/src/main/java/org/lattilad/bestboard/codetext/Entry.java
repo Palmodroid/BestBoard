@@ -1,25 +1,29 @@
-package org.lattilad.bestboard.abbreviation;
+package org.lattilad.bestboard.codetext;
 
 import org.lattilad.bestboard.utils.SimpleReader;
 import org.lattilad.bestboard.utils.StringReverseReader;
 
 public class Entry implements Comparable<Entry>
     {
-    public Entry( String ending, String expanded )
+
+    private String code;
+
+    public Entry( String code )
         {
-        this.ending = ending;
-        this.expanded = expanded;
+        this.code = code;
         }
 
-    public String ending;
-    public String expanded;
+    public String getCode()
+        {
+        return code;
+        }
 
     // Should be similar to compare, but it doesn't stop after ending
     @Override
     public int compareTo(Entry another)
         {
-        StringReverseReader thisString = new StringReverseReader( this.ending );
-        StringReverseReader anotherString = new StringReverseReader( another.ending );
+        StringReverseReader thisString = new StringReverseReader( this.code );
+        StringReverseReader anotherString = new StringReverseReader( another.getCode() );
         int thisChar;
         int anotherChar;
 
@@ -36,7 +40,7 @@ public class Entry implements Comparable<Entry>
         }
 
     /**
-     * This method should be similar to Entry.compareTo, (that is why it can be found here)
+     * This method should be similar to AbbreviationEntry.compareTo, (that is why it can be found here)
      * but this one is used for entry lookup
      */
     static public int compare(SimpleReader text, SimpleReader ending )
