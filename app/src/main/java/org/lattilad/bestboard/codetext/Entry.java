@@ -1,11 +1,11 @@
 package org.lattilad.bestboard.codetext;
 
+import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.utils.SimpleReader;
 import org.lattilad.bestboard.utils.StringReverseReader;
 
-public class Entry implements Comparable<Entry>
+public abstract class Entry implements Comparable<Entry>
     {
-
     private String code;
 
     public Entry( String code )
@@ -17,6 +17,8 @@ public class Entry implements Comparable<Entry>
         {
         return code;
         }
+
+    public abstract void activate(SoftBoardProcessor processor);
 
     // Should be similar to compare, but it doesn't stop after ending
     @Override

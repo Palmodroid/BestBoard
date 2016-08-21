@@ -8,6 +8,11 @@ public class VariaLegend
     private String text;
     private String title;
 
+    public VariaLegend(String text)
+        {
+        this( text, text );
+        }
+
     public VariaLegend(String text, String title)
         {
         this.text = text;

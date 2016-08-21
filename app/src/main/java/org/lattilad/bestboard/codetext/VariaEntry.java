@@ -1,18 +1,24 @@
 package org.lattilad.bestboard.codetext;
 
+import org.lattilad.bestboard.SoftBoardProcessor;
+
 /**
  * Created by Beothe on 2016.08.20..
  */
 public class VariaEntry extends Entry
     {
-    private Varia varia;
-    private int index;
+    private VariaGroup variaGroup;
 
-    public VariaEntry(String code, Varia varia, int index )
+    public VariaEntry(String code, VariaGroup variaGroup )
         {
         super(code);
-        this.varia = varia;
-        this.index = index;
+        this.variaGroup = variaGroup;
+        }
+
+    @Override
+    public void activate(SoftBoardProcessor processor)
+        {
+        variaGroup.activate();
         }
 
     }

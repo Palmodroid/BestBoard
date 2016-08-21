@@ -1,6 +1,7 @@
 package org.lattilad.bestboard.parser;
 
 import android.graphics.Color;
+import android.os.Bundle;
 import android.view.KeyEvent;
 
 import org.lattilad.bestboard.Layout;
@@ -38,6 +39,9 @@ import org.lattilad.bestboard.buttons.PacketWebView;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.codetext.AbbreviationEntry;
 import org.lattilad.bestboard.codetext.EntryList;
+import org.lattilad.bestboard.codetext.Varia;
+import org.lattilad.bestboard.codetext.VariaGroup;
+import org.lattilad.bestboard.codetext.VariaLegend;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
 import org.lattilad.bestboard.modify.ModifyChar;
@@ -1458,14 +1462,45 @@ public class MethodsForCommands
             }
         }
 
+
+    /*
+     * if abbrevKeySet is false after parsing, then no abbrev key is available, so
+     * all abbrev should be used at init.
+     * Otherwise no abbrev is set.
+     */
+    public boolean abbrevKeySet = false;
+
     public Button setAbbrev( ExtendedMap<Long, Object> parameters )
         {
         Scribe.debug(Debug.DATA, "Abbreviation Button is defined");
 
-        // Packet with default cannot be null!
-        return completeMainTouchButton( new ButtonAbbrev( (List) parameters.remove( Commands.TOKEN_IDS ) ),
-                parameters);
+        List<Long> ids;
+
+        ids = (List) parameters.remove( Commands.TOKEN_IDS );
+        if ( ids == null )
+            {
+            ids = new ArrayList<>(1);
+            ids.add( (Long)parameters.remove( Commands.TOKEN_IDS ));
+            }
+
+        if ( ids.isEmpty() )
+            {
+            tokenizer().error("ABBREV", R.string.data_abbrev_missing_id);
+            return setEmpty( parameters );
+            }
+
+        ButtonAbbrev button = new ButtonAbbrev( ids );
+
+        if ( (boolean)parameters.remove( Commands.TOKEN_START, false ) )
+            {
+            if ( softBoardData.codeTextProcessor.activeButton != null )
+                tokenizer().error("ABBREV", R.string.data_abbrev_missing_id);
+            softBoardData.codeTextProcessor.activeButton = button;
+            }
+
+        return completeMainTouchButton( button, parameters);
         }
+
 
     public Button setProgram( ExtendedMap<Long, Object> parameters )
         {
@@ -1926,6 +1961,146 @@ public class MethodsForCommands
 
         tokenizer().note( Tokenizer.regenerateKeyword( id ),
                 R.string.data_abbrev_added );
+        }
+
+
+    public void addVaria(ExtendedMap<Long, Object> parameters )
+        {
+        Long id;
+
+        id = (Long) parameters.remove( Commands.TOKEN_ID );
+        if ( id == null )
+            {
+            tokenizer().error("ADDVARIA", R.string.data_varia_no_id );
+            return;
+            }
+
+        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
+        ArrayList<KeyValuePair> groups = (ArrayList<KeyValuePair>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_ADDGROUP ) );
+
+        if ( groups == null || groups.isEmpty() )
+            {
+            tokenizer().error( Tokenizer.regenerateKeyword(id), R.string.data_varia_no_groups );
+            return;
+            }
+
+        Varia varia = new Varia();
+
+        for (KeyValuePair group : groups)
+            {
+            // group contains its code
+            varia.addGroup( (VariaGroup) group.getValue() );
+            }
+
+        // returns true if previous collection was overwritten
+        if ( softBoardData.codeTextProcessor.addVaria( id, varia ) )
+            {
+            tokenizer().error( Tokenizer.regenerateKeyword( id ),
+                    R.string.data_varia_overwritten );
+            }
+
+        tokenizer().note( Tokenizer.regenerateKeyword( id ),
+                R.string.data_abbrev_added );
+        }
+
+
+        /**
+         * Varia group is identified by CODE (text)
+         * One group can contain only one LEGENDS (legends defined only by text) and list of LEGEND.
+         * LEGEND-s with no index (or negative) are added at the end of the list
+         * LEGEND-s with valid index replace (without notice) the previous legend at this position.
+         * @param parameters
+         * @return defined varia group
+         */
+    public VariaGroup addVariaGroup(ExtendedMap<Long, Object> parameters )
+        {
+        String code = (String) parameters.remove( Commands.TOKEN_CODE );
+        if ( code == null )
+            {
+            tokenizer().error("VARIAGROUP", R.string.data_group_no_code );
+            return null;
+            }
+
+        List<VariaLegend> legendList = new ArrayList<>();
+
+        List<Object> textLegends = (List<Object>)parameters.remove( Commands.TOKEN_LEGENDS);
+        if ( textLegends != null )
+            {
+            for (Object textLegend: textLegends)
+                {
+                legendList.add(new VariaLegend((String) textLegend));
+                }
+            }
+
+        // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
+        ArrayList<KeyValuePair> legends = (ArrayList<KeyValuePair>)parameters.remove(
+                Bit.setSignedBitOn( Commands.TOKEN_LEGEND ) );
+
+        // value cannot be null (only non-null results are stored during parse
+        if ( legends != null )
+            {
+            Bundle bundle;
+            int num;
+            String text;
+            String title;
+
+            for (KeyValuePair legend : legends)
+                {
+                bundle = (Bundle) legend.getValue();
+                num = bundle.getInt("NO");
+                text = bundle.getString("TEXT");
+                title = bundle.getString("TITLE");
+
+                if ( num > legendList.size() )
+                    {
+                    num = -1; // add to the end
+                    tokenizer().error( code , R.string.data_group_index_invalid, text );
+                    }
+                if (num >= 0 || num < legendList.size() ) // replace at index
+                    {
+                    legendList.set(num, new VariaLegend(text, title));
+                    }
+                else // add to the end
+                    {
+                    legendList.add( new VariaLegend(text, title));
+                    }
+                }
+            }
+
+        if ( legendList.isEmpty() )
+            {
+            tokenizer().error( code , R.string.data_group_index_invalid );
+            return null;
+            }
+
+        return new VariaGroup( code, legendList );
+        }
+
+
+    /**
+     * Returns legend data for varia. Because it should (can) contain index information,
+     * it returns a bundle instead of legend class. If text is missing, then null is returned.
+     * @param parameters
+     * @return bundle of NO, TEXT and TITLE. NO is -1, if missing
+     * Null is returned, if TEXT is missing!
+     */
+    public Bundle addVariaLegend(ExtendedMap<Long, Object> parameters )
+        {
+        String text = (String) parameters.remove( Commands.TOKEN_TEXT );
+        if ( text == null )
+            {
+            tokenizer().error("VARIALEGEND", R.string.data_legend_no_text );
+            return null;
+            }
+
+        Bundle bundle = new Bundle( 3 );
+        bundle.putString( "TEXT", text );
+
+        bundle.putString( "TITLE", (String) parameters.remove( Commands.TOKEN_TEXT, text ));
+        bundle.putInt( "NO", (int) parameters.remove( Commands.TOKEN_ID, -1 ));
+
+        return bundle;
         }
 
 

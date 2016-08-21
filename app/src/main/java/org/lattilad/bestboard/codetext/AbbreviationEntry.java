@@ -1,5 +1,7 @@
 package org.lattilad.bestboard.codetext;
 
+import org.lattilad.bestboard.SoftBoardProcessor;
+
 public class AbbreviationEntry extends Entry
     {
     private String expanded;
@@ -15,4 +17,9 @@ public class AbbreviationEntry extends Entry
         return expanded;
         }
 
+    @Override
+    public void activate(SoftBoardProcessor processor)
+        {
+        processor.changeStringBeforeCursor( getCode().length(), expanded);
+        }
     }

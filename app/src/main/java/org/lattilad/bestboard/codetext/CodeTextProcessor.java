@@ -2,22 +2,117 @@ package org.lattilad.bestboard.codetext;
 
 import org.lattilad.bestboard.buttons.ButtonAbbrev;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * CodeText-s are a completely new feature. Code-texts are standard text, which are written by the
+ * user. Bestboard translate these codes into special functions.
+ * Currently two functions are implemented: abbreviation and varia-packets. Both of them should be
+ * managed by CodeTextProcessor, because code-text entries are checked during typing.
+ */
 public class CodeTextProcessor
     {
-    private Map<Long, EntryList> abbreviations = new HashMap<>();
+    /* PART OF VARIA */
 
-    private EntryList activeAbbreviations = new EntryList();
+    /** Storage for all varia classes */
+    private Map<Long, Varia> varias = new HashMap<>();
 
+    /** Storage for code-text entries - VariaEntries are stored here */
+    private EntryList variaEntries = new EntryList();
+
+
+    /**
+     * Stores a new varia collection. This varia collection is NOT initialized yet!
+     * @param id    varia id keyword
+     * @param varia collection
+     * @return true if collection replaces a previous collection with the same id
+     */
+    public boolean addVaria(Long id, Varia varia)
+        {
+        return varias.put(id, varia) != null;
+        }
+
+
+    /**
+     * Init all varia collections. VariaEntries are added to variaEntries.
+     * Entries should know: CODE-TEXT and GROUP (Group contains its VARIA to activate)
+     * activeVariaEntrieas are sorted!
+     */
+    private void initVaria()
+        {
+        for ( Varia varia : varias.values() )
+            {
+            for ( VariaGroup group : varia.getGroups() )
+                {
+                variaEntries.add( new VariaEntry( group.getCode(), group ));
+                }
+            }
+        variaEntries.sort();
+        codeEntries.addAll( variaEntries );
+        }
+
+
+    /* PART OF ABBREVIATON */
+
+    /** Just stores the currently active button; no connection with these classes */
     public ButtonAbbrev activeButton = null;
 
+    /**
+     * Storage for code-text entries
+     * Abbreviations do not have a separate class, they are just stored as EntryList of AbbreviationEntries
+     * All these entries (grouped by id-s) are stored here
+     */
+    private Map<Long, EntryList> abbreviations = new HashMap<>();
+
+    /**
+     * Stores a new abbreviation collection, which is NOT Initialised yet!
+     * @param id abbreviation id keyword
+     * @param abbreviation collection of abbreviation entries
+     * @return true if collection replaces a previous collection with the same id
+     */
     public boolean addAbbreviation(Long id, EntryList abbreviation )
         {
         return abbreviations.put( id, abbreviation) != null;
+        }
+
+    private void initAbbreviation( boolean abbrevKeySet )
+        {
+        if ( !abbrevKeySet ) // no key is set at all
+            {
+            for ( EntryList abbreviation : abbreviations.values() )
+                {
+                codeEntries.addAll( abbreviation ); // all abbrevs should be used
+                }
+            }
+        else if ( activeButton != null ) // start key is set
+            {
+            for ( Long id : activeButton.getIdList() )
+                {
+                codeEntries.addAll( abbreviations.get( id ) ); // keys abbrevs should be used
+                }
+            }
+        else // keys are available, but no starting key is set
+            {
+            return; // there are no abbreviations at all, no further sort is needed
+            }
+        codeEntries.sort();
+        }
+
+
+    /* COMMON PART */
+
+    /** active code-entries */
+    private EntryList codeEntries = new EntryList();
+
+    /**
+     * Init is called by parseMainDescriptorFile() when parsing is finished
+     */
+    public void init( boolean abbrevKeySet )
+        {
+        initVaria();
+        initAbbreviation( abbrevKeySet );
         }
 
     public void startAbbreviation(List<Long> idList )
@@ -26,42 +121,21 @@ public class CodeTextProcessor
 
         for ( Long id : idList )
             {
-            activeAbbreviations.addAll( abbreviations.get( id ) );
+            codeEntries.addAll( abbreviations.get( id ) );
             }
 
-        activeAbbreviations.sort();
+        codeEntries.sort();
         }
 
     public void stopAbbreviation()
         {
-        activeAbbreviations.clear();
+        codeEntries.clear();
+        // varia should remain intact after stop
+        codeEntries.addAll( variaEntries );
         }
 
-    public void initAbbreviations( )
+    public EntryList getCodeEntries()
         {
-        startAbbreviation(startingAbbreviations);
-        }
-
-    public EntryList getAbbreviation()
-        {
-        return activeAbbreviations;
+        return codeEntries;
         }
     }
-
-/*
-
-Map ID - VARIA
-
-    Class VARIA
-
-        Map CODE - GROUP
-
-
-        LEGEND: TEXT/TITLE
-
-        ArrayList<LEGEND>
-
-        G
-
-
- */

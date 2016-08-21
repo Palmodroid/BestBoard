@@ -49,6 +49,8 @@
     <string name="data_meta_bad_parameter">"Meta parameter cannot be identified!"</string>
     <string name="data_showtitle_bad_parameter">"Marker-title parameter cannot be identified!"</string>
     <string name="data_meta_unknown_meta_state">"Unknown meta-state!"</string>
+    <string name="data_abbrev_missing_id">"No id is given!"</string>
+    <string name="data_abbrev_start_already_set">"Abbreviation set for start was already set!"</string>
     <string name="data_button_function_missing">"No function is defined for button, an empty button is set!"</string>
     <string name="data_button_overwritten">"Previous button definition is overwritten!"</string>
     <string name="data_button_added">"Button added:"</string>
@@ -76,6 +78,14 @@
     <string name="data_abbrev_bad_entry">"Entry has no expanded text:"</string>
     <string name="data_abbrev_overwritten">"Previous collection of abbreviations is overwritten!"</string>
     <string name="data_abbrev_added">"Collection of abbreviations is added."</string>
+    <string name="data_legend_no_text">"Varia legend has no text!"</string>
+    <string name="data_group_no_code">"Varia group has no code!"</string>
+    <string name="data_group_index_invalid">"Legend index is invalid:"</string>
+    <string name="data_group_legends_missing">"No legend is defined!"</string>
+    <string name="data_varia_no_id">"New varia has no ID!"</string>
+    <string name="data_varia_no_groups">"Varia has no valid groups!"</string>
+    <string name="data_varia_overwritten">"Previous collection of varia is overwritten!"</string>
+    <string name="data_varia_added">"Collection of varia is added."</string>
     <string name="data_primary_board_missing">"Root board is not defined, sentence non-wide layout is used."</string>
 
 </resources>

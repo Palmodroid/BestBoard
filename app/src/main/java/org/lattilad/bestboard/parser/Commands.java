@@ -232,7 +232,9 @@ public class Commands
     public static final long TOKEN_PROGRAM = 0xf61900e6aL;
 
     public static final long TOKEN_ABBREV = 0x2a99b1b3L;
+    // public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_IDS = 0x1623eL;
+    // public static final long TOKEN_START = 0x3385de2L;
 
     public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
 
@@ -271,7 +273,6 @@ public class Commands
     public static final long TOKEN_ADDABBREV = 0x21196688325bL;
     // public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_ENTRIES = 0x8bf664820L;
-    // public static final long TOKEN_START = 0x3385de2L;
 
     public static final long TOKEN_ADDVARIA = 0xe5051e7c5fL;
     public static final long TOKEN_ADDGROUP = 0xe5037e9badL;
@@ -779,11 +780,14 @@ public class Commands
                 .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
 
         add(TOKEN_ABBREV, ArrayUtils.concat(buttonArray, new long[]{
-                TOKEN_IDS }))
+                TOKEN_ID,
+                TOKEN_IDS,
+                TOKEN_START }))
                 .method("setAbbrev").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON});
-        add(TOKEN_IDS, (PARAMETER_KEYWORD | PARAMETER_MOD_LIST));
-
+        // add(TOKEN_ID, PARAMETER_KEYWORD);
+        add(TOKEN_IDS, PARAMETER_KEYWORD | PARAMETER_MOD_LIST);
+        // add(TOKEN_START, PARAMETER_FLAG);
 
         add(TOKEN_META, new long[]{
                 TOKEN_CAPS,
@@ -880,7 +884,8 @@ public class Commands
         add(TOKEN_ENTRIES, (PARAMETER_STRING | PARAMETER_MOD_LIST));
 
         add(TOKEN_ADDVARIA, new long[]{
-                TOKEN_ID, TOKEN_ADDGROUP }).method("addVaria");
+                TOKEN_ID,
+                TOKEN_ADDGROUP | PARAMETER_MOD_MULTIPLE }).method("addVaria");
         add(TOKEN_ADDGROUP, new long[]{
                 TOKEN_CODE,
                 TOKEN_LEGENDS,

@@ -10,6 +10,10 @@ public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
     {
     private List<Long> idList;
 
+    public List<Long> getIdList()
+        {
+        return idList;
+        }
 
     @Override
     public ButtonAbbrev clone()

@@ -287,7 +287,7 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         // Finish data classes
 
         // Starting abbreviatons-collection should be set after loading data
-        softBoardData.codeTextProcessor.initAbbreviations();
+        softBoardData.codeTextProcessor.init( methodsForCommands.abbrevKeySet );
 
         // Typeface should be set for TitleDescriptor and all layouts
         if ( methodsForCommands.typefaceFile != null )
