@@ -22,16 +22,11 @@ public class PacketKey extends Packet
      */
     public PacketKey( SoftBoardData softBoardData, int combinedKeyCode, int binaryHardState )
         {
-        super( softBoardData );
+        super( softBoardData, null );
         this.hardKeyCode = (combinedKeyCode > 0xFFFF) ? (char)(combinedKeyCode & 0xFFFF)
                 : HardKey.convertFromAscii( (char) combinedKeyCode);
         this.binaryHardState = binaryHardState;
-        }
-
-    @Override
-    public String getString()
-        {
-        return HardKey.getString(hardKeyCode);
+        setTitleString( HardKey.getString(hardKeyCode) );
         }
 
 

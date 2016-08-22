@@ -12,7 +12,6 @@ import org.lattilad.bestboard.utils.StringUtils;
 public class PacketRun extends Packet
     {
     String packageName;
-    String name;
 
     public PacketRun( SoftBoardData softBoardData, String packageName )
         {
@@ -20,18 +19,8 @@ public class PacketRun extends Packet
         this.packageName = packageName;
 
         int index = packageName.lastIndexOf('.');
-        name = StringUtils.abbreviateString( index > 0 ?
-            packageName.substring(index +1) : packageName, 5 );
-        }
-
-    /**
-     * String representation of the data (title)
-     * @return String representation of this packet
-     */
-    @Override
-    public String getString()
-        {
-        return name;
+        setTitleString( StringUtils.abbreviateString( index > 0 ?
+            packageName.substring(index +1) : packageName, 5 ) );
         }
 
     /**
@@ -52,11 +41,6 @@ public class PacketRun extends Packet
             Scribe.error("Could not run: " + packageName + "!");
             Scribe.disableToastLog();
             }
-        }
-
-    @Override
-    public void release()
-        {
         }
 
     }

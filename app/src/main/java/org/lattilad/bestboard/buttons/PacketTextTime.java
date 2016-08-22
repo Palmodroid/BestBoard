@@ -6,47 +6,53 @@ package org.lattilad.bestboard.buttons;
 /**
  * Time as formatted string to be sent to the editor
  */
-import org.lattilad.bestboard.*;
-import java.text.*;
-import java.util.*;
+import org.lattilad.bestboard.SoftBoardData;
 
-public class PacketTextTime extends PacketText
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+public class PacketTextTime extends PacketTextBase
     {
     /* time format, or null for auto-format */
     String format = null;
+    String time;
 
-    
-    public PacketTextTime(SoftBoardData softBoardData, String format, int autoCaps, int autoSpace)
+    public PacketTextTime( SoftBoardData softBoardData, String format )
         {
-        super( softBoardData, null, autoCaps, false, autoSpace );
+        super( softBoardData, "TIME" );
         this.format = format;
         }
-        
-    @Override
-    public String getString()
+
+    protected String getString()
         {
-        return "TIME";
+        return time;
         }
 
-    @Override
-    public void send()
+    private void setTimeString()
         {
         try
             {
             if ( format == null )
                 {
-                string = DateFormat.getDateInstance().format(new Date());
+                time = DateFormat.getDateInstance().format(new Date());
                 }
             else
                 {
                 SimpleDateFormat sdf=new SimpleDateFormat( format );
-                string = sdf.format(new Date());
+                time = sdf.format(new Date());
                 }
             }
         catch (Exception ex)
             {
-            string = "[ERROR]";
+            time = "[ERROR]";
             }
+        }
+
+    @Override
+    public void send()
+        {
+        setTimeString();
         super.send();
         }
 

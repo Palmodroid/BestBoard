@@ -29,7 +29,7 @@ public class ButtonMulti extends ButtonMainTouch implements Cloneable
         if ( packets.isEmpty() )
             return "MULTI";
         else
-            return packets.get(0).getString();
+            return packets.get(0).getTitleString();
         }
 
     private static int counter = 0;

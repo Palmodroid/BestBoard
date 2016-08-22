@@ -30,6 +30,7 @@ public class PacketFunction extends Packet
         {
         super( softBoardData );
         this.functionCode = functionCode;
+        setTitleString( checkTitleString() );
         }
 
 
@@ -37,8 +38,7 @@ public class PacketFunction extends Packet
      * String representation of the data (title)
      * @return String representation of this packet
      */
-    @Override
-    public String getString()
+    private String checkTitleString( )
         {
         if ( functionCode == Commands.TOKEN_DELETE )
             return "DEL";

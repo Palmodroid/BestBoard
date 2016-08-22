@@ -33,4 +33,18 @@ public class VariaGroup
         {
         varia.setActiveGroup( this );
         }
+
+    public String getText( int index )
+        {
+        if (index >= 0 && index < legends.size())
+            return legends.get(index).getText();
+        return "";
+        }
+
+    public String getTitle( int index )
+        {
+        if (index >= 0 && index < legends.size())
+            return legends.get(index).getTitle();
+        return "";
+        }
     }

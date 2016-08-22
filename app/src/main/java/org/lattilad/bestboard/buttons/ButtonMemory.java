@@ -32,14 +32,14 @@ public class ButtonMemory extends ButtonMainTouch implements Cloneable
     public ButtonMemory( PacketText packet )
         {
         this.packet = packet;
-        if ( packet.getString().length() == 0 )
+        if ( packet.getTitleString().length() == 0 )
             {
             state = 1;
             }
         else
             {
             state = 3;
-            abbreviation = StringUtils.abbreviateString( packet.getString(), 5 );
+            abbreviation = StringUtils.abbreviateString( packet.getTitleString(), 5 );
             }
         }
 

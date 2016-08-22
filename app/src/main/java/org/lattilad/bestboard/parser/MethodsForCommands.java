@@ -1564,8 +1564,8 @@ public class MethodsForCommands
         PacketText packetText = packetText(parameters, "");
 
         List<Object> strings = new ArrayList<>();
-        if ( packetText.getString().length() > 0)
-            strings.add( packetText.getString() );
+        if ( packetText.getTitleString().length() > 0)
+            strings.add( packetText.getTitleString() );
 
         // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
         ArrayList<KeyValuePair> textList = (ArrayList<KeyValuePair>)parameters.remove(

@@ -30,4 +30,14 @@ public class Varia
         {
         activeGroup = group;
         }
+
+    public String getText( int index )
+        {
+        return activeGroup.getText( index );
+        }
+
+    public String getTitle( int index )
+        {
+        return activeGroup.getTitle( index );
+        }
     }

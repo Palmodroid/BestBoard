@@ -14,7 +14,7 @@ public class PacketChangeCase extends Packet
 
     public PacketChangeCase(SoftBoardData softBoardData, boolean lower, boolean upper, boolean sentence)
         {
-        super( softBoardData );
+        super( softBoardData, "CAP" );
 
         this.lower = lower;
         this.upper = upper;
@@ -22,16 +22,6 @@ public class PacketChangeCase extends Packet
         // if none of the params is true, then sentence should be true as default
         // ti. if BOTH lower AND upper ARE false, then sentence should be always true
         this.sentence = !(lower || upper) || sentence;
-        }
-
-    /**
-     * String representation of the data (title)
-     * @return String representation of this packet
-     */
-    @Override
-    public String getString()
-        {
-        return "CAP";
         }
 
     /**
@@ -93,11 +83,6 @@ public class PacketChangeCase extends Packet
                 return;
                 }
             }
-        }
-
-    @Override
-    public void release()
-        {
         }
 
     }

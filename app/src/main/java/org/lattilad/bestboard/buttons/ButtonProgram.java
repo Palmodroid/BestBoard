@@ -71,7 +71,7 @@ public class ButtonProgram extends ButtonMainTouch implements Cloneable
         if ( packetRun == null )
             string = getFirstString();
         else
-            string = packetRun.getString();
+            string = packetRun.getTitleString();
 
         titles.getLast().drawTitle(canvas, layout, string, centerX, centerY);
         }

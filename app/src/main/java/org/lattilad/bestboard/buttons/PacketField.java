@@ -1,7 +1,5 @@
 package org.lattilad.bestboard.buttons;
 
-import org.lattilad.bestboard.SoftBoardData;
-
 /**
  * Special Text, where cursor is moved back to the position of the last '\c'
  */
@@ -14,8 +12,9 @@ import org.lattilad.bestboard.SoftBoardData;
  **/
 
 
-public class PacketField extends PacketText
+public class PacketField
     {
+    /*
     public PacketField(SoftBoardData softBoardData, String string, int autoCaps, boolean stringCaps, int autoSpace)
         {
         super(softBoardData, string, autoCaps, stringCaps, autoSpace);
@@ -29,4 +28,5 @@ public class PacketField extends PacketText
             this.movement = position - this.string.length();
             }
         }
+        */
     }

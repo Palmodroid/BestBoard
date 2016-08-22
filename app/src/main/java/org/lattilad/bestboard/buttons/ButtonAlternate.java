@@ -30,12 +30,12 @@ public class ButtonAlternate extends ButtonMainTouch implements Cloneable
 
     public String getFirstString()
         {
-        return packets[0].getString();
+        return packets[0].getTitleString();
         }
 
     public String getSecondString()
         {
-        return packets[1].getString();
+        return packets[1].getTitleString();
         }
 
     public boolean isChangingButton()
@@ -64,7 +64,7 @@ public class ButtonAlternate extends ButtonMainTouch implements Cloneable
         // draw last title - always with changing string
         int centerX = getPixelX( columnInGrids, layout.layoutXOffset);
         int centerY = getPixelY( rowInGrids, layout.layoutYOffset);
-        titles.getLast().drawTitle(canvas, layout, packets[counter].getString(), centerX, centerY);
+        titles.getLast().drawTitle(canvas, layout, packets[counter].getTitleString(), centerX, centerY);
         }
 
     /**

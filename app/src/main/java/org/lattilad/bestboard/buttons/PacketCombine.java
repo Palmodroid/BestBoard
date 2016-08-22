@@ -18,15 +18,19 @@ public class PacketCombine extends Packet
     public PacketCombine( SoftBoardData softBoardData, Packet packetFirst, PacketKey packetKey )
         {
         super( softBoardData );
-
+        // title-string is NOT set, because it will use the title-string of the first packet
         this.packetFirst = packetFirst;
         this.packetKey = packetKey;
         }
 
+    /**
+     * original getTitleString should be overridden, because title-string of a packet can change
+     * @return
+     */
     @Override
-    public String getString()
+    public String getTitleString()
         {
-        return packetFirst.getString();
+        return packetFirst.getTitleString();
         }
 
     @Override

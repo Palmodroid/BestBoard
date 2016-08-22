@@ -32,8 +32,6 @@ public class PacketMove extends Packet // eventually it is in the group of Packe
 
     protected PacketKey packetKey = null;
 
-    protected String name;
-
 
     public PacketMove(SoftBoardData softBoardData, int moveType, int cursorType, int selectionType, PacketKey packetKey )
         {
@@ -45,9 +43,9 @@ public class PacketMove extends Packet // eventually it is in the group of Packe
         this.packetKey = packetKey;
 
         if ( moveType == TOP )
-            name = "T-";
+            setTitleString( "T-" );
         else if ( moveType == BOTTOM )
-            name = "-B";
+            setTitleString( "-B" );
         else
             {
             StringBuilder builder = new StringBuilder();
@@ -56,14 +54,8 @@ public class PacketMove extends Packet // eventually it is in the group of Packe
             builder.append( (moveType & 0xFF) == LEFT ? 'L' : 'R');
             if ( cursorType != SoftBoardProcessor.CURSOR_LAST )
                 builder.append( cursorType == SoftBoardProcessor.CURSOR_BEGIN ? '1' : '2' );
-            name = builder.toString();
+            setTitleString( builder.toString() );
             }
-        }
-
-    @Override
-    public String getString()
-        {
-        return name;
         }
 
     @Override

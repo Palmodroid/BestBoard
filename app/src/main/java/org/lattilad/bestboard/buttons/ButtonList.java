@@ -40,7 +40,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         this.packetText = packetText;
         this.packetSecond = packetSecond;
         modifyText = new ModifyText(layout.softBoardData, true );
-        modifyText.setFirstString( packetText.getString() );
+        modifyText.setFirstString( packetText.getTitleString() );
         }
 
     protected void connected()
@@ -57,7 +57,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
 
     public String getFirstString()
         {
-        return packetText.getString();
+        return packetText.getTitleString();
         }
 
     @Override

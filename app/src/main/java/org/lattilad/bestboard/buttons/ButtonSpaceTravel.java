@@ -31,7 +31,7 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
 
     public String getFirstString()
         {
-        return packet.getString();
+        return packet.getTitleString();
         }
 
     @Override

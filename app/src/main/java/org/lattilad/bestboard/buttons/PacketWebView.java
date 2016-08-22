@@ -13,7 +13,6 @@ public class PacketWebView extends Packet
     {
     String extraType;
     String extraData;
-    String name;
 
     public PacketWebView( SoftBoardData softBoardData, String extraType, String extraData )
         {
@@ -22,18 +21,8 @@ public class PacketWebView extends Packet
         this.extraData = extraData;
 
         int index = extraData.lastIndexOf('/');
-        name = StringUtils.abbreviateString(index > 0 ?
-                extraData.substring(index + 1) : extraData, 5);
-        }
-
-    /**
-     * String representation of the data (title)
-     * @return String representation of this packet
-     */
-    @Override
-    public String getString()
-        {
-        return name;
+        setTitleString( StringUtils.abbreviateString(index > 0 ?
+                extraData.substring(index + 1) : extraData, 5) );
         }
 
     /**
@@ -48,8 +37,4 @@ public class PacketWebView extends Packet
         softBoardData.softBoardListener.getApplicationContext().startActivity(intent);
         }
 
-    @Override
-    public void release()
-        {
-        }
     }

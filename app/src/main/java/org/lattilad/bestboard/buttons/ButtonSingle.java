@@ -70,7 +70,7 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
 
     public ButtonList extendToList( )
         {
-        if ( packet instanceof PacketText && packet.getString().length() > 0 )
+        if ( packet instanceof PacketText && packet.getTitleString().length() > 0 )
             {
             ButtonList buttonList = new ButtonList((PacketText)packet, null);
             buttonList.setTitles(getTitles());
@@ -83,7 +83,7 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
 
     public String getFirstString()
         {
-        return packet.getString();
+        return packet.getTitleString();
         }
 
     /**
