@@ -115,16 +115,11 @@ public class TitleDescriptor
     public static final int GET_SECOND_STRING = -2;
     public static final int BUTTON_DECIDES = -3;
 
-    private int type;
+    private final int type;
 
     public int getType()
         {
         return type;
-        }
-
-    public void setType( int type )
-        {
-        this.type = type;
         }
 
     public boolean isShowTitle()
@@ -139,12 +134,6 @@ public class TitleDescriptor
         return text;
         }
 
-    public void setText(String newText)
-        {
-        type = TEXT;
-        text = newText;
-        }
-
     private int xOffset;
     private int yOffset;
     private int size;
@@ -155,7 +144,7 @@ public class TitleDescriptor
     public TitleDescriptor( String text, int xOffset, int yOffset, int size,
                            boolean bold, boolean italics, int color )
         {
-        this( 0, text, xOffset, yOffset, size, bold, italics, color);
+        this( TEXT, text, xOffset, yOffset, size, bold, italics, color);
         }
 
     public TitleDescriptor( int type, int xOffset, int yOffset, int size,
@@ -179,11 +168,11 @@ public class TitleDescriptor
         this.color = color;
         }
 
-    // !! Cloneable could be used here, but it has some problems !!
+/*    // !! Cloneable could be used here, but it has some problems !!
     public TitleDescriptor copy()
         {
         return new TitleDescriptor( type, text, xOffset, yOffset, size, bold, italics, color);
-        }
+        } */
 
     /**
      * Draws titles on the button. Only TEXT titles are drawn.
@@ -192,35 +181,35 @@ public class TitleDescriptor
      * (Repeated calculation is not needed.)
      * Title text will be uppercase if capslock is forced by the layout
      * @param canvas to draw on
-     * @param layout provides screen specific information (text and hexagon size)
-     * @param centerX coord. in pixels (offset included)
-     * @param centerY coord. in pixels
+     * param layout provides screen specific information (text and hexagon size)
+     * param centerX coord. in pixels (offset included)
+     * param centerY coord. in pixels
      */
-    public void drawTextTitle(Canvas canvas, Layout layout, int centerX, int centerY)
+    public void drawTextTitle(Canvas canvas, Button button, int xOffsetInPixel, int yOffsetInPixel)
         {
         if ( text != null )
-            drawTitle( canvas, layout, text, centerX, centerY );
+            drawTitle( canvas, text, button, xOffsetInPixel, yOffsetInPixel );
         }
 
-    public void drawShowTitle(Canvas canvas, Layout layout, int centerX, int centerY)
+    public void drawShowTitle(Canvas canvas, Button button, int xOffsetInPixel, int yOffsetInPixel)
         {
         // if ( type > 0 ) getShowText checks for real show-titles
-        drawTitle( canvas, layout,
-                layout.softBoardData.softBoardShow.getShowText(type),
-                centerX, centerY );
+        drawTitle( canvas,
+                button.getLayout().softBoardData.softBoardShow.getShowText(type),
+                button, xOffsetInPixel, yOffsetInPixel );
         }
 
     /**
      * Draws an external title on the button.
      * @param canvas to draw on
-     * @param layout provides screen specific information (text and hexagon size)
+     * param layout provides screen specific information (text and hexagon size)
      * @param text external text to show as title
-     * @param centerX coord. in pixels (offset included)
-     * @param centerY coord. in pixels
+     * param centerX coord. in pixels (offset included)
+     * aram centerY coord. in pixels
      */
-    public void drawTitle( Canvas canvas, Layout layout, String text, int centerX, int centerY )
+    public void drawTitle( Canvas canvas, String text, Button button, int xOffsetInPixel, int yOffsetInPixel )
         {
-        textPaint.setTextSize(layout.fontData.textSize * size / 1000);
+        textPaint.setTextSize(button.getLayout().fontData.textSize * size / 1000);
         textPaint.setColor(color);
 
         textPaint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
@@ -229,13 +218,13 @@ public class TitleDescriptor
 
         textPaint.setTextSkewX(italics ? -0.25f : 0);
 
-        int adjust = layout.fontData.yAdjust * size / 1000;
+        int adjust = button.getLayout().fontData.yAdjust * size / 1000;
         // Scribe.debug("Size: " + size + " Adjust: " + adjust);
 
         canvas.drawText(
-                layout.isCapsForced() ? text.toUpperCase(layout.softBoardData.locale) : text,
-                centerX + xOffset * layout.halfHexagonWidthInPixels / 1500,
-                centerY + yOffset * layout.halfHexagonHeightInPixels / 1000 + adjust,
+                button.getLayout().isCapsForced() ? text.toUpperCase(button.getLayout().softBoardData.locale) : text,
+                button.getXCenter() + xOffset * button.getLayout().halfHexagonWidthInPixels / 1500,
+                button.getYCenter() + yOffset * button.getLayout().halfHexagonHeightInPixels / 1000 + adjust,
                 textPaint);
         }
     }

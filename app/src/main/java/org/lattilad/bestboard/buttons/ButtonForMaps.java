@@ -38,16 +38,14 @@ public class ButtonForMaps extends Button
 
     private Path RimHexagonPath()
         {
-        int pixelX = getPixelX(columnInGrids, 0);
-        int pixelY = getPixelY(rowInGrids, 0);
         Path path = new Path();
 
-        path.moveTo(pixelX, pixelY - 2 * pixelRimQuarterHeight );
-        path.lineTo(pixelX + pixelRimHalfWidth, pixelY - pixelRimQuarterHeight );
-        path.lineTo(pixelX + pixelRimHalfWidth, pixelY + pixelRimQuarterHeight );
-        path.lineTo(pixelX, pixelY + 2 * pixelRimQuarterHeight );
-        path.lineTo(pixelX - pixelRimHalfWidth, pixelY + pixelRimQuarterHeight );
-        path.lineTo(pixelX - pixelRimHalfWidth, pixelY - pixelRimQuarterHeight );
+        path.moveTo(getXCenter() , getYCenter() - 2 * pixelRimQuarterHeight );
+        path.lineTo(getXCenter() + pixelRimHalfWidth, getYCenter() - pixelRimQuarterHeight );
+        path.lineTo(getXCenter() + pixelRimHalfWidth, getYCenter() + pixelRimQuarterHeight );
+        path.lineTo(getXCenter() , getYCenter() + 2 * pixelRimQuarterHeight );
+        path.lineTo(getXCenter()  - pixelRimHalfWidth, getYCenter() + pixelRimQuarterHeight );
+        path.lineTo(getXCenter()  - pixelRimHalfWidth, getYCenter() - pixelRimQuarterHeight );
         path.close();
 
         return path;
@@ -56,8 +54,7 @@ public class ButtonForMaps extends Button
 
     public void drawButtonForMap(Canvas canvas, int columnInHexagons, int rowInHexagons)
         {
-        this.columnInGrids = getGridX(columnInHexagons, rowInHexagons);
-        this.rowInGrids = getGridY(rowInHexagons);
+        setPosition( columnInHexagons, rowInHexagons );
 
         hexagonMapPaint.setColor(
                 layout.colorFromTouchCode(

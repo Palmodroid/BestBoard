@@ -95,9 +95,24 @@ public class Button implements Cloneable
     /** Button's layout */
     protected Layout layout;
 
-    /** Button's position in grid */
-    protected int columnInGrids;
-    protected int rowInGrids;
+    public Layout getLayout()
+        {
+        return layout;
+        }
+
+
+    /** Button's and hexagon's position in pixel */
+    private int xMinus;
+    private int xCenter;
+    private int xPlus;
+
+    private int yMinus2;
+    private int yMinus1;
+    private int yCenter;
+    private int yPlus1;
+    private int yPlus2;
+
+
 
     /** Button's background color */
     protected int color;
@@ -107,6 +122,7 @@ public class Button implements Cloneable
 
     /** Button's name - only for parsing */
     public String name;
+
 
     /**
      * Connects the Button instance to its layout and position.
@@ -118,8 +134,29 @@ public class Button implements Cloneable
     public void setPosition( Layout layout, int arrayColumn, int arrayRow )
         {
         this.layout = layout;
-        this.columnInGrids = getGridX(arrayColumn, arrayRow);
-        this.rowInGrids = getGridY(arrayRow);
+        setPosition(arrayColumn,arrayRow);
+        }
+
+    /**
+     * If layout is ready (eg. ButtonForMaps) connects the Button instance to its position.
+     * @param arrayColumn column (hexagonal)
+     * @param arrayRow row (hexagonal)
+     */
+    public void setPosition( int arrayColumn, int arrayRow )
+        {
+        int columnInGrids = getGridX(arrayColumn, arrayRow);
+        int rowInGrids = getGridY(arrayRow);
+
+        xMinus = getPixelX( columnInGrids - 1 );
+        xCenter = getPixelX( columnInGrids );
+        xPlus = getPixelX( columnInGrids + 1 );
+
+        yMinus2 = getPixelY( rowInGrids - 2 );
+        yMinus1 = getPixelY( rowInGrids - 1 );
+        yCenter = getPixelY( rowInGrids );
+        yPlus1 = getPixelY( rowInGrids + 1 );
+        yPlus2 = getPixelY( rowInGrids + 2 );
+
         connected();
         }
 
@@ -205,6 +242,29 @@ public class Button implements Cloneable
     // HALF-WIDTH and QUOTER-HEIGHT hexagons
 
     /**
+     * Converts X-grid to X-pixel without offset
+     * (Center and corners of the hexagon)
+     * @param gridX grid X coordinate
+     * @return pixel X coordinate
+     */
+    protected int getPixelX( int gridX )
+        {
+        return gridX * layout.areaWidthInPixels / layout.areaWidthInGrids;
+        }
+
+
+    /**
+     * Converts Y-grid to Y-pixel without offset
+     * (Center and corners of the hexagon)
+     * @param gridY grid Y coordinate
+     * @return pixel Y coordinate
+     */
+    protected int getPixelY( int gridY )
+        {
+        return gridY * layout.layoutHeightInPixels / layout.layoutHeightInGrids;
+        }
+
+    /**
      * Converts X-grid to X-pixel
      * (Center and corners of the hexagon)
      * @param gridX grid X coordinate
@@ -231,6 +291,24 @@ public class Button implements Cloneable
 
 
     /**
+     * Returns button centre in pixels without offset
+     * @return x center
+     */
+    public int getXCenter()
+        {
+        return xCenter;
+        }
+
+    /**
+     * Returns button centre in pixels without offset
+     * @return y center
+     */
+    public int getYCenter()
+        {
+        return yCenter;
+        }
+
+    /**
      * Creates button's hexagon with the use of the grids
      * The created path can be used both for outline and fill
      * @param xOffsetInPixel x offset in pixels
@@ -243,18 +321,12 @@ public class Button implements Cloneable
         {
         Path path = new Path();
 
-        int xminus = getPixelX( columnInGrids - 1, xOffsetInPixel );
-        int xcenter = getPixelX( columnInGrids, xOffsetInPixel );
-        int xplus = getPixelX( columnInGrids + 1, xOffsetInPixel );
-        int yminus = getPixelY( rowInGrids - 1, yOffsetInPixel );
-        int yplus = getPixelY( rowInGrids + 1, yOffsetInPixel );
-
-        path.moveTo(xcenter, getPixelY( rowInGrids - 2, yOffsetInPixel ));
-        path.lineTo(xplus, yminus);
-        path.lineTo(xplus, yplus);
-        path.lineTo(xcenter, getPixelY( rowInGrids + 2, yOffsetInPixel ));
-        path.lineTo(xminus, yplus);
-        path.lineTo(xminus, yminus);
+        path.moveTo(xCenter + xOffsetInPixel, yMinus2 + yOffsetInPixel);
+        path.lineTo(xPlus + xOffsetInPixel, yMinus1 + yOffsetInPixel);
+        path.lineTo(xPlus + xOffsetInPixel, yPlus1 + yOffsetInPixel);
+        path.lineTo(xCenter + xOffsetInPixel, yPlus2 + yOffsetInPixel);
+        path.lineTo(xMinus + xOffsetInPixel, yPlus1 + yOffsetInPixel);
+        path.lineTo(xMinus + xOffsetInPixel, yMinus1 + yOffsetInPixel);
         path.close();
 
         return path;
@@ -368,13 +440,10 @@ public class Button implements Cloneable
         // Theoretically from index/touchCode the buttons position can be calculated.
         // BUT this is NOT obligatory!! So the buttons will store their position.
 
-        int centerX = getPixelX(columnInGrids, xOffsetInPixel);
-        int centerY = getPixelY(rowInGrids, yOffsetInPixel);
-
         for ( TitleDescriptor title : titles )
             {
             // ONLY TEXT titles are drawn (text != null)
-            title.drawTextTitle(canvas, layout, centerX, centerY);
+            title.drawTextTitle(canvas, this, xOffsetInPixel, yOffsetInPixel);
             }
         }
 
@@ -391,11 +460,8 @@ public class Button implements Cloneable
      */
     protected void drawButtonShowTitle(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
         {
-        int centerX = getPixelX(columnInGrids, xOffsetInPixel);
-        int centerY = getPixelY(rowInGrids, yOffsetInPixel);
-
         // ONLY VALID MARKERS are drawn
-        titles.getLast().drawShowTitle(canvas, layout, centerX, centerY);
+        titles.getLast().drawShowTitle(canvas, this, xOffsetInPixel, yOffsetInPixel);
         }
 
 
@@ -423,8 +489,8 @@ public class Button implements Cloneable
 
         canvas.drawText(
                 columnInHexagons == 2 ? rowInHexagons + ":" + columnInHexagons : Integer.toString(columnInHexagons),
-                getPixelX( columnInGrids, 0), // + layout.halfHexagonWidthInPixels / 1000,
-                getPixelY( rowInGrids, - layout.halfHexagonHeightInPixels / 2),
+                getXCenter(), // + layout.halfHexagonWidthInPixels / 1000,
+                getYCenter() - layout.halfHexagonHeightInPixels / 2,
                 TitleDescriptor.textPaint);
         }
     }

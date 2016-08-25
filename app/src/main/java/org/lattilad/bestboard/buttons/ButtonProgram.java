@@ -48,15 +48,12 @@ public class ButtonProgram extends ButtonMainTouch implements Cloneable
     // All but last title is drawn
     protected void drawButtonTextTitles(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
         {
-        int centerX = getPixelX(columnInGrids, xOffsetInPixel);
-        int centerY = getPixelY(rowInGrids, yOffsetInPixel);
-
         Iterator<TitleDescriptor> titlesIterator = titles.iterator();
         if (titlesIterator.hasNext())
             titlesIterator.next(); // just step over the last item
         while (titlesIterator.hasNext())
             {
-            titlesIterator.next().drawTextTitle(canvas, layout, centerX, centerY);
+            titlesIterator.next().drawTextTitle(canvas, this, xOffsetInPixel, yOffsetInPixel);
             }
         }
 
@@ -64,8 +61,6 @@ public class ButtonProgram extends ButtonMainTouch implements Cloneable
     private void drawButtonLastTitle(Canvas canvas)
         {
         // draw last title - always with changing string
-        int centerX = getPixelX( columnInGrids, layout.layoutXOffset);
-        int centerY = getPixelY(rowInGrids, layout.layoutYOffset);
         String string;
 
         if ( packetRun == null )
@@ -73,7 +68,8 @@ public class ButtonProgram extends ButtonMainTouch implements Cloneable
         else
             string = packetRun.getTitleString();
 
-        titles.getLast().drawTitle(canvas, layout, string, centerX, centerY);
+        titles.getLast().drawTitle(canvas, string,
+                this, layout.layoutXOffset, layout.layoutYOffset);
         }
 
     // public void drawButtonConstantPart(Canvas canvas) - remains original
