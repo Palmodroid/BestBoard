@@ -85,11 +85,20 @@ public class Button implements Cloneable
         return "";
         }
 
-    public String getSecondString()
+    public boolean isFirstStringChanging()
         {
-        return getFirstString();
+        return false;
         }
 
+    public String getSecondString()
+        {
+        return "";
+        }
+
+    public boolean isSecondStringChanging()
+        {
+        return false;
+        }
 
 
     /** Button's layout */
@@ -343,9 +352,18 @@ public class Button implements Cloneable
     public boolean isChangingButton()
         {
         // This method checks only show-titles
-        return titles.getLast().isShowTitle();
+        return isChangingTitle() != TitleDescriptor.NO_CHANGE;
         }
 
+    public int isChangingTitle()
+        {
+        int isChanging = 0;
+        for ( TitleDescriptor title : titles )
+            {
+            isChanging |= title.isChangingTitle( this );
+            }
+        return isChanging;
+        }
 
     /**
      * Button subclasses can decide about the default title type by overriding this method.
@@ -355,6 +373,59 @@ public class Button implements Cloneable
         {
         return TitleDescriptor.GET_FIRST_STRING;
         }
+
+
+    /**
+     * Change           ConstantPart    ChangingPart    Touched
+     * Background             -           B T(all)       tB T(all)
+     * Title:
+     *    NO              B T(NO FIRST SECOND)           tB T(all)
+     *    FIRST           B T(NO)         T(FIRST)       tB T(all)
+     *    SECOND          B T(NO)         T(SECOND)      tB T(all)
+     *    SHOW            B T(NO)         T(SHOW)        tB T(all)
+     *
+     * Button.changingInfo contains binary information about changing parts:
+     *
+     *  00011110
+     *         * - Constant text (only together with background)
+     *        *  - Primary text (depends on the result of isPrimaryTextChanging())
+     *       *   - Secondary text (depends on the result of isSecondaryTextChanging())
+     *      *    - Showtext - always change
+     *     *     - Background (and all texts should change)
+     *
+     *  TitleDescriptor.getChangingInfo() returns whether this title is changing (same format as above)
+     *
+     *  Button.setChaningInfo() should be called always (?? where)
+     *  If Button subtype needs changing background, then it should be overridden to return -1
+     *  Otherwise it should return the sum (logical-or) of titles (getTitlesChangingInfo())
+     *
+     *  Constants:
+     *  ALL_CHANGE: -1 (because with background all titles should be redrawn)
+     *  BACKGROUND_CHANGE = 16;
+     public static final int NO_CHANGE = 0;
+     public static final int TEXT_TITLE_CHANGE = 1;
+     public static final int SHOW_TITLE_CHANGE = 2;
+     public static final int FIRST_TITLE_CHANGE = 4;
+     public static final int SECOND_TITLE_CHANGE = 8;
+     *
+     *  Button.drawConstantParts() - is only called when layout is created
+     *      Draw NON-changing parts, !changingInfo (logical-no) should be used
+     *
+     *  BUtton.drawChangingParts() - is called at every touch
+     *      Draw changing parts, changingInfo shows these parts with binary 1
+     *
+     *  Button.drawTouchedParts() - is called when button is in touch
+     *      Draw touched background
+     *      Draw all titles (call drawTitles() with -1 (ALL_CHANGE)
+     *
+     *   Button subclasses should override:
+     *   isPrimaryTextChanging()/isSecondaryTextChanging() (together with getPrimary/secondary text)
+     *   - if they use changing packets
+     *   OR - at least
+     *   getPrimaryText - to get one static title
+     *
+     *   setChangingInfo to return -1, AND drawBackground, if button needs changing background
+     */
 
 
     /**

@@ -174,6 +174,38 @@ public class TitleDescriptor
         return new TitleDescriptor( type, text, xOffset, yOffset, size, bold, italics, color);
         } */
 
+
+    public static final int NO_CHANGE = 0;
+    public static final int SHOW_TITLE_CHANGE = 1;
+    public static final int FIRST_TITLE_CHANGE = 2;
+    public static final int SECOND_TITLE_CHANGE = 4;
+
+    /**
+     * 0 - title never change
+     * 1 - show title (always change)
+     * 2 - first title change
+     * 4 - second title changing
+     */
+    public int isChangingTitle( Button button )
+        {
+        int type = this.type;
+
+        if ( type == BUTTON_DECIDES )   type = button.defaultTitleType();
+
+        if ( type == TEXT )
+            return NO_CHANGE;
+
+        if ( type == GET_FIRST_STRING )
+            return button.isFirstStringChanging() ? FIRST_TITLE_CHANGE : NO_CHANGE;
+
+        if ( type == GET_SECOND_STRING )
+            return button.isSecondStringChanging() ? SECOND_TITLE_CHANGE : NO_CHANGE;
+
+        // ?? everything else ?? only positive values should come here
+        return SHOW_TITLE_CHANGE;
+        }
+
+
     /**
      * Draws titles on the button. Only TEXT titles are drawn.
      * Title can be attached to several buttons, so position data is given as parameter.
