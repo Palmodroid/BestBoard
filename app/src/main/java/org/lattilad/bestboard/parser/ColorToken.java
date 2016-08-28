@@ -1,8 +1,5 @@
 package org.lattilad.bestboard.parser;
 
-import org.lattilad.bestboard.scribe.Scribe;
-import org.lattilad.bestboard.utils.ExternalDataException;
-
 import java.util.Arrays;
 
 /**

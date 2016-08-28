@@ -3,8 +3,8 @@ package org.lattilad.bestboard.prefs;
 import android.app.Activity;
 import android.os.Bundle;
 
-import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.Ignition;
+import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 
 /**

@@ -5,7 +5,6 @@ import android.content.res.Configuration;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.SoftBoardListener;
 import org.lattilad.bestboard.debug.Debug;
-import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
 

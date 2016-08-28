@@ -6,11 +6,11 @@ import android.graphics.Rect;
 import android.graphics.Typeface;
 
 import org.lattilad.bestboard.Layout;
-import org.lattilad.bestboard.scribe.*;
+import org.lattilad.bestboard.scribe.Scribe;
 
 /**
  * Describes titles (formatted strings) on buttons.
- * Titles do not change (after creation), and can connect to different buttons
+ * Titledescriptor do not change (after creation), and can connect to different buttons
  */
 public class TitleDescriptor
     {
@@ -122,16 +122,21 @@ public class TitleDescriptor
         return type;
         }
 
-    public boolean isShowTitle()
-        {
-        return type > TEXT;
-        }
+    private String text;
 
-    private String text; // !! getters and setters needed !!
-
-    public String getText()
+    public String getName()
         {
-        return text;
+        if ( type == TEXT )
+            return text;
+        if ( type == GET_FIRST_STRING )
+            return "1st string";
+        if ( type == GET_SECOND_STRING )
+            return "2nd string ";
+        if ( type == BUTTON_DECIDES )
+            return "button decides";
+        if ( type > 0 )
+            return "show title";
+        return "INV";
         }
 
     private int xOffset;
@@ -175,34 +180,27 @@ public class TitleDescriptor
         } */
 
 
-    public static final int NO_CHANGE = 0;
-    public static final int SHOW_TITLE_CHANGE = 1;
-    public static final int FIRST_TITLE_CHANGE = 2;
-    public static final int SECOND_TITLE_CHANGE = 4;
-
     /**
      * 0 - title never change
      * 1 - show title (always change)
      * 2 - first title change
      * 4 - second title changing
      */
-    public int isChangingTitle( Button button )
+    public int getChangingInfo( Button button )
         {
-        int type = this.type;
-
-        if ( type == BUTTON_DECIDES )   type = button.defaultTitleType();
+        int type = (this.type == BUTTON_DECIDES) ? button.getDefaultTitleType() : this.type;
 
         if ( type == TEXT )
-            return NO_CHANGE;
+            return Button.DRAW_NOTHING;
 
         if ( type == GET_FIRST_STRING )
-            return button.isFirstStringChanging() ? FIRST_TITLE_CHANGE : NO_CHANGE;
+            return button.isFirstStringChanging() ? Button.DRAW_FIRST_TITLE : Button.DRAW_NOTHING;
 
         if ( type == GET_SECOND_STRING )
-            return button.isSecondStringChanging() ? SECOND_TITLE_CHANGE : NO_CHANGE;
+            return button.isSecondStringChanging() ? Button.DRAW_SECOND_TITLE : Button.DRAW_NOTHING;
 
         // ?? everything else ?? only positive values should come here
-        return SHOW_TITLE_CHANGE;
+        return Button.DRAW_SHOW_TITLE;
         }
 
 
@@ -217,20 +215,23 @@ public class TitleDescriptor
      * param centerX coord. in pixels (offset included)
      * param centerY coord. in pixels
      */
-    public void drawTextTitle(Canvas canvas, Button button, int xOffsetInPixel, int yOffsetInPixel)
+    public void drawTitle( Canvas canvas, int drawInfo, Button button, int xOffsetInPixel, int yOffsetInPixel )
         {
-        if ( text != null )
-            drawTitle( canvas, text, button, xOffsetInPixel, yOffsetInPixel );
-        }
+        if ( type == TEXT && (drawInfo & Button.DRAW_TEXT_TITLE) != 0 )
+            drawTitle(canvas, text, button, xOffsetInPixel, yOffsetInPixel);
 
-    public void drawShowTitle(Canvas canvas, Button button, int xOffsetInPixel, int yOffsetInPixel)
-        {
-        // if ( type > 0 ) getShowText checks for real show-titles
-        drawTitle( canvas,
-                button.getLayout().softBoardData.softBoardShow.getShowText(type),
-                button, xOffsetInPixel, yOffsetInPixel );
-        }
+        else if ( type == GET_FIRST_STRING && (drawInfo & Button.DRAW_FIRST_TITLE) != 0 )
+            drawTitle(canvas, button.getFirstString(), button, xOffsetInPixel, yOffsetInPixel);
 
+        else if ( type == GET_SECOND_STRING && (drawInfo & Button.DRAW_SECOND_TITLE) != 0 )
+            drawTitle(canvas, button.getFirstString(), button, xOffsetInPixel, yOffsetInPixel);
+
+        else if ((drawInfo & Button.DRAW_SHOW_TITLE) != 0) // SHOW_TITLE
+            drawTitle(canvas, button.getLayout().softBoardData.softBoardShow.getShowText(type), 
+            button, xOffsetInPixel, yOffsetInPixel);
+        }
+              
+        
     /**
      * Draws an external title on the button.
      * @param canvas to draw on

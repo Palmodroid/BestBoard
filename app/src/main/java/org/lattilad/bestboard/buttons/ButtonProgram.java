@@ -1,10 +1,6 @@
 package org.lattilad.bestboard.buttons;
 
-import android.graphics.Canvas;
-
 import org.lattilad.bestboard.SoftBoardData;
-
-import java.util.Iterator;
 
 /**
  * ButtonProgram is a complex button:
@@ -29,56 +25,24 @@ public class ButtonProgram extends ButtonMainTouch implements Cloneable
         this.packetRun = packetRun;
         }
 
-    public boolean isChangingButton()
-        {
-        return true;
-        }
-
     /**
      * This all comes from memory button, these buttons are very similar
      * Common class is needed
      */
 
-    // This is needed only by debug methods, because last title is not drawn
+    @Override
+    public boolean isFirstStringChanging()
+        {
+        return true;
+        }
+
+
+    @Override
     public String getFirstString()
         {
-        return "PROG";
+        return packetRun == null ? "PROG" : packetRun.getTitleString();
         }
 
-    // All but last title is drawn
-    protected void drawButtonTextTitles(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
-        {
-        Iterator<TitleDescriptor> titlesIterator = titles.iterator();
-        if (titlesIterator.hasNext())
-            titlesIterator.next(); // just step over the last item
-        while (titlesIterator.hasNext())
-            {
-            titlesIterator.next().drawTextTitle(canvas, this, xOffsetInPixel, yOffsetInPixel);
-            }
-        }
-
-    // Last title is drawn as changing part
-    private void drawButtonLastTitle(Canvas canvas)
-        {
-        // draw last title - always with changing string
-        String string;
-
-        if ( packetRun == null )
-            string = getFirstString();
-        else
-            string = packetRun.getTitleString();
-
-        titles.getLast().drawTitle(canvas, string,
-                this, layout.layoutXOffset, layout.layoutYOffset);
-        }
-
-    // public void drawButtonConstantPart(Canvas canvas) - remains original
-
-    // Last title is drawn as changing part
-    public void drawButtonChangingPart(Canvas canvas)
-        {
-        drawButtonLastTitle( canvas );
-        }
 
     @Override
     public void mainTouchStart( boolean isTouchDown )

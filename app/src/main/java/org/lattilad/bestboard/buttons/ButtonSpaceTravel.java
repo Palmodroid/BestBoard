@@ -29,10 +29,31 @@ public class ButtonSpaceTravel extends ButtonMainTouch implements Cloneable
         this.packetSecond = packetSecond; // can be null
         }
 
+
+    @Override
+    public boolean isFirstStringChanging()
+        {
+        return packet.isTitleStringChanging();
+        }
+
+    @Override
     public String getFirstString()
         {
         return packet.getTitleString();
         }
+
+    @Override
+    public boolean isSecondStringChanging()
+        {
+        return packetSecond != null ? packetSecond.isTitleStringChanging() : super.isSecondStringChanging();
+        }
+
+    @Override
+    public String getSecondString()
+        {
+        return packetSecond != null ? packetSecond.getTitleString() : super.getSecondString();
+        }
+
 
     @Override
     public void mainTouchStart( boolean isTouchDown )

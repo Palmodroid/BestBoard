@@ -62,7 +62,7 @@ public abstract class Packet
      * but if they do, then this method should be overridden
      * @return
      */
-    public boolean needsChangingButton()
+    public boolean isTitleStringChanging()
         {
         return false;
         }

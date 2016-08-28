@@ -55,10 +55,25 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         modifyText.extendFirstRoll( string );
         }
 
+    // Title of PacketText DO NOT change
+    @Override
     public String getFirstString()
         {
         return packetText.getTitleString();
         }
+
+    @Override
+    public boolean isSecondStringChanging()
+        {
+        return packetSecond != null ? packetSecond.isTitleStringChanging() : super.isSecondStringChanging();
+        }
+
+    @Override
+    public String getSecondString()
+        {
+        return packetSecond != null ? packetSecond.getTitleString() : super.getSecondString();
+        }
+
 
     @Override
     public void mainTouchStart( boolean isTouchDown )

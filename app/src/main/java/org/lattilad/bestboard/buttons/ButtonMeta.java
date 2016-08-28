@@ -1,7 +1,5 @@
 package org.lattilad.bestboard.buttons;
 
-import android.graphics.Canvas;
-
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -67,28 +65,28 @@ public class ButtonMeta extends ButtonMultiTouch implements Cloneable
             }
         }
 
+
     @Override
-    public void drawButtonChangingPart(Canvas canvas)
+    public int getColor()
         {
         if ( layout.softBoardData.layoutStates.metaStates[type].getState() == MetaState.IN_TOUCH &&
                 layout.softBoardData.displayTouch)
-            drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
+            return layout.softBoardData.touchColor;
 
         else if ( layout.softBoardData.layoutStates.metaStates[type].getState() == MetaState.META_ON )
-            drawButtonBackground(canvas, layout.softBoardData.metaColor, layout.layoutXOffset, layout.layoutYOffset);
+            return layout.softBoardData.metaColor;
 
         else if ( layout.softBoardData.layoutStates.metaStates[type].getState() == MetaState.META_LOCK )
-            drawButtonBackground(canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
+            return layout.softBoardData.lockColor;
 
         // It is only needed by CAPS, but all meta-buttons will know it.
         else if ( layout.softBoardData.autoFuncEnabled &&
                 layout.softBoardData.layoutStates.metaStates[type].getState() == CapsState.AUTOCAPS_ON )
-            drawButtonBackground(canvas, layout.softBoardData.autoColor, layout.layoutXOffset, layout.layoutYOffset);
+            return layout.softBoardData.autoColor;
 
-        else
-            return; // If state == META_OFF, then no redraw is needed
-        drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
+        return super.getColor(); // If state == META_OFF, then default color is needed
         }
+
 
     @Override
     public void multiTouchEvent( int phase )

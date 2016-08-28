@@ -11,7 +11,8 @@ public abstract class ButtonMultiTouch extends Button
         return (ButtonMultiTouch)super.clone();
         }
 
-    public boolean isChangingButton()
+    @Override
+    public boolean isColorChanging()
         {
         return true;
         }

@@ -23,28 +23,31 @@ public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
 
     public ButtonAbbrev( List<Long> idList )
         {
-        idList = idList;
+        this.idList = idList;
         }
 
-    public boolean isChangingButton()
-        {
-        return true;
-        }
-
+    @Override
     public String getFirstString()
         {
         return "ABR";
         }
 
     @Override
+    public boolean isColorChanging()
+        {
+        return true;
+        }
+
+    @Override
+    public int getColor()
+        {
+        return (layout.softBoardData.codeTextProcessor.activeButton == this) ?
+                layout.softBoardData.lockColor : super.getColor();
+        }
+
+    @Override
     public void drawButtonChangingPart(Canvas canvas)
         {
-        // Call super if show-title is needed
-        if ( layout.softBoardData.codeTextProcessor.activeButton == this )
-            {
-            drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
-            drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
-            }
         }
 
     @Override

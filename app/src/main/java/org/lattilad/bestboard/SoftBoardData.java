@@ -8,8 +8,8 @@ import android.preference.PreferenceManager;
 import android.util.LongSparseArray;
 import android.view.inputmethod.EditorInfo;
 
-import org.lattilad.bestboard.codetext.CodeTextProcessor;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
+import org.lattilad.bestboard.codetext.CodeTextProcessor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
 import org.lattilad.bestboard.prefs.PrefsFragment;

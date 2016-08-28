@@ -24,18 +24,32 @@ public class ButtonDouble extends ButtonMainTouch implements Cloneable
         this.packetSecond = packetSecond;
         }
 
+    @Override
+    public boolean isFirstStringChanging()
+        {
+        return packetFirst.isTitleStringChanging();
+        }
+
+    @Override
     public String getFirstString()
         {
         return packetFirst.getTitleString();
         }
 
+    @Override
+    public boolean isSecondStringChanging()
+        {
+        return packetSecond.isTitleStringChanging();
+        }
+
+    @Override
     public String getSecondString()
         {
         return packetSecond.getTitleString();
         }
 
-    private static int counter = 0;
 
+    private static int counter = 0;
 
     /**
      * Packet is sent independently from touch down/move

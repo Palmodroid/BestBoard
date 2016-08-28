@@ -81,6 +81,13 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
         return null;
         }
 
+    @Override
+    public boolean isFirstStringChanging()
+        {
+        return packet.isTitleStringChanging();
+        }
+
+    @Override
     public String getFirstString()
         {
         return packet.getTitleString();

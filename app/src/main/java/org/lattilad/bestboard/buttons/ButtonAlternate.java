@@ -1,10 +1,6 @@
 package org.lattilad.bestboard.buttons;
 
-import android.graphics.Canvas;
-
 import org.lattilad.bestboard.SoftBoardData;
-
-import java.util.Iterator;
 
 /**
  * Double button with double packet
@@ -28,40 +24,28 @@ public class ButtonAlternate extends ButtonMainTouch implements Cloneable
         packets[1] = packetSecond;
         }
 
+    @Override
+    public boolean isFirstStringChanging()
+        {
+        return true;
+        }
+
+    @Override
     public String getFirstString()
         {
         return packets[0].getTitleString();
         }
 
-    public String getSecondString()
-        {
-        return packets[1].getTitleString();
-        }
-
-    public boolean isChangingButton()
+    @Override
+    public boolean isSecondStringChanging()
         {
         return true;
         }
 
-    // All but last title is drawn
-    protected void drawButtonTextTitles(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
+    @Override
+    public String getSecondString()
         {
-        Iterator<TitleDescriptor> titlesIterator = titles.iterator();
-        if (titlesIterator.hasNext())
-            titlesIterator.next(); // just step over the last item
-        while (titlesIterator.hasNext())
-            {
-            titlesIterator.next().drawTextTitle(canvas, this, xOffsetInPixel, yOffsetInPixel);
-            }
-        }
-
-    // Last title is drawn as changing part
-    public void drawButtonChangingPart(Canvas canvas)
-        {
-        // draw last title - always with changing string
-        titles.getLast().drawTitle(canvas,
-                packets[counter].getTitleString(),
-                this, layout.layoutXOffset, layout.layoutYOffset);
+        return packets[1].getTitleString();
         }
 
     /**

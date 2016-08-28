@@ -10,6 +10,58 @@ import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.SinglyLinkedList;
 
+/**
+ * Change           ConstantPart    ChangingPart    Touched
+ * Background             -           B T(all)       tB T(all)
+ * Title:
+ *    NO              B T(NO FIRST SECOND)           tB T(all)
+ *    FIRST           B T(NO)         T(FIRST)       tB T(all)
+ *    SECOND          B T(NO)         T(SECOND)      tB T(all)
+ *    SHOW            B T(NO)         T(SHOW)        tB T(all)
+ *
+ * Button.changingInfo contains binary information about changing parts:
+ *
+ *  00011110
+ *         * - Constant text (only together with background)
+ *        *  - Primary text (depends on the result of isPrimaryTextChanging())
+ *       *   - Secondary text (depends on the result of isSecondaryTextChanging())
+ *      *    - Showtext - always change
+ *     *     - Background (and all texts should change)
+ *
+ *  TitleDescriptor.letChangingInfo() returns whether this title is changing (same format as above)
+ *
+ *  Button.letChangingInfo() should be called always (after titles are added)
+ *  If Button subtype needs changing background, then it should return -1
+ *  Otherwise it should return the sum (logical-or) of titles (getTitlesChangingInfo())
+ *
+ *  Constants:
+ *  ALL_CHANGE: -1 (because with background all titles should be redrawn)
+ *  BACKGROUND_CHANGE = 16;
+ public static final int NO_CHANGE = 0;
+ public static final int TEXT_TITLE_CHANGE = 1;
+ public static final int SHOW_TITLE_CHANGE = 2;
+ public static final int FIRST_TITLE_CHANGE = 4;
+ public static final int SECOND_TITLE_CHANGE = 8;
+ *
+ *  Button.drawConstantParts() - is only called when layout is created
+ *      Draw NON-changing parts, !changingInfo (logical-no) should be used
+ *
+ *  BUtton.drawChangingParts() - is called at every touch
+ *      Draw changing parts, changingInfo shows these parts with binary 1
+ *
+ *  Button.drawTouchedParts() - is called when button is in touch
+ *      Draw touched background
+ *      Draw all titles (call drawTitles() with -1 (ALL_CHANGE)
+ *
+ *   Button subclasses should override:
+ *   isPrimaryTextChanging()/isSecondaryTextChanging() (together with getPrimary/secondary text)
+ *   - if they use changing packets
+ *   OR - at least
+ *   getPrimaryText - to get one static title
+ *
+ *   isColorChanging() if background can change together with
+ *   getColor() to return background color depending on the situation. Supermethod returns default color.
+ */
 
 /*
  *  Button
@@ -33,25 +85,69 @@ import org.lattilad.bestboard.utils.SinglyLinkedList;
  *
  */
 
-
 /**
  * Base class for buttons.
  * The class itself defines an "empty" Button without any function
  */
 public class Button implements Cloneable
     {
+    /** Button's layout to reach layout's and softboard's data */
+    protected Layout layout;
+
+    /** Position data of the button's hexagon in pixel */
+    private int xMinus;
+    private int xCenter;
+    private int xPlus;
+
+    private int yMinus2;
+    private int yMinus1;
+    private int yCenter;
+    private int yPlus1;
+    private int yPlus2;
+
     /**
-     * If a Button subclass implements ChangingButton interface,
-     * then Layout.onDraw() calls its drawButtonChangingPart() method,
-     * which can redraw the changed button over the layout-bitmap.
-     * Buttons with ChangingButton interface will be collected in the Layout.addButton method().
-     *
-    public interface ChangingButton
+     * Button.changingInfo contains binary information about changing parts:
+     *  00011110
+     *         * - Constant text- never change
+     *        *  - Showtext - always change
+     *       *   - Primary text (depends on the result of isPrimaryTextChanging())
+     *      *    - Secondary text (depends on the result of isSecondaryTextChanging())
+     *     *     - Background (and all texts should change)
+     */
+    public static final int DRAW_NOTHING = 0;
+    public static final int DRAW_TEXT_TITLE = 1;
+    public static final int DRAW_SHOW_TITLE = 2;
+    public static final int DRAW_FIRST_TITLE = 4;
+    public static final int DRAW_SECOND_TITLE = 8;
+    public static final int DRAW_BACKGROUND = 16;
+    public static final int DRAW_ALL = -1;
+
+    /** Changing parts of the button */
+    protected int changingInfo;
+
+    /** Button's default background color */
+    protected int color;
+
+    /** Button's title(s) */
+    protected SinglyLinkedList<TitleDescriptor> titles;
+
+    /** Button's name - only for parsing */
+    public String name;
+
+    /** Hexagons fill paint will be set in static initialization, color is variable */
+    protected static Paint hexagonFillPaint = new Paint();
+
+    /** Hexagons stroke paint will be set in static initialization, color is BLACK */
+    protected static Paint hexagonStrokePaint = new Paint();
+
+    static
         {
-        // offset is always layout.xOffset (direct draw on screen)
-        public void drawButtonChangingPart(Canvas canvas);
+        hexagonFillPaint.setStyle( Paint.Style.FILL );
+        hexagonStrokePaint.setStyle( Paint.Style.STROKE );
+        hexagonStrokePaint.setStrokeWidth( 0f );
+        hexagonStrokePaint.setColor( Color.BLACK );
         }
-    */
+
 
     /*
     http://stackoverflow.com/a/7580966 how to clone
@@ -76,61 +172,13 @@ public class Button implements Cloneable
 
 
     /**
-     * Button's default title text.
-     * It will be only used if no title/title-text is given.
-     * @return Default title text - empty string for empty button
+     * Get button's layout set by setPosition() (or ButtonForMaps constructor)
+     * @return layout
      */
-    public String getFirstString()
-        {
-        return "";
-        }
-
-    public boolean isFirstStringChanging()
-        {
-        return false;
-        }
-
-    public String getSecondString()
-        {
-        return "";
-        }
-
-    public boolean isSecondStringChanging()
-        {
-        return false;
-        }
-
-
-    /** Button's layout */
-    protected Layout layout;
-
     public Layout getLayout()
         {
         return layout;
         }
-
-
-    /** Button's and hexagon's position in pixel */
-    private int xMinus;
-    private int xCenter;
-    private int xPlus;
-
-    private int yMinus2;
-    private int yMinus1;
-    private int yCenter;
-    private int yPlus1;
-    private int yPlus2;
-
-
-
-    /** Button's background color */
-    protected int color;
-
-    /** Button's title(s) */
-    protected SinglyLinkedList<TitleDescriptor> titles;
-
-    /** Button's name - only for parsing */
-    public String name;
 
 
     /**
@@ -147,7 +195,8 @@ public class Button implements Cloneable
         }
 
     /**
-     * If layout is ready (eg. ButtonForMaps) connects the Button instance to its position.
+     * Connects the Button instance to its position
+     * if layout is ready (eg. ButtonForMaps sets layout in constructor)
      * @param arrayColumn column (hexagonal)
      * @param arrayRow row (hexagonal)
      */
@@ -169,50 +218,18 @@ public class Button implements Cloneable
         connected();
         }
 
+
+    /**
+     * This method cen be overridden if button needs initialization after getting
+     * layout/softboard data
+     */
     protected void connected()
         {
-        // methods which requires softboarddata should come here
-        }
-
-    /**
-     * Sets button's background color
-     * @param color background color
-     */
-    public void setColor( int color )
-        {
-        this.color = color;
         }
 
 
-    /**
-     * Sets button's titles.
-     * Title cannot be null, but it is checked previously.
-     * @param titles title(s) of the button. CANNOT BE NULL OR INVALID!
-     */
-    public void setTitles( SinglyLinkedList<TitleDescriptor> titles )
-        {
-        this.titles = titles;
-        }
-
-    public SinglyLinkedList<TitleDescriptor> getTitles()
-        {
-        return titles;
-        }
-
-    /** Hexagons fill paint will be set in static initialization, color is variable */
-    protected static Paint hexagonFillPaint = new Paint();
-
-    /** Hexagons stroke paint will be set in static initialization, color is BLACK */
-    protected static Paint hexagonStrokePaint = new Paint();
-
-    static
-        {
-        hexagonFillPaint.setStyle( Paint.Style.FILL );
-        hexagonStrokePaint.setStyle( Paint.Style.STROKE );
-        hexagonStrokePaint.setStrokeWidth( 0f );
-        hexagonStrokePaint.setColor( Color.BLACK );
-        }
-
+    // "Grid" is a rectangular coordinate-system, which measures in
+    // HALF-WIDTH and QUOTER-HEIGHT hexagons
 
     // !! Always use X-Y or Column-Row pairs !!
     // GridX = HX * 2 + ( (HY + HK) % 2 )
@@ -247,9 +264,6 @@ public class Button implements Cloneable
         }
 
 
-    // "Grid" is a rectangular coordinate-system, which measures in
-    // HALF-WIDTH and QUOTER-HEIGHT hexagons
-
     /**
      * Converts X-grid to X-pixel without offset
      * (Center and corners of the hexagon)
@@ -273,30 +287,32 @@ public class Button implements Cloneable
         return gridY * layout.layoutHeightInPixels / layout.layoutHeightInGrids;
         }
 
+
     /**
      * Converts X-grid to X-pixel
      * (Center and corners of the hexagon)
      * @param gridX grid X coordinate
      * @param xOffsetInPixel X offset in pixels
      * @return pixel X coordinate
-     */
+     *
     protected int getPixelX( int gridX, int xOffsetInPixel )
         {
         return gridX * layout.areaWidthInPixels / layout.areaWidthInGrids + xOffsetInPixel;
         }
 
 
-    /**
+    **
      * Converts Y-grid to Y-pixel
      * (Center and corners of the hexagon)
      * @param gridY grid Y coordinate
      * @param yOffsetInPixel Y offset in pixels
      * @return pixel Y coordinate
-     */
+     *
     protected int getPixelY( int gridY, int yOffsetInPixel )
         {
         return gridY * layout.layoutHeightInPixels / layout.layoutHeightInGrids + yOffsetInPixel;
         }
+     */
 
 
     /**
@@ -308,6 +324,7 @@ public class Button implements Cloneable
         return xCenter;
         }
 
+
     /**
      * Returns button centre in pixels without offset
      * @return y center
@@ -316,6 +333,7 @@ public class Button implements Cloneable
         {
         return yCenter;
         }
+
 
     /**
      * Creates button's hexagon with the use of the grids
@@ -343,117 +361,205 @@ public class Button implements Cloneable
 
 
     /**
-     * Changing buttons should be redrawn after each touch
-     * This method should return true, if this is a changing button.
-     * The original method checks only showtitles.
-     * To change other parts (background), this method should be overridden
-     * @return true, if this button has got changing parts
+     * Changing buttons are redrawn at every cycle. Layout needs this information
+     * @return true if button has got changing parts
      */
     public boolean isChangingButton()
         {
-        // This method checks only show-titles
-        return isChangingTitle() != TitleDescriptor.NO_CHANGE;
+        return changingInfo != DRAW_NOTHING;
         }
 
-    public int isChangingTitle()
+    /**
+     * Changing buttons should be redrawn during each invalidation
+     * This method calculates and returns changingInfo,
+     * which contains the changing parts in binary format.
+     * To change other parts (background), this method should be overridden
+     * @return calculated changingInfo
+     */
+    protected int letChangingInfo()
         {
-        int isChanging = 0;
+        // if background is changing, then everything should be redrawn at each session
+        if (isColorChanging())
+            return DRAW_ALL;
+
+        // otherwise title-list decides, which title types should be redrawn
+        int changingInfo = 0;
         for ( TitleDescriptor title : titles )
             {
-            isChanging |= title.isChangingTitle( this );
+            changingInfo |= title.getChangingInfo( this );
             }
-        return isChanging;
+
+        return changingInfo;
         }
+
 
     /**
      * Button subclasses can decide about the default title type by overriding this method.
      * @return default title type
      */
-    public int defaultTitleType()
+    public int getDefaultTitleType()
         {
         return TitleDescriptor.GET_FIRST_STRING;
         }
 
 
     /**
-     * Change           ConstantPart    ChangingPart    Touched
-     * Background             -           B T(all)       tB T(all)
-     * Title:
-     *    NO              B T(NO FIRST SECOND)           tB T(all)
-     *    FIRST           B T(NO)         T(FIRST)       tB T(all)
-     *    SECOND          B T(NO)         T(SECOND)      tB T(all)
-     *    SHOW            B T(NO)         T(SHOW)        tB T(all)
-     *
-     * Button.changingInfo contains binary information about changing parts:
-     *
-     *  00011110
-     *         * - Constant text (only together with background)
-     *        *  - Primary text (depends on the result of isPrimaryTextChanging())
-     *       *   - Secondary text (depends on the result of isSecondaryTextChanging())
-     *      *    - Showtext - always change
-     *     *     - Background (and all texts should change)
-     *
-     *  TitleDescriptor.getChangingInfo() returns whether this title is changing (same format as above)
-     *
-     *  Button.setChaningInfo() should be called always (?? where)
-     *  If Button subtype needs changing background, then it should be overridden to return -1
-     *  Otherwise it should return the sum (logical-or) of titles (getTitlesChangingInfo())
-     *
-     *  Constants:
-     *  ALL_CHANGE: -1 (because with background all titles should be redrawn)
-     *  BACKGROUND_CHANGE = 16;
-     public static final int NO_CHANGE = 0;
-     public static final int TEXT_TITLE_CHANGE = 1;
-     public static final int SHOW_TITLE_CHANGE = 2;
-     public static final int FIRST_TITLE_CHANGE = 4;
-     public static final int SECOND_TITLE_CHANGE = 8;
-     *
-     *  Button.drawConstantParts() - is only called when layout is created
-     *      Draw NON-changing parts, !changingInfo (logical-no) should be used
-     *
-     *  BUtton.drawChangingParts() - is called at every touch
-     *      Draw changing parts, changingInfo shows these parts with binary 1
-     *
-     *  Button.drawTouchedParts() - is called when button is in touch
-     *      Draw touched background
-     *      Draw all titles (call drawTitles() with -1 (ALL_CHANGE)
-     *
-     *   Button subclasses should override:
-     *   isPrimaryTextChanging()/isSecondaryTextChanging() (together with getPrimary/secondary text)
-     *   - if they use changing packets
-     *   OR - at least
-     *   getPrimaryText - to get one static title
-     *
-     *   setChangingInfo to return -1, AND drawBackground, if button needs changing background
+     * Subclasses should override this method, to gather information for the first string
+     * from the firstPacket (if any)
+     * @return true, if first string can change during sessions
      */
+    public boolean isFirstStringChanging()
+        {
+        return false;
+        }
+
+
+    /**
+     * Button's default, first title text.
+     * @return Default title text - empty string for empty button
+     */
+    public String getFirstString()
+        {
+        return "";
+        }
+
+
+    /**
+     * Subclasses should override this method, to gather information for the second string
+     * from the secondPacket (if any)
+     * @return true, if second string can change during sessions
+     */
+    public boolean isSecondStringChanging()
+        {
+        return false;
+        }
+
+
+    /**
+     * Button's second title text.
+     * @return Default title text - empty string for empty button
+     */
+    public String getSecondString()
+        {
+        return "";
+        }
+
+
+    /**
+     * Sets button's titles.
+     * Title cannot be null, but it is checked previously.
+     * ChangingInfo is recalculated after each set, because new titles can change it.
+     * This method is called during button creation and extension.
+     * @param titles title(s) of the button. CANNOT BE NULL OR INVALID!
+     */
+    public void setTitles( SinglyLinkedList<TitleDescriptor> titles )
+        {
+        this.titles = titles;
+        changingInfo = letChangingInfo();
+        }
+
+
+    /**
+     * Gets button's title-list
+     * @return title(s) of the button
+     */
+    public SinglyLinkedList<TitleDescriptor> getTitles()
+        {
+        return titles;
+        }
+
+
+    /**
+     * Subclasses should override this method, if background could change between sessions
+     * @return true, if background can change
+     */
+    public boolean isColorChanging()
+        {
+        return false;
+        }
+
+
+    /**
+     * Sets button's default background color
+     * @param color background color
+     */
+    public void setColor( int color )
+        {
+        this.color = color;
+        }
+
+
+    /**
+     * Button subclasses can set background color by overriding this method.
+     * Supermethod will return default background color (set by setColor)
+     * @return default title type
+     */
+    public int getColor()
+        {
+        return color;
+        }
+
+
+    /**
+     * Helper method to draw the whole button
+     * @param canvas canvas of the layout
+     * @param drawInfo button parts to be drawn as defined by changing parts binary format
+     * @param color color of the background (getColor() should be used for default color)
+     * @param xOffsetInPixel x offset in pixels
+     * (can be 0 (layout bitmap) or layout.xOffset (direct draw on screen)
+     * @param yOffsetInPixel y offset in pixels
+     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
+     */
+    private void drawButton( Canvas canvas, int drawInfo, int color, int xOffsetInPixel, int yOffsetInPixel )
+        {
+
+        // draw the background
+
+        if ((drawInfo & DRAW_BACKGROUND) != 0)
+            {
+            hexagonFillPaint.setColor( color );
+
+            Path hexagonPath = hexagonPath(xOffsetInPixel, yOffsetInPixel);
+            canvas.drawPath(hexagonPath, hexagonFillPaint);
+            canvas.drawPath(hexagonPath, hexagonStrokePaint);
+            }
+
+        // draw the titles
+
+        // index (in buttons[][index]) == touchCode (this is always true)
+        // Theoretically from index/touchCode the buttons position can be calculated.
+        // BUT this is NOT obligatory!! So the buttons will store their position.
+        for ( TitleDescriptor title : titles )
+            {
+            // ONLY TEXT titles are drawn (text != null)
+            title.drawTitle(canvas, drawInfo, this, xOffsetInPixel, yOffsetInPixel);
+            }
+        }
 
 
     /**
      * Draw button on layout-bitmap (Layout.createLayoutScreen())
      * Background color is the button's original color
      * No x offset is applied
+     * NON-changing parts are drawn, so the opposite of changingInfo is needed
      * @param canvas canvas of the bitmap
      */
-    public void drawButtonConstantPart(Canvas canvas)
+    public void drawButtonConstantPart( Canvas canvas )
         {
-        // draw the background
-        drawButtonBackground(canvas, color, 0, 0);
-
-        // draw the titles - ONLY TEXT titles
-        drawButtonTextTitles(canvas, 0, 0);
+        drawButton( canvas, ~changingInfo, getColor(), 0, 0 );
         }
 
 
     /**
-     * If isChangingButton == true than changing part will be redrawn at every touch
-     * Draw button directly on the screen (above layout-bitmap) (Layout.onDraw)
-     * Layout.xOffset is applied (as for the layout-bitmap)
+     * Draw button on layout-bitmap (Layout.createLayoutScreen())
+     * Background color is the button's original color
+     * No x offset is applied
+     * Changing parts are drawn
      * @param canvas canvas of the bitmap
      */
-    public void drawButtonChangingPart(Canvas canvas)
+    public void drawButtonChangingPart( Canvas canvas )
         {
-        // draw last title - if it is a showtitle
-        drawButtonShowTitle(canvas, layout.layoutXOffset, layout.layoutYOffset);
+        drawButton( canvas, changingInfo, getColor(), 0, 0 );
         }
 
 
@@ -461,78 +567,12 @@ public class Button implements Cloneable
      * Draw button directly on the screen (above layout-bitmap) (Layout.onDraw)
      * Background color is the color of the touched keys (layout.softBoardData.touchColor)
      * Layout.xOffset is applied (as for the layout-bitmap)
+     * ALL parts should be drawn
      * @param canvas canvas of the bitmap
      */
-    public void drawButtonTouched(Canvas canvas)
+    public void drawButtonTouched( Canvas canvas )
         {
-        // draw the background
-        drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
-
-        // draw the titles - ONLY TEXT titles
-        drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
-
-        drawButtonChangingPart(canvas);
-        }
-
-
-    /**
-     * Draws button background with the specified background color and
-     * with the specified x-offset in pixel
-     * @param canvas canvas to draw on
-     * @param color background color
-     * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or layout.xOffset (direct draw on screen)
-     * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
-     */
-    protected void drawButtonBackground( Canvas canvas, int color, int xOffsetInPixel, int yOffsetInPixel )
-        {
-        hexagonFillPaint.setColor( color );
-
-        Path hexagonPath = hexagonPath(xOffsetInPixel, yOffsetInPixel);
-        canvas.drawPath(hexagonPath, hexagonFillPaint);
-        canvas.drawPath(hexagonPath, hexagonStrokePaint);
-        }
-
-
-    /**
-     * Draws the titles for drawButton. ONLY TEXT Titles are drawn, show-titles are skipped
-     * drawButton will calculate pixel coordinates previously
-     * This method could be changed, if not all titles are needed
-     * @param canvas canvas to draw on
-     * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or layout.xOffset (direct draw on screen)
-     * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
-     */
-    protected void drawButtonTextTitles(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
-        {
-        // index (in buttons[][index]) == touchCode (this is always true)
-        // Theoretically from index/touchCode the buttons position can be calculated.
-        // BUT this is NOT obligatory!! So the buttons will store their position.
-
-        for ( TitleDescriptor title : titles )
-            {
-            // ONLY TEXT titles are drawn (text != null)
-            title.drawTextTitle(canvas, this, xOffsetInPixel, yOffsetInPixel);
-            }
-        }
-
-
-    /**
-     * Draws the showtitle (if any) for drawButton. Show-title can be ONLY at the last position
-     * drawButton will calculate pixel coordinates previously
-     * This method could be changed, if not all titles are needed
-     * @param canvas canvas to draw on
-     * @param xOffsetInPixel x offset in pixels
-     * (can be 0 (layout bitmap) or layout.xOffset (direct draw on screen)
-     * @param yOffsetInPixel y offset in pixels
-     * (can be 0 (layout bitmap) or -layout.layoutYOffset (direct draw on screen)
-     */
-    protected void drawButtonShowTitle(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
-        {
-        // ONLY VALID MARKERS are drawn
-        titles.getLast().drawShowTitle(canvas, this, xOffsetInPixel, yOffsetInPixel);
+        drawButton( canvas, DRAW_ALL, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
         }
 
 

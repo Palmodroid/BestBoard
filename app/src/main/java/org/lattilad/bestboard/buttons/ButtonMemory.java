@@ -1,13 +1,9 @@
 package org.lattilad.bestboard.buttons;
 
-import android.graphics.Canvas;
-
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.StringUtils;
-
-import java.util.Iterator;
 
 /**
  * ButtonMemory is a complex button:
@@ -43,71 +39,34 @@ public class ButtonMemory extends ButtonMainTouch implements Cloneable
             }
         }
 
-    public boolean isChangingButton()
+    @Override
+    public boolean isColorChanging()
         {
         return true;
         }
 
-    // This is needed only by debug methods, because last title is not drawn
+    @Override
+    public int getColor()
+        {
+        return (state == 2 &&
+                layout.softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() == MetaState.META_LOCK ) ?
+                layout.softBoardData.lockColor : super.getColor();
+        }
+
+    @Override
+    public boolean isFirstStringChanging()
+        {
+        return true;
+        }
+
+    @Override
     public String getFirstString()
         {
-        return "MEM";
-        }
-
-    // All but last title is drawn
-    protected void drawButtonTextTitles(Canvas canvas, int xOffsetInPixel, int yOffsetInPixel)
-        {
-        Iterator<TitleDescriptor> titlesIterator = titles.iterator();
-        if (titlesIterator.hasNext())
-            titlesIterator.next(); // just step over the last item
-        while (titlesIterator.hasNext())
-            {
-            titlesIterator.next().drawTextTitle(canvas, this, xOffsetInPixel, yOffsetInPixel);
-            }
-        }
-
-    // Last title is drawn as changing part
-    private void drawButtonLastTitle(Canvas canvas)
-        {
-        // draw last title - always with changing string
-        String string;
-
         if ( state == 3 )
-            string = abbreviation;
+            return abbreviation;
         else if (state == 2 )
-            {
-            string = "SEL";
-            }
-        else
-            string = "MEM";
-
-        titles.getLast().drawTitle(canvas, string,
-                this, layout.layoutXOffset, layout.layoutYOffset);
-        }
-
-    // public void drawButtonConstantPart(Canvas canvas) - remains original
-
-    // Last title is drawn as changing part
-    public void drawButtonChangingPart(Canvas canvas)
-        {
-        if (state == 2 &&
-                layout.softBoardData.layoutStates.metaStates[LayoutStates.META_SHIFT].getState() == MetaState.META_LOCK )
-            {
-            drawButtonBackground(canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
-            drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
-            }
-
-        drawButtonLastTitle( canvas );
-        }
-
-    public void drawButtonTouched(Canvas canvas)
-        {
-        // draw the background
-        drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
-        // draw the titles - ONLY TEXT titles
-        drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
-
-        drawButtonLastTitle(canvas);
+            return "SEL";
+        return  "MEM";
         }
 
 

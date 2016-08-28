@@ -31,7 +31,7 @@ public class PacketTextVaria extends PacketTextBase
         }
 
     // These packets needs constant redraw
-    public boolean needsChangingButton()
+    public boolean isTitleStringChanging()
         {
         return true;
         }

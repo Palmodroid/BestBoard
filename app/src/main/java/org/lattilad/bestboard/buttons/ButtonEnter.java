@@ -26,7 +26,8 @@ public class ButtonEnter extends ButtonMainTouch implements Cloneable
             setOnStay();
         }
 
-    public int defaultTitleType()
+    // ENTER has got default SHOW-text, but no FIRST or SECOND string available
+    public int getDefaultTitleType()
         {
         return SoftBoardShow.ENTER_ACTION;
         }

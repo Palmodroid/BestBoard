@@ -1,6 +1,6 @@
 package org.lattilad.bestboard.fileselector;
 
-import java.io.*;
+import java.io.File;
 
 /**
  * One entry in the file-list of the selector

@@ -1,7 +1,5 @@
 package org.lattilad.bestboard.buttons;
 
-import android.graphics.Canvas;
-
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Tokenizer;
@@ -40,27 +38,27 @@ public class ButtonSwitch extends ButtonMultiTouch implements Cloneable
         }
 
     @Override
-    public void drawButtonChangingPart(Canvas canvas)
+    public int getColor()
         {
         int state = layout.softBoardData.boardTable.getState(layoutId);
 
         if ( state == BoardTable.ACTIVE )
-            drawButtonBackground(canvas, layout.softBoardData.metaColor, layout.layoutXOffset, layout.layoutYOffset);
+            return layout.softBoardData.metaColor;
         else if ( state == BoardTable.LOCKED )
-            drawButtonBackground(canvas, layout.softBoardData.lockColor, layout.layoutXOffset, layout.layoutYOffset);
+            return layout.softBoardData.lockColor;
         else if ( state == BoardTable.TOUCHED && layout.softBoardData.displayTouch )
-            drawButtonBackground(canvas, layout.softBoardData.touchColor, layout.layoutXOffset, layout.layoutYOffset);
+            return layout.softBoardData.touchColor;
 
         // It is only needed by CAPS, but all meta-buttons will know it.
         else if ( showAutoCaps &&
                 layout.softBoardData.autoFuncEnabled &&
                 layout.softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS].getState() == CapsState.AUTOCAPS_ON )
-            drawButtonBackground(canvas, layout.softBoardData.autoColor, layout.layoutXOffset, layout.layoutYOffset);
+            return layout.softBoardData.autoColor;
 
-        else
-            return; // If state == HIDDEN, then no redraw is needed
-        drawButtonTextTitles(canvas, layout.layoutXOffset, layout.layoutYOffset);
+        // If state == HIDDEN, then no redraw is needed
+        return super.getColor();
         }
+
 
     @Override
     public void multiTouchEvent( int phase )

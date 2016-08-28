@@ -24,6 +24,8 @@ public class ButtonMulti extends ButtonMainTouch implements Cloneable
         packets.add( packet );
         }
 
+    // What about changing titles?
+
     public String getFirstString()
         {
         if ( packets.isEmpty() )

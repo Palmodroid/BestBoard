@@ -815,39 +815,10 @@ public class MethodsForCommands
                         SinglyLinkedList<TitleDescriptor> titles =
                                 new SinglyLinkedList<>( button.getTitles() );
 
-                        TitleDescriptor showTitle = titles.getLast().isShowTitle() ? titles.getLast() : null ;
-
-                        TitleDescriptor titleDescriptor;
                         for ( KeyValuePair title : buttonExtension.titleList )
                             {
-                            titleDescriptor = (TitleDescriptor) title.getValue();
-                            if ( titleDescriptor.getType() < TitleDescriptor.TEXT )
-                                {
-                                // TitleDescriptor is not completed, depends on the value of the buttons
-                                titleDescriptor = titleDescriptor.copy();
-                                if ( titleDescriptor.getType() == TitleDescriptor.BUTTON_DECIDES )
-                                    titleDescriptor.setType( button.defaultTitleType() );
-
-                                if ( titleDescriptor.getType() == TitleDescriptor.GET_FIRST_STRING )
-                                    titleDescriptor.setText( button.getFirstString() );
-                                else if ( titleDescriptor.getType() == TitleDescriptor.GET_SECOND_STRING )
-                                    titleDescriptor.setText( button.getSecondString() );
-                                // else: text can remain null
-                                }
-
-                            if ( titleDescriptor.getType() == TitleDescriptor.TEXT )
-                                {
-                                // Completed titleDescriptor, so one instance is enough for all buttons
-                                titles.add(titleDescriptor);
-                                }
-                            else
-                                {
-                                // Show-title should be the last among titles
-                                showTitle = titleDescriptor;
-                                }
+                            titles.add( (TitleDescriptor) title.getValue() );
                             }
-                        if ( showTitle != null )
-                            titles.add(showTitle);
 
                         button.setTitles(titles);
                         tokenizer().note( "EXTEND", R.string.data_button_titles_extended);
@@ -1692,41 +1663,13 @@ public class MethodsForCommands
 
         // !! This part after this point could be nicer !!
         SinglyLinkedList<TitleDescriptor> titles = new SinglyLinkedList<>();
-        TitleDescriptor titleDescriptor;
 
         if ( titleList != null )
             {
-            TitleDescriptor showTitle = null;
             for (KeyValuePair title : titleList)
                 {
-                titleDescriptor = (TitleDescriptor) title.getValue();
-                if ( titleDescriptor.getType() < TitleDescriptor.TEXT )
-                    {
-                    // TitleDescriptor is not completed, depends on the value of the buttons
-                    titleDescriptor = titleDescriptor.copy();
-                    if ( titleDescriptor.getType() == TitleDescriptor.BUTTON_DECIDES )
-                        titleDescriptor.setType( button.defaultTitleType() );
-
-                    if ( titleDescriptor.getType() == TitleDescriptor.GET_FIRST_STRING )
-                        titleDescriptor.setText( button.getFirstString() );
-                    else if ( titleDescriptor.getType() == TitleDescriptor.GET_SECOND_STRING )
-                        titleDescriptor.setText( button.getSecondString() );
-                    // else: text can remain null
-                    }
-
-                if ( titleDescriptor.getType() == TitleDescriptor.TEXT )
-                    {
-                    // Completed titleDescriptor, so one instance is enough for all buttons
-                    titles.add(titleDescriptor);
-                    }
-                else
-                    {
-                    // Show-title should be the last among titles
-                    showTitle = titleDescriptor;
-                    }
+                titles.add( (TitleDescriptor) title.getValue() );
                 }
-            if ( showTitle != null )
-                titles.add(showTitle);
             }
         else
             {
@@ -1741,23 +1684,14 @@ public class MethodsForCommands
                 {
                 defaultTitle = new ExtendedMap<Long, Object>(0);
                 }
-            titleDescriptor = addTitle(defaultTitle);
-            if ( titleDescriptor.getType() == TitleDescriptor.BUTTON_DECIDES )
-                titleDescriptor.setType( button.defaultTitleType() );
-
-            if ( titleDescriptor.getType() == TitleDescriptor.GET_FIRST_STRING )
-                titleDescriptor.setText( button.getFirstString() );
-            else if ( titleDescriptor.getType() == TitleDescriptor.GET_SECOND_STRING )
-                titleDescriptor.setText( button.getSecondString() );
-            // else: text can remain null
-            titles.add(titleDescriptor);
+            titles.add( addTitle(defaultTitle) );
             }
 
         // button id can be created from the titles (and from the code)
         StringBuilder buttonNameBuilder = new StringBuilder();
         for ( TitleDescriptor title : titles )
             {
-            buttonNameBuilder.insert( 0, title.getText() ).insert( 0,'/');
+            buttonNameBuilder.insert( 0, title.getName() ).insert( 0,'/');
             }
         buttonNameBuilder.setCharAt(0, '\"');
         button.name = buttonNameBuilder.append('\"').toString();
