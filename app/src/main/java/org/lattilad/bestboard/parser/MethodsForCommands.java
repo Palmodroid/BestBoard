@@ -27,7 +27,6 @@ import org.lattilad.bestboard.buttons.ButtonSwitch;
 import org.lattilad.bestboard.buttons.Packet;
 import org.lattilad.bestboard.buttons.PacketChangeCase;
 import org.lattilad.bestboard.buttons.PacketCombine;
-import org.lattilad.bestboard.buttons.PacketField;
 import org.lattilad.bestboard.buttons.PacketFunction;
 import org.lattilad.bestboard.buttons.PacketKey;
 import org.lattilad.bestboard.buttons.PacketLoad;
@@ -997,6 +996,19 @@ public class MethodsForCommands
      */
     public PacketText packetText(ExtendedMap<Long, Object> parameters, String defaultText )
         {
+        return packetText( parameters, defaultText, true );
+        }
+
+    public PacketTextSimple packetTextSimple(ExtendedMap<Long, Object> parameters, String defaultText )
+        {
+        return (PacketTextSimple)packetText( parameters, defaultText, false );
+        }
+
+    // Some methods allows only PacketTextSimple, and not all derivated types
+    // but TEXT should be checked first, then the derived parameters, and default last.
+    // That is why we need the allTexts flag
+    private PacketText packetText(ExtendedMap<Long, Object> parameters, String defaultText, boolean allTexts )
+        {
         // PacketText is the base class, which can be TextSimple, TextTime, TextVaria, (TextField is not implemented)
         PacketText packet = null;
         Object temp;
@@ -1014,7 +1026,7 @@ public class MethodsForCommands
                 }
             // else NOT possible, TOKEN_TEXT is a text_parameter
             }
-        else // NON-TEXT
+        else if ( allTexts )// NON-TEXT
             {
             temp = parameters.remove(Commands.TOKEN_VARIA);
             if ( temp != null ) // VARIA
@@ -1502,7 +1514,7 @@ public class MethodsForCommands
 
         // Packet with default cannot be null!
         return completeMainTouchButton( new ButtonMemory(
-                        packetText(parameters, "")), // Can be null
+                        packetTextSimple(parameters, "")), // Can be null
                 parameters);
         }
 
@@ -1524,7 +1536,7 @@ public class MethodsForCommands
         // Packet with default cannot be null!
         return completeMainTouchButton( new ButtonEnter(
                 packetKey( parameters, 0x10000 + KeyEvent.KEYCODE_ENTER), // Or: '\n'
-                packetText(parameters, "\n"),
+                packetTextSimple(parameters, "\n"),
                 parameters.remove( Commands.TOKEN_REPEAT ) != null ),
                 parameters);
         }
@@ -1546,7 +1558,7 @@ public class MethodsForCommands
         {
         Scribe.debug(Debug.DATA, "List Button is defined");
 
-        PacketTextSimple packetTextSimple = packetText(parameters, "");
+        PacketTextSimple packetTextSimple = packetTextSimple(parameters, "");
 
         List<Object> strings = new ArrayList<>();
         if ( packetTextSimple.getTitleString().length() > 0)
