@@ -12,7 +12,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class PacketTextTime extends PacketTextBase
+public class PacketTextTime extends PacketText
     {
     /* time format, or null for auto-format */
     String format = null;

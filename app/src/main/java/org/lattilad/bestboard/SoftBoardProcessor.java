@@ -13,7 +13,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
-import org.lattilad.bestboard.buttons.PacketText;
+import org.lattilad.bestboard.buttons.PacketTextSimple;
 import org.lattilad.bestboard.codetext.Entry;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.prefs.PrefsFragment;
@@ -1166,17 +1166,17 @@ public class SoftBoardProcessor implements
             {
             ic.beginBatchEdit();
 
-            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 && softBoardData.autoFuncEnabled)
+            if ( (autoSpace & PacketTextSimple.ERASE_SPACES_BEFORE) != 0 && softBoardData.autoFuncEnabled)
                 {
                 sendDeleteSpacesBeforeCursor( ic );
                 }
-            if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 && softBoardData.autoFuncEnabled)
+            if ( (autoSpace & PacketTextSimple.ERASE_SPACES_AFTER) != 0 && softBoardData.autoFuncEnabled)
                 {
                 sendDeleteSpacesAfterCursor( ic );
                 }
 
             sendBuilder.setLength(0);
-            if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoFuncEnabled)
+            if ( (autoSpace & PacketTextSimple.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoFuncEnabled)
                 {
                 textBeforeCursor.reset(ic);
                 if ( !StringUtils.isWhiteSpace(textBeforeCursor.read()) )
@@ -1185,7 +1185,7 @@ public class SoftBoardProcessor implements
 
             sendBuilder.append(string);
 
-            if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 && softBoardData.autoFuncEnabled)
+            if ( (autoSpace & PacketTextSimple.AUTO_SPACE_AFTER) != 0 && softBoardData.autoFuncEnabled)
                 {
                 textAfterCursor.reset();
                 if ( !StringUtils.isSpace(textAfterCursor.read()) )
@@ -1211,17 +1211,17 @@ public class SoftBoardProcessor implements
             {
             ic.beginBatchEdit();
 
-            if ( (autoSpace & PacketText.ERASE_SPACES_BEFORE) != 0 && softBoardData.autoFuncEnabled)
+            if ( (autoSpace & PacketTextSimple.ERASE_SPACES_BEFORE) != 0 && softBoardData.autoFuncEnabled)
                 {
                 sendDeleteSpacesBeforeCursor( ic );
                 }
-            if ( (autoSpace & PacketText.ERASE_SPACES_AFTER) != 0 && softBoardData.autoFuncEnabled)
+            if ( (autoSpace & PacketTextSimple.ERASE_SPACES_AFTER) != 0 && softBoardData.autoFuncEnabled)
                 {
                 sendDeleteSpacesAfterCursor( ic );
                 }
 
             sendBuilder.setLength(0);
-            if ( (autoSpace & PacketText.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoFuncEnabled)
+            if ( (autoSpace & PacketTextSimple.AUTO_SPACE_BEFORE) != 0 && softBoardData.autoFuncEnabled)
                 {
                 textBeforeCursor.reset();
                 if ( !StringUtils.isWhiteSpace(textBeforeCursor.read()) )
@@ -1230,7 +1230,7 @@ public class SoftBoardProcessor implements
 
             sendBuilder.append(string);
 
-            if ( (autoSpace & PacketText.AUTO_SPACE_AFTER) != 0 && softBoardData.autoFuncEnabled)
+            if ( (autoSpace & PacketTextSimple.AUTO_SPACE_AFTER) != 0 && softBoardData.autoFuncEnabled)
                 {
                 textAfterCursor.reset();
                 if ( !StringUtils.isSpace(textAfterCursor.read()) )

@@ -34,7 +34,9 @@ import org.lattilad.bestboard.buttons.PacketLoad;
 import org.lattilad.bestboard.buttons.PacketMove;
 import org.lattilad.bestboard.buttons.PacketRun;
 import org.lattilad.bestboard.buttons.PacketText;
+import org.lattilad.bestboard.buttons.PacketTextSimple;
 import org.lattilad.bestboard.buttons.PacketTextTime;
+import org.lattilad.bestboard.buttons.PacketTextVaria;
 import org.lattilad.bestboard.buttons.PacketWebView;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.codetext.AbbreviationEntry;
@@ -993,91 +995,102 @@ public class MethodsForCommands
      * @param defaultText default text (if TEXT is missing) or null
      * @return Text packet or null
      */
-    public PacketText packetText( ExtendedMap<Long, Object> parameters, String defaultText )
+    public PacketText packetText(ExtendedMap<Long, Object> parameters, String defaultText )
         {
+        // PacketText is the base class, which can be TextSimple, TextTime, TextVaria, (TextField is not implemented)
         PacketText packet = null;
         Object temp;
-        boolean field = false;
 
         temp = parameters.remove(Commands.TOKEN_TEXT);
-        if ( temp == null )             // TEXT token is missing
+        if ( temp != null ) // TEXT
             {
-            temp = parameters.remove(Commands.TOKEN_FIELD);
-            if ( temp != null )
-                field = true;
-            else // temp == null
-                temp = parameters.remove( Commands.TOKEN_TIME );
+            if (temp instanceof String)
+                {
+                packet = new PacketTextSimple(softBoardData, (String) temp);
+                }
+            else if (temp instanceof Character)
+                {
+                packet = new PacketTextSimple( softBoardData, (Character)temp);
+                }
+            // else NOT possible, TOKEN_TEXT is a text_parameter
             }
-          
-        if ( temp == null )             // TEXT and TIME token is missing
+        else // NON-TEXT
             {
-            temp = defaultText;         // use default instead of TEXT
+            temp = parameters.remove(Commands.TOKEN_VARIA);
+            if ( temp != null ) // VARIA
+                {
+                int number = (int)parameters.remove(Commands.TOKEN_NO, -1);
+                if ( number == -1 )
+                    {
+                    tokenizer().error(Tokenizer.regenerateKeyword((long)temp), R.string.data_varia_no_no );
+                    // -1 as index always returns ""
+                    }
+                packet = new PacketTextVaria( softBoardData, (long)temp, number );
+                }
+            else // NON-TEXT, NON-VARIA
+                {
+                temp = parameters.remove(Commands.TOKEN_TIME);
+                if ( temp != null ) // TIME
+                    {
+                    packet = new PacketTextTime( softBoardData, (String)parameters.remove(Commands.TOKEN_FORMAT));
+                    }
+                // else // NON-TEXT, NON-VARIA, NON-TIME - continues separately, to check default text
+                }
+            }
+
+        if ( packet == null )             // TEXT BASED tokens are missing...
+            {
+            if ( defaultText == null )
+                return null;            // and default text is missing, too
+
+            packet = new PacketTextSimple( softBoardData, defaultText);
             }
         else if ( defaultText != null ) // both TEXT and default -> override default
             {
             tokenizer().note("PACKET", R.string.data_send_packet_text_override);
             }
 
-        if (temp != null)
-            {
-            long autoFlag;
+        long autoFlag;
+        int autoCaps = CapsState.AUTOCAPS_OFF;
+        int autoSpace = 0;
 
-            int autoCaps = CapsState.AUTOCAPS_OFF;
-            int autoSpace = 0;
+        autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOCAPS, -1L);
+        if ( autoFlag == Commands.TOKEN_ON )
+            autoCaps = CapsState.AUTOCAPS_ON;
+        else if ( autoFlag == Commands.TOKEN_HOLD )
+            autoCaps = CapsState.AUTOCAPS_HOLD;
+        else if ( autoFlag == Commands.TOKEN_WAIT )
+            autoCaps = CapsState.AUTOCAPS_WAIT;
+        else if ( autoFlag == Commands.TOKEN_OFF )
+            ; // default remains
+        else if ( autoFlag != -1L )
+            tokenizer().error("PACKET", R.string.data_autocaps_bad_parameter );
 
-            autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOCAPS, -1L);
-            if ( autoFlag == Commands.TOKEN_ON )
-                autoCaps = CapsState.AUTOCAPS_ON;
-            else if ( autoFlag == Commands.TOKEN_HOLD )
-                autoCaps = CapsState.AUTOCAPS_HOLD;
-            else if ( autoFlag == Commands.TOKEN_WAIT )
-                autoCaps = CapsState.AUTOCAPS_WAIT;
-            else if ( autoFlag == Commands.TOKEN_OFF )
-                ; // default remains
-            else if ( autoFlag != -1L )
-                tokenizer().error("PACKET", R.string.data_autocaps_bad_parameter );
+        packet.setAutoCaps( autoCaps );
 
-            autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOSPACE, -1L);
-            if ( autoFlag == Commands.TOKEN_BEFORE )
-                autoSpace = PacketText.AUTO_SPACE_BEFORE;
-            else if ( autoFlag == Commands.TOKEN_AFTER )
-                autoSpace = PacketText.AUTO_SPACE_AFTER;
-            else if ( autoFlag == Commands.TOKEN_AROUND )
-                autoSpace = PacketText.AUTO_SPACE_BEFORE | PacketText.AUTO_SPACE_AFTER;
-            else if ( autoFlag != -1L )
-                tokenizer().error("PACKET", R.string.data_autospace_bad_parameter );
+        autoFlag = (long)parameters.remove(Commands.TOKEN_AUTOSPACE, -1L);
+        if ( autoFlag == Commands.TOKEN_BEFORE )
+            autoSpace = PacketTextSimple.AUTO_SPACE_BEFORE;
+        else if ( autoFlag == Commands.TOKEN_AFTER )
+            autoSpace = PacketTextSimple.AUTO_SPACE_AFTER;
+        else if ( autoFlag == Commands.TOKEN_AROUND )
+            autoSpace = PacketTextSimple.AUTO_SPACE_BEFORE | PacketTextSimple.AUTO_SPACE_AFTER;
+        else if ( autoFlag != -1L )
+            tokenizer().error("PACKET", R.string.data_autospace_bad_parameter );
 
-            autoFlag = (long)parameters.remove(Commands.TOKEN_ERASESPACE, -1L);
-            if ( autoFlag == Commands.TOKEN_BEFORE )
-                autoSpace |= PacketText.ERASE_SPACES_BEFORE;
-            else if ( autoFlag == Commands.TOKEN_AFTER )
-                autoSpace |= PacketText.ERASE_SPACES_AFTER;
-            else if ( autoFlag == Commands.TOKEN_AROUND )
-                autoSpace |= PacketText.ERASE_SPACES_BEFORE | PacketText.ERASE_SPACES_AFTER;
-            else if ( autoFlag != -1L )
-                tokenizer().error("PACKET", R.string.data_erasespaces_bad_parameter );
+        autoFlag = (long)parameters.remove(Commands.TOKEN_ERASESPACE, -1L);
+        if ( autoFlag == Commands.TOKEN_BEFORE )
+            autoSpace |= PacketTextSimple.ERASE_SPACES_BEFORE;
+        else if ( autoFlag == Commands.TOKEN_AFTER )
+            autoSpace |= PacketTextSimple.ERASE_SPACES_AFTER;
+        else if ( autoFlag == Commands.TOKEN_AROUND )
+            autoSpace |= PacketTextSimple.ERASE_SPACES_BEFORE | PacketTextSimple.ERASE_SPACES_AFTER;
+        else if ( autoFlag != -1L )
+            tokenizer().error("PACKET", R.string.data_erasespaces_bad_parameter );
 
-            if (temp instanceof String)
-                {
-                if (field)
-                    packet = new PacketField(softBoardData, (String) temp, autoCaps,
-                            (boolean) parameters.remove(Commands.TOKEN_STRINGCAPS, false), autoSpace);
-                else
-                    packet = new PacketText(softBoardData, (String) temp, autoCaps,
-                            (boolean) parameters.remove(Commands.TOKEN_STRINGCAPS, false), autoSpace);
-                }
-            else if (temp instanceof Character)
-                {
-                packet = new PacketText( softBoardData, (Character)temp, autoCaps,
-                        autoSpace );
-                }
-            else // if (temp instanceof Boolean )
-            	{
-                packet = new PacketTextTime( softBoardData, 
-                		(String)parameters.remove(Commands.TOKEN_FORMAT), 
-                        autoCaps, autoSpace );
-				}
-            }
+        packet.setAutoSpace( autoSpace );
+
+        packet.setStringCaps((boolean) parameters.remove(Commands.TOKEN_STRINGCAPS, false));
 
         return packet;
         }
@@ -1241,6 +1254,7 @@ public class MethodsForCommands
 
 
     /**
+     * ENTRY POINT FOR ALL PACKET DEFINITIONS
      * Create text or key or function packet from parameters.
      * @param parameters for text or key or function packet
      * @return the created packet, or null if no TEXT or KEY or DO parameter is given
@@ -1532,11 +1546,11 @@ public class MethodsForCommands
         {
         Scribe.debug(Debug.DATA, "List Button is defined");
 
-        PacketText packetText = packetText(parameters, "");
+        PacketTextSimple packetTextSimple = packetText(parameters, "");
 
         List<Object> strings = new ArrayList<>();
-        if ( packetText.getTitleString().length() > 0)
-            strings.add( packetText.getTitleString() );
+        if ( packetTextSimple.getTitleString().length() > 0)
+            strings.add( packetTextSimple.getTitleString() );
 
         // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
         ArrayList<KeyValuePair> textList = (ArrayList<KeyValuePair>)parameters.remove(
@@ -1552,7 +1566,7 @@ public class MethodsForCommands
             }
 
         if ( strings.size() > 0 )
-            return completeMainTouchButton( new ButtonList( packetText,
+            return completeMainTouchButton( new ButtonList(packetTextSimple,
                     (Packet)parameters.remove( Commands.TOKEN_SECOND ),
                     strings ), parameters );
         else

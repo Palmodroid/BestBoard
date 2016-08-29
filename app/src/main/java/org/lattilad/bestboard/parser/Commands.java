@@ -577,6 +577,7 @@ public class Commands
 
         // Packet definitions
         // ***************************************
+        // Packet paramteres can be listed as a "mix"
 
         long[] packetArray = new long[]{
                 TOKEN_TEXT,
@@ -627,9 +628,13 @@ public class Commands
         add(TOKEN_WEB, PARAMETER_STRING);
         add(TOKEN_LOAD, PARAMETER_STRING);
 
+        // ChangeCase packet is NOT a one-parameter command,
+        // it has got three own flag parameters:
         add(TOKEN_CHANGECASE, new long[]{
                 TOKEN_LOWER, TOKEN_UPPER, TOKEN_SENTENCE })
                 .method("packetChangeCase").allowAsLabel().allowAsDefault();
+        // The result (as CHANGECASE parameter - PacketChangeCase java type)
+        // will be part of the whole packet list (PACKET, FIRST, SECOND, BUTTON...)
 
         add(TOKEN_LOWER, PARAMETER_FLAG);
         add(TOKEN_UPPER, PARAMETER_FLAG);

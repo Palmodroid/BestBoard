@@ -83,6 +83,7 @@
     <string name="data_group_index_invalid">"Legend index is invalid:"</string>
     <string name="data_group_legends_missing">"No legend is defined!"</string>
     <string name="data_varia_no_id">"New varia has no ID!"</string>
+    <string name="data_varia_no_no">"Varia parameter has got no valid index!"</string>
     <string name="data_varia_no_groups">"Varia has no valid groups!"</string>
     <string name="data_varia_overwritten">"Previous collection of varia is overwritten!"</string>
     <string name="data_varia_added">"Collection of varia is added."</string>

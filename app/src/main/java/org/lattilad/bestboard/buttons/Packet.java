@@ -4,7 +4,7 @@ import org.lattilad.bestboard.SoftBoardData;
 
 /**
  * Packet represents the data sent by the keyboard.
- * It can be textual (String) - PacketText or Hard-key (int code) - PacketKey - or PacketFunction
+ * It can be textual (String) - PacketTextSimple or Hard-key (int code) - PacketKey - or PacketFunction
  *
  * Packet should have a title-string, which can be provided by the constructor,
  * or can be set later by TITLE parameter (setTitleString).
@@ -87,7 +87,7 @@ public abstract class Packet
     /**
      * Finish duties, when button is left
      * Packets are clearing AUTOCAPS state
-     * If need, this method can be overridden (PacketText)
+     * If need, this method can be overridden (PacketTextSimple)
      */
     public void release()
     	{

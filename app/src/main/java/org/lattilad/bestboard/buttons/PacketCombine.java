@@ -34,6 +34,12 @@ public class PacketCombine extends Packet
         }
 
     @Override
+    public boolean isTitleStringChanging()
+        {
+        return packetFirst.isTitleStringChanging();
+        }
+
+    @Override
     public void send()
         {
         if (!softBoardData.layoutStates.isAnyHardMetaActive())

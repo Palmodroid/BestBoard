@@ -13,7 +13,7 @@ import org.lattilad.bestboard.utils.StringUtils;
  */
 public class ButtonMemory extends ButtonMainTouch implements Cloneable
     {
-    private PacketText packet;
+    private PacketTextSimple packet;
     private boolean done = false;
     String abbreviation;
     int state;
@@ -25,7 +25,7 @@ public class ButtonMemory extends ButtonMainTouch implements Cloneable
         }
 
     // packet is obligatory, but can be empty
-    public ButtonMemory( PacketText packet )
+    public ButtonMemory( PacketTextSimple packet )
         {
         this.packet = packet;
         if ( packet.getTitleString().length() == 0 )

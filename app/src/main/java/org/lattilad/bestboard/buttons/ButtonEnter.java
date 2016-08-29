@@ -8,7 +8,7 @@ import org.lattilad.bestboard.scribe.Scribe;
 public class ButtonEnter extends ButtonMainTouch implements Cloneable
     {
     private PacketKey packetKey;
-    private PacketText packetText;
+    private PacketTextSimple packetTextSimple;
     private boolean repeat;
 
     @Override
@@ -17,10 +17,10 @@ public class ButtonEnter extends ButtonMainTouch implements Cloneable
         return (ButtonEnter)super.clone();
         }
 
-    public ButtonEnter(PacketKey packetKey, PacketText packetText, boolean repeat)
+    public ButtonEnter(PacketKey packetKey, PacketTextSimple packetTextSimple, boolean repeat)
         {
         this.packetKey = packetKey;
-        this.packetText = packetText;
+        this.packetTextSimple = packetTextSimple;
         this.repeat = repeat;
         if ( repeat )
             setOnStay();
@@ -83,8 +83,8 @@ public class ButtonEnter extends ButtonMainTouch implements Cloneable
                 {
                 if ( !packetKey.sendIfNoMeta() )    // if any meta is turned on - send HARD-KEY
                     {
-                    packetText.send();              // if all meta is turned off - send TEXT
-                    packetText.release();           // autocaps should be set
+                    packetTextSimple.send();              // if all meta is turned off - send TEXT
+                    packetTextSimple.release();           // autocaps should be set
                     }
                 }
             // simulated hard-key

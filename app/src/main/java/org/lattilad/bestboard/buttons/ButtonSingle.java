@@ -70,9 +70,9 @@ public class ButtonSingle extends ButtonMainTouch implements Cloneable
 
     public ButtonList extendToList( )
         {
-        if ( packet instanceof PacketText && packet.getTitleString().length() > 0 )
+        if ( packet instanceof PacketTextSimple && packet.getTitleString().length() > 0 )
             {
-            ButtonList buttonList = new ButtonList((PacketText)packet, null);
+            ButtonList buttonList = new ButtonList((PacketTextSimple)packet, null);
             buttonList.setTitles(getTitles());
             buttonList.setColor(color);
             // onCircle cannot be checked because of repeat

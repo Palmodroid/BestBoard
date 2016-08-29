@@ -140,7 +140,7 @@ public class LayoutStates
 
     /**
      * If meta-ctrl or meta-alt is active,
-     * then PacketText is forced to send keyCodes instead of Strings.
+     * then PacketTextSimple is forced to send keyCodes instead of Strings.
      * @return true if keyCodes should be sent
      */
     public boolean isHardKeyForced()

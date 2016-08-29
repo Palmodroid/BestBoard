@@ -6,28 +6,34 @@ import org.lattilad.bestboard.codetext.Varia;
 /**
  * Created by tamas on 2016.08.22..
  */
-public class PacketTextVaria extends PacketTextBase
+public class PacketTextVaria extends PacketText
     {
-    private Varia varia;
+    private long variaId;
     private int index;
 
-    public PacketTextVaria( SoftBoardData softBoardData, Varia varia, int index )
+    public PacketTextVaria( SoftBoardData softBoardData, long variaId, int index )
         {
         super(softBoardData);
-        this. varia = varia;
+
+
+        this.variaId = variaId;
         this.index = index;
         }
+
+    // !! Packets should be called after parsing, to initialize eg. varia connections
 
     @Override
     protected String getString()
         {
-        return varia.getText( index );
+        Varia varia = softBoardData.codeTextProcessor.getVaria( variaId );
+        return (varia != null) ? varia.getText( index ) : "";
         }
 
     @Override
     public String getTitleString()
         {
-        return varia.getTitle( index );
+        Varia varia = softBoardData.codeTextProcessor.getVaria( variaId );
+        return (varia != null) ? varia.getTitle( index ) : "";
         }
 
     // These packets needs constant redraw

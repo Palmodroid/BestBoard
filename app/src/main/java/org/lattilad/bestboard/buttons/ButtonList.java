@@ -13,7 +13,7 @@ import java.util.List;
 public class ButtonList extends ButtonMainTouch implements Cloneable
     {
     // packet's string and modifyText's first string should be the same
-    private PacketText packetText;
+    private PacketTextSimple packetTextSimple;
     private Packet packetSecond;
     private ModifyText modifyText;
     private List<Object> strings;
@@ -28,26 +28,26 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         return (ButtonList)super.clone();
         }
 
-    public ButtonList(PacketText packetText, Packet packetSecond, List<Object> strings)
+    public ButtonList(PacketTextSimple packetTextSimple, Packet packetSecond, List<Object> strings)
         {
-        this.packetText = packetText;
+        this.packetTextSimple = packetTextSimple;
         this.packetSecond = packetSecond;
         this.strings = strings;
         }
 
-    public ButtonList(PacketText packetText, Packet packetSecond )
+    public ButtonList(PacketTextSimple packetTextSimple, Packet packetSecond )
         {
-        this.packetText = packetText;
+        this.packetTextSimple = packetTextSimple;
         this.packetSecond = packetSecond;
         modifyText = new ModifyText(layout.softBoardData, true );
-        modifyText.setFirstString( packetText.getTitleString() );
+        modifyText.setFirstString( packetTextSimple.getTitleString() );
         }
 
     protected void connected()
         {
         modifyText = new ModifyText(layout.softBoardData, true );
         modifyText.addStringRoll( strings );
-        packetText.setString( modifyText.getFirstString() );
+        packetTextSimple.setString( modifyText.getFirstString() );
         }
 
     public void extendList( String string )
@@ -55,11 +55,11 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         modifyText.extendFirstRoll( string );
         }
 
-    // Title of PacketText DO NOT change
+    // Title of PacketTextSimple DO NOT change
     @Override
     public String getFirstString()
         {
-        return packetText.getTitleString();
+        return packetTextSimple.getTitleString();
         }
 
     @Override
@@ -84,7 +84,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
             }
         else
             {
-            packetText.send();
+            packetTextSimple.send();
             }
         processCounter = layout.softBoardData.softBoardListener.getProcessCounter();
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
@@ -95,7 +95,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
         {
         // Change behaves as send - so release is always needed
         if ( secondSent )   packetSecond.release();
-        else                packetText.release();
+        else                packetTextSimple.release();
         }
 
     @Override
@@ -105,7 +105,7 @@ public class ButtonList extends ButtonMainTouch implements Cloneable
             {
             if ( secondSent )
                 {
-                packetText.send();
+                packetTextSimple.send();
                 secondSent = false;
                 }
             else

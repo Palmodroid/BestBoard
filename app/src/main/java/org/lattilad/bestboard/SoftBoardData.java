@@ -293,7 +293,7 @@ public class SoftBoardData
      * AUTOSPACE - check is needed only in
      *      SoftBoardProcessor.sendString( String string, int autoSpace )
      * AUTOCAPS - it should work as enabled, but without effects:
-     *      PacketText.send()
+     *      PacketTextSimple.send()
      *      ButtonMeta.drawButtonChangingPart(Canvas canvas)
      *
      */

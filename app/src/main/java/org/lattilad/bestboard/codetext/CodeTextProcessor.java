@@ -54,6 +54,12 @@ public class CodeTextProcessor
         }
 
 
+    public Varia getVaria(Long id)
+        {
+        return varias.get( id );
+        }
+
+
     /* PART OF ABBREVIATON */
 
     /** Just stores the currently active button; no connection with these classes */
