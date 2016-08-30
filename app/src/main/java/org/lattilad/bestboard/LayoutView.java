@@ -927,7 +927,6 @@ public class LayoutView extends View
         Scribe.locus( Debug.DRAW_VERBOSE );
 
         // layout.drawLayoutMap(canvas);
-        // layout.drawLayoutPicture(canvas, 0);
 
         layout.drawLayoutPicture(canvas);
 

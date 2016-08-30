@@ -33,8 +33,6 @@ public class ButtonForMaps extends Button
                 (layout.layoutHeightInGrids * 1000);
         pixelRimHalfWidth = (layout.areaWidthInPixels * (1000 - layout.softBoardData.outerRimPermil))
                 / (layout.areaWidthInGrids * 1000);
-
-        onLayoutReady();
         }
 
 
@@ -57,6 +55,8 @@ public class ButtonForMaps extends Button
     public void drawButtonForMap(Canvas canvas, int columnInHexagons, int rowInHexagons)
         {
         setPosition( columnInHexagons, rowInHexagons );
+        onLayoutReady();
+        // Layout is always ready at this time, but after setting position, coordinates should be recalculated
 
         hexagonMapPaint.setColor(
                 layout.colorFromTouchCode(
