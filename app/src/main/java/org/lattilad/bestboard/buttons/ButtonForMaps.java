@@ -33,6 +33,8 @@ public class ButtonForMaps extends Button
                 (layout.layoutHeightInGrids * 1000);
         pixelRimHalfWidth = (layout.areaWidthInPixels * (1000 - layout.softBoardData.outerRimPermil))
                 / (layout.areaWidthInGrids * 1000);
+
+        onLayoutReady();
         }
 
 

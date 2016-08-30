@@ -787,6 +787,7 @@ public class Layout
             {
             if (button != null)
                 {
+                button.onLayoutReady();
                 button.drawButtonConstantPart(canvas);
                 }
             }

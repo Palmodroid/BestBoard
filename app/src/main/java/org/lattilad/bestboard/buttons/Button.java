@@ -94,6 +94,10 @@ public class Button implements Cloneable
     /** Button's layout to reach layout's and softboard's data */
     protected Layout layout;
 
+    /** Position data of the button in grids */
+    int columnInGrids;
+    int rowInGrids;
+
     /** Position data of the button's hexagon in pixel */
     private int xMinus;
     private int xCenter;
@@ -202,18 +206,8 @@ public class Button implements Cloneable
      */
     public void setPosition( int arrayColumn, int arrayRow )
         {
-        int columnInGrids = getGridX(arrayColumn, arrayRow);
-        int rowInGrids = getGridY(arrayRow);
-
-        xMinus = getPixelX( columnInGrids - 1 );
-        xCenter = getPixelX( columnInGrids );
-        xPlus = getPixelX( columnInGrids + 1 );
-
-        yMinus2 = getPixelY( rowInGrids - 2 );
-        yMinus1 = getPixelY( rowInGrids - 1 );
-        yCenter = getPixelY( rowInGrids );
-        yPlus1 = getPixelY( rowInGrids + 1 );
-        yPlus2 = getPixelY( rowInGrids + 2 );
+        columnInGrids = getGridX(arrayColumn, arrayRow);
+        rowInGrids = getGridY(arrayRow);
 
         connected();
         }
@@ -225,6 +219,23 @@ public class Button implements Cloneable
      */
     protected void connected()
         {
+        }
+
+
+    /**
+     * This method is called, when layout is ready, so it can be measured
+     */
+    public void onLayoutReady()
+        {
+        xMinus = getPixelX( columnInGrids - 1 );
+        xCenter = getPixelX( columnInGrids );
+        xPlus = getPixelX( columnInGrids + 1 );
+
+        yMinus2 = getPixelY( rowInGrids - 2 );
+        yMinus1 = getPixelY( rowInGrids - 1 );
+        yCenter = getPixelY( rowInGrids );
+        yPlus1 = getPixelY( rowInGrids + 1 );
+        yPlus2 = getPixelY( rowInGrids + 2 );
         }
 
 
