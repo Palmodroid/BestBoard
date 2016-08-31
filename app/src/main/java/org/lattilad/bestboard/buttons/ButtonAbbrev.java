@@ -1,7 +1,5 @@
 package org.lattilad.bestboard.buttons;
 
-import android.graphics.Canvas;
-
 import org.lattilad.bestboard.SoftBoardData;
 
 import java.util.List;
@@ -46,22 +44,17 @@ public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
         }
 
     @Override
-    public void drawButtonChangingPart(Canvas canvas)
-        {
-        }
-
-    @Override
     public void mainTouchStart(boolean isTouchDown)
         {
         if ( layout.softBoardData.codeTextProcessor.activeButton == this )
             {
             layout.softBoardData.codeTextProcessor.activeButton = null;
-            layout.softBoardData.codeTextProcessor.startAbbreviation( idList );
+            layout.softBoardData.codeTextProcessor.stopAbbreviation();
             }
         else
             {
             layout.softBoardData.codeTextProcessor.activeButton = this;
-            layout.softBoardData.codeTextProcessor.stopAbbreviation();
+            layout.softBoardData.codeTextProcessor.startAbbreviation( idList );
             }
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }

@@ -1477,7 +1477,7 @@ public class MethodsForCommands
         if ( ids == null )
             {
             ids = new ArrayList<>(1);
-            ids.add( (Long)parameters.remove( Commands.TOKEN_IDS ));
+            ids.add( (Long)parameters.remove( Commands.TOKEN_ID ));
             }
 
         if ( ids.isEmpty() )
@@ -1487,11 +1487,12 @@ public class MethodsForCommands
             }
 
         ButtonAbbrev button = new ButtonAbbrev( ids );
+        abbrevKeySet = true;
 
         if ( (boolean)parameters.remove( Commands.TOKEN_START, false ) )
             {
             if ( softBoardData.codeTextProcessor.activeButton != null )
-                tokenizer().error("ABBREV", R.string.data_abbrev_missing_id);
+                tokenizer().error("ABBREV", R.string.data_abbrev_start_already_set);
             softBoardData.codeTextProcessor.activeButton = button;
             }
 

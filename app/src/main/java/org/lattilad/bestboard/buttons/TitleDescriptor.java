@@ -217,6 +217,8 @@ public class TitleDescriptor
      */
     public void drawTitle( Canvas canvas, int drawInfo, Button button, int xOffsetInPixel, int yOffsetInPixel )
         {
+        int type = (this.type == BUTTON_DECIDES) ? button.getDefaultTitleType() : this.type;
+
         if ( type == TEXT && (drawInfo & Button.DRAW_TEXT_TITLE) != 0 )
             drawTitle(canvas, text, button, xOffsetInPixel, yOffsetInPixel);
 
@@ -256,8 +258,8 @@ public class TitleDescriptor
 
         canvas.drawText(
                 button.getLayout().isCapsForced() ? text.toUpperCase(button.getLayout().softBoardData.locale) : text,
-                button.getXCenter() + xOffset * button.getLayout().halfHexagonWidthInPixels / 1500,
-                button.getYCenter() + yOffset * button.getLayout().halfHexagonHeightInPixels / 1000 + adjust,
+                button.getXCenter() + xOffsetInPixel + xOffset * button.getLayout().halfHexagonWidthInPixels / 1500,
+                button.getYCenter() + yOffsetInPixel + yOffset * button.getLayout().halfHexagonHeightInPixels / 1000 + adjust,
                 textPaint);
         }
     }

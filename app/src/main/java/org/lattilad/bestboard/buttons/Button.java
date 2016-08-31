@@ -570,7 +570,7 @@ public class Button implements Cloneable
      */
     public void drawButtonChangingPart( Canvas canvas )
         {
-        drawButton( canvas, changingInfo, getColor(), 0, 0 );
+        drawButton( canvas, changingInfo, getColor(), layout.layoutXOffset, layout.layoutYOffset);
         }
 
 
