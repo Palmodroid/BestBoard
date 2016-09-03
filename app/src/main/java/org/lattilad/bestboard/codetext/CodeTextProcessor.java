@@ -1,7 +1,5 @@
 package org.lattilad.bestboard.codetext;
 
-import org.lattilad.bestboard.buttons.ButtonAbbrev;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -62,8 +60,11 @@ public class CodeTextProcessor
 
     /* PART OF ABBREVIATON */
 
-    /** Just stores the currently active button; no connection with these classes */
-    public ButtonAbbrev activeButton = null;
+    /**
+     * Just stores the currently active abbreviations-list; no connection with these classes
+     * IdList is defined by the button, but buttons cannot be stored, because of the clone() method
+     */
+    public List<Long> activeAbbrevIdList = null;
 
     /**
      * Storage for code-text entries
@@ -92,9 +93,9 @@ public class CodeTextProcessor
                 codeEntries.addAll( abbreviation ); // all abbrevs should be used
                 }
             }
-        else if ( activeButton != null ) // start key is set
+        else if ( activeAbbrevIdList != null ) // start key is set
             {
-            for ( Long id : activeButton.getIdList() )
+            for ( Long id : activeAbbrevIdList )
                 {
                 codeEntries.addAll( abbreviations.get( id ) ); // keys abbrevs should be used
                 }

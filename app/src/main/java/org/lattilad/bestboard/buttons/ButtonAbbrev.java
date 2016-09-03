@@ -8,10 +8,10 @@ public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
     {
     private List<Long> idList;
 
-    public List<Long> getIdList()
+    /* public List<Long> getIdList()
         {
         return idList;
-        }
+        } */
 
     @Override
     public ButtonAbbrev clone()
@@ -39,21 +39,21 @@ public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
     @Override
     public int getColor()
         {
-        return (layout.softBoardData.codeTextProcessor.activeButton == this) ?
+        return (layout.softBoardData.codeTextProcessor.activeAbbrevIdList == idList) ?
                 layout.softBoardData.lockColor : super.getColor();
         }
 
     @Override
     public void mainTouchStart(boolean isTouchDown)
         {
-        if ( layout.softBoardData.codeTextProcessor.activeButton == this )
+        if ( layout.softBoardData.codeTextProcessor.activeAbbrevIdList == idList )
             {
-            layout.softBoardData.codeTextProcessor.activeButton = null;
+            layout.softBoardData.codeTextProcessor.activeAbbrevIdList = null;
             layout.softBoardData.codeTextProcessor.stopAbbreviation();
             }
         else
             {
-            layout.softBoardData.codeTextProcessor.activeButton = this;
+            layout.softBoardData.codeTextProcessor.activeAbbrevIdList = idList;
             layout.softBoardData.codeTextProcessor.startAbbreviation( idList );
             }
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);

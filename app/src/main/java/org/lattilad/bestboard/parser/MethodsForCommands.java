@@ -1491,9 +1491,9 @@ public class MethodsForCommands
 
         if ( (boolean)parameters.remove( Commands.TOKEN_START, false ) )
             {
-            if ( softBoardData.codeTextProcessor.activeButton != null )
+            if ( softBoardData.codeTextProcessor.activeAbbrevIdList != null )
                 tokenizer().error("ABBREV", R.string.data_abbrev_start_already_set);
-            softBoardData.codeTextProcessor.activeButton = button;
+            softBoardData.codeTextProcessor.activeAbbrevIdList = ids; // ids == button.getIdList()
             }
 
         return completeMainTouchButton( button, parameters);
