@@ -123,7 +123,7 @@ public class Commands
     public static final long TOKEN_TEXT = 0x17b9c8L;
     public static final long TOKEN_FIELD = 0x1bc2d9cL;
     public static final long TOKEN_VARIA = 0x37fd2d7L;
-    //public static final long TOKEN_NO = 0x1036aL;
+    //public static final long TOKEN_INDEX;
     public static final long TOKEN_KEY = 0x16d1bL;
     public static final long TOKEN_COMBINE = 0x790d8163bL;
     public static final long TOKEN_TIME = 0x17cd86L;
@@ -231,9 +231,9 @@ public class Commands
 
     public static final long TOKEN_PROGRAM = 0xf61900e6aL;
 
-    public static final long TOKEN_ABBREV = 0x2a99b1b3L;
+    public static final long TOKEN_AUTOSHORTCUT = 0x1abf1bb7efd2fe08L;
+    public static final long TOKEN_FINDSHORTCUT = 0x2647a677fd5f86c4L;
     // public static final long TOKEN_ID = 0x102a6L;
-    public static final long TOKEN_IDS = 0x1623eL;
     // public static final long TOKEN_START = 0x3385de2L;
 
     public static final long TOKEN_SPACETRAVEL = 0x1ea02b357b37bacL;
@@ -270,9 +270,13 @@ public class Commands
     public static final long TOKEN_IGNORESPACE = 0x13b2fae0bc2c2ceL;
     // public static final long TOKEN_REVERSE = 0x105e77189aL;
 
-    public static final long TOKEN_ADDABBREV = 0x21196688325bL;
+    public static final long TOKEN_ADDSHORTCUT = 0xb10266ef31f137L;
     // public static final long TOKEN_ID = 0x102a6L;
-    public static final long TOKEN_ENTRIES = 0x8bf664820L;
+    public static final long TOKEN_PAIRS = 0x2d40e6fL;
+
+    public static final long TOKEN_SHORTCUTSET = 0x1e67f285a0fd16eL;
+    // public static final long TOKEN_ID = 0x102a6L;
+    public static final long TOKEN_SHORTCUTS = 0x5af94c2d842bL;
 
     public static final long TOKEN_ADDVARIA = 0xe5051e7c5fL;
     public static final long TOKEN_ADDGROUP = 0xe5037e9badL;
@@ -280,7 +284,7 @@ public class Commands
     public static final long TOKEN_CODE = 0xac8a2L;
     public static final long TOKEN_LEGENDS = 0xcc736c644L;
     public static final long TOKEN_LEGEND = 0x586a3cb4L;
-    public static final long TOKEN_NO = 0x1036aL;
+    public static final long TOKEN_INDEX = 0x215cf78L;
     // public static final long TOKEN_TEXT = 0x17b9c8L;
     public static final long TOKEN_TITLE = 0x34cdb02L;
 
@@ -413,7 +417,7 @@ public class Commands
                 TOKEN_INCLUDE,
 
                 TOKEN_ADDMODIFY,
-                TOKEN_ADDABBREV,
+                TOKEN_ADDSHORTCUT,
                 TOKEN_ADDVARIA,
                 TOKEN_MONITOR,
 
@@ -538,7 +542,8 @@ public class Commands
                 TOKEN_SPACETRAVEL | PARAMETER_MOD_MULTIPLE,
                 TOKEN_MEMORY | PARAMETER_MOD_MULTIPLE,
                 TOKEN_PROGRAM | PARAMETER_MOD_MULTIPLE,
-                TOKEN_ABBREV | PARAMETER_MOD_MULTIPLE,
+                TOKEN_AUTOSHORTCUT | PARAMETER_MOD_MULTIPLE,
+                TOKEN_FINDSHORTCUT | PARAMETER_MOD_MULTIPLE,
                 TOKEN_ENTER | PARAMETER_MOD_MULTIPLE,
                 TOKEN_META | PARAMETER_MOD_MULTIPLE,
                 TOKEN_SWITCH | PARAMETER_MOD_MULTIPLE,
@@ -582,7 +587,7 @@ public class Commands
         long[] packetArray = new long[]{
                 TOKEN_TEXT,
                 // TOKEN_FIELD,
-                TOKEN_VARIA, TOKEN_NO,
+                TOKEN_VARIA, TOKEN_INDEX,
                 TOKEN_AUTOCAPS,
                 TOKEN_STRINGCAPS,
                 TOKEN_ERASESPACE,
@@ -612,7 +617,7 @@ public class Commands
         add(TOKEN_TEXT, PARAMETER_TEXT);
         add(TOKEN_FIELD, PARAMETER_TEXT);
         add(TOKEN_VARIA, PARAMETER_KEYWORD);
-        add(TOKEN_NO, PARAMETER_INT);
+        add(TOKEN_INDEX, PARAMETER_INT);
         add(TOKEN_KEY, PARAMETER_INT);
         add(TOKEN_COMBINE, PARAMETER_FLAG);
 
@@ -784,15 +789,17 @@ public class Commands
                 .method("setProgram").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON, TOKEN_PACKET});
 
-        add(TOKEN_ABBREV, ArrayUtils.concat(buttonArray, new long[]{
-                TOKEN_ID,
-                TOKEN_IDS,
-                TOKEN_START }))
-                .method("setAbbrev").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+        add(TOKEN_AUTOSHORTCUT, ArrayUtils.concat(buttonArray, new long[]{
+                TOKEN_ID }))
+                .method("setAutoShortCut").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
                 .labels(new long[]{TOKEN_BUTTON});
         // add(TOKEN_ID, PARAMETER_KEYWORD);
-        add(TOKEN_IDS, PARAMETER_KEYWORD | PARAMETER_MOD_LIST);
-        // add(TOKEN_START, PARAMETER_FLAG);
+
+        add(TOKEN_FINDSHORTCUT, ArrayUtils.concat(buttonArray, new long[]{
+                TOKEN_ID }))
+                .method("setFindShortCut").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault()
+                .labels(new long[]{TOKEN_BUTTON});
+        // add(TOKEN_ID, PARAMETER_KEYWORD);
 
         add(TOKEN_META, new long[]{
                 TOKEN_CAPS,
@@ -883,10 +890,17 @@ public class Commands
         add(TOKEN_ROLLS, (PARAMETER_STRING | PARAMETER_MOD_LIST));
         add(TOKEN_IGNORESPACE, PARAMETER_FLAG);
 
-        add(TOKEN_ADDABBREV, new long[]{
-                TOKEN_ID, TOKEN_ENTRIES }).method("addAbbrev");
+        add(TOKEN_ADDSHORTCUT, new long[]{
+                TOKEN_ID, TOKEN_PAIRS, TOKEN_START }).method("addShortCut");
         // TOKEN_ID is already defined
-        add(TOKEN_ENTRIES, (PARAMETER_STRING | PARAMETER_MOD_LIST));
+        add(TOKEN_PAIRS, (PARAMETER_STRING | PARAMETER_MOD_LIST));
+        // add(TOKEN_START, PARAMETER_FLAG);
+
+        add(TOKEN_SHORTCUTSET, new long[]{
+                TOKEN_ID, TOKEN_SHORTCUTS, TOKEN_START }).method("addShortCutSet");
+        // TOKEN_ID is already defined
+        add(TOKEN_SHORTCUTS, (PARAMETER_KEYWORD | PARAMETER_MOD_LIST));
+        // add(TOKEN_START, PARAMETER_FLAG);
 
         add(TOKEN_ADDVARIA, new long[]{
                 TOKEN_ID,
@@ -898,8 +912,8 @@ public class Commands
         add(TOKEN_CODE, PARAMETER_TEXT );
         add(TOKEN_LEGENDS, (PARAMETER_STRING | PARAMETER_MOD_LIST));
         add(TOKEN_LEGEND, new long[]{
-                TOKEN_NO, TOKEN_TEXT, TOKEN_TITLE }).method("addVariaLegend");
-        // TOKEN_NO is already defined
+                TOKEN_INDEX, TOKEN_TEXT, TOKEN_TITLE }).method("addVariaLegend");
+        // TOKEN_INDEX is already defined
         // TOKEN_TEXT is already defined
         add(TOKEN_TITLE, PARAMETER_TEXT );
 

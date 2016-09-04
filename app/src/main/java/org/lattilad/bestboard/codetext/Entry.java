@@ -8,6 +8,7 @@ public abstract class Entry implements Comparable<Entry>
     {
     private String code;
 
+
     public Entry( String code )
         {
         this.code = code;
@@ -42,7 +43,7 @@ public abstract class Entry implements Comparable<Entry>
         }
 
     /**
-     * This method should be similar to AbbreviationEntry.compareTo, (that is why it can be found here)
+     * This method should use similar algorithm with ShortCutEntry.compareTo, (that is why it can be found here)
      * but this one is used for entry lookup
      */
     static public int compare(SimpleReader text, SimpleReader ending )

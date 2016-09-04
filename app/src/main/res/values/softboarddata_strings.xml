@@ -73,11 +73,11 @@
     <string name="data_modify_no_rolls">"Modify has no valid rolls!"</string>
     <string name="data_modify_overwritten">"Previous modification data is overwritten!"</string>
     <string name="data_modify_added">"Modification data is added."</string>
-    <string name="data_abbrev_no_id">"Collection of abbreviations has no ID!"</string>
-    <string name="data_abbrev_no_entries">"Collection of abbreviations has no valid entries!"</string>
-    <string name="data_abbrev_bad_entry">"Entry has no expanded text:"</string>
-    <string name="data_abbrev_overwritten">"Previous collection of abbreviations is overwritten!"</string>
-    <string name="data_abbrev_added">"Collection of abbreviations is added."</string>
+    <string name="data_shortcut_no_id">"Shortcut collection has no ID!"</string>
+    <string name="data_shortcut_no_entries">"Shortcut collection has no valid entries!"</string>
+    <string name="data_shortcut_bad_entry">"Entry has no expanded text:"</string>
+    <string name="data_shortcut_overwritten">"Previous shortcut collection is overwritten!"</string>
+    <string name="data_shortcut_added">"Shortcut collection is added."</string>
     <string name="data_legend_no_text">"Varia legend has no text!"</string>
     <string name="data_group_no_code">"Varia group has no code!"</string>
     <string name="data_group_index_invalid">"Legend index is invalid:"</string>

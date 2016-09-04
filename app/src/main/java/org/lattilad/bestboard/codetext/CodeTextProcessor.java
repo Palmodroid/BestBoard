@@ -60,6 +60,23 @@ public class CodeTextProcessor
 
     /* PART OF ABBREVIATON */
 
+
+    private Map<Long, EntryList> shortCuts = new HashMap<>();
+
+
+    public boolean addShortCut( Long id, EntryList shortCut )
+        {
+        return shortCuts.put( id, shortCut) != null;
+        }
+
+    public boolean addShortCut( Long id, List<Long> shortCutList )
+        {
+        return shortCuts.put( id, new ShortCutSet(shortCutList) ) != null;
+        }
+
+
+
+
     /**
      * Just stores the currently active abbreviations-list; no connection with these classes
      * IdList is defined by the button, but buttons cannot be stored, because of the clone() method

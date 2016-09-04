@@ -2,11 +2,11 @@ package org.lattilad.bestboard.codetext;
 
 import org.lattilad.bestboard.SoftBoardProcessor;
 
-public class AbbreviationEntry extends Entry
+public class ShortCutEntry extends Entry
     {
     private String expanded;
 
-    public AbbreviationEntry(String code, String expanded )
+    public ShortCutEntry(String code, String expanded )
         {
         super(code);
         this.expanded = expanded;

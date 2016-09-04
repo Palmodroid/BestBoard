@@ -359,9 +359,9 @@ public class SoftBoardProcessor implements
                 break;
 
             entry.activate( this );
-            /* if ( entry instanceof AbbreviationEntry )
+            /* if ( entry instanceof ShortCutEntry )
                 {
-                changeStringBeforeCursor(entry.getCode().length(), ((AbbreviationEntry) entry).getExpanded());
+                changeStringBeforeCursor(entry.getCode().length(), ((ShortCutEntry) entry).getExpanded());
                 } */
 
             if ( entry == firstEntry)  // abbreviationEntry was already used - prevent infinite loops

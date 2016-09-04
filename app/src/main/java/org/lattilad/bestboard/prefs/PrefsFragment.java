@@ -1162,7 +1162,7 @@ public class PrefsFragment extends PreferenceFragment
 
 
     /**
-     * AbbreviationEntry point of preference fragment
+     * ShortCutEntry point of preference fragment
      * Registers on SharedPreferenceChangeListener
      * (getActivity() cannot be null in onResume())
      */

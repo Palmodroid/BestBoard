@@ -59,7 +59,7 @@ public class EntryList
 
             reader.reset();
             stringReverseReader.setString( entries.get(middle).getCode() );
-            cmp = AbbreviationEntry.compare( reader, stringReverseReader);
+            cmp = ShortCutEntry.compare( reader, stringReverseReader);
 
             builder.append("[").append(entries.get(middle).getCode()).append("/")
                     .append(cmp).append("/")

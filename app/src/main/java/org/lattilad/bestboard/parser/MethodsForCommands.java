@@ -38,7 +38,7 @@ import org.lattilad.bestboard.buttons.PacketTextTime;
 import org.lattilad.bestboard.buttons.PacketTextVaria;
 import org.lattilad.bestboard.buttons.PacketWebView;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
-import org.lattilad.bestboard.codetext.AbbreviationEntry;
+import org.lattilad.bestboard.codetext.ShortCutEntry;
 import org.lattilad.bestboard.codetext.EntryList;
 import org.lattilad.bestboard.codetext.Varia;
 import org.lattilad.bestboard.codetext.VariaGroup;
@@ -1031,7 +1031,7 @@ public class MethodsForCommands
             temp = parameters.remove(Commands.TOKEN_VARIA);
             if ( temp != null ) // VARIA
                 {
-                int number = (int)parameters.remove(Commands.TOKEN_NO, -1);
+                int number = (int)parameters.remove(Commands.TOKEN_INDEX, -1);
                 if ( number == -1 )
                     {
                     tokenizer().error(Tokenizer.regenerateKeyword((long)temp), R.string.data_varia_no_no );
@@ -1870,20 +1870,20 @@ public class MethodsForCommands
         }
 
 
-    public void addAbbrev( ExtendedMap<Long, Object> parameters )
+    public void addShortCut( ExtendedMap<Long, Object> parameters )
         {
         Long id;
 
         id = (Long) parameters.remove( Commands.TOKEN_ID );
         if ( id == null )
             {
-            tokenizer().error("ADDABBREV", R.string.data_abbrev_no_id );
+            tokenizer().error("ADDSHORTCUT", R.string.data_shortcut_no_id);
             return;
             }
 
-        EntryList abbreviation = new EntryList();
+        EntryList shortCut = new EntryList();
         boolean empty = true;
-        List<Object> entries = (List) parameters.remove( Commands.TOKEN_ENTRIES );
+        List<Object> entries = (List) parameters.remove( Commands.TOKEN_PAIRS );
         if ( entries != null )
             {
             // PARAMETER_STRING_LIST gives only non-null String items
@@ -1896,11 +1896,11 @@ public class MethodsForCommands
                 ending = (String) iterator.next();
                 if (!iterator.hasNext())
                     {
-                    tokenizer().error(Tokenizer.regenerateKeyword(id), R.string.data_abbrev_bad_entry, ending);
+                    tokenizer().error(Tokenizer.regenerateKeyword(id), R.string.data_shortcut_bad_entry, ending);
                     break;
                     }
                 expanded = (String) iterator.next();
-                abbreviation.add( new AbbreviationEntry(ending, expanded) );
+                shortCut.add( new ShortCutEntry(ending, expanded) );
                 empty = false;
                 // Scribe.note("ABBREV: " + ending + "/" + expanded);
                 }
@@ -1909,19 +1909,35 @@ public class MethodsForCommands
         // Check emptiness!
         if ( empty )
             {
-            tokenizer().error(Tokenizer.regenerateKeyword( id ), R.string.data_abbrev_no_entries );
+            tokenizer().error(Tokenizer.regenerateKeyword( id ), R.string.data_shortcut_no_entries);
             return;
             }
 
         // returns true if previous collection was overwritten
-        if ( softBoardData.codeTextProcessor.addAbbreviation( id, abbreviation ) )
+        if ( softBoardData.codeTextProcessor.addShortCut( id, shortCut ) )
             {
             tokenizer().error( Tokenizer.regenerateKeyword( id ),
-                    R.string.data_abbrev_overwritten );
+                    R.string.data_shortcut_overwritten);
             }
 
         tokenizer().note( Tokenizer.regenerateKeyword( id ),
-                R.string.data_abbrev_added );
+                R.string.data_shortcut_added);
+        }
+
+
+    public void addShortCutSet( ExtendedMap<Long, Object> parameters )
+        {
+        Long id;
+
+        id = (Long) parameters.remove( Commands.TOKEN_ID );
+        if ( id == null )
+            {
+            tokenizer().error("ADDSHORTCUTSET", R.string.data_shortcut_no_id);
+            return;
+            }
+
+        ...
+
         }
 
 
@@ -1962,7 +1978,7 @@ public class MethodsForCommands
             }
 
         tokenizer().note( Tokenizer.regenerateKeyword( id ),
-                R.string.data_abbrev_added );
+                R.string.data_shortcut_added);
         }
 
 
