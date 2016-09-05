@@ -49,8 +49,7 @@
     <string name="data_meta_bad_parameter">"Meta parameter cannot be identified!"</string>
     <string name="data_showtitle_bad_parameter">"Marker-title parameter cannot be identified!"</string>
     <string name="data_meta_unknown_meta_state">"Unknown meta-state!"</string>
-    <string name="data_abbrev_missing_id">"No id is given!"</string>
-    <string name="data_abbrev_start_already_set">"Abbreviation set for start was already set!"</string>
+    <string name="data_shortcut_missing_id">"No id is given!"</string>
     <string name="data_button_function_missing">"No function is defined for button, an empty button is set!"</string>
     <string name="data_button_overwritten">"Previous button definition is overwritten!"</string>
     <string name="data_button_added">"Button added:"</string>

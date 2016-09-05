@@ -10,10 +10,11 @@ import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.SoftBoardProcessor;
 import org.lattilad.bestboard.SoftBoardShow;
 import org.lattilad.bestboard.buttons.Button;
-import org.lattilad.bestboard.buttons.ButtonAbbrev;
 import org.lattilad.bestboard.buttons.ButtonAlternate;
+import org.lattilad.bestboard.buttons.ButtonAutoShortCut;
 import org.lattilad.bestboard.buttons.ButtonDouble;
 import org.lattilad.bestboard.buttons.ButtonEnter;
+import org.lattilad.bestboard.buttons.ButtonFindShortCut;
 import org.lattilad.bestboard.buttons.ButtonList;
 import org.lattilad.bestboard.buttons.ButtonMainTouch;
 import org.lattilad.bestboard.buttons.ButtonMemory;
@@ -38,8 +39,8 @@ import org.lattilad.bestboard.buttons.PacketTextTime;
 import org.lattilad.bestboard.buttons.PacketTextVaria;
 import org.lattilad.bestboard.buttons.PacketWebView;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
-import org.lattilad.bestboard.codetext.ShortCutEntry;
 import org.lattilad.bestboard.codetext.EntryList;
+import org.lattilad.bestboard.codetext.ShortCutEntry;
 import org.lattilad.bestboard.codetext.Varia;
 import org.lattilad.bestboard.codetext.VariaGroup;
 import org.lattilad.bestboard.codetext.VariaLegend;
@@ -1467,36 +1468,34 @@ public class MethodsForCommands
      */
     public boolean abbrevKeySet = false;
 
-    public Button setAbbrev( ExtendedMap<Long, Object> parameters )
+    public Button setAutoShortCut( ExtendedMap<Long, Object> parameters )
         {
-        Scribe.debug(Debug.DATA, "Abbreviation Button is defined");
+        Scribe.debug(Debug.DATA, "AutoShortCut Button is defined");
 
-        List<Long> ids;
-
-        ids = (List) parameters.remove( Commands.TOKEN_IDS );
-        if ( ids == null )
+        Long id = (Long) parameters.remove( Commands.TOKEN_ID );
+        if ( id == null )
             {
-            ids = new ArrayList<>(1);
-            ids.add( (Long)parameters.remove( Commands.TOKEN_ID ));
-            }
-
-        if ( ids.isEmpty() )
-            {
-            tokenizer().error("ABBREV", R.string.data_abbrev_missing_id);
+            tokenizer().error("AUTOSHORTCUT", R.string.data_shortcut_missing_id);
             return setEmpty( parameters );
             }
 
-        ButtonAbbrev button = new ButtonAbbrev( ids );
         abbrevKeySet = true;
+        return completeMainTouchButton( new ButtonAutoShortCut( id ), parameters);
+        }
 
-        if ( (boolean)parameters.remove( Commands.TOKEN_START, false ) )
+    public Button setFindShortCut( ExtendedMap<Long, Object> parameters )
+        {
+        Scribe.debug(Debug.DATA, "FindShortCut Button is defined");
+
+        Long id = (Long) parameters.remove( Commands.TOKEN_ID );
+        if ( id == null )
             {
-            if ( softBoardData.codeTextProcessor.activeAbbrevIdList != null )
-                tokenizer().error("ABBREV", R.string.data_abbrev_start_already_set);
-            softBoardData.codeTextProcessor.activeAbbrevIdList = ids; // ids == button.getIdList()
+            tokenizer().error("FINDSHORTCUT", R.string.data_shortcut_missing_id);
+            return setEmpty( parameters );
             }
 
-        return completeMainTouchButton( button, parameters);
+        abbrevKeySet = true;
+        return completeMainTouchButton( new ButtonFindShortCut( id ), parameters);
         }
 
 
@@ -1936,8 +1935,22 @@ public class MethodsForCommands
             return;
             }
 
-        ...
+        List<Long> shortCutSet = (List<Long>) parameters.remove( Commands.TOKEN_SHORTCUTS);
+        if ( shortCutSet == null || shortCutSet.isEmpty())
+            {
+            tokenizer().error(Tokenizer.regenerateKeyword( id ), R.string.data_shortcut_no_entries);
+            return;
+            }
 
+        // returns true if previous collection was overwritten
+        if ( softBoardData.codeTextProcessor.addShortCut( id, shortCutSet ) )
+            {
+            tokenizer().error( Tokenizer.regenerateKeyword( id ),
+                    R.string.data_shortcut_overwritten);
+            }
+
+        tokenizer().note( Tokenizer.regenerateKeyword( id ),
+                R.string.data_shortcut_added);
         }
 
 

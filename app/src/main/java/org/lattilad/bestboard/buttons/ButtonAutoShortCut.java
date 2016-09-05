@@ -2,26 +2,19 @@ package org.lattilad.bestboard.buttons;
 
 import org.lattilad.bestboard.SoftBoardData;
 
-import java.util.List;
-
-public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
+public class ButtonAutoShortCut extends ButtonMainTouch implements Cloneable
     {
-    private List<Long> idList;
-
-    /* public List<Long> getIdList()
-        {
-        return idList;
-        } */
+    private Long shortCutId;
 
     @Override
-    public ButtonAbbrev clone()
+    public ButtonAutoShortCut clone()
         {
-        return (ButtonAbbrev)super.clone();
+        return (ButtonAutoShortCut)super.clone();
         }
 
-    public ButtonAbbrev( List<Long> idList )
+    public ButtonAutoShortCut( Long shortCutId )
         {
-        this.idList = idList;
+        this.shortCutId = shortCutId;
         }
 
     @Override
@@ -39,22 +32,20 @@ public class ButtonAbbrev extends ButtonMainTouch implements Cloneable
     @Override
     public int getColor()
         {
-        return (layout.softBoardData.codeTextProcessor.activeAbbrevIdList == idList) ?
+        return (layout.softBoardData.codeTextProcessor.activeShortCutId == shortCutId) ?
                 layout.softBoardData.lockColor : super.getColor();
         }
 
     @Override
     public void mainTouchStart(boolean isTouchDown)
         {
-        if ( layout.softBoardData.codeTextProcessor.activeAbbrevIdList == idList )
+        if ( layout.softBoardData.codeTextProcessor.activeShortCutId == shortCutId )
             {
-            layout.softBoardData.codeTextProcessor.activeAbbrevIdList = null;
             layout.softBoardData.codeTextProcessor.stopAbbreviation();
             }
         else
             {
-            layout.softBoardData.codeTextProcessor.activeAbbrevIdList = idList;
-            layout.softBoardData.codeTextProcessor.startAbbreviation( idList );
+            layout.softBoardData.codeTextProcessor.startAbbreviation( shortCutId );
             }
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }

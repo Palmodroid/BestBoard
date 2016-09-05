@@ -1,6 +1,6 @@
 package org.lattilad.bestboard.codetext;
 
-import org.lattilad.bestboard.SoftBoardProcessor;
+import org.lattilad.bestboard.SoftBoardListener;
 
 /**
  * Created by Beothe on 2016.08.20..
@@ -16,7 +16,7 @@ public class VariaEntry extends Entry
         }
 
     @Override
-    public void activate(SoftBoardProcessor processor)
+    public void activate(SoftBoardListener processor)
         {
         variaGroup.activate();
         }

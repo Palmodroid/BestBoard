@@ -60,9 +60,18 @@ public class CodeTextProcessor
 
     /* PART OF ABBREVIATON */
 
+    /**
+     * Just stores the currently active abbreviations-list; no connection with these classes
+     * IdList is defined by the button, but buttons cannot be stored, because of the clone() method
+     */
+    public long activeShortCutId = -1L;
 
     private Map<Long, EntryList> shortCuts = new HashMap<>();
 
+    public EntryList getShortCut( Long id )
+        {
+        return shortCuts.get( id );
+        }
 
     public boolean addShortCut( Long id, EntryList shortCut )
         {
@@ -71,45 +80,27 @@ public class CodeTextProcessor
 
     public boolean addShortCut( Long id, List<Long> shortCutList )
         {
-        return shortCuts.put( id, new ShortCutSet(shortCutList) ) != null;
+        return shortCuts.put( id, new EntryListSet(shortCutList) ) != null;
         }
 
-
-
-
-    /**
-     * Just stores the currently active abbreviations-list; no connection with these classes
-     * IdList is defined by the button, but buttons cannot be stored, because of the clone() method
-     */
-    public List<Long> activeAbbrevIdList = null;
-
-    /**
-     * Storage for code-text entries
-     * Abbreviations do not have a separate class, they are just stored as EntryList of AbbreviationEntries
-     * All these entries (grouped by id-s) are stored here
-     */
-    private Map<Long, EntryList> abbreviations = new HashMap<>();
-
-    /**
-     * Stores a new abbreviation collection, which is NOT Initialised yet!
-     * @param id abbreviation id keyword
-     * @param abbreviation collection of abbreviation entries
-     * @return true if collection replaces a previous collection with the same id
-     */
-    public boolean addAbbreviation(Long id, EntryList abbreviation )
+    private void initShortCut( boolean shortCutKeySet )
         {
-        return abbreviations.put( id, abbreviation) != null;
-        }
-
-    private void initAbbreviation( boolean abbrevKeySet )
-        {
-        if ( !abbrevKeySet ) // no key is set at all
+        if ( !shortCutKeySet ) // no key is set at all
             {
-            for ( EntryList abbreviation : abbreviations.values() )
+            for ( EntryList shortCut : shortCuts.values() )
                 {
-                codeEntries.addAll( abbreviation ); // all abbrevs should be used
+                if ( !(shortCut instanceof EntryListSet) )
+                    codeEntries.addAll( shortCut ); // all abbrevs should be used
                 }
             }
+
+            /*
+            Kell egy másik lookup (leghosszabb)
+            START implementálása (codetextProcessor megkapja, ha START)
+            A ShortCutSet-ek inicilaizálása
+             */
+
+
         else if ( activeAbbrevIdList != null ) // start key is set
             {
             for ( Long id : activeAbbrevIdList )
@@ -124,11 +115,34 @@ public class CodeTextProcessor
         codeEntries.sort();
         }
 
+    public void startAbbreviation( Long id )
+        {
+        stopAbbreviation();
+
+        codeEntries.addAll( shortCuts.get( id ) );
+
+        codeEntries.sort();
+        activeShortCutId = id;
+        }
+
+    public void stopAbbreviation()
+        {
+        codeEntries.clear();
+        // varia should remain intact after stop
+        codeEntries.addAll( variaEntries );
+        activeShortCutId = -1L;
+        }
+
 
     /* COMMON PART */
 
     /** active code-entries */
     private EntryList codeEntries = new EntryList();
+
+    public EntryList getCodeEntries()
+        {
+        return codeEntries;
+        }
 
     /**
      * Init is called by parseMainDescriptorFile() when parsing is finished
@@ -139,27 +153,4 @@ public class CodeTextProcessor
         initAbbreviation( abbrevKeySet );
         }
 
-    public void startAbbreviation(List<Long> idList )
-        {
-        stopAbbreviation();
-
-        for ( Long id : idList )
-            {
-            codeEntries.addAll( abbreviations.get( id ) );
-            }
-
-        codeEntries.sort();
-        }
-
-    public void stopAbbreviation()
-        {
-        codeEntries.clear();
-        // varia should remain intact after stop
-        codeEntries.addAll( variaEntries );
-        }
-
-    public EntryList getCodeEntries()
-        {
-        return codeEntries;
-        }
     }

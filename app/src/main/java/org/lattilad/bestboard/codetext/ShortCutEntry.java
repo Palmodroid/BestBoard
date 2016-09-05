@@ -1,6 +1,6 @@
 package org.lattilad.bestboard.codetext;
 
-import org.lattilad.bestboard.SoftBoardProcessor;
+import org.lattilad.bestboard.SoftBoardListener;
 
 public class ShortCutEntry extends Entry
     {
@@ -18,7 +18,7 @@ public class ShortCutEntry extends Entry
         }
 
     @Override
-    public void activate(SoftBoardProcessor processor)
+    public void activate(SoftBoardListener processor)
         {
         processor.changeStringBeforeCursor( getCode().length(), expanded);
         }
