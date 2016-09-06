@@ -12,6 +12,7 @@ public class EntryListSet extends EntryList
         this.shortCutIds = shortCutIds;
         }
 
+    @Override
     public void init( CodeTextProcessor codeTextProcessor )
         {
         // for FIND a separate and sorted list is needed,

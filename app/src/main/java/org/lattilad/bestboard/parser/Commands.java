@@ -418,6 +418,7 @@ public class Commands
 
                 TOKEN_ADDMODIFY,
                 TOKEN_ADDSHORTCUT,
+                TOKEN_SHORTCUTSET,
                 TOKEN_ADDVARIA,
                 TOKEN_MONITOR,
 

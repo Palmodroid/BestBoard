@@ -1912,11 +1912,22 @@ public class MethodsForCommands
             return;
             }
 
+        // These parts are repeated, new method should be used !!
+
         // returns true if previous collection was overwritten
         if ( softBoardData.codeTextProcessor.addShortCut( id, shortCut ) )
             {
             tokenizer().error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_shortcut_overwritten);
+            }
+
+        if (parameters.remove( Commands.TOKEN_START ) != null)
+            {
+            if (softBoardData.codeTextProcessor.startShortCut( id ))
+                {
+                tokenizer().error(Tokenizer.regenerateKeyword(id),
+                        R.string.data_shortcut_more_starts);
+                }
             }
 
         tokenizer().note( Tokenizer.regenerateKeyword( id ),
@@ -1947,6 +1958,15 @@ public class MethodsForCommands
             {
             tokenizer().error( Tokenizer.regenerateKeyword( id ),
                     R.string.data_shortcut_overwritten);
+            }
+
+        if (parameters.remove( Commands.TOKEN_START ) != null)
+            {
+            if (softBoardData.codeTextProcessor.startShortCut( id ))
+                {
+                tokenizer().error(Tokenizer.regenerateKeyword(id),
+                        R.string.data_shortcut_more_starts);
+                }
             }
 
         tokenizer().note( Tokenizer.regenerateKeyword( id ),

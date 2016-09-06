@@ -38,6 +38,10 @@ public class EntryList
         Collections.sort( entries );
         }
 
+    public void init( CodeTextProcessor codeTextProcessor )
+        {
+        sort();
+        }
 
     public Entry lookUp(SimpleReader reader)
         {

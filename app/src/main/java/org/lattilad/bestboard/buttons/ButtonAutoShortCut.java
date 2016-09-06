@@ -32,14 +32,14 @@ public class ButtonAutoShortCut extends ButtonMainTouch implements Cloneable
     @Override
     public int getColor()
         {
-        return (layout.softBoardData.codeTextProcessor.activeShortCutId == shortCutId) ?
+        return (layout.softBoardData.codeTextProcessor.isActiveShortCut( shortCutId )) ?
                 layout.softBoardData.lockColor : super.getColor();
         }
 
     @Override
     public void mainTouchStart(boolean isTouchDown)
         {
-        if ( layout.softBoardData.codeTextProcessor.activeShortCutId == shortCutId )
+        if ( layout.softBoardData.codeTextProcessor.isActiveShortCut( shortCutId ))
             {
             layout.softBoardData.codeTextProcessor.stopAbbreviation();
             }

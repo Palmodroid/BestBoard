@@ -47,7 +47,7 @@ public class CodeTextProcessor
                 variaEntries.add( new VariaEntry( group.getCode(), group ));
                 }
             }
-        variaEntries.sort();
+        variaEntries.init( this ); // this will sort it
         codeEntries.addAll( variaEntries );
         }
 
@@ -64,7 +64,7 @@ public class CodeTextProcessor
      * Just stores the currently active abbreviations-list; no connection with these classes
      * IdList is defined by the button, but buttons cannot be stored, because of the clone() method
      */
-    public long activeShortCutId = -1L;
+    private long activeShortCutId = -1L;
 
     private Map<Long, EntryList> shortCuts = new HashMap<>();
 
@@ -85,6 +85,13 @@ public class CodeTextProcessor
 
     private void initShortCut( boolean shortCutKeySet )
         {
+        // initialize shortcutsets
+        for ( EntryList shortCut : shortCuts.values() )
+            {
+            shortCut.init(this); // this will initialize shortcutsets, and sort shortcuts
+            }
+
+        // if no key is set, then all non-set shortcut should be added
         if ( !shortCutKeySet ) // no key is set at all
             {
             for ( EntryList shortCut : shortCuts.values() )
@@ -94,25 +101,33 @@ public class CodeTextProcessor
                 }
             }
 
-            /*
-            Kell egy másik lookup (leghosszabb)
-            START implementálása (codetextProcessor megkapja, ha START)
-            A ShortCutSet-ek inicilaizálása
-             */
-
-
-        else if ( activeAbbrevIdList != null ) // start key is set
+        // if key is set, then active shortcut should start (if any)
+        else if ( activeShortCutId != -1L )
             {
-            for ( Long id : activeAbbrevIdList )
-                {
-                codeEntries.addAll( abbreviations.get( id ) ); // keys abbrevs should be used
-                }
+            codeEntries.addAll( shortCuts.get( activeShortCutId ) );
             }
-        else // keys are available, but no starting key is set
+
+        // no key is active - varia is already sorted
+        else
             {
-            return; // there are no abbreviations at all, no further sort is needed
+            return;
             }
+
         codeEntries.sort();
+        }
+
+    public boolean startShortCut( long id )
+        {
+        boolean overwrite = (activeShortCutId != -1);
+
+        activeShortCutId = id;
+
+        return overwrite;
+        }
+
+    public boolean isActiveShortCut( long id )
+        {
+        return id == activeShortCutId;
         }
 
     public void startAbbreviation( Long id )
@@ -150,7 +165,7 @@ public class CodeTextProcessor
     public void init( boolean abbrevKeySet )
         {
         initVaria();
-        initAbbreviation( abbrevKeySet );
+        initShortCut( abbrevKeySet );
         }
 
     }
