@@ -1890,7 +1890,7 @@ public class MethodsForCommands
             String ending;
             String expanded;
 
-            while (iterator.hasNext())
+           while (iterator.hasNext())
                 {
                 ending = (String) iterator.next();
                 if (!iterator.hasNext())

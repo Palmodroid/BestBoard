@@ -41,9 +41,20 @@ public class EntryList
     public void init( CodeTextProcessor codeTextProcessor )
         {
         sort();
+
+        Scribe.note("Entries after sort:");
+        for (int n = 0; n < entries.size(); n++)
+            {
+            Scribe.note("    " + n + " - [" + entries.get(n).getCode() + "]");
+            }
+
         }
 
-    public Entry lookUp(SimpleReader reader)
+
+    public static final int SHORTEST = -1;
+    public static final int LONGEST = 1;
+
+    public Entry lookUp( SimpleReader reader, int lengthType )
         {
         int	first;
         int	last;
@@ -71,6 +82,7 @@ public class EntryList
                     .append(middle).append("-")
                     .append(last)
                     .append("] ");
+            Scribe.note( builder.toString() );
 
             if (cmp < 0)
                 last=middle-1;
@@ -80,11 +92,47 @@ public class EntryList
 
             else
                 {
+                // EQ FOUND !
                 builder.append("EQ");
                 Scribe.note( builder.toString() );
+
+                if ( lengthType == LONGEST )
+                    {
+                    while ( middle > first )
+                        {
+                        middle--;
+
+                        reader.reset();
+                        stringReverseReader.setString( entries.get(middle).getCode() );
+                        if ( ShortCutEntry.compare( reader, stringReverseReader) != 0 )
+                            {
+                            middle++; // middle is not eq
+                            break;
+                            }
+                        else
+                            {
+                            Scribe.note("LONGEST: " + entries.get(middle).getCode() + "(" + middle + ")");
+                            }
+                        }
+                    }
+                else if ( lengthType == SHORTEST )
+                    {
+                    while ( middle < last )
+                        {
+                        middle++;
+
+                        reader.reset();
+                        stringReverseReader.setString( entries.get(middle).getCode() );
+                        if ( ShortCutEntry.compare( reader, stringReverseReader) != 0 )
+                            {
+                            middle--; // middle is not eq
+                            break;
+                            }
+                        }
+                    }
+
                 return entries.get(middle);
                 }
-
             }
 
         builder.append(" ** NOT FOUND");
