@@ -9,7 +9,7 @@ public abstract class Entry implements Comparable<Entry>
     private String code;
 
 
-    public Entry( String code )
+    public Entry(String code)
         {
         this.code = code;
         }
@@ -25,42 +25,71 @@ public abstract class Entry implements Comparable<Entry>
     @Override
     public int compareTo(Entry another)
         {
-        StringReverseReader thisString = new StringReverseReader( this.code );
-        StringReverseReader anotherString = new StringReverseReader( another.getCode() );
+        StringReverseReader thisString = new StringReverseReader(this.code);
+        StringReverseReader anotherString = new StringReverseReader(another.getCode());
         int thisChar;
         int anotherChar;
 
-        while ( (thisChar = thisString.read()) == (anotherChar = anotherString.read()) )
+        while ((thisChar = thisString.read()) == (anotherChar = anotherString.read()))
             {
-            if ( thisChar == -1 ) // && == anotherChar; complete eq
+            if (thisChar == -1) // && == anotherChar; complete eq
                 return 0;
             }
 
         // if ( thisChar == -1 ) // && != anotherChar; ending eq
         //     return 0;
 
-        return anotherChar-thisChar; // non eq
+        return thisChar - anotherChar; // non eq
         }
 
     /**
      * This method should use similar algorithm with ShortCutEntry.compareTo, (that is why it can be found here)
      * but this one is used for entry lookup
      */
-    static public int compare(SimpleReader text, SimpleReader ending )
+    static public int compare(SimpleReader text, SimpleReader ending)
         {
+        return compare(text, ending, -1);
+        }
+
+    /*
+     Kérdés: text szöveg vége megegyezik-e ending-gel? Text szöveg max hossza: maxLength
+     - - text kisebb, mint ending
+     0 - text (legfeljebb maxLength hossz) egyezik ending-gel
+     + - text nagyobb, mint ending
+     abszolút érték: egyező karakterek száma + 1
+     */
+    static public int compare(SimpleReader text, SimpleReader ending, int maxLength)
+        {
+        int identicalLength = 1;
+
         int textChar;
         int endingChar;
 
-        while ( (textChar = text.read()) == (endingChar = ending.read()) )
+        while (true)
             {
-            if ( endingChar == -1 ) // && == textChar; complete eq
+            if ( maxLength == 0 )
+                {
+                textChar = -1;
+                }
+            else
+                {
+                textChar = text.read();
+                maxLength--;
+                }
+
+            endingChar = ending.read();
+
+            // text ends with ending
+            if (endingChar == -1)
                 return 0;
+
+            // + text is higher
+            // - text is lower
+            if (textChar != endingChar)
+                return textChar > endingChar ? identicalLength : -identicalLength;
+
+            identicalLength++;
             }
-
-        if ( endingChar == -1 ) // && != textChar; ending eq
-            return 0;
-
-        return endingChar-textChar; // non eq
         }
 
     }

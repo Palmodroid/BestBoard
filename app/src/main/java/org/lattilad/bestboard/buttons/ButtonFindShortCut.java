@@ -2,7 +2,6 @@ package org.lattilad.bestboard.buttons;
 
 import org.lattilad.bestboard.SoftBoardData;
 import org.lattilad.bestboard.codetext.Entry;
-import org.lattilad.bestboard.codetext.EntryList;
 
 public class ButtonFindShortCut extends ButtonMainTouch implements Cloneable
     {
@@ -30,7 +29,7 @@ public class ButtonFindShortCut extends ButtonMainTouch implements Cloneable
         {
         // another lookup is needed !!
         Entry entry = layout.softBoardData.codeTextProcessor.getShortCut( shortCutId )
-                .lookUp( layout.softBoardData.softBoardListener.getTextBeforeCursor(), EntryList.LONGEST );
+                .lookUpShortest( layout.softBoardData.softBoardListener.getTextBeforeCursor() );
 
         if ( entry != null )        // no entry - stop
             entry.activate( layout.softBoardData.softBoardListener );
