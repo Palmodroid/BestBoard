@@ -44,6 +44,7 @@ public class Debug
     public static final int TIMER = 90;
     public static final int WEBVIEW = 90;
     public static final int SELECTOR = 90;
+    public static final int CODETEXT = 600;
 
     public static final int LAYOUTSTATE = 60;
     public static final int CAPSSTATE = 60;

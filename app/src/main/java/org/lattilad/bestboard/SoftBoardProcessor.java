@@ -15,7 +15,6 @@ import android.view.inputmethod.InputConnection;
 
 import org.lattilad.bestboard.buttons.PacketTextSimple;
 import org.lattilad.bestboard.codetext.Entry;
-import org.lattilad.bestboard.codetext.EntryList;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.prefs.PrefsFragment;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -355,7 +354,7 @@ public class SoftBoardProcessor implements
         while ( abbrevCounter == undoCounter )
             {
             Entry entry = softBoardData.codeTextProcessor.getCodeEntries()
-                    .lookUp( textBeforeCursor, EntryList.SHORTEST );
+                    .lookUpShortest( textBeforeCursor );
 
             if ( entry == null )        // no entry - stop
                 break;

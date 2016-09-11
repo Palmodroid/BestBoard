@@ -29,7 +29,7 @@ public class ButtonFindShortCut extends ButtonMainTouch implements Cloneable
         {
         // another lookup is needed !!
         Entry entry = layout.softBoardData.codeTextProcessor.getShortCut( shortCutId )
-                .lookUpShortest( layout.softBoardData.softBoardListener.getTextBeforeCursor() );
+                .lookUpLongest( layout.softBoardData.softBoardListener.getTextBeforeCursor() );
 
         if ( entry != null )        // no entry - stop
             entry.activate( layout.softBoardData.softBoardListener );

@@ -1,5 +1,6 @@
 package org.lattilad.bestboard.codetext;
 
+import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.SimpleReader;
 import org.lattilad.bestboard.utils.StringReverseReader;
@@ -51,9 +52,11 @@ public class EntryList
 
     public Entry lookUpLongest( SimpleReader reader )
         {
+        Scribe.debug(Debug.CODETEXT, "Searching for longest matching code");
         return lookUpLongest( reader, 0, entries.size()-1, -1);
         }
 
+    // Just a helper method with no limit in maximal length
     private Entry lookUpLongest( SimpleReader reader, int first, int last )
         {
         return lookUpLongest( reader, first, last, -1);
@@ -82,38 +85,47 @@ public class EntryList
                 .append(last)
                 .append("] * ");
 
-        if (cmp < 0)
+
+        if ( cmp <= -1 )
             {
-            builder.append("DOWN");
-            Scribe.note( builder.toString() );
+            builder.append("NO OR PARTIAL MATCH, SEARCH IN ALFA DIRECTION.");
+            Scribe.debug( Debug.CODETEXT, builder.toString() );
             return lookUpLongest(reader, first, middle - 1 );
             }
 
-        if (cmp > 0)
+        if ( cmp == +1 )
             {
-            builder.append("UP");
-            Scribe.note(builder.toString());
-            Entry entry = lookUpLongest(reader, middle + 1, last );
-            return entry != null ? entry : lookUpLongest(reader, first, middle-1, cmp-1);
+            builder.append("NO MATCH, SEARCH IN OMEGA DIRECTION.");
+            Scribe.debug( Debug.CODETEXT, builder.toString() );
+            return lookUpLongest(reader, middle + 1, last );
             }
 
-        // EQ found !
-        // continue searching in the direction of longer codes
-        builder.append("EQ - SEARCHING FOR LONGEST");
-        Scribe.note(builder.toString());
-        Entry longerEntry = lookUpLongest(reader, middle + 1, last );
+        if (cmp > +1)
+            {
+            builder.append("PARTIAL MATCH, SEARCH LONGER IN OMEGA, SHORTER IN ALFA DIRECTION.");
+            Scribe.debug( Debug.CODETEXT, builder.toString() );
+            Entry longerEntry = lookUpLongest(reader, middle+1, last );
+            return longerEntry != null ? longerEntry : lookUpLongest(reader, first, middle - 1, cmp-1 ); // it should be shorter !
+            }
+
+        // cmp == 0 - EQ found !
+        builder.append("COMPLETE MATCH, SEARCH LONGER IN OMEGA DIRECTION.");
+        Scribe.debug( Debug.CODETEXT, builder.toString() );
+        Entry longerEntry = lookUpLongest(reader, middle+1, last );
         return longerEntry == null ? entries.get(middle) : longerEntry;
         }
 
 
     public Entry lookUpShortest( SimpleReader reader )
         {
-        return lookUpLongest( reader, 0, entries.size()-1, -1);
+        Scribe.debug(Debug.CODETEXT, "Searching for shortest matching code");
+        return lookUpShortest( reader, 0, entries.size()-1, -1);
         }
 
+    // Just a helper method with no limit in maximal length
     private Entry lookUpShortest( SimpleReader reader, int first, int last )
         {
-        return lookUpLongest( reader, first, last, -1);
+        return lookUpShortest( reader, first, last, -1);
         }
 
     private Entry lookUpShortest( SimpleReader reader, int first, int last, int maxLength )
@@ -139,171 +151,40 @@ public class EntryList
                 .append(last)
                 .append("] * ");
 
-        if (cmp < 0)
+        if ( cmp <= -1 )
             {
-            builder.append("DOWN");
-            Scribe.note( builder.toString() );
+            builder.append("NO OR PARTIAL MATCH, SEARCH IN ALFA DIRECTION.");
+            Scribe.debug( Debug.CODETEXT, builder.toString() );
             return lookUpShortest(reader, first, middle - 1 );
             }
 
-        if (cmp > 0)
+        if ( cmp == +1 )
             {
-            builder.append("UP");
-            Scribe.note(builder.toString());
-            Entry entry = lookUpShortest(reader, first, middle-1, cmp-1);
-            return entry != null ? entry : lookUpShortest(reader, middle + 1, last );
+            builder.append("NO MATCH, SEARCH IN OMEGA DIRECTION.");
+            Scribe.debug( Debug.CODETEXT, builder.toString() );
+            return lookUpShortest(reader, middle + 1, last );
             }
 
-        // EQ found !
-        // continue searching in the direction of longer codes
-        builder.append("EQ - SEARCHING FOR LONGEST");
-        Scribe.note(builder.toString());
-        //?? Lehetne egyesével ??
-        Entry shorterEntry = lookUpShortest(reader, first, middle-1 );
+        if (cmp > +1)
+            {
+            builder.append("PARTIAL MATCH, SEARCH SHORTER IN ALFA LONGER IN OMEGA DIRECTION.");
+            Scribe.debug( Debug.CODETEXT, builder.toString() );
+            Entry shorterEntry = lookUpShortest(reader, first, middle-1, cmp-1 );  // It should be shorter!
+            return shorterEntry != null ? shorterEntry : lookUpShortest(reader, middle + 1, last );
+            }
+
+        // cmp == 0 - EQ found !
+        builder.append("COMPLETE MATCH, SEARCH SHORTER IN ALFA DIRECTION.");
+        Scribe.debug( Debug.CODETEXT, builder.toString() );
+        Entry shorterEntry = lookUpShortest(reader, first, middle-1, cmp-1 );  // It should be shorter!
         return shorterEntry == null ? entries.get(middle) : shorterEntry;
-        }
 
-
-
-/*            if (cmp < 0)
-                last=middle-1;
-
-            else if (cmp > 0)
-                first=middle+1;
-
-            else
-                {
-                // EQ FOUND !
-                builder.append("EQ");
-                Scribe.note( builder.toString() );
-
-                if ( lengthType == LONGEST )
-                    {
-                    longestFound = middle;
-                    builder.setLength(0); // clear builder before further search
-
-                    // continue searching in the direction of longer codes
-                    first = middle + 1;
-                    }
-
-                else // if ( lengthType == SHORTEST ) !! everything else is: shortest
-                    {
-                    while ( middle > last )
-                        {
-                        middle--;
-
-                        reader.reset();
-                        stringReverseReader.setString( entries.get(middle).getCode() );
-                        if ( ShortCutEntry.compare( reader, stringReverseReader) != 0 )
-                            {
-                            middle++; // middle is not eq
-                            Scribe.note( " ** SHORTEST: " + entries.get(middle).getCode() );
-                            return entries.get(middle);
-                            }
-                        }
-                    }
-                }
-            }
-
-        if ( longestFound > -1 )
-            {
-            builder.append(" ** LONGEST: ").append( entries.get(longestFound).getCode() );
-            Scribe.note( builder.toString() );
-            return entries.get(longestFound);
-            }
-
-        builder.append(" ** NOT FOUND");
-        Scribe.note( builder.toString() );
-        return null;
-
-        }
- */
-
-
-
-    public static final int SHORTEST = -1;
-    public static final int LONGEST = 1;
-
-    public Entry lookUp( SimpleReader reader, int lengthType )
-        {
-        int	first;
-        int	last;
-        int	middle = 0 ;
-        int longestFound = -1;
-        int	cmp = 0;
-        StringReverseReader stringReverseReader = new StringReverseReader();
-
-        first = 0;
-        last = entries.size()-1;
-
-        StringBuilder builder = new StringBuilder();
-
-        while ( first <= last )
-            {
-            // összesen v-e+1 elem, de k=ö/2 és k=(ö-1)/2 is jó (páratlannál azonos, párosnál a kisebb v. nagyobb "közepet" veszi"
-            middle = first + (last - first)/2;
-
-            reader.reset();
-            stringReverseReader.setString( entries.get(middle).getCode() );
-            cmp = ShortCutEntry.compare( reader, stringReverseReader);
-
-            builder.append("[").append(entries.get(middle).getCode()).append("/")
-                    .append(cmp).append("/")
-                    .append(first).append("-")
-                    .append(middle).append("-")
-                    .append(last)
-                    .append("] ");
-
-            if (cmp < 0)
-                last=middle-1;
-
-            else if (cmp > 0)
-                first=middle+1;
-
-            else
-                {
-                // EQ FOUND !
-                builder.append("EQ");
-                Scribe.note( builder.toString() );
-
-                if ( lengthType == LONGEST )
-                    {
-                    longestFound = middle;
-                    builder.setLength(0); // clear builder before further search
-
-                    // continue searching in the direction of longer codes
-                    first = middle + 1;
-                    }
-
-                else // if ( lengthType == SHORTEST ) !! everything else is: shortest
-                    {
-                    while ( middle > last )
-                        {
-                        middle--;
-
-                        reader.reset();
-                        stringReverseReader.setString( entries.get(middle).getCode() );
-                        if ( ShortCutEntry.compare( reader, stringReverseReader) != 0 )
-                            {
-                            middle++; // middle is not eq
-                            Scribe.note( " ** SHORTEST: " + entries.get(middle).getCode() );
-                            return entries.get(middle);
-                            }
-                        }
-                    }
-                }
-            }
-
-        if ( longestFound > -1 )
-            {
-            builder.append(" ** LONGEST: ").append( entries.get(longestFound).getCode() );
-            Scribe.note( builder.toString() );
-            return entries.get(longestFound);
-            }
-
-        builder.append(" ** NOT FOUND");
-        Scribe.note( builder.toString() );
-        return null;
+        // !! Consider stepwise check if looking up shorter entry in alfa direction,
+        // because similar endings should mean a badly organized list
+        // stepwise check could be quicker in most circumstances ??
+        // almafa/fa/a is badly organized;
+        // za,wa...ca,ba,aa can be searched better with halving
+        // but in most cases there will be no similar endings!
         }
 
     }
