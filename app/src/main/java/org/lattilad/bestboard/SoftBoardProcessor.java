@@ -245,7 +245,7 @@ public class SoftBoardProcessor implements
             {
             layoutView.type();
             ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
-                    .setAutoCapsState(CapsState.AUTOCAPS_OFF, true);
+                    .setAutoCapsState(CapsState.AUTOCAPS_OFF, false); // if OFF, then false is easier
             layoutView.invalidate();
             }
 

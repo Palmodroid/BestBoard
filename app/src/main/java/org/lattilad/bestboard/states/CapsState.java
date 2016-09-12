@@ -63,24 +63,23 @@ public class CapsState extends MetaState
         {
         if ( ( getInternalState() & MASK_MAIN ) == META_OFF )   // META_OFF 0, AUTOCAPS_WAIT 8, AUTOCAPS_ON 4
             {
-            autoCapsState &= MASK_AUTOCAPS;
-
-            if ( autoCapsState == AUTOCAPS_HOLD )   // change only if AUTOCAPS_WAIT
+            if ( enabled )
                 {
-                if ( getInternalState() == AUTOCAPS_WAIT )
-                    autoCapsState = AUTOCAPS_ON;
+                autoCapsState &= MASK_AUTOCAPS;
+
+                if (autoCapsState == AUTOCAPS_HOLD)   // change only if AUTOCAPS_WAIT
+                    {
+                    if (getInternalState() == AUTOCAPS_WAIT)
+                        setInternalState( AUTOCAPS_ON );
+                    }
+                else
+                    {
+                    setInternalState(autoCapsState);
+                    }
                 }
-
-            setInternalState( autoCapsState );
-
-            if ( !enabled )
-                clearAutoCapsOn();
+            else
+                setInternalState( AUTOCAPS_OFF );
             }
         }
 
-    public void clearAutoCapsOn()
-        {
-        if ( getInternalState() == AUTOCAPS_ON )
-            setInternalState( AUTOCAPS_OFF );
-        }
     }
