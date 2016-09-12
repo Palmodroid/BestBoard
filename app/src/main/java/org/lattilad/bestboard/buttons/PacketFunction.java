@@ -121,6 +121,8 @@ public class PacketFunction extends Packet
         else if ( functionCode == Commands.TOKEN_AUTOFUNC )
             {
             softBoardData.autoFuncEnabled = !softBoardData.autoFuncEnabled;
+            if ( !softBoardData.autoFuncEnabled)
+                ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS]).clearAutoCapsOn();
             }
 
         else if (functionCode == Commands.TOKEN_HELP )
@@ -145,7 +147,7 @@ public class PacketFunction extends Packet
         if ( functionCode == Commands.TOKEN_BACKSPACE )
             {
             ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
-                    .setAutoCapsState(CapsState.AUTOCAPS_OFF);
+                    .setAutoCapsState(CapsState.AUTOCAPS_OFF, true);
             }
         }
 

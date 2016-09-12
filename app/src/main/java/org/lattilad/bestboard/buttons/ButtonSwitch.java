@@ -51,7 +51,7 @@ public class ButtonSwitch extends ButtonMultiTouch implements Cloneable
 
         // It is only needed by CAPS, but all meta-buttons will know it.
         else if ( showAutoCaps &&
-                layout.softBoardData.autoFuncEnabled &&
+                // layout.softBoardData.autoFuncEnabled && !! autocaps cannot be set without autofuncEnabled
                 layout.softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS].getState() == CapsState.AUTOCAPS_ON )
             return layout.softBoardData.autoColor;
 

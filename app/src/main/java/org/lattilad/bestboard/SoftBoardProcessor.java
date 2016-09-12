@@ -245,7 +245,7 @@ public class SoftBoardProcessor implements
             {
             layoutView.type();
             ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
-                    .setAutoCapsState(CapsState.AUTOCAPS_OFF);
+                    .setAutoCapsState(CapsState.AUTOCAPS_OFF, true);
             layoutView.invalidate();
             }
 
@@ -253,7 +253,7 @@ public class SoftBoardProcessor implements
         if ( calculatedCursor[0] == 0 && editorInfo.initialCapsMode != 0 )
             {
             ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
-                    .setAutoCapsState(CapsState.AUTOCAPS_ON);
+                    .setAutoCapsState(CapsState.AUTOCAPS_ON, softBoardData.autoFuncEnabled);
             }
         }
 

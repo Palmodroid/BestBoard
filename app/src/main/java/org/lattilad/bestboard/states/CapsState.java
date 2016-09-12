@@ -57,20 +57,30 @@ public class CapsState extends MetaState
      * Set auto-caps state
      * State can be set only in META_OFF, AUTOCAPS_ON, AUTOCAPS_WAIT (AUTOCAPS_HOLD is not a valid state)
      * autoCapsState can be: AUTOCAPS_OFF (== CAPS_OFF), AUTOCAPS_WAIT, AUTOCAPS_ON and AUTOCAPS_HOLD
+     * enabled parameter == autoFuncENabled - no AUTOCAPS_ON can be set
      */
-    public void setAutoCapsState( int autoCapsState )
+    public void setAutoCapsState( int autoCapsState, boolean enabled )
         {
         if ( ( getInternalState() & MASK_MAIN ) == META_OFF )   // META_OFF 0, AUTOCAPS_WAIT 8, AUTOCAPS_ON 4
             {
             autoCapsState &= MASK_AUTOCAPS;
+
             if ( autoCapsState == AUTOCAPS_HOLD )   // change only if AUTOCAPS_WAIT
                 {
                 if ( getInternalState() == AUTOCAPS_WAIT )
-                    setInternalState( AUTOCAPS_ON );
+                    autoCapsState = AUTOCAPS_ON;
                 }
-            else
-                setInternalState( autoCapsState );
+
+            setInternalState( autoCapsState );
+
+            if ( !enabled )
+                clearAutoCapsOn();
             }
         }
 
-     }
+    public void clearAutoCapsOn()
+        {
+        if ( getInternalState() == AUTOCAPS_ON )
+            setInternalState( AUTOCAPS_OFF );
+        }
+    }

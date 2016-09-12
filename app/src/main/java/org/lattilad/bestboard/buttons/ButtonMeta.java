@@ -80,7 +80,7 @@ public class ButtonMeta extends ButtonMultiTouch implements Cloneable
             return layout.softBoardData.lockColor;
 
         // It is only needed by CAPS, but all meta-buttons will know it.
-        else if ( layout.softBoardData.autoFuncEnabled &&
+        else if ( // layout.softBoardData.autoFuncEnabled && !! AUTOCAPS_ON cannot be set without autofuncEnabled
                 layout.softBoardData.layoutStates.metaStates[type].getState() == CapsState.AUTOCAPS_ON )
             return layout.softBoardData.autoColor;
 
