@@ -37,6 +37,8 @@ public interface SoftBoardListener
     // Actually not in use - should be part of FIELD/PLAY
     void sendString( String string, int autoSpace, int movement );
 
+    void sendDelete( int length );
+
     // UseState needs this to change layout
     boolean undoLastString();
 

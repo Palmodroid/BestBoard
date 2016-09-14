@@ -1261,6 +1261,20 @@ public class SoftBoardProcessor implements
         }
 
 
+    // Varia needs delete only
+    public void sendDelete( int length )
+        {
+        Scribe.locus(Debug.SERVICE);
+
+        // ?? filter isSelected ??
+        InputConnection ic = softBoardService.getCurrentInputConnection();
+        if (ic != null)
+            {
+            sendDelete(ic, length);
+            }
+        }
+
+
     public void changeStringBeforeCursor( String string )
         {
         changeStringBeforeCursor(string.length(), string);

@@ -18,6 +18,7 @@ public class VariaEntry extends Entry
     @Override
     public void activate(SoftBoardListener processor)
         {
+        processor.sendDelete( -getCode().length() );
         variaGroup.activate();
         }
 
