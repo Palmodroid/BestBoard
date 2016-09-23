@@ -41,4 +41,16 @@ public class PacketTextVaria extends PacketText
         {
         return true;
         }
+    
+    @Override
+    public void send()
+        {
+        Varia varia = softBoardData.codeTextProcessor.getVaria( variaId );
+        if ( varia != null )
+            {
+            varia.deleteCodeEntryIfAvailable( softBoardData.softBoardListener );
+            }    
+            
+        super.send();
+        }
     }

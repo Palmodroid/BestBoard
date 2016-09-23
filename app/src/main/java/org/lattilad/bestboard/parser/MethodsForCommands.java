@@ -1982,7 +1982,7 @@ public class MethodsForCommands
         if ( id == null )
             {
             tokenizer().error("ADDVARIA", R.string.data_varia_no_id );
-            return;
+            return; 
             }
 
         // SetSignedBit states, that this will be a multiple parameter (ArrayList of KeyValuePairs)
@@ -1995,7 +1995,7 @@ public class MethodsForCommands
             return;
             }
 
-        Varia varia = new Varia();
+        Varia varia = new Varia( (boolean)parameters.remove( Commands.TOKEN_KEEPCODE, false) );
 
         for (KeyValuePair group : groups)
             {

@@ -151,7 +151,7 @@ public class SoftBoardProcessor implements
     private int undoLength = -1;
 
     /** abbrevCounter == -1 if abbrev is not allowed, undoCounter of the last sendString, if abbrev is needed **/
-    private long abbrevCounter = 0L;
+    private long codeCounter = 0L;
 
 
     /** Temporary variable to store string to be send */
@@ -338,7 +338,6 @@ public class SoftBoardProcessor implements
         checkCalculatedToReal();
         }
 
-
     public void checkAtStrokeEnd()
         {
         Scribe.locus(Debug.CURSOR);
@@ -351,10 +350,11 @@ public class SoftBoardProcessor implements
 
         Entry firstEntry = null;
         // ABBREV - recursive
-        while ( abbrevCounter == undoCounter )
+        while ( codeCounter == undoCounter )
             {
             Entry entry = softBoardData.codeTextProcessor.getCodeEntries()
-                    .lookUpShortest( textBeforeCursor );
+                    .lookUpLongest( textBeforeCursor );
+                    //.lookUpShortest( textBeforeCursor );
 
             if ( entry == null )        // no entry - stop
                 break;
@@ -531,8 +531,8 @@ public class SoftBoardProcessor implements
         undoLength = -1;
 
         // ABBREV
-        if ( abbrevCounter >= 0L )
-            abbrevCounter = undoCounter; // last process was string, abbrev check is needed
+        if ( codeCounter >= 0L )
+            codeCounter = undoCounter; // last process was string, abbrev check is needed
 
         modifyCalculatedCursor(calculatedCursor[0] + string.length());
         textBeforeCursor.sendString(string);

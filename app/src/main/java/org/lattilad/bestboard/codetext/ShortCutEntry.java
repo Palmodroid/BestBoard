@@ -18,7 +18,7 @@ public class ShortCutEntry extends Entry
         }
 
     @Override
-    public void activate(SoftBoardListener processor)
+    public void activate( SoftBoardListener processor )
         {
         processor.changeStringBeforeCursor( getCode().length(), expanded);
         }

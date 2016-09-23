@@ -23,6 +23,11 @@ public class VariaGroup
         {
         this.varia = varia;
         }
+        
+    public Varia getVaria()
+        {
+        return varia;
+        }
 
     public String getCode()
         {

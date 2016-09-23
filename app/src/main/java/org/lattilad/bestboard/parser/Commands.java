@@ -282,6 +282,7 @@ public class Commands
     public static final long TOKEN_ADDGROUP = 0xe5037e9badL;
     // public static final long TOKEN_ID = 0x102a6L;
     public static final long TOKEN_CODE = 0xac8a2L;
+    public static final long TOKEN_KEEPCODE = 0x1c2a9533fd3L;
     public static final long TOKEN_LEGENDS = 0xcc736c644L;
     public static final long TOKEN_LEGEND = 0x586a3cb4L;
     public static final long TOKEN_INDEX = 0x215cf78L;
@@ -905,7 +906,10 @@ public class Commands
 
         add(TOKEN_ADDVARIA, new long[]{
                 TOKEN_ID,
-                TOKEN_ADDGROUP | PARAMETER_MOD_MULTIPLE }).method("addVaria");
+                TOKEN_ADDGROUP | PARAMETER_MOD_MULTIPLE,
+                TOKEN_KEEPCODE }).method("addVaria");
+        add(TOKEN_KEEPCODE, PARAMETER_FLAG );
+        
         add(TOKEN_ADDGROUP, new long[]{
                 TOKEN_CODE,
                 TOKEN_LEGENDS,
