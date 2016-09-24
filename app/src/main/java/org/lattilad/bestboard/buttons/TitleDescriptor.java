@@ -226,7 +226,7 @@ public class TitleDescriptor
             drawTitle(canvas, button.getFirstString(), button, xOffsetInPixel, yOffsetInPixel);
 
         else if ( type == GET_SECOND_STRING && (drawInfo & Button.DRAW_SECOND_TITLE) != 0 )
-            drawTitle(canvas, button.getFirstString(), button, xOffsetInPixel, yOffsetInPixel);
+            drawTitle(canvas, button.getSecondString(), button, xOffsetInPixel, yOffsetInPixel);
 
         else if ((drawInfo & Button.DRAW_SHOW_TITLE) != 0) // SHOW_TITLE
             drawTitle(canvas, button.getLayout().softBoardData.softBoardShow.getShowText(type), 

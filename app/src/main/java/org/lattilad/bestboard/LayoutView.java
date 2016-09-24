@@ -928,6 +928,9 @@ public class LayoutView extends View
 
         // layout.drawLayoutMap(canvas);
 
+        // !! This cuold be part of draw… methods
+        Button.setLineFromLayout(layout);
+        
         layout.drawLayoutPicture(canvas);
 
         // ChangedButtons - draw over the bitmap, too

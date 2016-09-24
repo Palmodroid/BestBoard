@@ -84,6 +84,9 @@ public class Commands
     public static final long TOKEN_ROWS = 0x166362L;
     public static final long TOKEN_ALIGN = 0x12f9733L;
     public static final long TOKEN_COLOR = 0x16b2be3L;
+    public static final long TOKEN_LINECOLOR = 0x44b1e5672cf7L;
+    public static final long TOKEN_LINESIZE = 0x1db4b70e00eL;
+    public static final long TOKEN_PICTURE = 0xf3b101052L;
 
     public static final long TOKEN_ODDS = 0x13d439L;
     public static final long TOKEN_EVENS = 0x1a9a13dL;
@@ -505,7 +508,8 @@ public class Commands
         add(TOKEN_ADDLAYOUT, new long[]{
                 TOKEN_ID, TOKEN_HEXAGONAL, TOKEN_WIDE,
                 TOKEN_COLUMNS, TOKEN_HALFCOLUMNS, TOKEN_ROWS,
-                TOKEN_ALIGN, TOKEN_COLOR,
+                TOKEN_ALIGN, 
+                TOKEN_COLOR, TOKEN_LINECOLOR, TOKEN_LINESIZE, TOKEN_PICTURE,
                 TOKEN_TURNON, TOKEN_TURNOFF,
                 TOKEN_ASBOARD,
                 TOKEN_LOCK, TOKEN_START})
@@ -519,6 +523,9 @@ public class Commands
         add(TOKEN_ROWS, PARAMETER_INT);
         add(TOKEN_ALIGN, PARAMETER_KEYWORD );
         add(TOKEN_COLOR, PARAMETER_COLOR);
+        add(TOKEN_LINECOLOR, PARAMETER_COLOR);
+        add(TOKEN_LINESIZE, PARAMETER_INT);
+        add(TOKEN_PICTURE, PARAMETER_FILE);
 
         add(TOKEN_TURNON, PARAMETER_KEYWORD | PARAMETER_MOD_LIST );
         add(TOKEN_TURNOFF, PARAMETER_KEYWORD | PARAMETER_MOD_LIST);

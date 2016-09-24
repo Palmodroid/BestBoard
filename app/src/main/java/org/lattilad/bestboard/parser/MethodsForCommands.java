@@ -142,6 +142,11 @@ public class MethodsForCommands
 
     /** Layout's default background */
     public static final int DEFAULT_LAYOUT_COLOR = Color.LTGRAY;
+    
+    public static final int DEFAULT_LINE_COLOR = Color.BLACK;
+    
+    public static final int DEFAULT_LINE_SIZE = 0;
+        
 
     /** Button's default background */
     public static final int DEFAULT_BUTTON_COLOR = Color.LTGRAY;
@@ -462,6 +467,8 @@ public class MethodsForCommands
         boolean wide; // default false
         boolean oddRowsAligned; // default: EVENS ALIGNED
         int color; // default: defaultBoardColor
+        int lineColor;
+        int lineSize;
         Trilean[] metaStates = new Trilean[ LayoutStates.META_STATES_SIZE ]; // default: IGNORED
 
         id = (Long)parameters.remove( Commands.TOKEN_ID );
@@ -519,7 +526,9 @@ public class MethodsForCommands
                     R.string.data_align_bad_parameter );
 
         color = (int)parameters.remove(Commands.TOKEN_COLOR, DEFAULT_LAYOUT_COLOR);
-
+        lineColor = (int)parameters.remove(Commands.TOKEN_LINECOLOR, DEFAULT_LINE_COLOR);
+        lineSize = (int)parameters.remove(Commands.TOKEN_LINESIZE, DEFAULT_LINE_SIZE);
+        
         for ( int n = 0; n < LayoutStates.META_STATES_SIZE; n++ )
             {
             metaStates[n] = Trilean.IGNORED;
@@ -577,7 +586,14 @@ public class MethodsForCommands
 
         try
             {
-            Layout layout = new Layout(softBoardData, halfColumns, rows, oddRowsAligned, wide, color, metaStates );
+            Layout layout = new Layout(softBoardData, halfColumns, rows, oddRowsAligned, wide, 
+                    color, lineColor, lineSize ,metaStates );
+
+            File picture = (File)parameters.remove(Commands.TOKEN_PICTURE);
+            if ( picture != null )
+                {
+                layout.setPicture( picture );
+                }
 
             // needed only by debugging purposes
             layout.setLayoutId(id);

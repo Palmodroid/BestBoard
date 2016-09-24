@@ -148,11 +148,16 @@ public class Button implements Cloneable
         {
         hexagonFillPaint.setStyle( Paint.Style.FILL );
         hexagonStrokePaint.setStyle( Paint.Style.STROKE );
-        hexagonStrokePaint.setStrokeWidth( 0f );
-        hexagonStrokePaint.setColor( Color.BLACK );
         }
 
 
+    public static void setLineFromLayout(Layout layout)
+        {
+        hexagonStrokePaint.setStrokeWidth( (float)layout.lineSize );
+        hexagonStrokePaint.setColor( layout.lineColor );
+        }
+        
+        
     /*
     http://stackoverflow.com/a/7580966 how to clone
     http://www.artima.com/intv/bloch13.html

@@ -2,6 +2,7 @@ package org.lattilad.bestboard;
 
 
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -18,6 +19,7 @@ import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.ExternalDataException;
 import org.lattilad.bestboard.utils.Trilean;
 
+import java.io.File;
 import java.util.ArrayList;
 
 public class Layout
@@ -92,6 +94,12 @@ public class Layout
      * background color of the layout
      */
     public int layoutColor;
+    
+    public int lineColor;
+    
+    public int lineSize;
+    
+    private File picture = null;
 
     /**
      * meta-states to force
@@ -253,7 +261,8 @@ public class Layout
      *                                  Dimension can be checked previously with isValidDimension()
      */
     public Layout(SoftBoardData data, int halfcolumns, int rows,
-                  boolean oddRowsAligned, boolean wide, int color,
+                  boolean oddRowsAligned, boolean wide, 
+                  int color, int lineColor, int lineSize,
                   Trilean[] metaStates) throws ExternalDataException
         {
         Scribe.locus( Debug.LAYOUT);
@@ -284,6 +293,8 @@ public class Layout
         this.wide = wide;
 
         this.layoutColor = color;
+        this.lineColor = lineColor;
+        this.lineSize = lineSize;
 
         // INITIALIZE MONITOR ROW
         // These data can be overridden later,
@@ -303,6 +314,11 @@ public class Layout
         // SETSCREENDATA is needed for screen-specific information
 
         this.metaStates = metaStates;
+        }
+
+    public void setPicture( File picture )
+        {
+        this.picture = picture;
         }
 
     boolean[] storedMetaStates = new boolean[ LayoutStates.META_STATES_SIZE ];
@@ -779,9 +795,36 @@ public class Layout
         {
         Scribe.debug( Debug.LAYOUT, "Layout Layout is created - W: " + layoutWidthInPixels + " H: " + layoutHeightInPixels);
 
-        Bitmap skin = Bitmap.createBitmap(layoutWidthInPixels, layoutHeightInPixels, Bitmap.Config.RGB_565);
+        Bitmap skin = null;
+        if ( picture != null )
+            {
+            /*
+            // This will only crop the centre of the image
+            BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeFile(picture.getAbsolutePath(), bitmapOptions);
+            skin = ThumbnailUtils.extractThumbnail(bitmap, layoutWidthInPixels, layoutHeightInPixels, ThumbnailUtils.OPTIONS_RECYCLE_INPUT );
+            */
+            BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+            bitmapOptions.inPreferredConfig = Bitmap.Config.RGB_565;
+            Bitmap bitmap = BitmapFactory.decodeFile( picture.getAbsolutePath(), bitmapOptions );
+            if ( bitmap != null )
+                {
+                skin = Bitmap.createScaledBitmap(bitmap, layoutWidthInPixels, layoutHeightInPixels, true);
+                bitmap.recycle();
+                }
+            else
+                {
+                Scribe.error( Debug.LAYOUT, "Cannot decode picture from: " + picture.getAbsolutePath());
+                }
+            }
+
+        if ( skin == null )
+            {
+            skin = Bitmap.createBitmap(layoutWidthInPixels, layoutHeightInPixels, Bitmap.Config.RGB_565);
+            skin.eraseColor(layoutColor);
+            }
+
         Canvas canvas = new Canvas(skin);
-        skin.eraseColor(layoutColor);
 
         for (Button button : buttons)
             {
