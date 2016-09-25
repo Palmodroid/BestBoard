@@ -32,13 +32,13 @@ public abstract class PacketText extends Packet
     // protected int movement = 0; // FIELD is vorbidden, use of movement is erased
 
     /** Autocaps command, delivered after data was sent */
-    private int autoCaps = CapsState.AUTOCAPS_OFF;
+    protected int autoCaps = CapsState.AUTOCAPS_OFF;
 
     /**
      * All characters are uppercase if true
      * always true for originally character data
      */
-    private boolean stringCaps = false;
+    protected boolean stringCaps = false;
 
 
     public static final int AUTO_SPACE_BEFORE = 1;
@@ -49,7 +49,7 @@ public abstract class PacketText extends Packet
     /**
      * AutoSpace function, flags stored on the first 4 bits
      */
-    private int autoSpace = 0;
+    protected int autoSpace = 0;
 
     /**
      * Temporary variable to store uppercase status during one cycle

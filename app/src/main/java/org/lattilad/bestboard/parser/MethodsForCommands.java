@@ -34,6 +34,7 @@ import org.lattilad.bestboard.buttons.PacketLoad;
 import org.lattilad.bestboard.buttons.PacketMove;
 import org.lattilad.bestboard.buttons.PacketRun;
 import org.lattilad.bestboard.buttons.PacketText;
+import org.lattilad.bestboard.buttons.PacketTextCaps;
 import org.lattilad.bestboard.buttons.PacketTextSimple;
 import org.lattilad.bestboard.buttons.PacketTextTime;
 import org.lattilad.bestboard.buttons.PacketTextVaria;
@@ -1035,11 +1036,11 @@ public class MethodsForCommands
             {
             if (temp instanceof String)
                 {
-                packet = new PacketTextSimple(softBoardData, (String) temp);
+                packet = new PacketTextCaps(softBoardData, (String) temp); // INSTEAD OF SIMPLE !!
                 }
             else if (temp instanceof Character)
                 {
-                packet = new PacketTextSimple( softBoardData, (Character)temp);
+                packet = new PacketTextCaps( softBoardData, (Character)temp); // INSTEAD OF SIMPLE !!
                 }
             // else NOT possible, TOKEN_TEXT is a text_parameter
             }
@@ -1072,7 +1073,7 @@ public class MethodsForCommands
             if ( defaultText == null )
                 return null;            // and default text is missing, too
 
-            packet = new PacketTextSimple( softBoardData, defaultText);
+            packet = new PacketTextCaps( softBoardData, defaultText);  // INSTEAD OF SIMPLE !!
             }
         else if ( defaultText != null ) // both TEXT and default -> override default
             {
