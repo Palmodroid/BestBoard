@@ -46,7 +46,9 @@ public class Commands
     public static final long TOKEN_LANGUAGE = 0x1d6843c69dbL;
     public static final long TOKEN_COUNTRY = 0x791c65f9aL;
     public static final long TOKEN_VARIANT = 0x12b1368887L;
-
+    
+    public static final long TOKEN_ALFA = 0x92d23L;
+    
     public static final long TOKEN_ACTIVECOLOR = 0xb0be7c077b1cbdL;
     public static final long TOKEN_LOCKCOLOR = 0x45300a4413a0L;
     public static final long TOKEN_AUTOCOLOR = 0x229aefe38af0L;
@@ -440,6 +442,7 @@ public class Commands
                 TOKEN_TOUCHCOLOR,
                 TOKEN_STROKECOLOR,
                 TOKEN_FONT,
+                TOKEN_ALFA,
 
                 TOKEN_SHOWTITLES,
 
@@ -465,6 +468,8 @@ public class Commands
         add(TOKEN_LANGUAGE, PARAMETER_STRING);
         add(TOKEN_COUNTRY, PARAMETER_STRING);
         add(TOKEN_VARIANT, PARAMETER_STRING);
+        
+        add(TOKEN_ALFA, PARAMETER_INT).method("setDefaultAlfa");
 
         add(TOKEN_ACTIVECOLOR, PARAMETER_COLOR).method("setMetaColor");
         add(TOKEN_LOCKCOLOR, PARAMETER_COLOR).method("setLockColor");

@@ -150,6 +150,22 @@ public class Tokenizer
 
 
     /**
+     ** DEFAULT PARAMETERS
+     **/
+
+    /** Default alfa for colors - given as FULL COLOR VALUE */
+    private long defaultAlfa = 0xFF000000L;
+ 
+    /** Sets default alfa - range 00 - FF */
+    public int setDefaultAlfa( int alfaShort )
+        {
+        alfaShort &= 0xFF;
+        defaultAlfa = (long)alfaShort * 0x1000000;
+        return alfaShort;
+        }
+        
+        
+    /**
      ** PARAMETERS OF CURRENT TOKEN
      **/
 
@@ -1235,7 +1251,7 @@ public class Tokenizer
                         // One digit grayscale
                         else if ( tokenLength == 1 ) // 0xh
                             {
-                            tokenInteger = 0xFF000000L +
+                            tokenInteger = defaultAlfa +
                                     tokenIntegerDoubledDigits * 0x10000L +
                                     tokenIntegerDoubledDigits * 0x100L +
                                     tokenIntegerDoubledDigits;
@@ -1243,7 +1259,7 @@ public class Tokenizer
                         // Two digits grayscale
                         else if ( tokenLength == 2 ) // 0xhh
                             {
-                            tokenInteger = 0xFF000000L +
+                            tokenInteger = defaultAlfa +
                                     tokenInteger * 0x10000L +
                                     tokenInteger * 0x100L +
                                     tokenInteger;
@@ -1251,7 +1267,7 @@ public class Tokenizer
                         // Red-Green-Blue each has one digit
                         else if ( tokenLength == 3 ) // 0xrgb
                             {
-                            tokenInteger = 0xFF000000L + tokenIntegerDoubledDigits;
+                            tokenInteger = defaultAlfa + tokenIntegerDoubledDigits;
                             }
                         // Alpha-Red-Green-Blue each has one digit
                         else if ( tokenLength == 4 ) // 0xargb
@@ -1261,7 +1277,7 @@ public class Tokenizer
                         // Red-Green-Blue each has two digits
                         else if ( tokenLength == 6 ) // 0xrrggbb
                             {
-                            tokenInteger = 0xFF000000L + tokenInteger;
+                            tokenInteger = defaultAlfa + tokenInteger;
                             }
                         // Alpha-Red-Green-Blue each has two digits - full color value
                         else if ( tokenLength == 8 ) // 0xaarrggbb

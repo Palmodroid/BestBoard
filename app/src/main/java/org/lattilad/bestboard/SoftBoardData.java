@@ -76,6 +76,11 @@ public class SoftBoardData
      * Locale
      */
     public Locale locale = Locale.getDefault(); // or Locale.US - which is always available
+        
+    /**
+     * Default alfa for colors
+     */
+    public int defaultAlfa = 0xFF;
 
     /**
      * Color of pressed meta-keys

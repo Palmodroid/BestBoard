@@ -242,6 +242,13 @@ public class MethodsForCommands
         tokenizer().note(R.string.data_locale, String.valueOf(softBoardData.locale) );
         }
 
+    /** Set default alfa for colors * ALFA (int) */
+    public void setDefaultAlfa(Object intParameter)
+        {
+        softBoardData.defaultAlfa = tokenizer().setDefaultAlfa( (int)intParameter );
+        tokenizer().note(R.string.data_defaultalfa, Integer.toHexString( softBoardData.defaultAlfa ));
+        }
+
     /** Set color of touched meta keys * METACOLOR (color) */
     public void setMetaColor(Object colorParameter)
         {

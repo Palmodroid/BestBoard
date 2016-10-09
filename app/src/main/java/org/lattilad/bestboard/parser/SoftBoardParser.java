@@ -374,6 +374,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
             reader = new BufferedReader( new InputStreamReader( new FileInputStream( descriptorFile ), "UTF-8" ) );
             // "external" tokenizer is needed for MethodsForCommands
             tokenizer = new Tokenizer( caller.getApplicationContext(), reader );
+            // included coat files should use softboard's default alfa
+            tokenizer.setDefaultAlfa( softBoardData.defaultAlfa );
 
             parseSoftBoard();
 

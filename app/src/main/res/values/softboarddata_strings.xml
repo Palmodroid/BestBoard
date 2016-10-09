@@ -11,6 +11,7 @@
     <string name="data_locale">"Locale: (Error check was not preformed!)"</string>
     <string name="data_default_boardcolor">"Default color for layout: "</string>
     <string name="data_default_buttoncolor">"Default color for button: "</string>
+    <string name="data_defaultalfa">"Default alfa for colors: "</string>
     <string name="data_metacolor">"Color of active meta-keys:"</string>
     <string name="data_lockcolor">"Color of locked meta-keys:"</string>
     <string name="data_autocolor">"Color of activated autocaps:"</string>
