@@ -38,7 +38,9 @@ public class LayoutView extends View
      * rotation will change it
      * requestLayout will invalidate it
      */
-    private int validatedWidthInPixels = -1;
+    private int screenWidthInPixels = -1;
+    private int screenHeightInPixels = -1;
+    private int calculatedHeightInPixels = -1;
 
     /**
      ** CONSTRUCTION OF THE LAYOUT
@@ -136,7 +138,7 @@ public class LayoutView extends View
         Scribe.locus( Debug.VIEW );
 
         // layout-change needs recalculation
-        validatedWidthInPixels = -1;
+        screenWidthInPixels = -1;
 
         super.requestLayout();
         }
@@ -146,31 +148,104 @@ public class LayoutView extends View
      * Therefore the parameters are: EXACTLY screen_width and AT_MOST screen_height values.
      * There are two (several?) cycles of measuring. Calculation is performed during the first cycle,
      * after that layoutHeightInPixels will be set, and the second calculations are skipped.
-     * Screen width is stored in validatedWidthInPixels, so new calculations with this with are skipped.
+     * Screen width is stored in screenWidthInPixels, so new calculations with this with are skipped.
      */
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) throws InflateException
         {
-        Scribe.locus( Debug.VIEW );
+        Scribe.locus(Debug.VIEW);
 
+        // Check mode first. Only Width EXACTLY and Height AT_MOST are allowed!
+        int widthMode = MeasureSpec.getMode(widthMeasureSpec);
+        int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+
+        // ?? Can't call it with exact height in the second run?
+        if (widthMode != MeasureSpec.EXACTLY || heightMode != MeasureSpec.AT_MOST)
+            {
+            Scribe.error("Measure modes are incompatible with LayoutView!");
+            throw new InflateException("Measure modes are incompatible with LayoutView!");
+            }
+
+        // Check size next
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
 
-        // onMeasure will be called several times.
-        // Calculation will be performed only when screen parameters are changed 
-        // (screen rotated or layout changed (requestLayout())
-        if (widthSize != validatedWidthInPixels)
+        // !! Completely new height was given (not full and not previously calculated)!
+        if (heightSize != screenHeightInPixels && heightSize != calculatedHeightInPixels)
             {
-            int widthMode = MeasureSpec.getMode(widthMeasureSpec);
-            int heightMode = MeasureSpec.getMode(heightMeasureSpec);
+            screenHeightInPixels = heightSize;
+            calculatedHeightInPixels = -1;
+            }
 
-            // ?? Can't call it with exact height in the second run?
-            if (widthMode != MeasureSpec.EXACTLY || heightMode != MeasureSpec.AT_MOST)
-                {
-                Scribe.error("Measure modes are incompatible with LayoutView!");
-                throw new InflateException("Measure modes are incompatible with LayoutView!");
-                }
+        // Width was changed
+        if (widthSize != screenWidthInPixels)
+            {
+            screenWidthInPixels = widthSize;
+            calculatedHeightInPixels = -1;
+            // IMPORTANT! If width changes after calculation, then screenHeight is NOT affected!
+            }
 
+        // Width or Height was changed, calculation is missing
+        if (calculatedHeightInPixels < 0)
+            {
+            // layout dimensions are calculated (and stored) here
+            layout.calculateScreenData(screenWidthInPixels, screenHeightInPixels);
+            calculatedHeightInPixels = layout.areaHeightInPixels;
+            }
+
+        setMeasuredDimension(screenWidthInPixels, calculatedHeightInPixels);
+        }
+
+
+
+/*
+        Scribe.debug( Debug.VIEW, "OnMeasure is called with - Screenwidth: " + widthSize + " Screenheight: " + heightSize);
+
+        // onMeasure will be called several times.
+        // Calculation will be performed only when screen width is changed
+        // (screen rotated or layout changed (requestLayout())
+
+        /
+        Mik a lehetőségek?
+        - WIDTH változik (mindegy, hogy HEIGHT változott-e) - mindenképp új HEIGHT számítása szükséges
+            DE!
+            - Már számított magasságot kaptunk - akkor az eredeti magasságot kell használnunk!
+        - WIDTH azonos - HEIGHT változik
+            - új maximum ellenőrzés kell, de új számítás nem DE IGEN!V Bármelyik változik, új számítás kell
+
+        A szélesség EXACT, tehát mindig a megfelelő szélességet kapjuk meg
+        A magasság AT_MOST, tehát vagy a teljes, vagy a számított magasságot kapjuk meg.
+
+        Vagyis: a megkapott magasságot tárolni kell, majd a számítottat is (egyik sincs ténylegesen eltárolva másutt)
+        Ha a számított magasságot kapjuk, akkor a megkapottal kell tovább dolgozni.
+        (Ha változott a szélesség, akkor ezzel számoljon, ha nincs változás, akkor ne tekintse változásnak.)
+        A számított a layout.areaHeightInPixels lesz mégiscsak
+
+        layout.calculateScreenData( widthSize, heightSize );
+            csakis innen kerül meghívásra
+            jelenleg csak akkor fut le, ha width változott
+
+            NEMJÓ! Magasságváltozás is kell neki!
+
+         Egy layoutView van, és sok Layout
+         Ha kiszámít egy layoutot, akkor azt OTT tárolja
+         ITT az aktuális layout értékei vannak
+         /
+
+
+        // WIDTH is changed, let's set a huge HEIGHT, to get the maximal height in the next round
+        if ( widthSize != screenWidthInPixels)
+            {
+            screenWidthInPixels = widthSize;
+            validatedHeightInPixels = -1;
+
+            setMeasuredDimension(widthSize, 5000);
+            }
+
+        // HEIGHT is not calculated yet
+        else if ( validatedHeightInPixels < 0 )
+            {
+            screenWidthInPixels = -1;
 
             // layoutWidthInPixels and layoutHeightInPixels are set here
             layout.calculateScreenData( widthSize, heightSize );
@@ -179,18 +254,23 @@ public class LayoutView extends View
             Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
             Scribe.debug( Debug.VIEW, "- Calculated layout-height: " + layout.layoutHeightInPixels);
 
-            validatedWidthInPixels = widthSize;
+            screenWidthInPixels = widthSize;
+            validatedHeightInPixels = layout.layoutHeightInPixels;
+
+            // calculateScreen data has calculated height of the area
+            setMeasuredDimension(widthSize, layout.areaHeightInPixels);
             }
         else
             {
             Scribe.debug( Debug.VIEW, "CONSECUTIVE Calculations");
             Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
+
+            // calculateScreen data has calculated height of the area
+            setMeasuredDimension(widthSize, layout.areaHeightInPixels);
             }
 
-        // calculateScreen data has calculated height of the area
-        setMeasuredDimension(widthSize, layout.areaHeightInPixels);
         }
-
+*/
 
     /**
      ** CLASS VARIABLES FOR TOUCHES
@@ -470,7 +550,7 @@ public class LayoutView extends View
             case MotionEvent.ACTION_MOVE:
 
                 // onTouchEvent cannot work between delayed call of requestLayout() and onMeasure()
-                // during this phase validatedWidthInPixels == -1
+                // during this phase screenWidthInPixels == -1
 
                 // !! Theoretically invalidated phase affects all motion-events !!
                 // But
@@ -478,7 +558,7 @@ public class LayoutView extends View
                 // DOWN/POINTER_DOWN cannot happen so early !! (Is it true ??)
                 // If not, an other check could be inserted between DOWN and POINTER_DOWN
 
-                if ( validatedWidthInPixels < 0 )
+                if ( screenWidthInPixels < 0 )
                     {
                     Scribe.debug( Debug.TOUCH, "Layout is not ready yet, touch moves are dropped: " + event.getHistorySize()+1 );
                     return true;

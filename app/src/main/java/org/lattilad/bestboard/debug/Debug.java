@@ -32,7 +32,7 @@ public class Debug
     public static final int TOUCH_VERBOSE = 24;
     public static final int DRAW =26;
     public static final int DRAW_VERBOSE = 26;
-    public static final int VIEW = 30;
+    public static final int VIEW = 930;
     public static final int COMMANDS = 40;
     public static final int IGNITION = 50;
     public static final int DATA = 960;

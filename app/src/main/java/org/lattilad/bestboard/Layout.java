@@ -132,10 +132,12 @@ public class Layout
 
 
     /**
-     * screen width is stored to check whether new measurement is needed in calculateScreenData
-     * if new calculation is needed, then this value should be invalidated (-1)
+     * screen width and height are stored to check whether new measurement is needed
+     * in calculateScreenData
+     * if new calculation is needed, then width value should be invalidated (-1)
      */
-    public int validatedWidthInPixels = -1;
+    public int screenWidthInPixels = -1;
+    public int screenHeightInPixels;
 
     /**
      ** areaWidth and layoutHeight are measured and calculated first
@@ -421,7 +423,7 @@ public class Layout
 
 
     /**
-     * Calculates layout dimensions from screen specific data:
+     * Calculates dimensions of this layout from screen specific data:
      * - xOffset, layoutWidthInPixels, layoutHeightInPixels
      * - halfHexagonWidthInPixels, halfHexagonWidthInPixels
      * - textSize
@@ -430,7 +432,7 @@ public class Layout
      * This method also calculates data from preferences.
      * If those data are changed, invalidateCalculations should be called, to invalidate data.
      * @param screenWidthInPixels  screen width
-     * @param screenHeightInPixels screen height
+     * @param screenHeightInPixels screen height - full screen height should be given!
      */
     public void calculateScreenData( int screenWidthInPixels, int screenHeightInPixels )
         {
@@ -438,9 +440,13 @@ public class Layout
         
         // calculateScreenData is needed only, if orientation was changed
         // invalidateCalculations invalidates it to force calculations
-        if ( screenWidthInPixels == this.validatedWidthInPixels )
-            return;           
-        this.validatedWidthInPixels = screenWidthInPixels;
+        // From Android 6 this question is more difficult !!
+        if ( screenWidthInPixels == this.screenWidthInPixels &&
+                screenHeightInPixels == this.screenHeightInPixels )
+            return;
+
+        this.screenWidthInPixels = screenWidthInPixels;
+        this.screenHeightInPixels = screenHeightInPixels;
 
         // GENERATE SCREEN SPECIFIC VALUES
         boolean landscape = (screenWidthInPixels > screenHeightInPixels);
@@ -548,7 +554,7 @@ public class Layout
      */
     public void invalidateCalculations( boolean erasePictures )
         {
-        validatedWidthInPixels = -1;
+        screenWidthInPixels = -1;
 
         if ( erasePictures )
             {
