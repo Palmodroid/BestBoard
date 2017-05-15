@@ -10,6 +10,8 @@ import android.graphics.Typeface;
 
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonForMaps;
+import org.lattilad.bestboard.buttons.ButtonSingle;
+import org.lattilad.bestboard.buttons.PacketTextSimple;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Tokenizer;
@@ -17,6 +19,7 @@ import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.ExternalDataException;
+import org.lattilad.bestboard.utils.SinglyLinkedList;
 import org.lattilad.bestboard.utils.Trilean;
 
 import java.io.File;
@@ -310,8 +313,19 @@ public class Layout
         // INITIALIZE BUTTONS' ARRAY
         // this two-dimensional array will be populated later
         // null: non-defined (empty) button
-        buttons = new Button[layoutWidthInHexagons * layoutHeightInHexagons];
+
+        buttons = new Button[layoutWidthInHexagons * layoutHeightInHexagons + 1];
+        // +1 because 0 is the monitor-row-button
         // ADDBUTTON will fill up this array
+
+        //**************************************
+        Button button = new ButtonSingle( new PacketTextSimple(softBoardData, "MONITOR"), ButtonSingle.CAPITAL);
+        SinglyLinkedList<TitleDescriptor> titles = new SinglyLinkedList<>();
+        button.setTitles(titles);
+
+        button.setPosition(this, -2, 0);
+        buttons[0] = button;
+        //**************************************
 
         // SETSCREENDATA is needed for screen-specific information
 
@@ -653,12 +667,12 @@ public class Layout
      */
     public int touchCodeFromPosition(int hexagonCol, int hexagonRow)
         {
-        return hexagonRow * layoutWidthInHexagons + hexagonCol;
+        return hexagonRow * layoutWidthInHexagons + hexagonCol + 1;
         }
 
     // !! isValid(touchCode, layout) nem kéne???
 
-    public int colorFromTouchCode(int touchCode, boolean outerRim)
+    public static int colorFromTouchCode(int touchCode, boolean outerRim)
         {
         // TouchCode 5 + 5 bit > R 5 bit (G) B 5 bit
         // R byte : 5bit << 3 + 5
@@ -711,8 +725,11 @@ public class Layout
         if (mapX < 0 || mapX >= getLayoutMap().getWidth())
             return 0xFFFD00FD; // Empty color code generates Layout.EMPTY_TOUCH_CODE;
 
-        if (mapY < 0 || mapY >= getLayoutMap().getHeight())
+        if (mapY < 0)
             return 0xFFFD00FD; // Empty color code generates Layout.EMPTY_TOUCH_CODE;
+
+        if (mapY >= getLayoutMap().getHeight())
+            return colorFromTouchCode(0, false);
 
         return getLayoutMap().getPixel( mapX, mapY );
         }
