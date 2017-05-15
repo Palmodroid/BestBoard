@@ -10,7 +10,7 @@ import android.graphics.Typeface;
 
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonForMaps;
-import org.lattilad.bestboard.buttons.ButtonSingle;
+import org.lattilad.bestboard.buttons.ButtonMonitorRow;
 import org.lattilad.bestboard.buttons.PacketTextSimple;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
@@ -19,7 +19,6 @@ import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.ExternalDataException;
-import org.lattilad.bestboard.utils.SinglyLinkedList;
 import org.lattilad.bestboard.utils.Trilean;
 
 import java.io.File;
@@ -319,11 +318,8 @@ public class Layout
         // ADDBUTTON will fill up this array
 
         //**************************************
-        Button button = new ButtonSingle( new PacketTextSimple(softBoardData, "MONITOR"), ButtonSingle.CAPITAL);
-        SinglyLinkedList<TitleDescriptor> titles = new SinglyLinkedList<>();
-        button.setTitles(titles);
-
-        button.setPosition(this, -2, 0);
+        Button button = new ButtonMonitorRow( new PacketTextSimple(softBoardData, "MONITOR"));
+        button.setPosition(this, 0, 0);
         buttons[0] = button;
         //**************************************
 
