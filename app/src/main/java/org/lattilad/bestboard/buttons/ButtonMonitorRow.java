@@ -1,6 +1,9 @@
 package org.lattilad.bestboard.buttons;
 
+import android.content.Intent;
+
 import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.monitorrow.MonitorRowActivity;
 
 /**
  * Monitor Row
@@ -26,14 +29,18 @@ public class ButtonMonitorRow extends ButtonMainTouchInvisible implements Clonea
     @Override
     public void mainTouchStart( boolean isTouchDown )
         {
-        packet.send();
+        Intent intent = new Intent( layout.softBoardData.softBoardListener.getApplicationContext(),
+                MonitorRowActivity.class );
+        intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+        layout.softBoardData.softBoardListener.getApplicationContext().startActivity( intent );
+        // packet.send();
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);
         }
 
     @Override
     public void mainTouchEnd( boolean isTouchUp )
         {
-        packet.release();
+        // packet.release();
         }
 
     @Override

@@ -53,6 +53,16 @@
             android:name=".fileselector.FileSelectorActivity" >
         </activity>
 
+        <activity
+            android:name=".monitorrow.MonitorRowActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppDialogTheme"
+            android:excludeFromRecents="true"
+            android:windowSoftInputMode="stateAlwaysVisible|adjustResize">
+            <!--@style/AppTheme.NoActionBar"-->
+        </activity>
+
+
     </application>
 
 </manifest>
