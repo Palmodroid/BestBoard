@@ -5,7 +5,7 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <EditText
+        <org.lattilad.bestboard.monitorrow.EditTextWithBackButton
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:inputType="textPersonName"
@@ -13,7 +13,7 @@
             android:id="@+id/editText"
             android:layout_weight="1">
             <requestFocus />
-        </EditText>
+        </org.lattilad.bestboard.monitorrow.EditTextWithBackButton>
 
         <Button
             android:id="@+id/set_button"

@@ -33,6 +33,16 @@ public class MonitorRowActivity extends AppCompatActivity
         //getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
         this.setFinishOnTouchOutside(false);
 
+        ((EditTextWithBackButton) findViewById(R.id.editText)).setOnBackButtonListener(new EditTextWithBackButton.OnBackButtonListener()
+            {
+            @Override
+            public boolean onBackButton()
+                {
+                finish();
+                return true;
+                }
+            });
+
         ((Button) findViewById( R.id.draft_button )).setOnClickListener(new View.OnClickListener()
             {
             @Override
