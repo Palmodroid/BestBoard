@@ -64,6 +64,12 @@ public class PrefsFragment extends PreferenceFragment
     /** Clears spedometer data */
     public static final int PREFS_ACTION_CLEAR_SPEDOMETER = 5;
 
+    /** Just for testing */
+    public static final int PREFS_ACTION_STORE_DATA = 6;
+
+    /** Just for testing */
+    public static final int PREFS_ACTION_RECALL_DATA = 7;
+
 
     /**
      ** INTEGER PREFERENCE KEYS

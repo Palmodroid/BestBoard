@@ -43,6 +43,37 @@ public class SoftBoardProcessor implements
         return softBoardData;
         }
 
+    /**
+     * Changes the softBoardData structure of the currently available SoftBoardProcessor
+     * With this method a complete softkeyboard structure could be saved (and later reloaded,
+     * without parsing it again)
+     * IMPORTANT! All changing informations should be deleted! (Or checked!)
+     * So:
+     *   SoftBoardProcessor.initInput()
+     *   SoftBoardProcessor.initTextSession() other softboard can modify text without modifying cursor positions!
+     *   softBoardProcessor.getSoftBoardData().readPreferences();
+     *   softBoardProcessor.getSoftBoardData().boardTable.invalidateCalculations( true );
+     *   softBoardProcessor.getLayoutView().requestLayout();
+     * @param softBoardData new softBoardData
+     * @return previous softBoardData
+     */
+    public SoftBoardData changeSoftBoardData( SoftBoardData softBoardData )
+        {
+        SoftBoardData previousSoftBoardData;
+
+        previousSoftBoardData = this.softBoardData;
+
+        this.softBoardData = softBoardData;
+        this.softBoardData.readPreferences();
+        this.softBoardData.boardTable.invalidateCalculations( true );
+        initInput();
+        initTextSession();
+        getLayoutView().requestLayout();
+
+        return previousSoftBoardData;
+        }
+
+
     /** There is only ONE boardView for the whole softBoard, generated in softBoardParserFinished() */
     private LayoutView layoutView;
 

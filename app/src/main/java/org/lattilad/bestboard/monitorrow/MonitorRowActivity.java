@@ -11,7 +11,9 @@ import android.widget.Button;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.prefs.PrefsActivity;
 
+import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_RECALL_DATA;
 import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_RELOAD;
+import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_STORE_DATA;
 import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_COUNTER;
 import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_TYPE;
 
@@ -40,6 +42,42 @@ public class MonitorRowActivity extends AppCompatActivity
                 {
                 finish();
                 return true;
+                }
+            });
+
+        ((Button) findViewById( R.id.store_button )).setOnClickListener(new View.OnClickListener()
+            {
+            @Override
+            public void onClick(View view)
+                {
+                // Same communication as in Prefs
+                SharedPreferences sharedPrefs =
+                        PreferenceManager.getDefaultSharedPreferences( getApplicationContext() );
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+
+                editor.putInt( PREFS_COUNTER, sharedPrefs.getInt( PREFS_COUNTER, 0 ) + 1 );
+                editor.putInt( PREFS_TYPE, PREFS_ACTION_STORE_DATA );
+
+                editor.apply();
+                finish();
+                }
+            });
+
+        ((Button) findViewById( R.id.recall_button )).setOnClickListener(new View.OnClickListener()
+            {
+            @Override
+            public void onClick(View view)
+                {
+                // Same communication as in Prefs
+                SharedPreferences sharedPrefs =
+                        PreferenceManager.getDefaultSharedPreferences( getApplicationContext() );
+                SharedPreferences.Editor editor = sharedPrefs.edit();
+
+                editor.putInt( PREFS_COUNTER, sharedPrefs.getInt( PREFS_COUNTER, 0 ) + 1 );
+                editor.putInt( PREFS_TYPE, PREFS_ACTION_RECALL_DATA );
+
+                editor.apply();
+                finish();
                 }
             });
 

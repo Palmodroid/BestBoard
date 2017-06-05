@@ -51,6 +51,9 @@ public class SoftBoardService extends InputMethodService implements
     /** Connection to the text-processor part */
     private SoftBoardProcessor softBoardProcessor = null;
 
+    /** Just to store a non-active softBoardData instance */
+    private SoftBoardData storedSoftBoardData = null;
+
     /**
      * Service is notified if it needs to react preference changes.
      * Preference PREFS_COUNTER is incremented, and preference PREFS_TYPE identifies enterAction.
@@ -105,6 +108,25 @@ public class SoftBoardService extends InputMethodService implements
                         softBoardProcessor.getSoftBoardData().characterCounter.clear();
                         softBoardProcessor.getSoftBoardData().buttonCounter.clear();
                         softBoardProcessor.getSoftBoardData().showTiming();
+                        }
+                    break;
+
+                case PrefsFragment.PREFS_ACTION_STORE_DATA:
+                    Scribe.note( Debug.SERVICE,  "SERVICE: get notification to store softBoardData state." );
+                    if ( softBoardProcessor != null)
+                        {
+                        storedSoftBoardData = softBoardProcessor.getSoftBoardData();
+                        }
+                    break;
+
+                case PrefsFragment.PREFS_ACTION_RECALL_DATA:
+                    Scribe.note( Debug.SERVICE,  "SERVICE: get notification to restore softBoardData state." );
+                    if ( softBoardProcessor != null && storedSoftBoardData != null )
+                        {
+                        // softBoardProcessor.changeSoftBoardData( storedSoftBoardData );
+
+                        softBoardProcessor = new SoftBoardProcessor( this, storedSoftBoardData );
+                        softBoardProcessor.initInput();
                         }
                     break;
 
