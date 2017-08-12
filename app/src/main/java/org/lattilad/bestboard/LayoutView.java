@@ -22,6 +22,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static org.lattilad.bestboard.scribe.Scribe.debug;
+
 public class LayoutView extends View
     {
     /**
@@ -37,9 +39,11 @@ public class LayoutView extends View
      * screen width is stored to check whether new measurement is needed
      * rotation will change it
      * requestLayout will invalidate it
+     * screen-orientation ??
      */
     private int screenWidthInPixels = -1;
     private int screenHeightInPixels = -1;
+    private boolean screenOrientationIsLandscape = false;
     private int calculatedHeightInPixels = -1;
 
     /**
@@ -82,10 +86,10 @@ public class LayoutView extends View
         // orientation change will cancel touches
         if ( this.layout != layout)
             {
-            Scribe.debug( Debug.VIEW, "Layout is about to set: " + layout.toString() );
+            debug( Debug.VIEW, "Layout is about to set: " + layout.toString() );
             if ( this.layout != null )
                 {
-                Scribe.debug(Debug.VIEW, "Layout request is called");
+                debug(Debug.VIEW, "Layout request is called");
 
                 // any forced meta-state should be reverted
                 this.layout.revertForcedMetaStates();
@@ -169,17 +173,58 @@ public class LayoutView extends View
         // Check size next
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
+        debug( Debug.VIEW, "onMeasure is called with WIDTH: " + widthSize +
+                " HEIGHT: " + heightSize + " values.");
 
-        // !! Completely new height was given (not full and not previously calculated)!
-        if (heightSize != screenHeightInPixels && heightSize != calculatedHeightInPixels)
+        // Orientation was changed
+        if ( screenOrientationIsLandscape != layout.softBoardData.boardTable.isLandscape() )
             {
+            debug( Debug.VIEW, "Screen orientation is changed!");
+            screenOrientationIsLandscape = layout.softBoardData.boardTable.isLandscape();
+            screenWidthInPixels = -1;
+            screenHeightInPixels = -1; // no stored size can be used
+            }
+
+        debug( Debug.VIEW, "Screen orientation is: " +
+                (screenOrientationIsLandscape ? "LANDSCAPE" : "PORTRAIT"));
+
+        // This is working, but strange heights are given first
+
+        /*
+        // !! Completely new height was given (not full and not previously calculated)!
+        if ( ( heightSize != screenHeightInPixels ) &&
+                ( heightSize > calculatedHeightInPixels * 11 / 10 ) )
+
+            // This is a very interesting question! System sometimes gives random height data,
+            // usually 2-3 rows smaller than calculatedHeight. How could we decide whether this is
+            // a new height or a false calculated height?
+            // So now: height which is higher than the 110% of the calculated view should be
+            // treated as a new height
+            {
+            Scribe.debug( Debug.VIEW, "Height is not screenheight (" + screenHeightInPixels +
+                    ") nor calculatedheight (" + calculatedHeightInPixels +
+                    ")! HEIGHT (" + heightSize + ") is used as HEIGHT OF THE SCREEN");
             screenHeightInPixels = heightSize;
             calculatedHeightInPixels = -1;
             }
+            */
 
-        // Width was changed
-        if (widthSize != screenWidthInPixels)
+
+        // This algorythm uses the complete screen height (at first, or after orientation changes
+        // Layout height is somehow strange.
+        if ( screenHeightInPixels == -1 )
             {
+            screenHeightInPixels = layout.softBoardData.softBoardListener.getApplicationContext().
+                    getResources().getDisplayMetrics().heightPixels;
+            }
+
+
+        // Width (or orientation) was changed
+        if ( widthSize != screenWidthInPixels )
+            {
+            debug( Debug.VIEW, "Width is modified. WIDTH (" +
+                    widthSize + ") is not equal with previous screenwidth (" +
+                    screenWidthInPixels + ")!");
             screenWidthInPixels = widthSize;
             calculatedHeightInPixels = -1;
             // IMPORTANT! If width changes after calculation, then screenHeight is NOT affected!
@@ -188,15 +233,27 @@ public class LayoutView extends View
         // Width or Height was changed, calculation is missing
         if (calculatedHeightInPixels < 0)
             {
+            debug( Debug.VIEW, "New height calculation is needed!");
             // layout dimensions are calculated (and stored) here
             layout.calculateScreenData(screenWidthInPixels, screenHeightInPixels);
             calculatedHeightInPixels = layout.areaHeightInPixels;
             }
 
+//      ?? setMeasuredDimension(screenWidthInPixels, calculatedHeightInPixels | MEASURED_STATE_TOO_SMALL);
+
+        Scribe.debug(Debug.VIEW, "setMeasuredDimension is called with WIDTH: " + screenWidthInPixels +
+                " HEIGHT: " + calculatedHeightInPixels + " values.");
         setMeasuredDimension(screenWidthInPixels, calculatedHeightInPixels);
         }
 
+/*  @Override
+    protected void onSizeChanged(int w, int h, int oldw, int oldh)
+        {
+        super.onSizeChanged(w, h, oldw, oldh);
 
+        Scribe.debug( Debug.VIEW, "onSizeChanged HEIGHT: " + h + ", old value: " + oldh);
+        }
+*/
 
 /*
         Scribe.debug( Debug.VIEW, "OnMeasure is called with - Screenwidth: " + widthSize + " Screenheight: " + heightSize);
@@ -341,7 +398,7 @@ public class LayoutView extends View
 
             if ( buttonMainTouch != null )
                 {
-                Scribe.debug( Debug.TOUCH, "MainTouchBow created.");
+                debug( Debug.TOUCH, "MainTouchBow created.");
                 // in light-check cursor position should be checked before a new bow
                 layout.softBoardData.softBoardListener.checkAtBowStart();
 
@@ -350,7 +407,7 @@ public class LayoutView extends View
                 }
             else
                 {
-                Scribe.debug( Debug.TOUCH, "MainTouchBow with no button created.");
+                debug( Debug.TOUCH, "MainTouchBow with no button created.");
                 layout.softBoardData.softBoardListener.checkAtStrokeEnd();
                 }
             }
@@ -409,7 +466,7 @@ public class LayoutView extends View
         @Override
         public void run()
             {
-            Scribe.debug( Debug.TOUCH, "REPEAT touch is detected." );
+            debug( Debug.TOUCH, "REPEAT touch is detected." );
             repeatHandler.postDelayed( repeatRunnable,
                     mainTouchBow.buttonMainTouch.mainTouchSecondary( ButtonMainTouch.ON_STAY ) ?
                     layout.softBoardData.repeatTime : layout.softBoardData.stayBowTime );
@@ -479,7 +536,7 @@ public class LayoutView extends View
 
                 // Security valve: there is only THE FIRST touch now;
                 // all remained (abandoned) touches should be finished first
-                Scribe.debug( Debug.TOUCH, "First pointer is DOWN. Checking abandoned pointers." );
+                debug( Debug.TOUCH, "First pointer is DOWN. Checking abandoned pointers." );
 
                 // MAIN stroke - like UP
                 if (strokePointerId != -1)
@@ -489,7 +546,7 @@ public class LayoutView extends View
                     }
                 else
                     {
-                    Scribe.debug( Debug.TOUCH, "MAIN pointer is empty." );
+                    debug( Debug.TOUCH, "MAIN pointer is empty." );
                     }
 
                 // META stroke - RELEASE - ?? CLEARing state should be better ??
@@ -510,7 +567,7 @@ public class LayoutView extends View
                     }
                 else
                     {
-                    Scribe.debug(Debug.TOUCH, "MULTI pointer array is empty.");
+                    debug(Debug.TOUCH, "MULTI pointer array is empty.");
                     }
 
                 // just for security use- and meta-states are checked, that no touch remained
@@ -523,7 +580,7 @@ public class LayoutView extends View
             case MotionEvent.ACTION_POINTER_DOWN:
 
                 // Only one new touch point, no historical values.
-                Scribe.debug( Debug.TOUCH, "Pointer is DOWN." );
+                debug( Debug.TOUCH, "Pointer is DOWN." );
 
                 // bowPointerId should be empty to start new bow (there is no bow currently)
                 // THIS CAN START A NEW BOW ON A PREVIOUSLY HIDDEN LAYOUT
@@ -532,7 +589,7 @@ public class LayoutView extends View
                     index = event.getActionIndex(); // index of the newest touch
                     strokePointerId = event.getPointerId( index );
 
-                    Scribe.debug( Debug.TOUCH, "MAIN pointer was empty, new stroke is started. Id: " + strokePointerId );
+                    debug( Debug.TOUCH, "MAIN pointer was empty, new stroke is started. Id: " + strokePointerId );
 
                     // Touched StrokePoints
                     StrokePoint strokePoint = new StrokePoint((int) event.getX(index), (int) event.getY(index));
@@ -560,13 +617,13 @@ public class LayoutView extends View
 
                 if ( screenWidthInPixels < 0 )
                     {
-                    Scribe.debug( Debug.TOUCH, "Layout is not ready yet, touch moves are dropped: " + event.getHistorySize()+1 );
+                    debug( Debug.TOUCH, "Layout is not ready yet, touch moves are dropped: " + event.getHistorySize()+1 );
                     return true;
                     }
 
-                Scribe.debug( Debug.TOUCH_VERBOSE, "Pointer is in HOLD/MOVE." );
+                debug( Debug.TOUCH_VERBOSE, "Pointer is in HOLD/MOVE." );
 
-                Scribe.debug( Debug.TOUCH_VERBOSE, "META pointers to evaluate: " + multiTouchPointers.size());
+                debug( Debug.TOUCH_VERBOSE, "META pointers to evaluate: " + multiTouchPointers.size());
 
                 // Check all META pointers for movement - NO Historical values are checked
                 Iterator<Map.Entry<Integer, MultiTouchBow>> iterator =
@@ -579,7 +636,7 @@ public class LayoutView extends View
                     index = event.findPointerIndex( multiTouchPointer.getKey() );
                     if (index != -1)
                         {
-                        Scribe.debug(Debug.TOUCH_VERBOSE, "META pointer check: " + index);
+                        debug(Debug.TOUCH_VERBOSE, "META pointer check: " + index);
 
                         int color = layout.colorFromMap((int) event.getX(index), (int) event.getY(index));
                         int newTouchCode = Layout.touchCodeFromColor(color);
@@ -590,13 +647,13 @@ public class LayoutView extends View
                             // new button (touchCode) will behave, as the previous one on the previous layout
                             if (multiTouchPointer.getValue().touchCode == Layout.EMPTY_TOUCH_CODE)
                                 {
-                                Scribe.debug(Debug.TOUCH, "META button will refer to new touchCode on new layout: " + newTouchCode);
+                                debug(Debug.TOUCH, "META button will refer to new touchCode on new layout: " + newTouchCode);
                                 multiTouchPointer.getValue().touchCode = newTouchCode;
                                 }
                             // if button-center was reached
                             else if (!Layout.outerRimFromColor(color))
                                 {
-                                Scribe.debug(Debug.TOUCH, "META pointer left its button.");
+                                debug(Debug.TOUCH, "META pointer left its button.");
                                 multiTouchPointer.getValue().buttonMultiTouch.multiTouchEvent(ButtonMultiTouch.META_RELEASE);
                                 // META (indicator) keys change without the change of the MAIN
                                 this.invalidate();
@@ -604,7 +661,7 @@ public class LayoutView extends View
                                 if (strokePointerId == -1)
                                     {
                                     strokePointerId = multiTouchPointer.getKey();
-                                    Scribe.debug(Debug.TOUCH, "META pointer changed to MAIN. Id: " + strokePointerId);
+                                    debug(Debug.TOUCH, "META pointer changed to MAIN. Id: " + strokePointerId);
                                     // BowTouchCode == EMPTY_TOUCH_CODE; like ACTION_DOWN
                                     // BowButton == null; like ACTION_DOWN
 
@@ -613,7 +670,7 @@ public class LayoutView extends View
                                     pointerChangeFlag = META_TO_MAIN_CHANGE;
                                     } else
                                     {
-                                    Scribe.debug(Debug.TOUCH, "META pointer removed. MAIN is already occupied by Id: " + strokePointerId);
+                                    debug(Debug.TOUCH, "META pointer removed. MAIN is already occupied by Id: " + strokePointerId);
                                     }
 
                                 iterator.remove();
@@ -629,7 +686,7 @@ public class LayoutView extends View
                     }
 
                 // Check MAIN pointer
-                Scribe.debug( Debug.TOUCH_VERBOSE, "MAIN Pointer to evaluate: " + strokePointerId);
+                debug( Debug.TOUCH_VERBOSE, "MAIN Pointer to evaluate: " + strokePointerId);
 
                 // strokePointerId can be -1, this is not checked!!
                 index = event.findPointerIndex(strokePointerId);
@@ -669,7 +726,7 @@ public class LayoutView extends View
                 // MAIN stroke UP
                 if (id == strokePointerId) // Cannot be -1
                     {
-                    Scribe.debug( Debug.TOUCH, "MAIN Pointer is UP: " + id );
+                    debug( Debug.TOUCH, "MAIN Pointer is UP: " + id );
                     _touchEventUp();
                     }
 
@@ -680,7 +737,7 @@ public class LayoutView extends View
 
                     if (multiTouchBow != null)
                         {
-                        Scribe.debug( Debug.VIEW, "META Pointer UP. Id: " + id + " TouchCode: " + multiTouchBow.touchCode);
+                        debug( Debug.VIEW, "META Pointer UP. Id: " + id + " TouchCode: " + multiTouchBow.touchCode);
 
                         multiTouchBow.buttonMultiTouch.multiTouchEvent(ButtonMultiTouch.META_RELEASE);
                         // META (indicator) keys change without the change of the MAIN
@@ -699,7 +756,7 @@ public class LayoutView extends View
 
             case MotionEvent.ACTION_CANCEL:
 
-                Scribe.debug( Debug.VIEW, "ALL pointers CANCEL");
+                debug( Debug.VIEW, "ALL pointers CANCEL");
 
                 // CANCEL stores more touches (all touches if SPen nears to the screen)
                 // ALL MAIN and META touches are cancelled
@@ -736,7 +793,7 @@ public class LayoutView extends View
         {
         if (canvasPressure > layout.softBoardData.pressBowThreshold && canvasPressure != 1.0f)
             {
-            Scribe.debug( Debug.TOUCH, " prefsPressureThreshold: " + layout.softBoardData.pressBowThreshold + ", canvasPressure: " + canvasPressure);
+            debug( Debug.TOUCH, " prefsPressureThreshold: " + layout.softBoardData.pressBowThreshold + ", canvasPressure: " + canvasPressure);
             mainTouchBow.increasePressureCounter();
             }
 
@@ -873,7 +930,7 @@ public class LayoutView extends View
         if (mainTouchBow.touchCode != newBowTouchCode)
             {
             // THE TOUCHED BUTTON IS CHANGED!
-            Scribe.debug( Debug.TOUCH, "MAIN pointer arrived to a new touchCode: " + mainTouchBow.touchCode + " -> " + newBowTouchCode);
+            debug( Debug.TOUCH, "MAIN pointer arrived to a new touchCode: " + mainTouchBow.touchCode + " -> " + newBowTouchCode);
 
             // view should be invalidated
             // not only because the touch (controlled by displayTouch),
@@ -883,7 +940,7 @@ public class LayoutView extends View
             //  check bow's finish - finish previous button
             if (mainTouchBow.buttonMainTouch != null)
                 {
-                Scribe.debug( Debug.TOUCH, "Previous button is released: " + mainTouchBow.buttonMainTouch.getFirstString() );
+                debug( Debug.TOUCH, "Previous button is released: " + mainTouchBow.buttonMainTouch.getFirstString() );
 
                 // meta check could be here, after finishing the next main-stream button
                 // but in this case we should finish here
@@ -916,7 +973,7 @@ public class LayoutView extends View
                 // Button is on MAIN TOUCH
                 if (newBowButton instanceof ButtonMainTouch)
                     {
-                    Scribe.debug( Debug.TOUCH, "A new MAIN bow is started, MAIN button touched: " + newBowButton.getFirstString() );
+                    debug( Debug.TOUCH, "A new MAIN bow is started, MAIN button touched: " + newBowButton.getFirstString() );
                     // start a new MAIN bow
                     mainTouchBow = new MainTouchBow( newBowTouchCode, (ButtonMainTouch)newBowButton );
 
@@ -940,7 +997,7 @@ public class LayoutView extends View
                     {
                     // if MULTI -> put in MULTI
                     // MULTI TOUCH can start here only!!
-                    Scribe.debug( Debug.TOUCH, "MAIN pointer changed to MULTI. MULTI button touched: " + newBowButton.getFirstString() );
+                    debug( Debug.TOUCH, "MAIN pointer changed to MULTI. MULTI button touched: " + newBowButton.getFirstString() );
 
                     multiTouchPointers.put(strokePointerId, new MultiTouchBow(newBowTouchCode, (ButtonMultiTouch) newBowButton));
 
@@ -962,7 +1019,7 @@ public class LayoutView extends View
                 }
 
             // "outside" areas ends here
-            Scribe.debug( Debug.TOUCH, "MAIN pointer has no attached button.");
+            debug( Debug.TOUCH, "MAIN pointer has no attached button.");
             mainTouchBow = new MainTouchBow(newBowTouchCode, null);
             }
         else // same bow
@@ -970,7 +1027,7 @@ public class LayoutView extends View
             // check bow's long
             if ( mainTouchBow.isLong() && mainTouchBow.buttonMainTouch != null)
                 {
-                Scribe.debug(Debug.TOUCH, "LONG touch is detected.");
+                debug(Debug.TOUCH, "LONG touch is detected.");
                 mainTouchBow.buttonMainTouch.mainTouchSecondary(ButtonMainTouch.ON_CIRCLE);
                 mainTouchBow.resetMoveAndPressureCounter();
 
@@ -982,7 +1039,7 @@ public class LayoutView extends View
             // check bow's press
             if ( mainTouchBow.isPressed() && mainTouchBow.buttonMainTouch != null)
                 {
-                Scribe.debug( Debug.TOUCH, "PRESS touch is detected." );
+                debug( Debug.TOUCH, "PRESS touch is detected." );
                 mainTouchBow.buttonMainTouch.mainTouchSecondary(ButtonMainTouch.ON_HARD_PRESS);
                 mainTouchBow.resetMoveAndPressureCounter();
 
@@ -1005,6 +1062,17 @@ public class LayoutView extends View
     protected void onDraw(Canvas canvas)
         {
         Scribe.locus( Debug.DRAW_VERBOSE );
+
+        /*Scribe.debug( Debug.LAYOUT, "Layout HEIGHT at draw: " + getHeight() +
+                ", measured height: " + getMeasuredHeight() +
+                " , top: " + getTop() +
+                " , padding: " + getPaddingTop() + ", " + getPaddingBottom() +
+                ", offset: " + layout.layoutYOffset);*/
+
+        int loc[] = new int[2];
+        getLocationOnScreen( loc );
+        debug( Debug.LAYOUT, "Layout SCREEN LOCATION at draw: " +
+                loc[0] + ", " + loc[1] );
 
         // layout.drawLayoutMap(canvas);
 

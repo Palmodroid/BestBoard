@@ -11,7 +11,6 @@ import android.preference.PreferenceManager;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -165,8 +164,13 @@ public class SoftBoardService extends InputMethodService implements
         @Override
         public void onClick( View view )
             {
-            InputMethodManager imm = (InputMethodManager) getSystemService( Context.INPUT_METHOD_SERVICE );
-            imm.showInputMethodPicker();
+            Intent intent = new Intent( SoftBoardService.this, PrefsActivity.class);
+            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            startActivity(intent);
+
+            // Keyboard picker is always available above Ver 4.0, so we use settings instead of picker
+            // InputMethodManager imm = (InputMethodManager) getSystemService( Context.INPUT_METHOD_SERVICE );
+            // imm.showInputMethodPicker();
             }
         } );
 
@@ -245,6 +249,7 @@ public class SoftBoardService extends InputMethodService implements
             Scribe.note( Debug.SERVICE, "Waiting for sd-card..." );
 
             warning = "Be patient! SD_CARD is not ready yet!";
+            setInputView( noKeyboardView() );
 
             if ( receiver == null )
                 {
@@ -270,6 +275,9 @@ public class SoftBoardService extends InputMethodService implements
         // sd-card is ready - release receiver if started
         if ( receiver != null )
             {
+            warning = "SD_CARD is ready, BestBoard is loading. Please, wait! ";
+            setInputView( noKeyboardView() );
+
             unregisterReceiver(receiver);
             receiver = null;
             }
@@ -319,6 +327,8 @@ public class SoftBoardService extends InputMethodService implements
         if (softBoardProcessor == null)
             {
             Scribe.note(Debug.SERVICE, "Soft-layout is not ready yet, no-keyboard-view will be displayed.");
+            warning = "BestBoard is loading. Please, wait! ";
+
             return noKeyboardView();
             }
         else
@@ -369,7 +379,7 @@ public class SoftBoardService extends InputMethodService implements
                 break;
             // no warning is necessary for CANCEL
             default:
-                warning = "Critical error!";
+                warning = "Process is cancelled!";
             }
         // Generating a new view with the warning
         Scribe.debug( Debug.SERVICE, warning );

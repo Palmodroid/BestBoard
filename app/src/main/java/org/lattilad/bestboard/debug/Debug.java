@@ -27,7 +27,7 @@ public class Debug
     private static final int LIMIT = 500;
 
     public static final int PREF = 90;
-    public static final int LAYOUT = 20;
+    public static final int LAYOUT = 920;
     public static final int TOUCH = 24;
     public static final int TOUCH_VERBOSE = 24;
     public static final int DRAW =26;
@@ -35,8 +35,8 @@ public class Debug
     public static final int VIEW = 930;
     public static final int COMMANDS = 40;
     public static final int IGNITION = 50;
-    public static final int DATA = 960;
-    public static final int PARSER = 970;
+    public static final int DATA = 60;
+    public static final int PARSER = 70;
     public static final int BLOCK = 70;
     public static final int SERVICE = 80;
     public static final int TEXT = 90;
@@ -44,7 +44,7 @@ public class Debug
     public static final int TIMER = 90;
     public static final int WEBVIEW = 90;
     public static final int SELECTOR = 90;
-    public static final int CODETEXT = 600;
+    public static final int CODETEXT = 00;
 
     public static final int LAYOUTSTATE = 60;
     public static final int CAPSSTATE = 60;

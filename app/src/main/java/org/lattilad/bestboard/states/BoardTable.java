@@ -1,6 +1,7 @@
 package org.lattilad.bestboard.states;
 
 import android.content.res.Configuration;
+import android.content.res.Resources;
 
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.SoftBoardListener;
@@ -315,9 +316,11 @@ public class BoardTable
     // and .SoftBoardService.onCreateInputView()
     public void setOrientation()
         {
-        Configuration config = softBoardListener.getApplicationContext()
-                .getResources().getConfiguration();
-        orientation = (config.orientation == Configuration.ORIENTATION_PORTRAIT ?
+        Resources resources;
+
+        resources = softBoardListener.getApplicationContext().getResources();
+
+        orientation = (resources.getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT ?
                 ORIENTATION_PORTRAIT : ORIENTATION_LANDSCAPE);
         // Theoretically it could be undefined, but then it will be treated as landscape
 

@@ -2,10 +2,10 @@
 <resources>
 
 	<string name="text_warning">Warning!</string>
-	<string name="text_picker">Please choose another keyboard!</string>
+	<string name="text_picker">Press button for settings!</string>
 	<string name="image">!</string>
 
-	<color name="background">#FF151B8D</color>
-	<color name="text">#FFFFFFCC</color>
+	<color name="background">#FF3CB371</color>
+	<color name="text">#FFFFFFE0</color>
 	
  </resources>
