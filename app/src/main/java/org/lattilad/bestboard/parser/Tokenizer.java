@@ -23,6 +23,7 @@ import java.util.Locale;
  * <li>keywords - letters, digits and '_' allowed.
  * Keywords are converted to lowercase, and cannot begin with number.</li>
  * <li>"string" - All BMP characters, some escape sequences are allowed.
+ * Special unicode sequence also can be used.
  * Strings can be divided by '_' (underline sign right after the " sign: "_)</li>
  * <li>'c' - One character. All BMP characters, same escape sequences are allowed.</li>
  * <li>-+integers - negative or positive sign (on the first position) and 0-9 are allowed.</li>
@@ -30,6 +31,8 @@ import java.util.Locale;
  * <li>0ccolors - same as integers, but in aarrggbb/rrggbb/argb/rgb format, 
  * with hexadecimal digits. Default 'aa/a' is 0xFF.
  * One or two digits will be interpreted as grayscale.</li>
+ * <li>0nmnemonics - CSS3 or Visiobone color mnemonics, integer equivalent is returned.
+ * Opaque white is used if mnemonic is not valid.</li>
  * <li>-+decimal.fraction - same as integers (with one decimal point).</li>
  * <li>EOL - end of line can be treated as white-space (default) or separate token (after #)</li>
  * <li>EOF - end of file is treated as a separate token.</li>
@@ -50,9 +53,15 @@ import java.util.Locale;
  * <li> '\\' - Backslash (0x5C) </li>
  * <li> '\'' - Single quotation mark (0x27) </li>
  * <li> '\"' - Double quotation mark (0x22)</li>
+ * <li> '\$' - Dollar mark (0x24)</li>
  * <li> '\HHHH' - Four digit hexadecimal unicode</li>
  * </ul>
  * <p>
+ * <li> $HHHHHH - Hexadecimal unicode sequence can be used only in strings.
+ * Valid unicode (numeric-sequences) are converted into one- or two-characters strings.
+ * Sequence is terminated after reading six hexadecimal characters or
+ * at the first non-hexadecimal character. </li>
+ *
  * nextToken() will recognize the next token and return the token type.
  * getStringToken(), getIntegerToken, getDoubleToken can be used to retrieve the parameters:
  * <ul>

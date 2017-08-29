@@ -31,7 +31,7 @@ public class ButtonMonitorRow extends ButtonMainTouchInvisible implements Clonea
         {
         Intent intent = new Intent( layout.softBoardData.softBoardListener.getApplicationContext(),
                 MonitorRowActivity.class );
-        intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+        // intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
         layout.softBoardData.softBoardListener.getApplicationContext().startActivity( intent );
         // packet.send();
         layout.softBoardData.vibrate(SoftBoardData.VIBRATE_PRIMARY);

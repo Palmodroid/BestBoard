@@ -38,7 +38,7 @@ public class Debug
     public static final int DATA = 60;
     public static final int PARSER = 70;
     public static final int BLOCK = 70;
-    public static final int SERVICE = 80;
+    public static final int SERVICE = 980;
     public static final int TEXT = 90;
     public static final int CURSOR = 90;
     public static final int TIMER = 90;

@@ -16,6 +16,7 @@ import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Tokenizer;
 import org.lattilad.bestboard.scribe.Scribe;
+import org.lattilad.bestboard.states.BoardTable;
 import org.lattilad.bestboard.states.LayoutStates;
 import org.lattilad.bestboard.states.MetaState;
 import org.lattilad.bestboard.utils.ExternalDataException;
@@ -437,7 +438,7 @@ public class Layout
      * - xOffset, layoutWidthInPixels, layoutHeightInPixels
      * - halfHexagonWidthInPixels, halfHexagonWidthInPixels
      * - textSize
-     * It is called by BoardView.onMeasure() when screen (width) is changed or
+     * It is called by LayoutView.onMeasure() when screen (width) is changed or
      * layout is changed. Recalculation is needed only, when ScreenWidthInPixels changed.
      * This method also calculates data from preferences.
      * If those data are changed, invalidateCalculations should be called, to invalidate data.
@@ -450,7 +451,9 @@ public class Layout
         
         // calculateScreenData is needed only, if orientation was changed
         // invalidateCalculations invalidates it to force calculations
-        // From Android 6 this question is more difficult !!
+        // With Navigation Bar, this question become more difficult,
+        // measure cycle somtimes fails, and there are more evaluations.
+        // This check is maintained for older systems
         if ( screenWidthInPixels == this.screenWidthInPixels &&
                 screenHeightInPixels == this.screenHeightInPixels )
             return;
@@ -460,9 +463,10 @@ public class Layout
 
         // GENERATE SCREEN SPECIFIC VALUES
         boolean landscape = (screenWidthInPixels > screenHeightInPixels);
-        
+        boolean landscapeControl = softBoardData.boardTable.getOrientation() == BoardTable.ORIENTATION_LANDSCAPE;
+
         // orientation can be found in UseState also
-        if ( landscape != softBoardData.boardTable.isLandscape() )
+        if ( landscape != landscapeControl )
             Scribe.error("Orientation in onMeasure and in link-state is not the same!");
 
         // temporary variables are needed to check whether layout dimension is changed
@@ -829,7 +833,7 @@ public class Layout
             if ( bitmap != null )
                 {
                 skin = Bitmap.createScaledBitmap(bitmap, layoutWidthInPixels, layoutHeightInPixels, true);
-                bitmap.recycle();
+                //bitmap.recycle(); skin and bitmap can be the same. recycle is not needed per documentation
                 }
             else
                 {

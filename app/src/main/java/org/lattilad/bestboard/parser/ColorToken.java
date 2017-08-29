@@ -6,6 +6,8 @@ import java.util.Arrays;
  * Simplified class to store color mnemonics
  * Because these data are final, no sort method is used in run-time.
  * Data should be sorted previously!
+ *
+ * CSS3 and Visibone color mnemonics are used
  */
 public class ColorToken
     {

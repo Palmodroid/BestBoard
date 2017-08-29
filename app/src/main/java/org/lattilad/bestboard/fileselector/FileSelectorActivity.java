@@ -49,6 +49,9 @@ import java.util.Locale;
 
 public class FileSelectorActivity extends FragmentActivity
     {
+    // Intent-ben extra Boolean jelzésére: csak az aktuális könyvtárban választható file
+    public static String ONE_DIRECTORY = "ONE_DIRECTORY";
+
     // Intent-ben extra String jelzésére: SD-kártyán belüli indító könyvtár
     public static String DIRECTORY_SUB_PATH = "DIRECTORY_SUB_PATH";
 
@@ -73,6 +76,9 @@ public class FileSelectorActivity extends FragmentActivity
 
         // Csak a megadott végződéssel (kiterjesztéssel) rendelkező file-ok kerülnek listázásra
         String fileEnding;
+
+        // Csak az aktuális könyvtárban választhatunk
+        boolean oneDirectory;
 
         // A lista első látható elemének helyét megőrizzük az elforgatáskor
         // http://stackoverflow.com/questions/3014089/maintain-save-restore-scroll-position-when-returning-to-a-listview
@@ -242,6 +248,8 @@ public class FileSelectorActivity extends FragmentActivity
 
             Intent intent = getIntent();
 
+            variables.oneDirectory = intent.getBooleanExtra( ONE_DIRECTORY, false);
+
             variables.fileEnding = intent.getStringExtra(FILE_ENDING);
             if ( variables.fileEnding == null )
                 variables.fileEnding="";
@@ -324,15 +332,20 @@ public class FileSelectorActivity extends FragmentActivity
                 }
             }
 
-        Collections.sort(dirEntries);
+        if ( variables.oneDirectory )
+            variables.positionOfFileSection = 0;
+        else
+            {
+            Collections.sort(dirEntries);
 
-        // Divider-t is hozzáadjuk
-        dirEntries.add( 0, new FileEntry( getString( R.string.divider_directories ) , null, FileEntry.Type.DIVIDER, null ));
+            // Divider-t is hozzáadjuk
+            dirEntries.add(0, new FileEntry(getString(R.string.divider_directories), null, FileEntry.Type.DIVIDER, null));
 
-        if(!dir.equals(variables.rootDir))
-            dirEntries.add(0,new FileEntry( "..", "Parent Directory", FileEntry.Type.PARENT_DIR, dir.getParentFile() ));
+            if (!dir.equals(variables.rootDir))
+                dirEntries.add(0, new FileEntry("..", "Parent Directory", FileEntry.Type.PARENT_DIR, dir.getParentFile()));
 
-        variables.positionOfFileSection = dirEntries.size();
+            variables.positionOfFileSection = dirEntries.size();
+            }
 
         // Divider-t is hozzáadjuk
         dirEntries.add( new FileEntry( getString( R.string.divider_files ) , null, FileEntry.Type.DIVIDER, null ));

@@ -10,6 +10,9 @@ import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.SinglyLinkedList;
 
+import static android.graphics.Paint.Style.STROKE;
+import static org.lattilad.bestboard.buttons.TitleDescriptor.textPaint;
+
 /**
  * Change           ConstantPart    ChangingPart    Touched
  * Background             -           B T(all)       tB T(all)
@@ -147,7 +150,7 @@ public class Button implements Cloneable
     static
         {
         hexagonFillPaint.setStyle( Paint.Style.FILL );
-        hexagonStrokePaint.setStyle( Paint.Style.STROKE );
+        hexagonStrokePaint.setStyle( STROKE );
         }
 
 
@@ -604,20 +607,35 @@ public class Button implements Cloneable
     public void drawGridTitle( Canvas canvas, Layout layout, int columnInHexagons, int rowInHexagons )
         {
         setPosition( layout, columnInHexagons, rowInHexagons );
+        onLayoutReady(); // One button instance is called for each cell on layout, layout is ready at this time
 
-        TitleDescriptor.textPaint.setTextSize(layout.fontData.textSize);
-        TitleDescriptor.textPaint.setColor(Color.BLACK);
-        TitleDescriptor.textPaint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
+        textPaint.setTextSize(layout.fontData.textSize);
+        textPaint.setColor(Color.BLACK);
+        textPaint.setFlags(Paint.ANTI_ALIAS_FLAG | Paint.DITHER_FLAG |
                 Paint.SUBPIXEL_TEXT_FLAG | Paint.LINEAR_TEXT_FLAG);
-        TitleDescriptor.textPaint.setTextSkewX(0);
+        textPaint.setTextSkewX(0);
 
         columnInHexagons++; // back from arrayColumn
         rowInHexagons++;    // back from arrayRow
 
+        String text = columnInHexagons == 2 ? rowInHexagons + ":" + columnInHexagons : Integer.toString(columnInHexagons);
+
+        textPaint.setStyle( Paint.Style.STROKE );
+        textPaint.setStrokeWidth( 5f );
+        textPaint.setColor(Color.WHITE);
         canvas.drawText(
-                columnInHexagons == 2 ? rowInHexagons + ":" + columnInHexagons : Integer.toString(columnInHexagons),
+                text,
                 getXCenter(), // + layout.halfHexagonWidthInPixels / 1000,
                 getYCenter() - layout.halfHexagonHeightInPixels / 2,
-                TitleDescriptor.textPaint);
+                textPaint);
+
+        textPaint.setStyle( Paint.Style.FILL );
+        textPaint.setColor(Color.BLACK);
+        canvas.drawText(
+                text,
+                getXCenter(), // + layout.halfHexagonWidthInPixels / 1000,
+                getYCenter() - layout.halfHexagonHeightInPixels / 2,
+                textPaint);
+
         }
     }

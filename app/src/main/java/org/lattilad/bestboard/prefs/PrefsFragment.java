@@ -768,6 +768,14 @@ public class PrefsFragment extends PreferenceFragment
             if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
             }
 
+        // Cursor / Paths allow
+        if ( key.equals( getString( R.string.cursor_paths_allow_key )) || allKeys )
+            {
+            Scribe.note( Debug.PREF,  "PREFERENCES: Cursor paths indicator has changed!" );
+
+            if ( !allKeys )     performAction(PREFS_ACTION_REFRESH);
+            }
+
         // Cursor / Vibration allow
         if ( key.equals( getString( R.string.cursor_vibration_allow_key )) || allKeys )
             {
@@ -968,12 +976,21 @@ public class PrefsFragment extends PreferenceFragment
      **/
 
     /**
-     * Notifies server to react preference changes
+     * Helper method to call similar method inside of PrefsFragment
      * @param type action type
      */
     private void performAction( int type )
         {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        performAction( getActivity(), type);
+        }
+
+    /**
+     * Notifies server to react preference changes - this can be called outside of PrefsFragment
+     * @param type action type
+     */
+    public static void performAction( Context context, int type )
+        {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
         SharedPreferences.Editor editor = sharedPrefs.edit();
 
         editor.putInt( PREFS_COUNTER, sharedPrefs.getInt( PREFS_COUNTER, 0 ) + 1 );

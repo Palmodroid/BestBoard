@@ -30,6 +30,18 @@
     <string name="descriptor_file_dialog_title">Name of descriptor file</string>
     <string name="descriptor_file_dialog_message">Enter name of descriptor file! File should be in coat format!</string>
 
+    <string name="use_testing_key">usetesting</string>
+    <string name="use_testing_title">Use test file instead of main file</string>
+    <string name="use_testing_on">Test file is in use</string>
+    <string name="use_testing_off">Main file is in use</string>
+
+    <string name="descriptor_testing_key">testing</string>
+    <string name="descriptor_testing_title">Name of descriptor file under construction</string>
+    <string name="descriptor_testing_summary">Descriptor file: </string>
+    <string name="descriptor_testing_summary_invalid">Descriptor file cannot be found! </string>
+    <string name="descriptor_testing_dialog_title">Name of descriptor file</string>
+    <string name="descriptor_testing_dialog_message">Enter name of descriptor file! File should be in coat format!</string>
+
     <string name="descriptor_reload_key">reload</string>
     <string name="descriptor_reload_title">Force reload of descriptor file</string>
     <string name="descriptor_reload_summary">Touch to reload and parse descriptor data!</string>
@@ -134,6 +146,10 @@
     <string name="cursor_stroke_allow_key">stroke</string>
     <string name="cursor_stroke_allow_title">Show stroke on keyboard</string>
     <string name="cursor_stroke_allow_summary">Last stroke will be shown as dots</string>
+
+    <string name="cursor_paths_allow_key">path</string>
+    <string name="cursor_paths_allow_title">Show all strokes on keyboard</string>
+    <string name="cursor_paths_allow_summary">Strokes will be shown as lines</string>
 
     <string name="cursor_stroke_color_key">strokecolor</string>
     <string name="cursor_stroke_color_title">Color of the stroke</string>

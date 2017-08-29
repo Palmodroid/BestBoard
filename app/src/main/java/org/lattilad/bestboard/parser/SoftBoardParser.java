@@ -424,14 +424,14 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
         if ( tokenizer.nextToken() != Tokenizer.TYPE_KEYWORD ||
                 tokenizer.getIntegerToken() != Commands.TOKEN_COAT ||
                 (temp = parseOneParameter( Commands.PARAMETER_LONG)) == null ||
-                (long)temp != Commands.COAT_VERSION )
+                (long)temp > Commands.COAT_VERSION )
             {
             tokenizer.error( R.string.parser_coat_file_invalid, String.valueOf(Commands.COAT_VERSION) );
             throw new InvalidCoatFileException();
             }
         else
             {
-            tokenizer.note(R.string.parser_coat_file_ok, String.valueOf(Commands.COAT_VERSION));
+            tokenizer.note(R.string.parser_coat_file_ok, temp.toString());
             }
 
         try

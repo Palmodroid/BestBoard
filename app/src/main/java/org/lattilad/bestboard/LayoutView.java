@@ -4,6 +4,7 @@ package org.lattilad.bestboard;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
+import android.graphics.Path;
 import android.os.Handler;
 import android.view.InflateException;
 import android.view.MotionEvent;
@@ -43,7 +44,6 @@ public class LayoutView extends View
      */
     private int screenWidthInPixels = -1;
     private int screenHeightInPixels = -1;
-    private boolean screenOrientationIsLandscape = false;
     private int calculatedHeightInPixels = -1;
 
     /**
@@ -69,6 +69,10 @@ public class LayoutView extends View
         strokePaint = new Paint();
         strokePaint.setStyle(Paint.Style.FILL);
         //strokePaint.setColor(data.strokeColor);
+
+        pathPaint = new Paint();
+        pathPaint.setStyle(Paint.Style.STROKE);
+        pathPaint.setStrokeWidth( 5f );
         }
 
     /**
@@ -131,6 +135,11 @@ public class LayoutView extends View
             pointerChangeFlag = BOARD_CHANGE;
 
             strokePaint.setColor( layout.softBoardData.strokeColor );
+            pathPaint.setColor( layout.softBoardData.strokeColor );
+
+            // clears strokePaths
+            strokePaths.clear();
+
             }
         // !!!!!!! SIZE CONTROL IS STILL MISSING !!!!!!!!!
 
@@ -142,10 +151,24 @@ public class LayoutView extends View
         Scribe.locus( Debug.VIEW );
 
         // layout-change needs recalculation
+        screenHeightInPixels = -1;
         screenWidthInPixels = -1;
 
         super.requestLayout();
         }
+
+
+    boolean fakeView = false;
+
+    /**
+     * Called by SoftBoardProcessor.onCreateInputView() (after orientation change eg.)
+     */
+    public void measureFakeViewFirst()
+        {
+        fakeView = true;
+        calculatedHeightInPixels = -1;
+        }
+
 
     /**
      * Parent is a FrameView with "match_parent" width and "wrap_content" height.
@@ -170,164 +193,67 @@ public class LayoutView extends View
             throw new InflateException("Measure modes are incompatible with LayoutView!");
             }
 
-        // Check size next
         int widthSize = MeasureSpec.getSize(widthMeasureSpec);
         int heightSize = MeasureSpec.getSize(heightMeasureSpec);
-        debug( Debug.VIEW, "onMeasure is called with WIDTH: " + widthSize +
-                " HEIGHT: " + heightSize + " values.");
 
-        // Orientation was changed
-        if ( screenOrientationIsLandscape != layout.softBoardData.boardTable.isLandscape() )
+        // onCreateInputView signs, that there was an Orientation Change
+        // If there is a Navigation Bar, then measure cycle seriously fails after orientation change
+        // So fake values are set in this round, and onDraw will call requestLayout() to set the
+        // correct values
+        if ( fakeView )
             {
-            debug( Debug.VIEW, "Screen orientation is changed!");
-            screenOrientationIsLandscape = layout.softBoardData.boardTable.isLandscape();
-            screenWidthInPixels = -1;
-            screenHeightInPixels = -1; // no stored size can be used
+            debug( Debug.VIEW, "onMeasure values: " +
+                    "width: " + widthSize +
+                    ", height: " + heightSize +
+                    "; onMeasure is measuring fake view!");
+
+            // Animation is nicer, if fakeView is smaller than keyboardView
+            // BUT!
+            // height can be lower during measuring cycle, than previously returned height!
+            // so returning height of ex. 1 px could result a view with 0 px height!
+            // if height is 0, than onDraw (and requestLAyout) is NOT called!
+            // 25% height seems to be a good solution
+
+            if ( calculatedHeightInPixels < 0 )
+                calculatedHeightInPixels = heightSize / 4;
+            setMeasuredDimension(widthSize, calculatedHeightInPixels);
+            return;
             }
 
-        debug( Debug.VIEW, "Screen orientation is: " +
-                (screenOrientationIsLandscape ? "LANDSCAPE" : "PORTRAIT"));
+        // NORMAL MEASURING CYCLE STARTS HERE
 
-        // This is working, but strange heights are given first
-
-        /*
-        // !! Completely new height was given (not full and not previously calculated)!
-        if ( ( heightSize != screenHeightInPixels ) &&
-                ( heightSize > calculatedHeightInPixels * 11 / 10 ) )
-
-            // This is a very interesting question! System sometimes gives random height data,
-            // usually 2-3 rows smaller than calculatedHeight. How could we decide whether this is
-            // a new height or a false calculated height?
-            // So now: height which is higher than the 110% of the calculated view should be
-            // treated as a new height
+        // Width is AT_MOST, so it can be even the calculated height (even smaller)
+        if ( heightSize != screenHeightInPixels && heightSize > calculatedHeightInPixels )
             {
-            Scribe.debug( Debug.VIEW, "Height is not screenheight (" + screenHeightInPixels +
-                    ") nor calculatedheight (" + calculatedHeightInPixels +
-                    ")! HEIGHT (" + heightSize + ") is used as HEIGHT OF THE SCREEN");
             screenHeightInPixels = heightSize;
             calculatedHeightInPixels = -1;
             }
-            */
 
-
-        // This algorythm uses the complete screen height (at first, or after orientation changes
-        // Layout height is somehow strange.
-        if ( screenHeightInPixels == -1 )
-            {
-            screenHeightInPixels = layout.softBoardData.softBoardListener.getApplicationContext().
-                    getResources().getDisplayMetrics().heightPixels;
-            }
-
-
-        // Width (or orientation) was changed
+        // Width is EXACT, so new calculation is needed
         if ( widthSize != screenWidthInPixels )
             {
-            debug( Debug.VIEW, "Width is modified. WIDTH (" +
-                    widthSize + ") is not equal with previous screenwidth (" +
-                    screenWidthInPixels + ")!");
             screenWidthInPixels = widthSize;
             calculatedHeightInPixels = -1;
-            // IMPORTANT! If width changes after calculation, then screenHeight is NOT affected!
             }
 
         // Width or Height was changed, calculation is missing
         if (calculatedHeightInPixels < 0)
             {
-            debug( Debug.VIEW, "New height calculation is needed!");
             // layout dimensions are calculated (and stored) here
             layout.calculateScreenData(screenWidthInPixels, screenHeightInPixels);
             calculatedHeightInPixels = layout.areaHeightInPixels;
             }
 
-//      ?? setMeasuredDimension(screenWidthInPixels, calculatedHeightInPixels | MEASURED_STATE_TOO_SMALL);
+        debug( Debug.VIEW, "onMeasure values: " +
+                "width: " + widthSize +
+                ", height: " + heightSize +
+                ", screen-width: " + screenWidthInPixels +
+                ", screen-height: " + screenHeightInPixels +
+                ", calculated height: " + calculatedHeightInPixels );
 
-        Scribe.debug(Debug.VIEW, "setMeasuredDimension is called with WIDTH: " + screenWidthInPixels +
-                " HEIGHT: " + calculatedHeightInPixels + " values.");
-        setMeasuredDimension(screenWidthInPixels, calculatedHeightInPixels);
+        setMeasuredDimension( screenWidthInPixels, calculatedHeightInPixels );
         }
 
-/*  @Override
-    protected void onSizeChanged(int w, int h, int oldw, int oldh)
-        {
-        super.onSizeChanged(w, h, oldw, oldh);
-
-        Scribe.debug( Debug.VIEW, "onSizeChanged HEIGHT: " + h + ", old value: " + oldh);
-        }
-*/
-
-/*
-        Scribe.debug( Debug.VIEW, "OnMeasure is called with - Screenwidth: " + widthSize + " Screenheight: " + heightSize);
-
-        // onMeasure will be called several times.
-        // Calculation will be performed only when screen width is changed
-        // (screen rotated or layout changed (requestLayout())
-
-        /
-        Mik a lehetőségek?
-        - WIDTH változik (mindegy, hogy HEIGHT változott-e) - mindenképp új HEIGHT számítása szükséges
-            DE!
-            - Már számított magasságot kaptunk - akkor az eredeti magasságot kell használnunk!
-        - WIDTH azonos - HEIGHT változik
-            - új maximum ellenőrzés kell, de új számítás nem DE IGEN!V Bármelyik változik, új számítás kell
-
-        A szélesség EXACT, tehát mindig a megfelelő szélességet kapjuk meg
-        A magasság AT_MOST, tehát vagy a teljes, vagy a számított magasságot kapjuk meg.
-
-        Vagyis: a megkapott magasságot tárolni kell, majd a számítottat is (egyik sincs ténylegesen eltárolva másutt)
-        Ha a számított magasságot kapjuk, akkor a megkapottal kell tovább dolgozni.
-        (Ha változott a szélesség, akkor ezzel számoljon, ha nincs változás, akkor ne tekintse változásnak.)
-        A számított a layout.areaHeightInPixels lesz mégiscsak
-
-        layout.calculateScreenData( widthSize, heightSize );
-            csakis innen kerül meghívásra
-            jelenleg csak akkor fut le, ha width változott
-
-            NEMJÓ! Magasságváltozás is kell neki!
-
-         Egy layoutView van, és sok Layout
-         Ha kiszámít egy layoutot, akkor azt OTT tárolja
-         ITT az aktuális layout értékei vannak
-         /
-
-
-        // WIDTH is changed, let's set a huge HEIGHT, to get the maximal height in the next round
-        if ( widthSize != screenWidthInPixels)
-            {
-            screenWidthInPixels = widthSize;
-            validatedHeightInPixels = -1;
-
-            setMeasuredDimension(widthSize, 5000);
-            }
-
-        // HEIGHT is not calculated yet
-        else if ( validatedHeightInPixels < 0 )
-            {
-            screenWidthInPixels = -1;
-
-            // layoutWidthInPixels and layoutHeightInPixels are set here
-            layout.calculateScreenData( widthSize, heightSize );
-
-            Scribe.debug(Debug.VIEW, "FIRST Calculation");
-            Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
-            Scribe.debug( Debug.VIEW, "- Calculated layout-height: " + layout.layoutHeightInPixels);
-
-            screenWidthInPixels = widthSize;
-            validatedHeightInPixels = layout.layoutHeightInPixels;
-
-            // calculateScreen data has calculated height of the area
-            setMeasuredDimension(widthSize, layout.areaHeightInPixels);
-            }
-        else
-            {
-            Scribe.debug( Debug.VIEW, "CONSECUTIVE Calculations");
-            Scribe.debug( Debug.VIEW, "- Screenwidth: " + widthSize + " Screenheight: " + heightSize);
-
-            // calculateScreen data has calculated height of the area
-            setMeasuredDimension(widthSize, layout.areaHeightInPixels);
-            }
-
-        }
-*/
 
     /**
      ** CLASS VARIABLES FOR TOUCHES
@@ -369,11 +295,14 @@ public class LayoutView extends View
      */
     List<StrokePoint> strokePoints = new ArrayList<StrokePoint>();
 
+    List<Path> strokePaths = new ArrayList<Path>();
+    Path lastStrokePath = null;
+
     /**
      * Paint for stroke
      */
     private Paint strokePaint;
-
+    private Paint pathPaint;
 
     // MAIN TOUCH - ButtonMainTouch subclasses can work only with a single touch
     // Multiple touches could be active, but only one MAIN Touch can exist at once
@@ -879,6 +808,26 @@ public class LayoutView extends View
             // if (bowAction != TOUCH_HOLD) - but HOLD never calls evaluate main
             strokePoints.add(strokePoint);
 
+            if ( layout.softBoardData.displayPaths )
+                {
+                if ( bowAction == TOUCH_DOWN )
+                    {
+                    lastStrokePath = new Path();
+                    strokePaths.add( lastStrokePath );
+
+                    lastStrokePath.moveTo( strokePoint.canvasX, strokePoint.canvasY );
+                    // Scribe.debug(Debug.VIEW, "Touch DOWN. New path is moving to " +
+                    //         strokePoint.canvasX + ", " + strokePoint.canvasY);
+                    }
+                else if ( lastStrokePath != null )// TOUCH_MOVE TOUCH_UP
+                    {
+                    lastStrokePath.lineTo( strokePoint.canvasX, strokePoint.canvasY );
+                    // Scribe.debug(Debug.VIEW, "Touch MOVE. Path is lining to " +
+                    //         strokePoint.canvasX + ", " + strokePoint.canvasY);
+                    }
+                this.invalidate();
+                }
+
             // !! Shorter stroke can be drawn !!
             // while ( strokePoints.size() > 150 )
             //     strokePoints.remove( 0 );
@@ -1063,16 +1012,27 @@ public class LayoutView extends View
         {
         Scribe.locus( Debug.DRAW_VERBOSE );
 
+        // Navigation Bar seriously fails
+        // This cannot be previously, it is not working even in onSizeChanged.
+        if (fakeView)
+            {
+            debug( Debug.VIEW, "onDraw is requesting new Layout because of fake view." );
+
+            fakeView = false;
+            requestLayout();
+            return;
+            }
+
         /*Scribe.debug( Debug.LAYOUT, "Layout HEIGHT at draw: " + getHeight() +
                 ", measured height: " + getMeasuredHeight() +
                 " , top: " + getTop() +
                 " , padding: " + getPaddingTop() + ", " + getPaddingBottom() +
                 ", offset: " + layout.layoutYOffset);*/
 
-        int loc[] = new int[2];
-        getLocationOnScreen( loc );
-        debug( Debug.LAYOUT, "Layout SCREEN LOCATION at draw: " +
-                loc[0] + ", " + loc[1] );
+        //int loc[] = new int[2];
+        //getLocationOnScreen( loc );
+        //debug( Debug.LAYOUT, "Layout SCREEN LOCATION at draw: " +
+        //        loc[0] + ", " + loc[1] );
 
         // layout.drawLayoutMap(canvas);
 
@@ -1090,6 +1050,14 @@ public class LayoutView extends View
             mainTouchBow.buttonMainTouch.drawButtonTouched(canvas);
 
         // TouchedPoints - if needed
+        if (layout.softBoardData.displayPaths)
+            {
+            for ( Path path : strokePaths )
+                {
+                canvas.drawPath(path, pathPaint);
+                }
+            }
+
         if (layout.softBoardData.displayStroke)
             {
             for (StrokePoint touchedPoint : strokePoints)

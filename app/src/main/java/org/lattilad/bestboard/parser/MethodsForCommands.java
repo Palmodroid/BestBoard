@@ -2132,7 +2132,7 @@ public class MethodsForCommands
         bundle.putString( "TEXT", text );
 
         bundle.putString( "TITLE", (String) parameters.remove( Commands.TOKEN_TEXT, text ));
-        bundle.putInt( "NO", (int) parameters.remove( Commands.TOKEN_ID, -1 ));
+        bundle.putInt( "NO", (int) parameters.remove( Commands.TOKEN_INDEX, -1 )); //????????????? That was ID - it should be INDEX? Or not?
 
         return bundle;
         }

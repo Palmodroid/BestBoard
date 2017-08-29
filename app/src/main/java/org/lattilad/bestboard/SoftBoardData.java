@@ -155,6 +155,10 @@ public class SoftBoardData
                 softBoardListener.getApplicationContext().getString(R.string.cursor_stroke_allow_key),
                 true);
 
+        displayPaths = sharedPrefs.getBoolean(
+                softBoardListener.getApplicationContext().getString(R.string.cursor_paths_allow_key),
+                true);
+
         vibrationAllowed = sharedPrefs.getBoolean(
                 softBoardListener.getApplicationContext().getString(R.string.cursor_vibration_allow_key),
                 true);
@@ -248,6 +252,11 @@ public class SoftBoardData
      * Stroke is displayed or not
      */
     public boolean displayStroke = true;
+
+    /**
+     * Display all strokes for manual
+     */
+    public boolean displayPaths = true;
 
     /**
      * Vibration is allowed or not

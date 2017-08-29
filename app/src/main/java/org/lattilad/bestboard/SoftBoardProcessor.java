@@ -286,6 +286,9 @@ public class SoftBoardProcessor implements
             ((CapsState) softBoardData.layoutStates.metaStates[LayoutStates.META_CAPS])
                     .setAutoCapsState(CapsState.AUTOCAPS_ON, softBoardData.autoFuncEnabled);
             }
+
+        // clears strokePaths
+        getLayoutView().strokePaths.clear();
         }
 
 
@@ -809,16 +812,16 @@ public class SoftBoardProcessor implements
         // setting index is not necessary
         softBoardData.boardTable.setOrientation();
 
-        // boardView should be saved
+        // layoutView should be saved
         ViewGroup parent = (ViewGroup) getLayoutView().getParent();
         if (parent != null)
             {
-            parent.removeView(getLayoutView());
+            parent.removeView(getLayoutView()); // this is layoutView!!
             }
 
-        getLayoutView().setLayout(softBoardData.boardTable.getActiveLayout());
-
-        return getLayoutView();
+        layoutView.setLayout(softBoardData.boardTable.getActiveLayout());
+        layoutView.measureFakeViewFirst(); // Because of navigation bar error
+        return layoutView;
         }
 
 

@@ -823,7 +823,7 @@ public class Commands
                 TOKEN_LOCK,
 
                 TOKEN_ADDTITLE | PARAMETER_MOD_MULTIPLE,
-                        TOKEN_COLOR,
+                TOKEN_COLOR,
                 TOKEN_OVERWRITE})
                 .method("setMeta").group(TOKEN_BUTTON).allowAsLabel().allowAsDefault().labels(new long[]{TOKEN_BUTTON});
 

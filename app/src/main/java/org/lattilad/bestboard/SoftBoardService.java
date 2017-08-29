@@ -165,7 +165,7 @@ public class SoftBoardService extends InputMethodService implements
         public void onClick( View view )
             {
             Intent intent = new Intent( SoftBoardService.this, PrefsActivity.class);
-            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            //intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
             startActivity(intent);
 
             // Keyboard picker is always available above Ver 4.0, so we use settings instead of picker
@@ -237,6 +237,22 @@ public class SoftBoardService extends InputMethodService implements
         }
 
 
+    private boolean isTesting()
+        {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
+        boolean useTesting = sharedPrefs.getBoolean(getString(R.string.use_testing_key),
+                getResources().getBoolean(R.bool.use_testing_default));
+        return useTesting;
+        }
+
+    private void stopTesting()
+        {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
+        SharedPreferences.Editor editor = sharedPrefs.edit();
+        editor.putBoolean( getString(R.string.use_testing_key), false );
+        editor.apply();
+        }
+
     /**
      * Stops any previous parsing, and starts a new parse.
      * As a result a completely new soft-layout will be created.
@@ -249,6 +265,7 @@ public class SoftBoardService extends InputMethodService implements
             Scribe.note( Debug.SERVICE, "Waiting for sd-card..." );
 
             warning = "Be patient! SD_CARD is not ready yet!";
+            Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
             setInputView( noKeyboardView() );
 
             if ( receiver == null )
@@ -276,6 +293,7 @@ public class SoftBoardService extends InputMethodService implements
         if ( receiver != null )
             {
             warning = "SD_CARD is ready, BestBoard is loading. Please, wait! ";
+            Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
             setInputView( noKeyboardView() );
 
             unregisterReceiver(receiver);
@@ -293,9 +311,18 @@ public class SoftBoardService extends InputMethodService implements
 
         if ( coatFileName == null )
             {
-            this.coatFileName =
-                    sharedPrefs.getString(getString(R.string.descriptor_file_key),
-                            getString(R.string.descriptor_file_default));
+            if ( !isTesting() )
+                {
+                this.coatFileName =
+                        sharedPrefs.getString(getString(R.string.descriptor_file_key),
+                                getString(R.string.descriptor_file_default));
+                }
+            else
+                {
+                this.coatFileName =
+                        sharedPrefs.getString(getString(R.string.descriptor_testing_key),
+                                getString(R.string.descriptor_testing_default));
+                }
             }
         else
             {
@@ -306,6 +333,7 @@ public class SoftBoardService extends InputMethodService implements
         // Any previous parsing should stop now
         if ( softBoardParser != null )  softBoardParser.cancel(false);
 
+        Toast.makeText( this, "Parsing of <" + this.coatFileName + "> has been started! Be patient!", Toast.LENGTH_LONG ).show();
         softBoardParser = new SoftBoardParser(this, directoryFile, this.coatFileName );
         softBoardParser.execute();
 
@@ -389,10 +417,17 @@ public class SoftBoardService extends InputMethodService implements
 
         softBoardParser = null;
 
-        Intent intent = new Intent( this, PrefsActivity.class);
-        intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-        startActivity(intent);
-
+        if ( !isTesting() )
+            {
+            Intent intent = new Intent(this, PrefsActivity.class);
+            //intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            startActivity(intent);
+            }
+        else
+            {
+            stopTesting(); // Critical error in test file will return to main file
+            startSoftBoardParser( null );
+            }
         }
 
 
@@ -418,18 +453,20 @@ public class SoftBoardService extends InputMethodService implements
             // Warning should be shown!
             Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
 
-            // Display coat.log
-            Intent intent = new Intent( this, WebViewActivity.class);
-            intent.putExtra( WebViewActivity.WORK, Debug.coatLogFileName);
-            intent.putExtra( WebViewActivity.SEARCH, "ERROR");
-            //intent.setData(Uri.parse("http://lattilad.org/"));
-            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
-            //intent.addFlags( Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT );
-            //intent.addFlags( Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY );
-            //  intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            //intent.addFlags( Intent.FLAG_FROM_BACKGROUND );
-            startActivity(intent);
-
+            if ( isTesting() )
+                {
+                // Display coat.log
+                Intent intent = new Intent(this, WebViewActivity.class);
+                intent.putExtra(WebViewActivity.WORK, Debug.coatLogFileName);
+                intent.putExtra(WebViewActivity.SEARCH, "ERROR");
+                //intent.setData(Uri.parse("http://lattilad.org/"));
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                //intent.addFlags( Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT );
+                //intent.addFlags( Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY );
+                //  intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+                //intent.addFlags( Intent.FLAG_FROM_BACKGROUND );
+                startActivity(intent);
+                }
             }
         // parsing finished without errors, but this is not the first parsing!
         else if ( this.softBoardProcessor != null )

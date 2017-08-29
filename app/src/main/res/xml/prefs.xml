@@ -186,6 +186,12 @@
 			android:summary="@string/cursor_stroke_allow_summary"
 			android:defaultValue="@bool/cursor_stroke_allow_key" />
 
+		<CheckBoxPreference
+			android:key="@string/cursor_paths_allow_key"
+			android:title="@string/cursor_paths_allow_title"
+			android:summary="@string/cursor_paths_allow_summary"
+			android:defaultValue="@bool/cursor_paths_allow_key" />
+
 		<!--EditTextPreference
 			android:key="@string/cursor_stroke_color_key"
 			android:digits="0123456789abcdefABCDEF"

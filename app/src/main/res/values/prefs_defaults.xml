@@ -3,6 +3,8 @@
 
     <string name="descriptor_directory_default">"_bestboard"</string>
     <string name="descriptor_file_default">test.txt</string>
+    <bool name="use_testing_default">false</bool>
+    <string name="descriptor_testing_default">test.txt</string>
 
     <bool name="drawing_hide_upper_default">false</bool>
     <bool name="drawing_hide_lower_default">false</bool>
@@ -47,6 +49,7 @@
 
     <bool name="cursor_touch_allow_default">true</bool>
     <bool name="cursor_stroke_allow_key">true</bool>
+    <bool name="cursor_paths_allow_key">true</bool>
     <bool name="cursor_vibration_allow_key">false</bool>
 
     <string name="cursor_vibration_first_default">25</string>

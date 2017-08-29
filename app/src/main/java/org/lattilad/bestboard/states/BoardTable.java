@@ -331,9 +331,9 @@ public class BoardTable
 
     // BoardView.onMeasure() and Layout.calculateScreenData checks orientation
     // This can be used at least for error checking
-    public boolean isLandscape()
+    public int getOrientation()
         {
-        return orientation == ORIENTATION_LANDSCAPE;
+        return orientation;
         }
 
 

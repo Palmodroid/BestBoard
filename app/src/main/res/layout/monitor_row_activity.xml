@@ -11,7 +11,22 @@
     android:orientation="horizontal">
 
     <Button
+        android:id="@+id/test_button"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Test"/>
+
+    <Button
+        android:id="@+id/main_button"
+        android:layout_weight="1"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Main"/>
+
+    <Button
         android:id="@+id/store_button"
+        android:visibility="gone"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -19,6 +34,7 @@
 
     <Button
         android:id="@+id/recall_button"
+        android:visibility="gone"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
