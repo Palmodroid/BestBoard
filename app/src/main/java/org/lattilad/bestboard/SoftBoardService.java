@@ -110,7 +110,7 @@ public class SoftBoardService extends InputMethodService implements
                         }
                     break;
 
-                case PrefsFragment.PREFS_ACTION_STORE_DATA:
+/*                case PrefsFragment.PREFS_ACTION_STORE_DATA:
                     Scribe.note( Debug.SERVICE,  "SERVICE: get notification to store softBoardData state." );
                     if ( softBoardProcessor != null)
                         {
@@ -128,9 +128,42 @@ public class SoftBoardService extends InputMethodService implements
                         softBoardProcessor.initInput();
                         }
                     break;
+*/
+
+                // TEST MODE cannot be set from here, because of endless loop!
+                // if softboardmode is NOT stored, it will be stored
+                // reload is started
+                case PrefsFragment.PREFS_ACTION_TEST_LOAD:
+                    Scribe.note( Debug.SERVICE,  "SERVICE: get notification to load test mode." );
+                    if ( softBoardProcessor != null && storedSoftBoardData == null )
+                        {
+                        storedSoftBoardData = softBoardProcessor.getSoftBoardData();
+                        }
+                    startSoftBoardParser( null );
+
+                    break;
+
+                // TEST MODE cannot be set from here, because of endless loop!
+                // if softboardmode is stored, it will be restored
+                // otherwise reload is started
+                case PrefsFragment.PREFS_ACTION_TEST_RETURN:
+                    Scribe.note( Debug.SERVICE,  "SERVICE: get notification to return from test mode." );
+                    if ( storedSoftBoardData != null )
+                        {
+                        // softBoardProcessor.changeSoftBoardData( storedSoftBoardData );
+                        // it is a better idea to start a new softBoardProcessor
+                        softBoardProcessor = new SoftBoardProcessor( this, storedSoftBoardData );
+                        storedSoftBoardData = null; // In MAIN MODE this should be cleared
+                        softBoardProcessor.initInput();
+                        }
+                    else
+                        {
+                        startSoftBoardParser( null );
+                        }
+                    break;
 
                 default:
-                    Scribe.error( "SERVICE: preference enterAction type is invalid!" );
+                    Scribe.error( "SERVICE: preference Action type is invalid!" );
                 }
             }
         }
@@ -237,19 +270,19 @@ public class SoftBoardService extends InputMethodService implements
         }
 
 
-    private boolean isTesting()
+    private boolean isTestMode()
         {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
-        boolean useTesting = sharedPrefs.getBoolean(getString(R.string.use_testing_key),
-                getResources().getBoolean(R.bool.use_testing_default));
-        return useTesting;
+        boolean testMode = sharedPrefs.getBoolean(getString(R.string.test_mode_key),
+                getResources().getBoolean(R.bool.test_mode_default));
+        return testMode;
         }
 
-    private void stopTesting()
+    private void stopTestMode()
         {
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
         SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean( getString(R.string.use_testing_key), false );
+        editor.putBoolean( getString(R.string.test_mode_key), false );
         editor.apply();
         }
 
@@ -311,17 +344,18 @@ public class SoftBoardService extends InputMethodService implements
 
         if ( coatFileName == null )
             {
-            if ( !isTesting() )
+            if ( !isTestMode() )
                 {
                 this.coatFileName =
                         sharedPrefs.getString(getString(R.string.descriptor_file_key),
                                 getString(R.string.descriptor_file_default));
+                storedSoftBoardData = null; // In MAIN MODE this should be cleared
                 }
             else
                 {
                 this.coatFileName =
-                        sharedPrefs.getString(getString(R.string.descriptor_testing_key),
-                                getString(R.string.descriptor_testing_default));
+                        sharedPrefs.getString(getString(R.string.test_file_key),
+                                getString(R.string.test_file_default));
                 }
             }
         else
@@ -417,7 +451,7 @@ public class SoftBoardService extends InputMethodService implements
 
         softBoardParser = null;
 
-        if ( !isTesting() )
+        if ( !isTestMode() )
             {
             Intent intent = new Intent(this, PrefsActivity.class);
             //intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
@@ -425,7 +459,7 @@ public class SoftBoardService extends InputMethodService implements
             }
         else
             {
-            stopTesting(); // Critical error in test file will return to main file
+            stopTestMode(); // Critical error in test file will return to main file
             startSoftBoardParser( null );
             }
         }
@@ -453,7 +487,7 @@ public class SoftBoardService extends InputMethodService implements
             // Warning should be shown!
             Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
 
-            if ( isTesting() )
+            if ( isTestMode() )
                 {
                 // Display coat.log
                 Intent intent = new Intent(this, WebViewActivity.class);

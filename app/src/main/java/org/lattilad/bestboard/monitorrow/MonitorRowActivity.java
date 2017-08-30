@@ -3,7 +3,6 @@ package org.lattilad.bestboard.monitorrow;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
@@ -11,20 +10,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.google.android.gms.appindexing.Action;
-import com.google.android.gms.appindexing.AppIndex;
-import com.google.android.gms.appindexing.Thing;
-import com.google.android.gms.common.api.GoogleApiClient;
-
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.fileselector.FileSelectorActivity;
 import org.lattilad.bestboard.prefs.PrefsActivity;
 
-import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_RECALL_DATA;
-import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_RELOAD;
-import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_STORE_DATA;
-import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_COUNTER;
-import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_TYPE;
+import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_TEST_LOAD;
+import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_TEST_RETURN;
 import static org.lattilad.bestboard.prefs.PrefsFragment.performAction;
 
 /**
@@ -33,6 +24,19 @@ import static org.lattilad.bestboard.prefs.PrefsFragment.performAction;
  * android.util.AndroidRuntimeException: Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?
  *
  * TEST:
+ * Preferences:
+ * test_mode, test_file, test_selecet
+ *
+ * TEST_MODE is always started from outside (by prefs)
+ * SoftBoardService.startSoftBoardParser() decides on the value of the preference
+ * storedSoftBoardData is located at service
+ * softBoardData is given immediately to SoftBoardProcessor
+ *
+ * THIS IS IMPORTANT
+ * Entering MAIN mode: always clears stored data
+ * Entering TEST mode: (only in TEST_LOAD action) stores MAIN mode, if it was not stored
+ * RELOAD - reloads without knowing stored state
+ *
  * Long click:
  *      Selects file for testing
  *      Stores main data (if it was not stored already)
@@ -46,26 +50,19 @@ import static org.lattilad.bestboard.prefs.PrefsFragment.performAction;
  *      Clears testing bit
  *      Restores (if data was stored) otherwise reloads main file
  *
- * Actions:
- * ACTION_LOAD_TEST:
- * if testing bit is off - stores data, sets testing bit
+ * Actions: CANNOT SET BIT, BECAUSE OF ENDLESS PREFS LOOP!!
+ * ACTION_TEST_LOAD:
+ * if not yet stored stores data
  * reloads
  *
- * ACTION_RETURN_MAIN:
- * only if testing bit is on
- * clears testing bit
+ * ACTION_TEST_RETURN:
  * if data is stored - restores it, clears store-variable
  * if not - reloads
  */
 
 public class MonitorRowActivity extends AppCompatActivity
     {
-    private static final int FILE_SELECTOR_REQUEST = 1;
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    private GoogleApiClient client;
+    private static final int TEST_SELECTOR_REQUEST = 2;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -86,40 +83,37 @@ public class MonitorRowActivity extends AppCompatActivity
                 }
             });
 
-        ((Button) findViewById(R.id.test_button)).setOnClickListener(new View.OnClickListener()
+        Button testButton = ((Button) findViewById(R.id.test_button));
+        testButton.setOnClickListener(new View.OnClickListener()
             {
             @Override
             public void onClick(View view)
                 {
                 SharedPreferences sharedPrefs =
                         PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                String directoryName =
-                        sharedPrefs.getString(getString(R.string.descriptor_directory_key),
-                                getString(R.string.descriptor_directory_default));
-                Intent intent = new Intent();
-                intent.setClass(getApplicationContext(), FileSelectorActivity.class);
-                intent.putExtra(FileSelectorActivity.DIRECTORY_SUB_PATH, directoryName);
-                intent.putExtra(FileSelectorActivity.ONE_DIRECTORY, true);
-                // intent.putExtra( FileSelectorActivity.FILE_ENDING, ".txt");
-                startActivityForResult(intent, FILE_SELECTOR_REQUEST);
+                String testFileName =
+                        sharedPrefs.getString(getString(R.string.test_file_key),
+                                getString(R.string.test_file_default));
+                if ( testFileName.isEmpty() )
+                    selectTestFile();
+                else
+                    loadTestFile();
                 }
             });
 
-
-        ((Button) findViewById(R.id.test_button)).setOnLongClickListener(new View.OnLongClickListener()
+        testButton.setOnLongClickListener(new View.OnLongClickListener()
             {
             @Override
             public boolean onLongClick(View v)
                 {
-
-
-
+                selectTestFile();
                 return true;
                 }
             });
 
 
-        ((Button) findViewById(R.id.main_button)).setOnClickListener(new View.OnClickListener()
+        Button mainButton = ((Button) findViewById(R.id.main_button));
+        mainButton.setOnClickListener(new View.OnClickListener()
             {
             @Override
             public void onClick(View view)
@@ -127,67 +121,21 @@ public class MonitorRowActivity extends AppCompatActivity
                 SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
                 SharedPreferences.Editor editor = sharedPrefs.edit();
 
-                editor.putBoolean(getString(R.string.use_testing_key), false);
+                editor.putBoolean(getString(R.string.test_mode_key), false);
 
                 editor.apply();
 
-                performAction(getApplicationContext(), PREFS_ACTION_RELOAD);
-                }
-            });
-
-        ((Button) findViewById(R.id.store_button)).setOnClickListener(new View.OnClickListener()
-            {
-            @Override
-            public void onClick(View view)
-                {
-                // Same communication as in Prefs
-                SharedPreferences sharedPrefs =
-                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = sharedPrefs.edit();
-
-                editor.putInt(PREFS_COUNTER, sharedPrefs.getInt(PREFS_COUNTER, 0) + 1);
-                editor.putInt(PREFS_TYPE, PREFS_ACTION_STORE_DATA);
-
-                editor.apply();
+                performAction(getApplicationContext(), PREFS_ACTION_TEST_RETURN);
                 finish();
                 }
             });
 
-        ((Button) findViewById(R.id.recall_button)).setOnClickListener(new View.OnClickListener()
-            {
-            @Override
-            public void onClick(View view)
-                {
-                // Same communication as in Prefs
-                SharedPreferences sharedPrefs =
-                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = sharedPrefs.edit();
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
+        boolean testMode = sharedPrefs.getBoolean(getString(R.string.test_mode_key),
+                getResources().getBoolean(R.bool.test_mode_default));
 
-                editor.putInt(PREFS_COUNTER, sharedPrefs.getInt(PREFS_COUNTER, 0) + 1);
-                editor.putInt(PREFS_TYPE, PREFS_ACTION_RECALL_DATA);
+        mainButton.setVisibility( testMode ? View.VISIBLE : View.GONE );
 
-                editor.apply();
-                finish();
-                }
-            });
-
-        ((Button) findViewById(R.id.draft_button)).setOnClickListener(new View.OnClickListener()
-            {
-            @Override
-            public void onClick(View view)
-                {
-                // Same communication as in Prefs
-                SharedPreferences sharedPrefs =
-                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = sharedPrefs.edit();
-
-                editor.putInt(PREFS_COUNTER, sharedPrefs.getInt(PREFS_COUNTER, 0) + 1);
-                editor.putInt(PREFS_TYPE, PREFS_ACTION_RELOAD);
-
-                editor.apply();
-                finish();
-                }
-            });
 
         ((Button) findViewById(R.id.set_button)).setOnClickListener(new View.OnClickListener()
             {
@@ -201,30 +149,42 @@ public class MonitorRowActivity extends AppCompatActivity
                 finish();
                 }
             });
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
         }
 
-    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    void selectTestFile()
         {
-        if (requestCode == FILE_SELECTOR_REQUEST)
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+        String directoryName =
+                sharedPrefs.getString(getString(R.string.descriptor_directory_key),
+                        getString(R.string.descriptor_directory_default));
+        Intent intent = new Intent();
+        intent.setClass(getApplicationContext(), FileSelectorActivity.class);
+        intent.putExtra(FileSelectorActivity.DIRECTORY_SUB_PATH, directoryName);
+        intent.putExtra(FileSelectorActivity.ONE_DIRECTORY, true);
+        // intent.putExtra( FileSelectorActivity.FILE_ENDING, ".txt");
+        startActivityForResult(intent, TEST_SELECTOR_REQUEST);
+        }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+        {
+        if (requestCode == TEST_SELECTOR_REQUEST)
             {
             if (resultCode == Activity.RESULT_OK)
                 {
                 String fileName = data.getStringExtra(FileSelectorActivity.FILE_NAME);
-                Toast.makeText(this, "File clicked: " + fileName, Toast.LENGTH_LONG).show();
+                // Toast.makeText(this, "File clicked: " + fileName, Toast.LENGTH_LONG).show();
 
                 SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
                 SharedPreferences.Editor editor = sharedPrefs.edit();
 
-                editor.putBoolean(getString(R.string.use_testing_key), true);
-                editor.putString(getString(R.string.descriptor_testing_key), fileName);
+                editor.putString(getString(R.string.test_file_key), fileName);
 
                 editor.apply();
 
-                performAction(this, PREFS_ACTION_RELOAD);
-                } else if (resultCode == Activity.RESULT_CANCELED)
+                loadTestFile();
+                }
+            else if (resultCode == Activity.RESULT_CANCELED)
                 {
                 Toast.makeText(this, "- C A N C E L -", Toast.LENGTH_SHORT).show();
                 }
@@ -233,42 +193,16 @@ public class MonitorRowActivity extends AppCompatActivity
             }
         }
 
-    /**
-     * ATTENTION: This was auto-generated to implement the App Indexing API.
-     * See https://g.co/AppIndexing/AndroidStudio for more information.
-     */
-    public Action getIndexApiAction()
+    void loadTestFile()
         {
-        Thing object = new Thing.Builder()
-                .setName("MonitorRow Page") // TODO: Define a title for the content shown.
-                // TODO: Make sure this auto-generated URL is correct.
-                .setUrl(Uri.parse("http://[ENTER-YOUR-URL-HERE]"))
-                .build();
-        return new Action.Builder(Action.TYPE_VIEW)
-                .setObject(object)
-                .setActionStatus(Action.STATUS_TYPE_COMPLETED)
-                .build();
-        }
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences.Editor editor = sharedPrefs.edit();
 
-    @Override
-    public void onStart()
-        {
-        super.onStart();
+        editor.putBoolean(getString(R.string.test_mode_key), true);
 
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        client.connect();
-        AppIndex.AppIndexApi.start(client, getIndexApiAction());
-        }
+        editor.apply();
 
-    @Override
-    public void onStop()
-        {
-        super.onStop();
-
-        // ATTENTION: This was auto-generated to implement the App Indexing API.
-        // See https://g.co/AppIndexing/AndroidStudio for more information.
-        AppIndex.AppIndexApi.end(client, getIndexApiAction());
-        client.disconnect();
+        performAction(this, PREFS_ACTION_TEST_LOAD);
+        finish();
         }
     }

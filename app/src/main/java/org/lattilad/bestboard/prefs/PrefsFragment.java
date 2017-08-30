@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Environment;
+import android.preference.CheckBoxPreference;
 import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
@@ -65,10 +66,16 @@ public class PrefsFragment extends PreferenceFragment
     public static final int PREFS_ACTION_CLEAR_SPEDOMETER = 5;
 
     /** Just for testing */
-    public static final int PREFS_ACTION_STORE_DATA = 6;
+    // public static final int PREFS_ACTION_STORE_DATA = 6;
 
     /** Just for testing */
-    public static final int PREFS_ACTION_RECALL_DATA = 7;
+    // public static final int PREFS_ACTION_RECALL_DATA = 7;
+
+    /** Saves main softboarddata, and loads test */
+    public static final int PREFS_ACTION_TEST_LOAD = 8;
+
+    /** Restores main softboarddata */
+    public static final int PREFS_ACTION_TEST_RETURN = 9;
 
 
     /**
@@ -566,6 +573,21 @@ public class PrefsFragment extends PreferenceFragment
      */
     private void checkPrefs( SharedPreferences sharedPrefs, String key, boolean allKeys )
         {
+        // Test / Mode
+        if ( key.equals( getString( R.string.test_mode_key )) || allKeys )
+            {
+            // Cannot be null, if prefs.xml is valid
+            Preference preference = findPreference( getString( R.string.test_mode_key ) );
+            boolean value = sharedPrefs.getBoolean(getString(R.string.test_mode_key),
+                    getResources().getBoolean(R.bool.test_mode_default));
+            preference.setSummary( getString( value ?
+                    R.string.test_mode_on : R.string.test_mode_off ));
+
+            Scribe.note( Debug.PREF, "PREFERENCES: Test mode is set to: " + value );
+            if ( !allKeys )     performAction( value ?
+                    PREFS_ACTION_TEST_LOAD : PREFS_ACTION_TEST_RETURN );
+            }
+
         // Descriptor / Working directory
         if ( key.equals( getString( R.string.descriptor_directory_key )) || allKeys )
             {
@@ -573,7 +595,7 @@ public class PrefsFragment extends PreferenceFragment
             // If directory (and descriptor file) is valid,
             // then working directory for debug should be also changed
             // Debug is needed for preferences, too - so directory will be changed directly
-            if ( checkDescriptorFilePreferences( sharedPrefs ))
+            if ( checkDescriptorFilePreferences( sharedPrefs ) )
                 {
                 String directoryName =
                         sharedPrefs.getString( getString( R.string.descriptor_directory_key ),
@@ -582,6 +604,9 @@ public class PrefsFragment extends PreferenceFragment
                 Scribe.setDirectoryName( directoryName ); // Primary directory name
                 Scribe.setDirectoryNameSecondary( directoryName ); // Secondary directory name
                 }
+
+            // Test file should also be checked.
+            checkTestFilePreferences( sharedPrefs );
             }
 
         // Descriptor / Coat descriptor file
@@ -591,7 +616,22 @@ public class PrefsFragment extends PreferenceFragment
             // If new descriptor file is valid, then it should be reloaded
             if ( checkDescriptorFilePreferences( sharedPrefs ) && !allKeys )
                 {
-                performAction( PREFS_ACTION_RELOAD );
+                // RELOAD only, if NOT in TEST mode
+                if ( !((CheckBoxPreference)findPreference( getString(R.string.test_mode_key) )).isChecked() )
+                    performAction( PREFS_ACTION_RELOAD );
+                }
+            }
+
+        // Test / Coat descriptor file
+        if ( key.equals( getString( R.string.test_file_key )) || allKeys )
+            {
+            Scribe.note( Debug.PREF,  "PREFERENCES: test file has changed!" );
+            // If new descriptor file is valid, then it should be reloaded
+            if ( checkTestFilePreferences( sharedPrefs ) && !allKeys )
+                {
+                // RELOAD only, if in TEST mode
+                if ( !((CheckBoxPreference)findPreference( getString(R.string.test_mode_key) )).isChecked() )
+                    performAction( PREFS_ACTION_RELOAD );
                 }
             }
 
@@ -911,24 +951,17 @@ public class PrefsFragment extends PreferenceFragment
         }
 
     /**
-     * Checking and validating descriptor file preferences.
-     * Both working directory and descriptor file are checked, and reload is also set.
+     * Checking and validating directory preference.
      * This method now is only used in PrefsFragment, parsing will check the files once more.
      * If it will be used more generally, then getAction() should be checked against null!
      */
-    private boolean checkDescriptorFilePreferences( SharedPreferences sharedPrefs )
+    private File checkDirectoryPreference( SharedPreferences sharedPrefs )
         {
         // These cannot be null, if prefs.xml is valid
         Preference directoryPreference = findPreference( getString( R.string.descriptor_directory_key ) );
-        Preference filePreference = findPreference( getString( R.string.descriptor_file_key ) );
-        Preference reloadPreference = findPreference( getString( R.string.descriptor_reload_key ) );
 
         // Originally all preferences handled as invalid
         directoryPreference.setSummary( getString( R.string.descriptor_directory_summary_invalid ) );
-        filePreference.setSummary( getString( R.string.descriptor_file_summary_invalid ) );
-
-        Scribe.debug(Debug.PREF, "Reload disabled!");
-        reloadPreference.setEnabled( false );
 
         // Working directory is checked
         // It can change later, so parsing will check it again
@@ -941,11 +974,37 @@ public class PrefsFragment extends PreferenceFragment
             {
             Scribe.error( "PREFERENCES: working directory is missing: " +
                     directoryFile.getAbsolutePath() );
-            return false;
+            return null;
             }
 
         directoryPreference.setSummary( getString( R.string.descriptor_directory_summary ) + " " +
                 directoryName );
+
+        return directoryFile;
+        }
+
+    /**
+     * Checking and validating descriptor file preferences. Directory is also checked.
+     * This method now is only used in PrefsFragment, parsing will check the files once more.
+     * If it will be used more generally, then getAction() should be checked against null!
+     */
+    private boolean checkDescriptorFilePreferences( SharedPreferences sharedPrefs )
+        {
+        // These cannot be null, if prefs.xml is valid
+        Preference filePreference = findPreference( getString( R.string.descriptor_file_key ) );
+        Preference reloadPreference = findPreference( getString( R.string.descriptor_reload_key ) );
+
+        // Originally all preferences handled as invalid
+        filePreference.setSummary( getString( R.string.descriptor_file_summary_invalid ) );
+
+        Scribe.debug(Debug.PREF, "Reload disabled!");
+        reloadPreference.setEnabled( false );
+
+        // Working directory is checked
+        // It can change later, so parsing will check it again
+        File directoryFile = checkDirectoryPreference( sharedPrefs );
+        if (directoryFile == null)
+            return false;
 
         // Directory is valid, descriptor file is checked
         // It can change later, so parsing will check it again
@@ -970,6 +1029,67 @@ public class PrefsFragment extends PreferenceFragment
         return true;
         }
 
+    /**
+     * Checking and validating test file preferences. Directory is also checked.
+     * If test file is missing, then test mode is disabled.
+     * This method now is only used in PrefsFragment, parsing will check the files once more.
+     * If it will be used more generally, then getAction() should be checked against null!
+     */
+    private boolean checkTestFilePreferences( SharedPreferences sharedPrefs )
+        {
+        // These cannot be null, if prefs.xml is valid
+        Preference testFilePreference = findPreference( getString( R.string.test_file_key ) );
+        CheckBoxPreference testModePreference =
+                (CheckBoxPreference)findPreference( getString( R.string.test_mode_key ) );
+
+        String testName =
+                sharedPrefs.getString(getString(R.string.test_file_key), "");
+
+        if (testName.isEmpty())
+            {
+            // TEST FILE IS EMPTY
+            testFilePreference.setSummary(getString(R.string.test_file_summary_empty));
+            Scribe.debug(Debug.PREF, "PREFERENCES: test file is empty");
+            }
+        else
+            {
+            // SUPPOSE, THAT TEST FILE IS INVALID
+            testFilePreference.setSummary(getString(R.string.test_file_summary_invalid));
+
+            // Working directory is checked
+            // It can change later, so parsing will check it again
+            File directoryFile = checkDirectoryPreference(sharedPrefs);
+            if (directoryFile != null)
+                {
+                // Directory is valid, test file is checked
+                // It can change later, so parsing will check it again
+
+                // test file can be empty, but in test mode it cannot be deleted
+                File testFile = new File(directoryFile, testName);
+
+                if (testFile.exists() && testFile.isFile())
+                    {
+                    // TEST FILE IS OK - TEST MODE IS ENABLED
+                    testFilePreference.setSummary(getString(R.string.test_file_summary) + " " +
+                            testFile.getAbsolutePath());
+                    testModePreference.setEnabled(true);
+                    return true;
+                    }
+                else
+                    {
+                    Scribe.error("PREFERENCES: test file is missing: " +
+                            testFile.getAbsolutePath());
+                    }
+                }
+            }
+
+        // TEST FILE IS EMPTY OR INVALID
+
+        testModePreference.setChecked( false );
+        testModePreference.setEnabled( false );
+
+        return false;
+        }
 
     /**
      ** ACTIONS OF THE SERVICE, FORCED BY PREFERENCE CHANGES
@@ -1020,6 +1140,22 @@ public class PrefsFragment extends PreferenceFragment
                 Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to clear spedometer data." );
                 break;
 
+/*            case PREFS_ACTION_STORE_DATA:
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to store softboarddata." );
+                break;
+
+            case PREFS_ACTION_RECALL_DATA:
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to recall softboarddata." );
+                break;
+*/
+            case PREFS_ACTION_TEST_LOAD:
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to load test file in test mode." );
+                break;
+
+            case PREFS_ACTION_TEST_RETURN:
+                Scribe.note( Debug.PREF,  "PREFERENCE: server is notified to return from test mode." );
+                break;
+
             default:
                 Scribe.error( "PREFERENCE: preference action type is invalid!");
             }
@@ -1031,56 +1167,72 @@ public class PrefsFragment extends PreferenceFragment
      **/
 
     private static final int FILE_SELECTOR_REQUEST = 1;
+    private static final int TEST_SELECTOR_REQUEST = 2;
 
 
     public void onActivityResult(int requestCode, int resultCode, Intent data)
         {
         Scribe.locus( Debug.PREF );
 
-        if (requestCode == FILE_SELECTOR_REQUEST)
+        if (requestCode == FILE_SELECTOR_REQUEST && resultCode == Activity.RESULT_OK)
             {
-            if (resultCode == Activity.RESULT_OK)
-                {
-                //String result=data.getStringExtra("RESULT");
+            //String result=data.getStringExtra("RESULT");
 
-                //visszateres data reszben
-                String result = data.getData().getPath();
-                Toast.makeText(getActivity(), "File Clicked: " + result, Toast.LENGTH_LONG).show();
+            //visszateres data reszben
+            String result = data.getData().getPath();
+            //Toast.makeText(getActivity(), "File Clicked: " + result, Toast.LENGTH_LONG).show();
 
 /*
-                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-                SharedPreferences.Editor editor = sharedPrefs.edit();
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+            SharedPreferences.Editor editor = sharedPrefs.edit();
 
-                String fileName = data.getStringExtra(FileSelectorActivity.FILE_NAME);
-                if (fileName != null)
-                    editor.putString(getString(R.string.descriptor_file_key), fileName);
+            String fileName = data.getStringExtra(FileSelectorActivity.FILE_NAME);
+            if (fileName != null)
+                editor.putString(getString(R.string.descriptor_file_key), fileName);
 
-                String subDirectory = data.getStringExtra(FileSelectorActivity.DIRECTORY_SUB_PATH);
-                if (subDirectory != null)
-                    editor.putString(getString(R.string.descriptor_directory_key), subDirectory);
+            String subDirectory = data.getStringExtra(FileSelectorActivity.DIRECTORY_SUB_PATH);
+            if (subDirectory != null)
+                editor.putString(getString(R.string.descriptor_directory_key), subDirectory);
 
-                editor.apply();
+            editor.apply();
 */
 
-                String subDirectory = data.getStringExtra(FileSelectorActivity.DIRECTORY_SUB_PATH);
-                EditTextPreference descriptorDirectoryPreference =
-                        (EditTextPreference)findPreference( getString(R.string.descriptor_directory_key) );
-                descriptorDirectoryPreference.setText( subDirectory );
+            String subDirectory = data.getStringExtra(FileSelectorActivity.DIRECTORY_SUB_PATH);
+            EditTextPreference descriptorDirectoryPreference =
+                    (EditTextPreference)findPreference( getString(R.string.descriptor_directory_key) );
+            descriptorDirectoryPreference.setText( subDirectory );
 
-                String fileName = data.getStringExtra(FileSelectorActivity.FILE_NAME);
-                EditTextPreference descriptorFilePreference =
-                        (EditTextPreference)findPreference( getString(R.string.descriptor_file_key) );
-                descriptorFilePreference.setText( fileName );
+            String fileName = data.getStringExtra(FileSelectorActivity.FILE_NAME);
+            EditTextPreference descriptorFilePreference =
+                    (EditTextPreference)findPreference( getString(R.string.descriptor_file_key) );
+            descriptorFilePreference.setText( fileName );
 
 //                Scribe.debug(Debug.PREF, sharedPrefs.getString(getString(R.string.descriptor_file_key), ""));
 //                Scribe.debug(Debug.PREF, sharedPrefs.getString(getString(R.string.descriptor_directory_key), ""));
 
-                performAction(PREFS_ACTION_RELOAD);
-                }
-            else if (resultCode == Activity.RESULT_CANCELED)
-                {
-                Toast.makeText(getActivity(), "- C A N C E L -", Toast.LENGTH_SHORT).show();
-                }
+            performAction(PREFS_ACTION_RELOAD);
+            }
+
+        else if (requestCode == TEST_SELECTOR_REQUEST && resultCode == Activity.RESULT_OK)
+            {
+            String fileName = data.getStringExtra(FileSelectorActivity.FILE_NAME);
+            EditTextPreference testFilePreference =
+                    (EditTextPreference)findPreference( getString(R.string.test_file_key) );
+            testFilePreference.setText( fileName );
+
+            // Theoretically this is a valid test file
+            // Set TEST MODE on!
+
+            CheckBoxPreference testModePreference = (CheckBoxPreference)findPreference( getString(R.string.test_mode_key) );
+            testModePreference.setEnabled( true ); // Setting testFilePreference could set it on already
+            testModePreference.setChecked( true );
+
+            performAction(PREFS_ACTION_TEST_LOAD);
+            }
+
+        else if (resultCode == Activity.RESULT_CANCELED) // Any request code
+            {
+            Toast.makeText(getActivity(), "- C A N C E L -", Toast.LENGTH_SHORT).show();
             }
         }
 
@@ -1131,6 +1283,33 @@ public class PrefsFragment extends PreferenceFragment
                     return true;
                     }
                 });
+
+        findPreference(getString(R.string.test_select_key)).
+                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                    {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference)
+                        {
+                        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                        if ( checkDirectoryPreference( sharedPrefs ) != null )
+                            {
+                            String directoryName =
+                                    sharedPrefs.getString(getString(R.string.descriptor_directory_key),
+                                            getString(R.string.descriptor_directory_default));
+                            Intent intent = new Intent();
+                            intent.setClass(getActivity(), FileSelectorActivity.class);
+                            intent.putExtra(FileSelectorActivity.DIRECTORY_SUB_PATH, directoryName);
+                            intent.putExtra(FileSelectorActivity.ONE_DIRECTORY, true);
+                            // intent.putExtra( FileSelectorActivity.FILE_ENDING, ".txt");
+                            startActivityForResult(intent, TEST_SELECTOR_REQUEST);
+                            }
+                        else
+                            {
+                            Toast.makeText(getActivity(), "Directory is not valid!", Toast.LENGTH_SHORT).show();
+                            }
+                        return true;
+                        }
+                    });
 
         findPreference(getString(R.string.descriptor_reload_key)).
                 setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()

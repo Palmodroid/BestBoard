@@ -3,8 +3,8 @@
 
     <string name="descriptor_directory_default">"_bestboard"</string>
     <string name="descriptor_file_default">test.txt</string>
-    <bool name="use_testing_default">false</bool>
-    <string name="descriptor_testing_default">test.txt</string>
+    <bool name="test_mode_default">false</bool>
+    <string name="test_file_default">""</string>
 
     <bool name="drawing_hide_upper_default">false</bool>
     <bool name="drawing_hide_lower_default">false</bool>
@@ -73,7 +73,7 @@
 
     <bool name="editing_text_session_default">true</bool>
 
-    <bool name="debug_default">false</bool>
+    <bool name="debug_default">true</bool>
     <bool name="debug_grid_title_default">false</bool>
 
 </resources>

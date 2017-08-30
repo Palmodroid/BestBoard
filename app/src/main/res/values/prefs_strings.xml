@@ -12,7 +12,12 @@
 
     <string name="prefs_descriptor">Descriptor file</string>
 
-    <string name="descriptor_select_key">select</string>
+    <string name="test_mode_key">testmode</string>
+    <string name="test_mode_title">Use test file instead of main file</string>
+    <string name="test_mode_on">Test file is in use</string>
+    <string name="test_mode_off">Main file is in use</string>
+
+    <string name="descriptor_select_key">selectmain</string>
     <string name="descriptor_select_title">File selector</string>
     <string name="descriptor_select_summary">Select descriptor file and working directory</string>
 
@@ -23,24 +28,24 @@
     <string name="descriptor_directory_dialog_title">Name of working directory</string>
     <string name="descriptor_directory_dialog_message">Enter name of working directory! Directory should be below external storage directory.</string>
 
-    <string name="descriptor_file_key">descriptor</string>
+    <string name="descriptor_file_key">coatfile</string>
     <string name="descriptor_file_title">Name of descriptor file</string>
     <string name="descriptor_file_summary">Descriptor file: </string>
     <string name="descriptor_file_summary_invalid">Descriptor file cannot be found! </string>
     <string name="descriptor_file_dialog_title">Name of descriptor file</string>
     <string name="descriptor_file_dialog_message">Enter name of descriptor file! File should be in coat format!</string>
 
-    <string name="use_testing_key">usetesting</string>
-    <string name="use_testing_title">Use test file instead of main file</string>
-    <string name="use_testing_on">Test file is in use</string>
-    <string name="use_testing_off">Main file is in use</string>
+    <string name="test_select_key">selecttest</string>
+    <string name="test_select_title">File selector</string>
+    <string name="test_select_summary">Select descriptor file for testing</string>
 
-    <string name="descriptor_testing_key">testing</string>
-    <string name="descriptor_testing_title">Name of descriptor file under construction</string>
-    <string name="descriptor_testing_summary">Descriptor file: </string>
-    <string name="descriptor_testing_summary_invalid">Descriptor file cannot be found! </string>
-    <string name="descriptor_testing_dialog_title">Name of descriptor file</string>
-    <string name="descriptor_testing_dialog_message">Enter name of descriptor file! File should be in coat format!</string>
+    <string name="test_file_key">testfile</string>
+    <string name="test_file_title">Name of descriptor test file</string>
+    <string name="test_file_summary">Descriptor test file: </string>
+    <string name="test_file_summary_empty">Descriptor test file is not defined! </string>
+    <string name="test_file_summary_invalid">Descriptor test file cannot be found! </string>
+    <string name="test_file_dialog_title">Name of descriptor test file</string>
+    <string name="test_file_dialog_message">Enter name of descriptor test file! File should be in coat format!</string>
 
     <string name="descriptor_reload_key">reload</string>
     <string name="descriptor_reload_title">Force reload of descriptor file</string>

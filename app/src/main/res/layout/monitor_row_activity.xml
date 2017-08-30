@@ -25,34 +25,12 @@
         android:text="Main"/>
 
     <Button
-        android:id="@+id/store_button"
-        android:visibility="gone"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Store"/>
-
-    <Button
-        android:id="@+id/recall_button"
-        android:visibility="gone"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Recall"/>
-
-    <Button
         android:id="@+id/set_button"
         android:layout_weight="1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:text="Set"/>
 
-    <Button
-        android:id="@+id/draft_button"
-        android:layout_weight="1"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:text="Reload"/>
     </LinearLayout>
 
     <org.lattilad.bestboard.monitorrow.EditTextWithBackButton
