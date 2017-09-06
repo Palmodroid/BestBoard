@@ -9,6 +9,10 @@
     <string name="help_title">Show help</string>
     <string name="help_summary">Touch to show help page!</string>
 
+    <string name="settings_input_key">settingsinput</string>
+    <string name="settings_input_title">Show system input settings</string>
+    <string name="settings_input_summary">Touch to show system input settings!</string>
+
 
     <string name="prefs_descriptor">Descriptor file</string>
 

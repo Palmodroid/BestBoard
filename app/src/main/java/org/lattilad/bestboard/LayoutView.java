@@ -100,7 +100,7 @@ public class LayoutView extends View
 
                 requestLayout(); // it should be called later
                 }
-            
+
             this.layout = layout;
 
             // mainTouchBow cannot be null, but it cannot get value before setLayout
@@ -161,8 +161,18 @@ public class LayoutView extends View
     boolean fakeView = false;
 
     /**
-     * Called by SoftBoardProcessor.onCreateInputView() (after orientation change eg.)
-     */
+     ** There are two serious system errors here:
+     ** 1. Because of Navigation Bar measurement, after the first onMeasurement cycle
+     ** the TOP position is sometimes bad. This only occurs after orientation change
+     ** 2. After entering TEST MODE, there is an onMeasure cycle with false height values.
+     ** There is immiadetely a new cycle - with the right values -, but onDraw is NOT
+     ** started after the second cycle!
+     **
+     ** 1. Called by SoftBoardProcessor.onCreateInputView() (after orientation change eg.)
+     ** 2. Called by constructor of SoftBoardProcessor
+     **
+     ** Can be easier to call it from every setLayout??
+     **/
     public void measureFakeViewFirst()
         {
         fakeView = true;

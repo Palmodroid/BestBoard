@@ -802,6 +802,7 @@ public class SoftBoardProcessor implements
 
         layoutView = new LayoutView( softBoardService );
         layoutView.setLayout(this.softBoardData.boardTable.getActiveLayout());
+        layoutView.measureFakeViewFirst();
 
         softBoardService.setInputView(layoutView);
         }
@@ -821,6 +822,7 @@ public class SoftBoardProcessor implements
 
         layoutView.setLayout(softBoardData.boardTable.getActiveLayout());
         layoutView.measureFakeViewFirst(); // Because of navigation bar error
+
         return layoutView;
         }
 

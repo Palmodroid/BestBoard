@@ -198,7 +198,7 @@ public class SoftBoardService extends InputMethodService implements
         public void onClick( View view )
             {
             Intent intent = new Intent( SoftBoardService.this, PrefsActivity.class);
-            //intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
             startActivity(intent);
 
             // Keyboard picker is always available above Ver 4.0, so we use settings instead of picker
@@ -454,7 +454,7 @@ public class SoftBoardService extends InputMethodService implements
         if ( !isTestMode() )
             {
             Intent intent = new Intent(this, PrefsActivity.class);
-            //intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
             startActivity(intent);
             }
         else

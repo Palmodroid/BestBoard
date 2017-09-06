@@ -22,6 +22,7 @@ import static org.lattilad.bestboard.prefs.PrefsFragment.performAction;
  * startActivity(new Intent(getApplicationContext(), PermissionRequestActivity.class));
  * Process: org.lattilad.bestboard, PID: 31817
  * android.util.AndroidRuntimeException: Calling startActivity() from outside of an Activity  context requires the FLAG_ACTIVITY_NEW_TASK flag. Is this really what you want?
+ * NOT ANY MORE? (Mukodott, amikor kitoroltem, de csak android 7.0-ben)
  *
  * TEST:
  * Preferences:
@@ -144,7 +145,7 @@ public class MonitorRowActivity extends AppCompatActivity
                 {
                 Intent intent = new Intent(getApplicationContext(), PrefsActivity.class);
                 //intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT); // http://stackoverflow.com/a/36841529
-                //intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+                intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
                 startActivity(intent);
                 finish();
                 }

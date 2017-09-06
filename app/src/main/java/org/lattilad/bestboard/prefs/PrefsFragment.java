@@ -17,6 +17,7 @@ import org.lattilad.bestboard.Ignition;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.fileselector.FileSelectorActivity;
+import org.lattilad.bestboard.permission.RequestPermissionActivity;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.webview.WebViewActivity;
 
@@ -1260,6 +1261,31 @@ public class PrefsFragment extends PreferenceFragment
                     // getActivity() cannot be null, when button is displayed
                     Intent intent = new Intent( getActivity(), WebViewActivity.class);
                     intent.putExtra( WebViewActivity.WORK, "help.html" );
+                    startActivity(intent);
+                    return true;
+                    }
+                });
+
+        // Preference as button - only click behavior is used
+        findPreference(getString(R.string.settings_input_key)).
+                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                    {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference)
+                        {
+                    // getActivity() cannot be null, when button is displayed
+//                    Intent intent = new Intent();
+//                    intent.setAction(Settings.ACTION_INPUT_METHOD_SETTINGS);
+                    // per doc activity may not exist
+                    // intent.resolveActivity(packageManager) can be helpful
+//                    intent.addCategory(Intent.CATEGORY_DEFAULT);
+
+Intent intent = new Intent( getActivity(), RequestPermissionActivity.class);
+startActivity(intent);
+
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
                     startActivity(intent);
                     return true;
                     }

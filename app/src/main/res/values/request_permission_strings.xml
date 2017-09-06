@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="colorEnabledGreenBorder">#bbff99</color>
+    <color name="colorEnabledGreen">#ccffb3</color>
+
+    <string name="permission_welcome">"Before You begin…"</string>
+
+    <string name="permission_main_info">"Best\'s Board is a completely configurable hexagonal soft-keyboard."
+        "It uses plain text files to describe layouts."</string>
+
+    <string name="permission_data_info">"Descriptor text files are located on the external storage (sd-card) to be easily editable. "
+        "Best\'s Board will use only the working folder. "
+        "Please, grant permission to the data storage!"</string>
+    <string name="permission_data_ok">External storage access granted</string>
+    <string name="permission_data_button">Grant external storage access!</string>
+    <string name="permission_data_settings_button">Enter system settings \n to grant external storage access!</string>
+
+    <string name="permission_input_info">"Best\'s Board (as all soft-keyboards) should be enabled in system settings. "
+        "Best\'s Board DOES NOT store any keystrokes or any typed information, not even within the developer logs."</string>
+    <string name="permission_input_ok">BestBoard input method is enabled</string>
+    <string name="permission_input_settings_button">Enter system settings to \n enable BestBoard input method!</string>
+
+    <string name="permission_help_info">"Best\'s Board is easy to use! Select a predefined layout, and start typing! "
+        "You can modify layouts or create Your own layout. "
+        "Just open a coat descriptor file in Your favorite text editor. \n\n"
+        "The on-board manual (provided inside the working-folder) can be opened from the preferences "
+        "or right from here: "</string>
+    <string name="permission_help_button">Help!</string>
+
+    <string name="permission_goodbye">Have a good typing!</string>
+
+</resources>

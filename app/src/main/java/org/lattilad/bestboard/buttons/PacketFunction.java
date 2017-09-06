@@ -98,7 +98,7 @@ public class PacketFunction extends Packet
             // but it doesn't work without Single_top - BACK went back to an other instance
 
             Intent intent = new Intent( softBoardData.softBoardListener.getApplicationContext(), PrefsActivity.class);
-            //intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+            intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
             // http://stackoverflow.com/a/7910905 - cannot use single_top, etc. if startactivityforresult is used
             //intent.addFlags( Intent.FLAG_ACTIVITY_BROUGHT_TO_FRONT );
             //intent.addFlags( Intent.FLAG_ACTIVITY_LAUNCHED_FROM_HISTORY );

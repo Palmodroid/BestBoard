@@ -9,10 +9,20 @@
 			android:title="@string/help_title"
 			android:summary="@string/help_summary" />
 
-	</PreferenceCategory>
+        <Preference
+            android:key="@string/settings_input_key"
+            android:title="@string/settings_input_title"
+            android:summary="@string/settings_input_summary" />
+
+    </PreferenceCategory>
 
 	<PreferenceCategory
 		android:title="@string/prefs_descriptor">
+
+		<CheckBoxPreference
+			android:key="@string/test_mode_key"
+			android:title="@string/test_mode_title"
+			android:defaultValue="@bool/test_mode_default" />
 
 		<Preference
 			android:key="@string/descriptor_select_key"
@@ -35,7 +45,20 @@
 			android:dialogMessage="@string/descriptor_file_dialog_message"
 			android:defaultValue="@string/descriptor_file_default" />
 
-		<Preference
+        <Preference
+            android:key="@string/test_select_key"
+            android:title="@string/test_select_title"
+            android:summary="@string/test_select_summary" />
+
+        <EditTextPreference
+            android:key="@string/test_file_key"
+            android:title="@string/test_file_title"
+            android:summary="@string/test_file_summary_invalid"
+            android:dialogTitle="@string/test_file_dialog_title"
+            android:dialogMessage="@string/test_file_dialog_message"
+            android:defaultValue="@string/test_file_default" />
+
+        <Preference
 			android:key="@string/descriptor_reload_key"
 			android:title="@string/descriptor_reload_title"
 			android:summary="@string/descriptor_reload_summary" />

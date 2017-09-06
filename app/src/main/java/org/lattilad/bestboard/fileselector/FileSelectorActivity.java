@@ -305,7 +305,7 @@ public class FileSelectorActivity extends FragmentActivity
         if ( dir.equals( variables.rootDir) )
             this.setTitle("Contents of External Storage");
         else
-            this.setTitle("Current Dir: " + dir.getName());
+            this.setTitle("Contents of " + dir.getName());
 
         List<FileEntry>dirEntries = new ArrayList<FileEntry>();
         List<FileEntry>fileEntries = new ArrayList<FileEntry>();
@@ -405,7 +405,7 @@ public class FileSelectorActivity extends FragmentActivity
     @Override
     public void onBackPressed()
         {
-        if ( !variables.currentDir.equals( variables.rootDir ) )
+        if ( !variables.currentDir.equals( variables.rootDir ) && !variables.oneDirectory )
             {
             populateList( variables.currentDir.getParentFile(), variables.currentDir );
             }
