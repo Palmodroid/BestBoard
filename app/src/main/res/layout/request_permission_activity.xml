@@ -12,6 +12,12 @@
         android:divider="@drawable/divider"
         android:orientation="vertical">
 
+        <ImageView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@mipmap/start_button"
+            android:contentDescription="@string/image"/>
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -32,6 +38,7 @@
             android:text="@string/permission_data_info"/>
 
         <TextView
+            android:id="@+id/permission_data_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -60,6 +67,7 @@
             android:text="@string/permission_input_info"/>
 
         <TextView
+            android:id="@+id/permission_input_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
@@ -79,13 +87,17 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/permission_help_info"/>
+            android:text="@string/permission_help_info"
+
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/permission_help_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/permission_help_button"/>
+            android:text="@string/permission_help_button"
+
+            android:visibility="gone" />
 
         <TextView
             android:layout_width="wrap_content"

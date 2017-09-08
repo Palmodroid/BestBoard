@@ -53,6 +53,7 @@ public class Debug
     public static final int BOARDTABLE = 60;
 
     public static final int BUTTON = 60;
+    public static final int PERMISSION = 960;
 
     // Other settings
 

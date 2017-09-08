@@ -11,8 +11,10 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.lattilad.bestboard.R;
+import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.fileselector.FileSelectorActivity;
 import org.lattilad.bestboard.prefs.PrefsActivity;
+import org.lattilad.bestboard.scribe.Scribe;
 
 import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_TEST_LOAD;
 import static org.lattilad.bestboard.prefs.PrefsFragment.PREFS_ACTION_TEST_RETURN;
@@ -64,11 +66,27 @@ import static org.lattilad.bestboard.prefs.PrefsFragment.performAction;
 public class MonitorRowActivity extends AppCompatActivity
     {
     private static final int TEST_SELECTOR_REQUEST = 2;
+    private Button mainButton;
+
+    @Override
+    protected void onResume()
+        {
+        super.onResume();
+        Scribe.locus(Debug.PERMISSION);
+
+        // When returning from Activity, only onResume and onStart are called to check the test bit
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
+        boolean testMode = sharedPrefs.getBoolean(getString(R.string.test_mode_key),
+                getResources().getBoolean(R.bool.test_mode_default));
+
+        mainButton.setVisibility( testMode ? View.VISIBLE : View.GONE );
+        }
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
         {
         super.onCreate(savedInstanceState);
+        Scribe.locus(Debug.PERMISSION);
 
         setContentView(R.layout.monitor_row_activity);
         //getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
@@ -113,7 +131,7 @@ public class MonitorRowActivity extends AppCompatActivity
             });
 
 
-        Button mainButton = ((Button) findViewById(R.id.main_button));
+        mainButton = ((Button) findViewById(R.id.main_button));
         mainButton.setOnClickListener(new View.OnClickListener()
             {
             @Override
@@ -130,13 +148,6 @@ public class MonitorRowActivity extends AppCompatActivity
                 finish();
                 }
             });
-
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
-        boolean testMode = sharedPrefs.getBoolean(getString(R.string.test_mode_key),
-                getResources().getBoolean(R.bool.test_mode_default));
-
-        mainButton.setVisibility( testMode ? View.VISIBLE : View.GONE );
-
 
         ((Button) findViewById(R.id.set_button)).setOnClickListener(new View.OnClickListener()
             {

@@ -1273,19 +1273,7 @@ public class PrefsFragment extends PreferenceFragment
                     @Override
                     public boolean onPreferenceClick(Preference preference)
                         {
-                    // getActivity() cannot be null, when button is displayed
-//                    Intent intent = new Intent();
-//                    intent.setAction(Settings.ACTION_INPUT_METHOD_SETTINGS);
-                    // per doc activity may not exist
-                    // intent.resolveActivity(packageManager) can be helpful
-//                    intent.addCategory(Intent.CATEGORY_DEFAULT);
-
-Intent intent = new Intent( getActivity(), RequestPermissionActivity.class);
-startActivity(intent);
-
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
-                    intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
+                    Intent intent = new Intent( getActivity(), RequestPermissionActivity.class);
                     startActivity(intent);
                     return true;
                     }

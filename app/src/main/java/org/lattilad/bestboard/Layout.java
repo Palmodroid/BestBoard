@@ -11,7 +11,6 @@ import android.graphics.Typeface;
 import org.lattilad.bestboard.buttons.Button;
 import org.lattilad.bestboard.buttons.ButtonForMaps;
 import org.lattilad.bestboard.buttons.ButtonMonitorRow;
-import org.lattilad.bestboard.buttons.PacketTextSimple;
 import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.parser.Tokenizer;
@@ -319,7 +318,7 @@ public class Layout
         // ADDBUTTON will fill up this array
 
         //**************************************
-        Button button = new ButtonMonitorRow( new PacketTextSimple(softBoardData, "MONITOR"));
+        Button button = new ButtonMonitorRow( );
         button.setPosition(this, 0, 0);
         buttons[0] = button;
         //**************************************
