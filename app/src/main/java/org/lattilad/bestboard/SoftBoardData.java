@@ -12,6 +12,7 @@ import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.codetext.CodeTextProcessor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
+import org.lattilad.bestboard.monitorrow.TestModeActivity;
 import org.lattilad.bestboard.prefs.PrefsFragment;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.states.BoardTable;
@@ -480,7 +481,13 @@ public class SoftBoardData
 
     public String getMonitorString()
         {
-        return monitorString;
+        // to show timing
+        // return monitorString;
+
+        if ( TestModeActivity.isTestMode( softBoardListener.getApplicationContext() ) )
+            return "TEST-MODE";
+        else
+            return "MAIN-MODE";
         }
 
 

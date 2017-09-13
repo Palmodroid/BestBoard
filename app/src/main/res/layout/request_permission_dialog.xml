@@ -35,30 +35,36 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:text="@string/permission_data_info"/>
+            android:text="@string/permission_storage_info"/>
 
         <TextView
-            android:id="@+id/permission_data_ok"
+            android:id="@+id/permission_storage_ok"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
             android:padding="@dimen/spacing"
             android:background="@drawable/background_enabled"
             android:textColor="@color/text"
-            android:text="@string/permission_data_ok"
+            android:text="@string/permission_storage_ok"
             android:textStyle="normal|italic"/>
 
+        <!--    This Button style was nicer (called from Activity
+                PreferenceDialog do not use the sam style           -->
         <Button
-            android:id="@+id/permission_data_button"
+            android:id="@+id/permission_storage_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/permission_data_button"/>
+            android:textAllCaps="true"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:text="@string/permission_storage_button"/>
 
         <Button
-            android:id="@+id/permission_data_settings_button"
+            android:id="@+id/permission_storage_settings_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/permission_data_settings_button"/>
+            android:textAllCaps="true"
+            android:textAppearance="?android:textAppearanceSmall"
+            android:text="@string/permission_storage_settings_button"/>
 
         <TextView
             android:layout_width="wrap_content"
@@ -81,6 +87,8 @@
             android:id="@+id/permission_input_settings_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:textAllCaps="true"
+            android:textAppearance="?android:textAppearanceSmall"
             android:text="@string/permission_input_settings_button"/>
 
         <TextView
@@ -96,6 +104,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/permission_help_button"
+            android:textAllCaps="true"
+            android:textAppearance="?android:textAppearanceSmall"
 
             android:visibility="gone" />
 

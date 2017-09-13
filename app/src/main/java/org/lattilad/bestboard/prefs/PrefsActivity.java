@@ -5,6 +5,7 @@ import android.os.Bundle;
 
 import org.lattilad.bestboard.Ignition;
 import org.lattilad.bestboard.debug.Debug;
+import org.lattilad.bestboard.permission.RequestPermissionDialog;
 import org.lattilad.bestboard.scribe.Scribe;
 
 /**
@@ -31,49 +32,84 @@ import org.lattilad.bestboard.scribe.Scribe;
  * Preferences can be read:
  * SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( getContext() );
  * boolean pref = sharedPrefs.getBoolean( getContext().getString( R.string.pref_key ), false);
+ *
+ * https://stackoverflow.com/questions/32070186/how-to-use-the-v7-v14-preference-support-library
  */
 
 /**
  * PrefsActivity only starts PrefsFragment
  * All preferences are managed by PrefsFragment
  */
-public class PrefsActivity extends Activity
+public class PrefsActivity extends Activity // https://stackoverflow.com/a/31297546
+        implements RequestPermissionDialog.OnDialogFinishListener
     {
     private static String PREFS_FRAGMENT_TAG = "org.lattilad.bestboard.prefs";
 
     /**
      * This is the only method needed by PrefsActivity.
      * It only finds (or creates if missing) fragment and set it as root view
+     *
      * @param savedInstanceState savedInstanceState - not used
      */
     @Override
-    public void onCreate( Bundle savedInstanceState )
+    public void onCreate(Bundle savedInstanceState)
         {
         super.onCreate(savedInstanceState);
 
-        // This should be called at every starting point
-        Ignition.start(this);
+        // No file log before getting
+        Scribe.disableFileLog();
 
-        Scribe.locus( Debug.PREF );
+        Scribe.locus(Debug.PREF);
 
         // Preference manager should save/recreate the fragment instance
-        PrefsFragment prefsFragment = (PrefsFragment)getFragmentManager()
+        PrefsFragment prefsFragment = (PrefsFragment) getFragmentManager()
                 .findFragmentByTag(PREFS_FRAGMENT_TAG);
-        if ( prefsFragment == null )
+        if (prefsFragment == null)
             {
-            Scribe.debug( Debug.PREF, "New preference fragment is created." );
+            Scribe.debug(Debug.PREF, "New preference fragment is created.");
             prefsFragment = new PrefsFragment();
             }
         else
             {
-            Scribe.debug( Debug.PREF, "Preference fragment is restored." );
+            Scribe.debug(Debug.PREF, "Preference fragment is restored.");
             }
 
         // android.R.id.content is the root view
         // but it can hidden behind action bar - http://stackoverflow.com/a/4488149
         // - !! not modified yet !!
         getFragmentManager().beginTransaction()
-                .replace( android.R.id.content, prefsFragment, PREFS_FRAGMENT_TAG )
+                .replace(android.R.id.content, prefsFragment, PREFS_FRAGMENT_TAG)
                 .commit();
+
+        Scribe.locus(Debug.PERMISSION);
+
+        RequestPermissionDialog requestPermissionDialog =
+                (RequestPermissionDialog)getFragmentManager().findFragmentByTag("dialog");
+        if ( requestPermissionDialog == null )
+            {
+            Scribe.debug(Debug.PERMISSION, "Permission dialog is not found, it should be recreated!");
+            requestPermissionDialog = RequestPermissionDialog.newInstance();
+            // requestPermissionDialog.setRetainInstance(true); - do not need to retain
+            // testDialog.setCancelable(false);
+            requestPermissionDialog.show( getFragmentManager(), "dialog");
+            }
+        else
+            Scribe.debug(Debug.PERMISSION, "Permission dialog is found");
+        }
+
+    @Override
+    public void onFinish(boolean ready)
+        {
+        if ( ready )
+            {
+            // Permissions are ready. We could start here
+            // This should be called at every starting point
+            Ignition.start(this);
+            }
+        else
+            {
+            // User want to escape without giving permissions
+            finish();
+            }
         }
     }

@@ -1,6 +1,7 @@
 package org.lattilad.bestboard.monitorrow;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
@@ -63,7 +64,7 @@ import static org.lattilad.bestboard.prefs.PrefsFragment.performAction;
  * if not - reloads
  */
 
-public class MonitorRowActivity extends AppCompatActivity
+public class TestModeActivity extends AppCompatActivity
     {
     private static final int TEST_SELECTOR_REQUEST = 2;
     private Button mainButton;
@@ -75,11 +76,7 @@ public class MonitorRowActivity extends AppCompatActivity
         Scribe.locus(Debug.PERMISSION);
 
         // When returning from Activity, only onResume and onStart are called to check the test bit
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
-        boolean testMode = sharedPrefs.getBoolean(getString(R.string.test_mode_key),
-                getResources().getBoolean(R.bool.test_mode_default));
-
-        mainButton.setVisibility( testMode ? View.VISIBLE : View.GONE );
+        mainButton.setVisibility(isTestMode( this ) ? View.VISIBLE : View.GONE);
         }
 
     @Override
@@ -102,21 +99,14 @@ public class MonitorRowActivity extends AppCompatActivity
                 }
             });
 
-        Button testButton = ((Button) findViewById(R.id.test_button));
+        final Button testButton = ((Button) findViewById(R.id.test_button));
         testButton.setOnClickListener(new View.OnClickListener()
             {
             @Override
             public void onClick(View view)
                 {
-                SharedPreferences sharedPrefs =
-                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                String testFileName =
-                        sharedPrefs.getString(getString(R.string.test_file_key),
-                                getString(R.string.test_file_default));
-                if ( testFileName.isEmpty() )
-                    selectTestFile();
-                else
-                    loadTestFile();
+                loadOrSelectTestFile();
+                finish();
                 }
             });
 
@@ -137,14 +127,7 @@ public class MonitorRowActivity extends AppCompatActivity
             @Override
             public void onClick(View view)
                 {
-                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-                SharedPreferences.Editor editor = sharedPrefs.edit();
-
-                editor.putBoolean(getString(R.string.test_mode_key), false);
-
-                editor.apply();
-
-                performAction(getApplicationContext(), PREFS_ACTION_TEST_RETURN);
+                returnToMainFile();
                 finish();
                 }
             });
@@ -156,13 +139,47 @@ public class MonitorRowActivity extends AppCompatActivity
                 {
                 Intent intent = new Intent(getApplicationContext(), PrefsActivity.class);
                 //intent.addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT); // http://stackoverflow.com/a/36841529
-                intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 startActivity(intent);
                 finish();
                 }
             });
         }
 
+
+    /**
+     * Sets TESTMODE flag, and starts PREFS_ACTION_TEST_LOAD
+     */
+    void loadTestFile()
+        {
+        loadTestFile( this );
+        }
+
+    static void loadTestFile( Context context )
+        {
+        setTestMode( context, true );
+        performAction( context , PREFS_ACTION_TEST_LOAD);
+        }
+
+    /**
+     * Clears TESTMODE flag, and starts PREFS_ACTION_TEST_RETURN
+     */
+    void returnToMainFile()
+        {
+        returnToMainFile( this );
+        }
+
+    static void returnToMainFile( Context context )
+        {
+        setTestMode( context, false );
+        performAction( context, PREFS_ACTION_TEST_RETURN);
+        }
+
+
+    /**
+     * Starts FileSelectorActivity to select test file
+     * Selected test file is loaded in onActivityResult
+     */
     void selectTestFile()
         {
         SharedPreferences sharedPrefs =
@@ -178,6 +195,31 @@ public class MonitorRowActivity extends AppCompatActivity
         startActivityForResult(intent, TEST_SELECTOR_REQUEST);
         }
 
+
+    /**
+     * If testFile is empty selects it, otherwise loads it
+     */
+    void loadOrSelectTestFile()
+        {
+        if ( isTestFileNameEmpty( this ) )
+            selectTestFile();
+        else
+            loadTestFile();
+        }
+
+    static boolean isTestFileNameEmpty( Context context )
+        {
+        SharedPreferences sharedPrefs =
+                PreferenceManager.getDefaultSharedPreferences( context );
+        String testFileName =
+                sharedPrefs.getString( context.getString(R.string.test_file_key),
+                        context.getString(R.string.test_file_default));
+        return testFileName.isEmpty();
+        }
+
+    /**
+     * Next step of select test file: Saves selected test file name, and then loads it
+     */
     protected void onActivityResult(int requestCode, int resultCode, Intent data)
         {
         if (requestCode == TEST_SELECTOR_REQUEST)
@@ -205,16 +247,44 @@ public class MonitorRowActivity extends AppCompatActivity
             }
         }
 
-    void loadTestFile()
+
+    public static boolean isTestMode( Context context )
         {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
+        return sharedPrefs.getBoolean( context.getString(R.string.test_mode_key),
+                context.getResources().getBoolean(R.bool.test_mode_default));
+        }
+
+
+    public static void setTestMode( Context context, boolean testMode )
+        {
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( context );
         SharedPreferences.Editor editor = sharedPrefs.edit();
-
-        editor.putBoolean(getString(R.string.test_mode_key), true);
-
+        editor.putBoolean( context.getString(R.string.test_mode_key), testMode );
         editor.apply();
+        }
 
-        performAction(this, PREFS_ACTION_TEST_LOAD);
-        finish();
+
+    /**
+     * Secondary function of MonitorRowButton and TEST function
+     * TESTMODE true:
+     * returns to MAIN
+     * TESTMODE false:
+     * if test-file is not empty - loads TEST
+     * @param context context is needed
+     */
+    public static void toggleTestMode( Context context )
+        {
+        if ( isTestMode( context ) )
+            {
+            returnToMainFile( context );
+            }
+        else
+            {
+            if (!isTestFileNameEmpty(context))
+                {
+                loadTestFile( context );
+                }
+            }
         }
     }

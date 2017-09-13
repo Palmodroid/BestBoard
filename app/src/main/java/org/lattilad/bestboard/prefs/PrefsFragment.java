@@ -1,5 +1,6 @@
 package org.lattilad.bestboard.prefs;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -17,12 +18,11 @@ import org.lattilad.bestboard.Ignition;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.fileselector.FileSelectorActivity;
-import org.lattilad.bestboard.permission.RequestPermissionActivity;
+import org.lattilad.bestboard.parser.TokenizerTest;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.webview.WebViewActivity;
 
 import java.io.File;
-
 
 /**
  * PrefsFragment manages all preferences.
@@ -956,7 +956,7 @@ public class PrefsFragment extends PreferenceFragment
      * This method now is only used in PrefsFragment, parsing will check the files once more.
      * If it will be used more generally, then getAction() should be checked against null!
      */
-    private File checkDirectoryPreference( SharedPreferences sharedPrefs )
+    private File checkDirectoryPreference(SharedPreferences sharedPrefs )
         {
         // These cannot be null, if prefs.xml is valid
         Preference directoryPreference = findPreference( getString( R.string.descriptor_directory_key ) );
@@ -1266,19 +1266,6 @@ public class PrefsFragment extends PreferenceFragment
                     }
                 });
 
-        // Preference as button - only click behavior is used
-        findPreference(getString(R.string.settings_input_key)).
-                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
-                    {
-                    @Override
-                    public boolean onPreferenceClick(Preference preference)
-                        {
-                    Intent intent = new Intent( getActivity(), RequestPermissionActivity.class);
-                    startActivity(intent);
-                    return true;
-                    }
-                });
-
         findPreference(getString(R.string.descriptor_select_key)).
                 setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
                 {
@@ -1371,6 +1358,20 @@ public class PrefsFragment extends PreferenceFragment
                     return true;
                     }
                 });
+
+        // Preference as button - only click behavior is used
+        findPreference(getString(R.string.debug_token_key)).
+                setOnPreferenceClickListener(new Preference.OnPreferenceClickListener()
+                    {
+                    @Override
+                    public boolean onPreferenceClick(Preference preference)
+                        {
+                        Intent intent = new Intent( getActivity(), TokenizerTest.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                        startActivity(intent);
+                        return true;
+                        }
+                    });
 
         // Prepare dialog messages
         prepareIntPrefsDialogMessage();

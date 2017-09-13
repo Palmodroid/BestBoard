@@ -9,10 +9,6 @@
     <string name="help_title">Show help</string>
     <string name="help_summary">Touch to show help page!</string>
 
-    <string name="settings_input_key">settingsinput</string>
-    <string name="settings_input_title">Show system input settings</string>
-    <string name="settings_input_summary">Touch to show system input settings!</string>
-
 
     <string name="prefs_descriptor">Descriptor file</string>
 
@@ -234,6 +230,10 @@
     <string name="debug_key">debug</string>
     <string name="debug_title">Enable developer log</string>
     <string name="debug_summary">Detailed developer log can be enabled for debugging</string>
+
+    <string name="debug_token_key">debugtoken</string>
+    <string name="debug_token_title">Start tokenizer</string>
+    <string name="debug_token_summary">Use only, if You know what is it for!</string>
 
     <string name="debug_grid_title_key">gridtitle</string>
     <string name="debug_grid_title_title">Numbers on hexagons</string>

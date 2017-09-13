@@ -9,12 +9,12 @@
     <string name="permission_main_info">"Best\'s Board is a completely configurable hexagonal soft-keyboard."
         "It uses plain text files to describe layouts."</string>
 
-    <string name="permission_data_info">"Descriptor text files are located on the external storage (sd-card) to be easily editable. "
+    <string name="permission_storage_info">"Descriptor text files are located on the external storage (sd-card) to be easily editable. "
         "Best\'s Board will use only the working folder. "
         "Please, grant permission to the data storage!"</string>
-    <string name="permission_data_ok">External storage access granted</string>
-    <string name="permission_data_button">Grant external storage access!</string>
-    <string name="permission_data_settings_button">Enter system settings \n to grant external storage access!</string>
+    <string name="permission_storage_ok">External storage access granted</string>
+    <string name="permission_storage_button">Grant external storage access!</string>
+    <string name="permission_storage_settings_button">Enter system settings \n to grant external storage access!</string>
 
     <string name="permission_input_info">"Best\'s Board (as all soft-keyboards) should be enabled in system settings. "
         "Best\'s Board DOES NOT store any keystrokes or any typed information, not even within the developer logs."</string>
@@ -29,5 +29,7 @@
     <string name="permission_help_button">Help!</string>
 
     <string name="permission_goodbye">Have a good typing!</string>
+
+    <string name="permission_ready">Permissions are granted!</string>
 
 </resources>

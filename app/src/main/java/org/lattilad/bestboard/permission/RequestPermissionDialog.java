@@ -2,7 +2,9 @@ package org.lattilad.bestboard.permission;
 
 
 import android.app.Activity;
+import android.app.DialogFragment;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -12,7 +14,10 @@ import android.preference.PreferenceManager;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.Window;
 import android.view.inputmethod.InputMethodInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -26,32 +31,27 @@ import org.lattilad.bestboard.scribe.Scribe;
 
 import java.util.List;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+
 /**
- * User needs to give 2 types of "permissions" for BestBoard:
- * - grant WRITE_EXTERNAL_STROAGE system permission (storage)
- * - enable INPUT METHOD (input)
+ * Permission is essential for BestBoard to work
+ * There are two possibilities:
+ * - PermissionACTIVITY starts first, and it starts PrefsActivity, if perm.s are granted
+ * - PermissionDIALOGFRAGMENT asks for permissions
  *
- * STORAGE:
- * BestBoard gives information about STORAGE at the very beginning.
- * This permission can be granted via system dialogs.
- * If these dialogs are disabled, then permission can be set only
- * at the system settings of the application.
+ * Good guide to create DialogFragments:
+ * https://guides.codepath.com/android/Using-DialogFragment
  *
- * onRequestPermissionsResult will not work, if permission is granted inside settings,
- * so permission changes are checked in the onResume method.
- *
- * INPUT:
- * Input method should be enabled among system settings (PermissionInputSettingsButton),
- * and can be checked by InputMethodManager.
- * BestBoard cannot be selected without enabling it.
- *
- * Both permissions are checked within the onResume method,
- * because both permissions can be set outside this activity.
  */
-public class RequestPermissionActivity extends Activity
+
+public class RequestPermissionDialog extends DialogFragment
     {
     // Preference needed by checkStorage()
     private String PERMISSION_ALREADY_REQUESTED = "permissionrequested";
+
+    // only false to true changes should RELOAD bestboard
+    // this should be RETAINED!!
+    private boolean previousCheckStorage = true;
 
     private Button PermissionStorageButton;
     private Button PermissionStorageSettingsButton;
@@ -60,15 +60,90 @@ public class RequestPermissionActivity extends Activity
     private Button PermissionInputSettingsButton;
     private TextView PermissionInputOk;
 
+    OnDialogFinishListener onDialogFinishListener;
+
+    // The container Activity must implement this interface so the frag can deliver messages
+    public interface OnDialogFinishListener
+        {
+        public void onFinish( boolean ready );
+        }
+
+    // Fragment needs an empty constructor - still don't understand why
+    public RequestPermissionDialog() {super();}
+
+    public static RequestPermissionDialog newInstance()
+        {
+        Scribe.locus(Debug.PERMISSION);
+
+        RequestPermissionDialog requestPermissionDialog = new RequestPermissionDialog();
+        // needed to check preference change to true
+        requestPermissionDialog.setRetainInstance( true );
+
+        return requestPermissionDialog;
+        }
 
     @Override
-    protected void onCreate(Bundle savedInstanceState)
+    public void onAttach(Activity context)
         {
-        super.onCreate(savedInstanceState);
+        Scribe.locus(Debug.PERMISSION);
+        super.onAttach(context);
 
-        setContentView(R.layout.request_permission_dialog);
-        //getWindow().setLayout(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
-        this.setFinishOnTouchOutside(false);
+        try
+            {
+            onDialogFinishListener = (OnDialogFinishListener) context;
+            }
+        catch (ClassCastException e)
+            {
+            throw new ClassCastException( context.toString() + " must implement OnInputReadyListener");
+            }
+        }
+
+
+    @Override
+    public void onDetach()
+        {
+        Scribe.locus(Debug.PERMISSION);
+        super.onDetach();
+
+        onDialogFinishListener = null;
+        }
+
+
+    // http://code.google.com/p/android/issues/detail?id=17423
+    // http://stackoverflow.com/questions/8235080/fragments-dialogfragment-and-screen-rotation
+    // http://stackoverflow.com/questions/8417885/android-fragments-retaining-an-asynctask-during-screen-rotation-or-configuratio
+    // http://stackoverflow.com/questions/3078389/java-default-no-argument-constructor
+    @Override
+    public void onDestroyView()
+        {
+        Scribe.locus(Debug.PERMISSION);
+        if (getDialog() != null && getRetainInstance())
+            getDialog().setDismissMessage(null);
+        super.onDestroyView();
+        }
+
+
+    @Override
+    public void onCancel(DialogInterface dialog)
+        {
+        Scribe.locus(Debug.PERMISSION);
+        super.onCancel(dialog);
+
+        // IF PERMISSIONS ARE GIVEN, FRAGMENT WILL DISMISS IN ONRESUME!
+        onDialogFinishListener.onFinish( false );
+        }
+
+
+    // onCreateView is called after onAttach
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+                             Bundle savedInstanceState)
+        {
+        Scribe.locus(Debug.PERMISSION);
+        View view = inflater.inflate(R.layout.request_permission_dialog, container);
+
+        getDialog().requestWindowFeature(Window.FEATURE_NO_TITLE); // https://stackoverflow.com/a/15279400
+        getDialog().setCanceledOnTouchOutside( false ); // https://stackoverflow.com/questions/16480114/dialogfragment-setcancelable-property-not-working
 
         /*
          * GRANTING STORAGE PERMISSION
@@ -76,26 +151,26 @@ public class RequestPermissionActivity extends Activity
 
         // Asks permission for storage (external storage write access)
         // Stores that permission was already asked
-        PermissionStorageButton = (Button) (findViewById(R.id.permission_storage_button));
+        PermissionStorageButton = (Button) (view.findViewById(R.id.permission_storage_button));
         PermissionStorageButton.setOnClickListener(new View.OnClickListener()
             {
             @Override
             public void onClick(View view)
                 {
                 // Permission request code is not handled, permission is checked in the onResume method
-                ActivityCompat.requestPermissions( RequestPermissionActivity.this,
+                ActivityCompat.requestPermissions( getActivity(),
                         new String[]{android.Manifest.permission.WRITE_EXTERNAL_STORAGE},
                         1234);
 
                 // Set PERMISSION_ALREADY_REQUESTED flag
-                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( getApplicationContext() );
+                SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( getActivity() );
                 SharedPreferences.Editor editor = sharedPrefs.edit();
                 editor.putBoolean(PERMISSION_ALREADY_REQUESTED, true );
                 editor.apply();
                 }
             });
 
-        PermissionStorageSettingsButton = (Button) (findViewById(R.id.permission_storage_settings_button));
+        PermissionStorageSettingsButton = (Button) ( view.findViewById(R.id.permission_storage_settings_button));
         PermissionStorageSettingsButton.setOnClickListener(new View.OnClickListener()
             {
             @Override
@@ -104,7 +179,7 @@ public class RequestPermissionActivity extends Activity
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                 intent.addCategory(Intent.CATEGORY_DEFAULT);
-                intent.setData(Uri.parse("package:" + getPackageName()));
+                intent.setData(Uri.parse("package:" + getActivity().getPackageName()));
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
                 intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
                 intent.addFlags(Intent.FLAG_ACTIVITY_EXCLUDE_FROM_RECENTS);
@@ -112,14 +187,14 @@ public class RequestPermissionActivity extends Activity
                 }
             });
 
-        PermissionStorageOk = (TextView) (findViewById(R.id.permission_storage_ok));
+        PermissionStorageOk = (TextView) (view.findViewById(R.id.permission_storage_ok));
 
 
         /*
          * ENABLING INPUT METHOD
          */
 
-        PermissionInputSettingsButton = (Button) (findViewById(R.id.permission_input_settings_button));
+        PermissionInputSettingsButton = (Button) (view.findViewById(R.id.permission_input_settings_button));
         PermissionInputSettingsButton.setOnClickListener(new View.OnClickListener()
             {
             @Override
@@ -137,14 +212,16 @@ public class RequestPermissionActivity extends Activity
                 }
             });
 
-        PermissionInputOk = (TextView) (findViewById(R.id.permission_input_ok));
+        PermissionInputOk = (TextView) (view.findViewById(R.id.permission_input_ok));
 
+        return view;
         }
 
 
     @Override
-    protected void onResume()
+    public void onResume()
         {
+        Scribe.locus(Debug.PERMISSION);
         super.onResume();
 
         boolean storageEnabled = checkStorage();
@@ -153,15 +230,12 @@ public class RequestPermissionActivity extends Activity
         // if both permissions are ready, we could finish
         if ( storageEnabled && inputEnabled )
             {
-            Toast.makeText(this, getString(R.string.permission_ready), Toast.LENGTH_SHORT).show();
-            // Call the next activity from here !!!!
-            finish(); // - https://stackoverflow.com/questions/18957125/how-to-finish-activity-when-starting-other-activity-in-android
+            Toast.makeText(getActivity(), getString(R.string.permission_ready), Toast.LENGTH_SHORT).show();
+            onDialogFinishListener.onFinish( true );
+            dismiss();
             }
         }
 
-
-    // only false to true changes should RELOAD bestboard
-    private boolean previousCheckStorage = true;
 
     public static boolean isStorageEnabled(Context context )
         {
@@ -170,18 +244,19 @@ public class RequestPermissionActivity extends Activity
                 PackageManager.PERMISSION_GRANTED;
         }
 
+
     /**
      * Check whether Storage Permisson is granted, and sets views according to the result
      * @return true if enabled, false if not
      */
     boolean checkStorage()
         {
-        if ( isStorageEnabled( this ) )
+        if ( isStorageEnabled( getActivity() ) )
             {
             Scribe.debug(Debug.PERMISSION, "Storage permission is granted" );
 
             // if true, clear PERMISSION_ALREADY_REQUESTED flag
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( getActivity() );
             SharedPreferences.Editor editor = sharedPrefs.edit();
             editor.putBoolean(PERMISSION_ALREADY_REQUESTED, false);
             editor.apply();
@@ -194,7 +269,7 @@ public class RequestPermissionActivity extends Activity
             if ( !previousCheckStorage ) // false -> true change
                 {
                 Scribe.debug(Debug.PERMISSION, "Storage permission is changed to ENABLED, BestBoard should reload. (if already started)" );
-                PrefsFragment.performAction(this, PrefsFragment.PREFS_ACTION_RELOAD);
+                PrefsFragment.performAction( getActivity(), PrefsFragment.PREFS_ACTION_RELOAD);
                 }
             previousCheckStorage = true;
             }
@@ -209,11 +284,11 @@ public class RequestPermissionActivity extends Activity
             // should show rationale:
             //      - Consequent run, user is not decided yet
             boolean shouldShowRequestPermissionRationale =
-                    ActivityCompat.shouldShowRequestPermissionRationale(this,
+                    ActivityCompat.shouldShowRequestPermissionRationale( getActivity(),
                             android.Manifest.permission.WRITE_EXTERNAL_STORAGE);
 
             // read PERMISSION_ALREADY_REQUESTED flag
-            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( getApplicationContext() );
+            SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( getActivity() );
             boolean permissionRequested = sharedPrefs.getBoolean(PERMISSION_ALREADY_REQUESTED, false );
 
             if ( !permissionRequested ||                    // not yet requested, first run
@@ -266,7 +341,7 @@ public class RequestPermissionActivity extends Activity
         {
         Scribe.locus(Debug.PERMISSION);
 
-        if (isInputEnabled(this))
+        if (isInputEnabled(getActivity()))
             {
             PermissionInputSettingsButton.setVisibility(View.GONE);
             PermissionInputOk.setVisibility(View.VISIBLE);

@@ -15,8 +15,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import org.lattilad.bestboard.debug.Debug;
+import org.lattilad.bestboard.monitorrow.TestModeActivity;
 import org.lattilad.bestboard.parser.SoftBoardParser;
 import org.lattilad.bestboard.parser.SoftBoardParser.SoftBoardParserListener;
+import org.lattilad.bestboard.permission.RequestPermissionDialog;
 import org.lattilad.bestboard.prefs.PrefsActivity;
 import org.lattilad.bestboard.prefs.PrefsFragment;
 import org.lattilad.bestboard.scribe.Scribe;
@@ -270,28 +272,15 @@ public class SoftBoardService extends InputMethodService implements
         }
 
 
-    private boolean isTestMode()
-        {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
-        boolean testMode = sharedPrefs.getBoolean(getString(R.string.test_mode_key),
-                getResources().getBoolean(R.bool.test_mode_default));
-        return testMode;
-        }
-
-    private void stopTestMode()
-        {
-        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences( this );
-        SharedPreferences.Editor editor = sharedPrefs.edit();
-        editor.putBoolean( getString(R.string.test_mode_key), false );
-        editor.apply();
-        }
-
     /**
      * Stops any previous parsing, and starts a new parse.
      * As a result a completely new soft-layout will be created.
      */
     public void startSoftBoardParser( final String coatFileName )
         {
+        // This can be overridden later
+        warning = "BestBoard is loading. Please, wait! ";
+
         // sd-card is not ready, waiting for MEDIA_MOUNTED broadcast
         if ( !Environment.getExternalStorageState().equals( Environment.MEDIA_MOUNTED ))
             {
@@ -344,7 +333,7 @@ public class SoftBoardService extends InputMethodService implements
 
         if ( coatFileName == null )
             {
-            if ( !isTestMode() )
+            if ( !TestModeActivity.isTestMode( this ) )
                 {
                 this.coatFileName =
                         sharedPrefs.getString(getString(R.string.descriptor_file_key),
@@ -388,9 +377,9 @@ public class SoftBoardService extends InputMethodService implements
 
         if (softBoardProcessor == null)
             {
+            // It could overwrite warning after softBoardParserCritical error
+            // so warning is at the beginning of softboardparser
             Scribe.note(Debug.SERVICE, "Soft-layout is not ready yet, no-keyboard-view will be displayed.");
-            warning = "BestBoard is loading. Please, wait! ";
-
             return noKeyboardView();
             }
         else
@@ -428,7 +417,14 @@ public class SoftBoardService extends InputMethodService implements
         switch ( errorInfo )
             {
             case SoftBoardParser.CRITICAL_FILE_NOT_FOUND_ERROR:
-                warning = "Critical error! Could not find coat file! Please, check preferences!";
+                // Permissions are checked by the settings at start
+                // If BestBoard input method is enabled only, than file cannot be found
+                // OR: storage permission could be checked at every startSoftBoardParser calls.
+
+                if ( RequestPermissionDialog.isStorageEnabled( this ) )
+                    warning = "Critical error! Could not find coat file! Please, check preferences!";
+                else
+                    warning = "Critical error! Please, start settings and grant permissions!";
                 break;
             case SoftBoardParser.CRITICAL_IO_ERROR:
                 warning = "Critical error! Could not read sd-card!";
@@ -451,7 +447,7 @@ public class SoftBoardService extends InputMethodService implements
 
         softBoardParser = null;
 
-        if ( !isTestMode() )
+        if ( !TestModeActivity.isTestMode( this ) )
             {
             Intent intent = new Intent(this, PrefsActivity.class);
             intent.addFlags( Intent.FLAG_ACTIVITY_NEW_TASK );
@@ -459,7 +455,7 @@ public class SoftBoardService extends InputMethodService implements
             }
         else
             {
-            stopTestMode(); // Critical error in test file will return to main file
+            TestModeActivity.setTestMode( this, false ); // Critical error in test file will return to main file
             startSoftBoardParser( null );
             }
         }
@@ -487,7 +483,7 @@ public class SoftBoardService extends InputMethodService implements
             // Warning should be shown!
             Toast.makeText( this, warning, Toast.LENGTH_LONG ).show();
 
-            if ( isTestMode() )
+            if ( TestModeActivity.isTestMode( this ) )
                 {
                 // Display coat.log
                 Intent intent = new Intent(this, WebViewActivity.class);

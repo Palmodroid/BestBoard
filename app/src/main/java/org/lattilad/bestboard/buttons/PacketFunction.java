@@ -1,8 +1,10 @@
 package org.lattilad.bestboard.buttons;
 
+import android.content.Context;
 import android.content.Intent;
 
 import org.lattilad.bestboard.SoftBoardData;
+import org.lattilad.bestboard.monitorrow.TestModeActivity;
 import org.lattilad.bestboard.parser.Commands;
 import org.lattilad.bestboard.prefs.PrefsActivity;
 import org.lattilad.bestboard.states.CapsState;
@@ -63,6 +65,9 @@ public class PacketFunction extends Packet
 
         if ( functionCode == Commands.TOKEN_HELP )
             return "HELP";
+
+        if ( functionCode == Commands.TOKEN_TEST )
+            return "TEST";
 
         // any other code
         return "ERR";
@@ -136,6 +141,12 @@ public class PacketFunction extends Packet
             //  intent.addFlags( Intent.FLAG_ACTIVITY_SINGLE_TOP );
             //intent.addFlags( Intent.FLAG_FROM_BACKGROUND );
             softBoardData.softBoardListener.getApplicationContext().startActivity(intent);
+            }
+
+        else if (functionCode == Commands.TOKEN_TEST )
+            {
+            Context context = softBoardData.softBoardListener.getApplicationContext();
+            TestModeActivity.toggleTestMode( context );
             }
 
         }

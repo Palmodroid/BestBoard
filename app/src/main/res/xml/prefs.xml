@@ -9,11 +9,6 @@
 			android:title="@string/help_title"
 			android:summary="@string/help_summary" />
 
-        <Preference
-            android:key="@string/settings_input_key"
-            android:title="@string/settings_input_title"
-            android:summary="@string/settings_input_summary" />
-
     </PreferenceCategory>
 
 	<PreferenceCategory
@@ -307,6 +302,11 @@
 			android:title="@string/debug_title"
 			android:summary="@string/debug_summary"
 			android:defaultValue="@bool/debug_default" />
+
+		<Preference
+			android:key="@string/debug_token_key"
+			android:title="@string/debug_token_title"
+			android:summary="@string/debug_token_summary" />
 
 		<CheckBoxPreference
 			android:key="@string/debug_grid_title_key"

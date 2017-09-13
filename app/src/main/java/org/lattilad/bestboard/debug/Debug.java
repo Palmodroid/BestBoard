@@ -80,6 +80,7 @@ public class Debug
         Scribe.setConfig()
                 .enable( enabled )
                 .setDirectoryName( directoryName )      // Primary directory name
+                .enableFileLog()                        // Enable file log under the default name
                 .enableSysLog( LOG_TAG )                // Primary log-tag : BEST
                 .setLimit( LIMIT )
                 .init( context );                       // Primary file name : package name

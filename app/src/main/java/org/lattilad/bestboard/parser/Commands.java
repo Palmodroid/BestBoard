@@ -47,8 +47,8 @@ public class Commands
     public static final long TOKEN_COUNTRY = 0x791c65f9aL;
     public static final long TOKEN_VARIANT = 0x12b1368887L;
     
-    public static final long TOKEN_ALFA = 0x92d23L;
-    
+    public static final long TOKEN_ALPHA = 0x12fbcbaL;
+
     public static final long TOKEN_ACTIVECOLOR = 0xb0be7c077b1cbdL;
     public static final long TOKEN_LOCKCOLOR = 0x45300a4413a0L;
     public static final long TOKEN_AUTOCOLOR = 0x229aefe38af0L;
@@ -140,6 +140,8 @@ public class Commands
     public static final long TOKEN_SETTINGS = 0x273bad5bcccL;
     public static final long TOKEN_SELECTALL = 0x5ab4faaa9d61L;
     public static final long TOKEN_HELP = 0xe71acL;
+
+    public static final long TOKEN_TEST = 0x17b90fL;
 
     public static final long TOKEN_CHANGECASE = 0x5c19ec2779e2bL;
     public static final long TOKEN_LOWER = 0x26cc5bdL;
@@ -442,7 +444,7 @@ public class Commands
                 TOKEN_TOUCHCOLOR,
                 TOKEN_STROKECOLOR,
                 TOKEN_FONT,
-                TOKEN_ALFA,
+                TOKEN_ALPHA,
 
                 TOKEN_SHOWTITLES,
 
@@ -469,7 +471,7 @@ public class Commands
         add(TOKEN_COUNTRY, PARAMETER_STRING);
         add(TOKEN_VARIANT, PARAMETER_STRING);
         
-        add(TOKEN_ALFA, PARAMETER_INT).method("setDefaultAlfa");
+        add(TOKEN_ALPHA, PARAMETER_INT).method("setDefaultAlfa");
 
         add(TOKEN_ACTIVECOLOR, PARAMETER_COLOR).method("setMetaColor");
         add(TOKEN_LOCKCOLOR, PARAMETER_COLOR).method("setLockColor");
@@ -609,7 +611,8 @@ public class Commands
                 TOKEN_KEY,
                 TOKEN_TURNON, TOKEN_TURNOFF,
                 TOKEN_DELETE, TOKEN_BACKSPACE, TOKEN_TOGGLE, TOKEN_SELECTALL, TOKEN_CHANGECASE,
-                TOKEN_RELOAD, TOKEN_SETTINGS, TOKEN_HELP, TOKEN_RUN, TOKEN_HTML, TOKEN_WEB, TOKEN_LOAD,
+                TOKEN_RELOAD, TOKEN_SETTINGS, TOKEN_HELP, TOKEN_TEST,
+                TOKEN_RUN, TOKEN_HTML, TOKEN_WEB, TOKEN_LOAD,
                 TOKEN_TOP, TOKEN_LEFT, TOKEN_RIGHT, TOKEN_BOTTOM, TOKEN_WORD, TOKEN_PARA, TOKEN_CURSOR, TOKEN_SELECT,
 
                 TOKEN_COMBINE,
@@ -642,6 +645,7 @@ public class Commands
         add(TOKEN_TOGGLE, PARAMETER_KEYWORD);
         add(TOKEN_SELECTALL, PARAMETER_FLAG);
         add(TOKEN_HELP, PARAMETER_FLAG);
+        add(TOKEN_TEST, PARAMETER_FLAG);
         add(TOKEN_RUN, PARAMETER_STRING);
         add(TOKEN_HTML, PARAMETER_STRING);
         add(TOKEN_WEB, PARAMETER_STRING);
