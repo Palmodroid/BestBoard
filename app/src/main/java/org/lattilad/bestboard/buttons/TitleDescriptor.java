@@ -39,6 +39,9 @@ public class TitleDescriptor
         textPaint.setTypeface( typeface );
         }
 
+    /**
+     * Data to measure text - recalculated at every new layout
+     */
     static public class FontData
         {
         public int textSize;

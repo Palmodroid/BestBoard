@@ -35,6 +35,7 @@ import org.lattilad.bestboard.buttons.PacketMove;
 import org.lattilad.bestboard.buttons.PacketRun;
 import org.lattilad.bestboard.buttons.PacketText;
 import org.lattilad.bestboard.buttons.PacketTextCaps;
+import org.lattilad.bestboard.buttons.PacketTextCapsTone;
 import org.lattilad.bestboard.buttons.PacketTextSimple;
 import org.lattilad.bestboard.buttons.PacketTextTime;
 import org.lattilad.bestboard.buttons.PacketTextVaria;
@@ -1038,16 +1039,18 @@ public class MethodsForCommands
         PacketText packet = null;
         Object temp;
 
+int tone = (int)(parameters.remove( Commands.TOKEN_TONE, 0 ));
+
         temp = parameters.remove(Commands.TOKEN_TEXT);
         if ( temp != null ) // TEXT
             {
             if (temp instanceof String)
                 {
-                packet = new PacketTextCaps(softBoardData, (String) temp); // INSTEAD OF SIMPLE !!
+                packet = new PacketTextCapsTone( softBoardData, (String) temp, tone ); // INSTEAD OF SIMPLE !!
                 }
             else if (temp instanceof Character)
                 {
-                packet = new PacketTextCaps( softBoardData, (Character)temp); // INSTEAD OF SIMPLE !!
+                packet = new PacketTextCapsTone( softBoardData, (Character)temp, tone ); // INSTEAD OF SIMPLE !!
                 }
             // else NOT possible, TOKEN_TEXT is a text_parameter
             }
