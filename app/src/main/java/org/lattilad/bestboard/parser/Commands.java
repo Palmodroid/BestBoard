@@ -126,7 +126,6 @@ public class Commands
     public static final long TOKEN_SECOND = 0x7556168dL;
 
     public static final long TOKEN_TEXT = 0x17b9c8L;
-    public static final long TOKEN_TONE = 0x17edc1L;
     public static final long TOKEN_FIELD = 0x1bc2d9cL;
     public static final long TOKEN_VARIA = 0x37fd2d7L;
     //public static final long TOKEN_INDEX;
@@ -603,7 +602,6 @@ public class Commands
 
         long[] packetArray = new long[]{
                 TOKEN_TEXT,
-                TOKEN_TONE,
                 // TOKEN_FIELD,
                 TOKEN_VARIA, TOKEN_INDEX,
                 TOKEN_AUTOCAPS,
@@ -634,7 +632,6 @@ public class Commands
                 .method("packet");
 
         add(TOKEN_TEXT, PARAMETER_TEXT);
-        add(TOKEN_TONE, PARAMETER_INT);
         add(TOKEN_FIELD, PARAMETER_TEXT);
         add(TOKEN_VARIA, PARAMETER_KEYWORD);
         add(TOKEN_INDEX, PARAMETER_INT);
