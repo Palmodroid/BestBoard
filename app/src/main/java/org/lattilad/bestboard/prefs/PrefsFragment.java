@@ -144,18 +144,16 @@ public class PrefsFragment extends PreferenceFragment
         SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(context);
 
         /* Testing default preferences
-        SharedPreferences.Editor editor = sharedPrefs.edit();
+        SharedPreferences.Editor e = sharedPrefs.edit();
         Scribe.note( Debug.PREF,  "Testing. Preferences are cleared completely" );
-        editor.clear();
-        editor.apply();
+        e.clear();
+        e.apply();
         Scribe.note( Debug.PREF, "BEFORE SETTING DEFAULT VALUE - Prefs contains sample preference: "
                 + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
-        PreferenceManager.setDefaultValues(context, R.xml.prefs, true);
-        Scribe.note( Debug.PREF, "AFTER SETTING DEFAULT VALUE - Prefs contains sample preference: "
-                + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
+        // PreferenceManager.setDefaultValues(context, R.xml.prefs, true);
+        // Scribe.note( Debug.PREF, "AFTER SETTING DEFAULT VALUE - Prefs contains sample preference: "
+        //        + sharedPrefs.contains( context.getString( R.string.debug_key ) ));
         */
-
-        // OR
 
         if ( !sharedPrefs.contains( PREFS_COUNTER ) )
             {

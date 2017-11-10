@@ -14,6 +14,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 
 import org.lattilad.bestboard.buttons.PacketTextSimple;
+import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.codetext.Entry;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.prefs.PrefsFragment;
@@ -64,6 +65,10 @@ public class SoftBoardProcessor implements
         previousSoftBoardData = this.softBoardData;
 
         this.softBoardData = softBoardData;
+        // static typeface var should be reloaded whenever softBoardData is loaded
+        // - changeSoftBoard method is not used! -
+        TitleDescriptor.setTypeface( this.softBoardData.typeface );
+
         this.softBoardData.readPreferences();
         this.softBoardData.boardTable.invalidateCalculations( true );
         initInput();
@@ -793,6 +798,10 @@ public class SoftBoardProcessor implements
         {
         this.softBoardService = softBoardService;
         this.softBoardData = softBoardData;
+
+        // static typeface var should be reloaded whenever softBoardData is loaded
+        // - this is the only place for that -
+        TitleDescriptor.setTypeface( this.softBoardData.typeface );
 
         softBoardData.connect(this);
 

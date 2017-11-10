@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="descriptor_directory_default">"_bestboard"</string>
-    <string name="descriptor_file_default">test.txt</string>
+    <string name="descriptor_directory_default">"bestboard"</string>
+    <string name="descriptor_file_default">fallback.txt</string>
     <bool name="test_mode_default">false</bool>
     <string name="test_file_default">""</string>
 
@@ -39,28 +39,28 @@
     <integer name="touch_press_threshold_min">0</integer>
     <integer name="touch_press_threshold_max">10000</integer>
 
-    <string name="touch_stay_time_default">500</string>
+    <string name="touch_stay_time_default">250</string>
     <integer name="touch_stay_time_min">0</integer>
     <integer name="touch_stay_time_max">1000</integer>
 
-    <string name="touch_repeat_time_default">300</string>
+    <string name="touch_repeat_time_default">150</string>
     <integer name="touch_repeat_time_min">0</integer>
     <integer name="touch_repeat_time_max">1000</integer>
 
     <bool name="cursor_touch_allow_default">true</bool>
     <bool name="cursor_stroke_allow_key">true</bool>
-    <bool name="cursor_paths_allow_key">true</bool>
-    <bool name="cursor_vibration_allow_key">false</bool>
+    <bool name="cursor_paths_allow_key">false</bool>
+    <bool name="cursor_vibration_allow_key">true</bool>
 
-    <string name="cursor_vibration_first_default">25</string>
+    <string name="cursor_vibration_first_default">0</string>
     <integer name="cursor_vibration_first_min">0</integer>
     <integer name="cursor_vibration_first_max">1000</integer>
 
-    <string name="cursor_vibration_second_default">50</string>
+    <string name="cursor_vibration_second_default">20</string>
     <integer name="cursor_vibration_second_min">0</integer>
     <integer name="cursor_vibration_second_max">1000</integer>
 
-    <string name="cursor_vibration_repeat_default">10</string>
+    <string name="cursor_vibration_repeat_default">5</string>
     <integer name="cursor_vibration_repeat_min">0</integer>
     <integer name="cursor_vibration_repeat_max">1000</integer>
 

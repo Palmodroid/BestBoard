@@ -1,0 +1,283 @@
+﻿; begin Header
+coat (1000)
+name "Fallback"
+version 1
+author "LAttilaD"
+description "Fallback keyboard"
+; end Header
+; begin Colors
+let (lettercolor 0nlg)
+let (digitcolor 0ndg)
+let (spacecolor 0npwm)
+let (deletecolor 0nlhr)
+let (entercolor 0nlhs)
+let (shiftcolor 0nldo)
+let (specialcolor 0nlho)
+let (altcolor 0nodo)
+let (altsymcolor 0nlfy)
+let (diacolor 0nowg)
+let (switchcolor 0npdb)
+let (normalbgnd 0nk)
+; end Colors
+; begin Defaults
+activecolor 0ndfg
+lockcolor 0nlhs
+autocolor 0ndfy
+default (addtitle (size 1500))
+; 	begin Enter
+let (entertext "↵")
+showtitles (
+	entertext (entertext)
+	gotext (entertext)
+	searchtext (entertext)
+	sendtext (entertext)
+	nexttext (entertext)
+	donetext (entertext)
+	prevtext (entertext)
+	nonetext (entertext)
+	unknowntext (entertext)
+)
+; 	end Enter
+; end Defaults
+; begin Slots
+; end Slots
+; begin Blocks
+;	begin QWERTY
+let (qwertyblock
+	block (
+		button (text 'q' color lettercolor)
+		button (text 'w' color lettercolor)
+		button (text 'e' color lettercolor)
+		button (text 'r' color lettercolor)
+		button (text 't' color lettercolor)
+		button (text 'y' color lettercolor)
+		button (text 'u' color lettercolor)
+		button (text 'i' color lettercolor)
+		button (text 'o' color lettercolor)
+		button (text 'p' color lettercolor)
+	crr
+		button (text 'a' color lettercolor)
+		button (text 's' color lettercolor)
+		button (text 'd' color lettercolor)
+		button (text 'f' color lettercolor)
+		button (text 'g' color lettercolor)
+		button (text 'h' color lettercolor)
+		button (text 'j' color lettercolor)
+		button (text 'k' color lettercolor)
+		button (text 'l' color lettercolor)
+	crr
+		button (text 'z' color lettercolor)
+		button (text 'x' color lettercolor)
+		button (text 'c' color lettercolor)
+		button (text 'v' color lettercolor)
+		button (text 'b' color lettercolor)
+		button (text 'n' color lettercolor)
+		button (text 'm' color lettercolor)
+		button (text ' ' color spacecolor addtitle (text "space" size 750))
+	)
+)
+;	end QWERTY
+;	begin Digits
+let (digitblock
+	block (
+		button (text '7' color digitcolor)
+		button (text '8' color digitcolor)
+		button (text '9' color digitcolor)
+	crl
+		button (text '4' color digitcolor)
+		button (text '5' color digitcolor)
+		button (text '6' color digitcolor)
+	crl
+		button (text '1' color digitcolor)
+		button (text '2' color digitcolor)
+		button (text '3' color digitcolor)
+		button (text '0' color digitcolor)
+	)
+)
+;	end Digits
+;	begin Left Group
+let (leftblock
+	block (
+		button (settings color specialcolor addtitle (text "Set" size 800 xoffset 800))
+	ur ul
+		switch (board letterlayout color switchcolor addtitle (text "ÿ" xoffset 800))
+	)
+)
+;	end Left Group
+;	begin Right Group
+let (rightblock
+	block (
+		button (backspace repeat color deletecolor addtitle (text '←'))
+	crl crr
+		enter (color entercolor addtitle (size 2000))
+	crr
+		meta (caps color shiftcolor
+			addtitle (text '⇑' xoffset -800)
+		)
+	)
+)
+;	end Right Group
+;	begin Alt
+let (altblock
+	block (
+		button (text '!' color altcolor addtitle (color altsymcolor xoffset 750))
+		button (text "'" color altcolor addtitle (color altsymcolor))
+		button (text '"' color altcolor addtitle (color altsymcolor))
+		button (text '#' color altcolor addtitle (color altsymcolor))
+		button (text '$' color altcolor addtitle (color altsymcolor))
+		button (text '%' color altcolor addtitle (color altsymcolor))
+		button (text '&' color altcolor addtitle (color altsymcolor))
+		button (text '@' color altcolor addtitle (color altsymcolor))
+		button (text '^' color altcolor addtitle (color altsymcolor))
+		button (text '/' color altcolor addtitle (color altsymcolor))
+		button (text '*' color altcolor addtitle (color altsymcolor))
+		button (text '+' color altcolor addtitle (color altsymcolor))
+		button (text '-' color altcolor addtitle (color altsymcolor))
+		button (text '_' color altcolor addtitle (color altsymcolor))
+	crr
+		button (text '(' color altcolor addtitle (color altsymcolor))
+		button (text ')' color altcolor addtitle (color altsymcolor))
+		button (text '[' color altcolor addtitle (color altsymcolor))
+		button (text ']' color altcolor addtitle (color altsymcolor))
+		button (text '{' color altcolor addtitle (color altsymcolor))
+		button (text '}' color altcolor addtitle (color altsymcolor))
+		button (text '<' color altcolor addtitle (color altsymcolor))
+		button (text '>' color altcolor addtitle (color altsymcolor))
+		button (text '|' color altcolor addtitle (color altsymcolor))
+		button (text '~' color altcolor addtitle (color altsymcolor))
+		button (text '`' color altcolor addtitle (color altsymcolor))
+		button (text '§' color altcolor addtitle (color altsymcolor))
+	crr
+		button (text ',' color altcolor addtitle (color altsymcolor))
+		button (text '.' color altcolor addtitle (color altsymcolor))
+		button (text ';' color altcolor addtitle (color altsymcolor))
+		button (text ':' color altcolor addtitle (color altsymcolor))
+		button (text '?' color altcolor addtitle (color altsymcolor))
+		button (text '–' color altcolor addtitle (color altsymcolor))
+		button (text '©' color altcolor addtitle (color altsymcolor))
+		button (text '«' color altcolor addtitle (color altsymcolor))
+		button (text '»' color altcolor addtitle (color altsymcolor))
+		button (text '„' color altcolor addtitle (color altsymcolor))
+		button (text '”' color altcolor addtitle (color altsymcolor))
+		button (text '“' color altcolor addtitle (color altsymcolor))
+	)
+)
+;	end Alt
+;	begin Letters
+let (letterblock
+	block (
+		button (text 'á' color diacolor addtitle (color altsymcolor xoffset 750))
+		button (text 'ć' color diacolor addtitle (color altsymcolor))
+		button (text 'é' color diacolor addtitle (color altsymcolor))
+		button (text 'í' color diacolor addtitle (color altsymcolor))
+		button (text 'ĺ' color diacolor addtitle (color altsymcolor))
+		button (text 'ń' color diacolor addtitle (color altsymcolor))
+		button (text 'ó' color diacolor addtitle (color altsymcolor))
+		button (text 'ŕ' color diacolor addtitle (color altsymcolor))
+		button (text 'ś' color diacolor addtitle (color altsymcolor))
+		button (text 'ú' color diacolor addtitle (color altsymcolor))
+		button (text 'ý' color diacolor addtitle (color altsymcolor))
+		button (text 'ź' color diacolor addtitle (color altsymcolor))
+		button (text 'ő' color diacolor addtitle (color altsymcolor))
+		button (text 'ű' color diacolor addtitle (color altsymcolor))
+	crr
+		button (text 'à' color diacolor addtitle (color altsymcolor))
+		button (text 'è' color diacolor addtitle (color altsymcolor))
+		button (text 'ì' color diacolor addtitle (color altsymcolor))
+		button (text 'ò' color diacolor addtitle (color altsymcolor))
+		button (text 'ù' color diacolor addtitle (color altsymcolor))
+		button (text 'č' color diacolor addtitle (color altsymcolor))
+		button (text 'ď' color diacolor addtitle (color altsymcolor))
+		button (text 'ě' color diacolor addtitle (color altsymcolor))
+		button (text 'ľ' color diacolor addtitle (color altsymcolor))
+		button (text 'ň' color diacolor addtitle (color altsymcolor))
+		button (text 'ř' color diacolor addtitle (color altsymcolor))
+		button (text 'š' color diacolor addtitle (color altsymcolor))
+		button (text 'ť' color diacolor addtitle (color altsymcolor))
+		button (text 'ž' color diacolor addtitle (color altsymcolor xoffset -750))
+	crl
+		button (text 'â' color diacolor addtitle (color altsymcolor xoffset 750))
+		button (text 'ĉ' color diacolor addtitle (color altsymcolor))
+		button (text 'ê' color diacolor addtitle (color altsymcolor))
+		button (text 'ĝ' color diacolor addtitle (color altsymcolor))
+		button (text 'ĥ' color diacolor addtitle (color altsymcolor))
+		button (text 'î' color diacolor addtitle (color altsymcolor))
+		button (text 'ĵ' color diacolor addtitle (color altsymcolor))
+		button (text 'ô' color diacolor addtitle (color altsymcolor))
+		button (text 'ŝ' color diacolor addtitle (color altsymcolor))
+		button (text 'û' color diacolor addtitle (color altsymcolor))
+		button (text 'ŵ' color diacolor addtitle (color altsymcolor))
+		button (text 'ŷ' color diacolor addtitle (color altsymcolor))
+		button (text 'æ' color diacolor addtitle (color altsymcolor))
+		button (text 'œ' color diacolor addtitle (color altsymcolor))
+	crr
+		button (text 'ã' color diacolor addtitle (color altsymcolor))
+		button (text 'ñ' color diacolor addtitle (color altsymcolor))
+		button (text 'õ' color diacolor addtitle (color altsymcolor))
+		button (text 'ā' color diacolor addtitle (color altsymcolor))
+		button (text 'ē' color diacolor addtitle (color altsymcolor))
+		button (text 'ī' color diacolor addtitle (color altsymcolor))
+		button (text 'ō' color diacolor addtitle (color altsymcolor))
+		button (text 'ū' color diacolor addtitle (color altsymcolor))
+		button (text 'ä' color diacolor addtitle (color altsymcolor))
+		button (text 'ë' color diacolor addtitle (color altsymcolor))
+		button (text 'ï' color diacolor addtitle (color altsymcolor))
+		button (text 'ö' color diacolor addtitle (color altsymcolor))
+		button (text 'ü' color diacolor addtitle (color altsymcolor))
+		button (text 'ÿ' color diacolor addtitle (color altsymcolor xoffset -750))
+	crl
+		button (text 'ċ' color diacolor addtitle (color altsymcolor xoffset 750))
+		button (text 'ė' color diacolor addtitle (color altsymcolor))
+		button (text 'ı' color diacolor addtitle (color altsymcolor))
+		button (text 'ż' color diacolor addtitle (color altsymcolor))
+		button (text 'ð' color diacolor addtitle (color altsymcolor))
+		button (text 'ß' color diacolor addtitle (color altsymcolor))
+		button (text 'þ' color diacolor addtitle (color altsymcolor))
+		button (text 'ă' color diacolor addtitle (color altsymcolor))
+		button (text 'ğ' color diacolor addtitle (color altsymcolor))
+		button (text 'ŭ' color diacolor addtitle (color altsymcolor))
+		button (text 'ą' color diacolor addtitle (color altsymcolor))
+		button (text 'ę' color diacolor addtitle (color altsymcolor))
+		button (text 'į' color diacolor addtitle (color altsymcolor))
+		button (text 'ų' color diacolor addtitle (color altsymcolor))
+	crr
+		button (text 'å' color diacolor addtitle (color altsymcolor))
+		button (text 'ů' color diacolor addtitle (color altsymcolor))
+		button (text 'ç' color diacolor addtitle (color altsymcolor))
+		button (text 'ģ' color diacolor addtitle (color altsymcolor))
+		button (text 'ķ' color diacolor addtitle (color altsymcolor))
+		button (text 'ļ' color diacolor addtitle (color altsymcolor))
+		button (text 'ņ' color diacolor addtitle (color altsymcolor))
+		button (text 'ş' color diacolor addtitle (color altsymcolor))
+		button (text 'ţ' color diacolor addtitle (color altsymcolor))
+		button (text 'đ' color diacolor addtitle (color altsymcolor))
+		button (text 'ħ' color diacolor addtitle (color altsymcolor))
+		button (text 'ł' color diacolor addtitle (color altsymcolor))
+		button (text 'ø' color diacolor addtitle (color altsymcolor))
+		button (text 'ŧ' color diacolor addtitle (color altsymcolor xoffset -750))
+	)
+)
+;	end Letters
+; end Blocks
+; begin Layouts
+addlayout (id mainlayout start
+	columns 13 rows 6 align evens turnoff (caps) asboard color normalbgnd)
+addlayout (id letterlayout
+	columns 13 rows 6 align evens turnoff (caps) asboard color normalbgnd)
+; end Layouts
+; begin Assembling Layouts
+;	begin Main
+default (block (layout mainlayout))
+
+block (qwertyblock row 4 column 1)
+block (digitblock row 4 column 11)
+block (rightblock row 3 column 14)
+block (leftblock row 5 column 1)
+block (altblock row 1 column 1)
+; end Main
+;	begin Letters
+default (block (layout letterlayout))
+
+block (letterblock row 1 column 1)
+; end Letters
+; end Assembling Layouts

@@ -10,7 +10,6 @@ import android.preference.PreferenceManager;
 import org.lattilad.bestboard.Layout;
 import org.lattilad.bestboard.R;
 import org.lattilad.bestboard.SoftBoardData;
-import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.scribe.Scribe;
 import org.lattilad.bestboard.utils.ArrayUtils;
@@ -296,7 +295,8 @@ public class SoftBoardParser extends AsyncTask<Void, Void, Integer>
                 {
                 Typeface typeface = Typeface.createFromFile(methodsForCommands.typefaceFile);
                 note(R.string.data_typeface, typeface.toString());
-                TitleDescriptor.setTypeface(typeface);
+                //TitleDescriptor.setTypeface(typeface);
+                softBoardData.typeface = typeface;
 
                 for (Layout layout : methodsForCommands.layouts.values())
                     {

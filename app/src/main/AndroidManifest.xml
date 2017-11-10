@@ -9,8 +9,10 @@
     <uses-permission
         android:name="android.permission.INTERNET" />
 
+    <!-- https://stackoverflow.com/questions/35517239/sharedpreferences-are-not-being-cleared-when-i-uninstall
+    android:allowBackup="false" or "true" -->
     <application
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:icon="@mipmap/start_button"
         android:label="@string/app_name"
         android:supportsRtl="true"

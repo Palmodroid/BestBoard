@@ -3,12 +3,12 @@ package org.lattilad.bestboard;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Vibrator;
 import android.preference.PreferenceManager;
 import android.util.LongSparseArray;
 import android.view.inputmethod.EditorInfo;
 
-import org.lattilad.bestboard.buttons.TitleDescriptor;
 import org.lattilad.bestboard.codetext.CodeTextProcessor;
 import org.lattilad.bestboard.debug.Debug;
 import org.lattilad.bestboard.modify.Modify;
@@ -107,6 +107,11 @@ public class SoftBoardData
      * Color of stroke
      */
     public int strokeColor = Color.MAGENTA & 0x77FFFFFF;
+
+    /**
+     * Typeface - should be loaded into static TitleDescriptor.typeface
+     */
+    public Typeface typeface = null;
 
 
     /**
@@ -376,7 +381,8 @@ public class SoftBoardData
     public SoftBoardData( )
         {
         // static variables should be deleted!!
-        TitleDescriptor.setTypeface(null);
+        // NO!! More SoftBoardData-s are used, so static vars should be abandoned or reloaded
+        // TitleDescriptor.setTypeface(null);
 
         layoutStates = new LayoutStates();
         boardTable = new BoardTable();
