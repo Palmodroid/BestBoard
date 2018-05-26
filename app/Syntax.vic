@@ -1,0 +1,702 @@
+---- START ----
+
+//** A COAT FILE FELÉPÍTÉSE **//
+
+A coat-file a billentyűzet paramétereit írja le. Mivel minden paraméter egyúttal utasítás is, valamint az utasítások paraméterként is szerepelhetnek, ezért a coat nyelv alapelemei a paraméter-parancsok. A nyelv az egymás után álló paraméter-parancsokból áll össze. A legtöbb paraméter-parancshoz természetesen paraméterek is tartoznak, melyek a paraméter-parancs után álló zárójelben találhatóak. Hogy milyen paraméter(ek)et vár, azt természetesen a paraméter-parancs azonosítja. A paraméterek lehetnek további paraméter-parancsok, vagy pedig egyszerű, konstans paraméterek. 
+
+Ha a paraméter-parancs csupán egyetlen, konstansként megadott paramétert vár, akkor a zárójelezés elhagyható, egyébként kötelező.
+
+Vannak olyan paraméter-parancsok, melyek paramétere egy konstansokból álló lista. A lista egy vagy több (vagy akár nulla) elemet is tartalmazhat, melyek mindegyike azonos típusú konstans. Ilyenkor a zárójelezés soha nem hagyható el! (A dokumentációban //…// jelöli.)
+
+Ha a paraméter-parancshoz több különböző paraméter tartozik, akkor a zárójelezés szintén kötelező. Ilyenkor a paraméterek mindegyike egy paraméter-parancs. Ha ebből eredeti parancs csupán egyetlen példányt enged meg, akkor mindig az utolsóként megadott paraméter kerül feldolgozásra. 
+
+Vannak természetesen olyan (ún. multiplex) paraméterek, melyekből az eredeti parancs többet is megenged. Ezt a szintaxis jelöli, de ilyenkor figyelnünk kell arra, hogy a felsorolásban többször szereplő paraméter-parancsot minden alkalommal kiírjuk. (A dokumentációban //…// jelöli) 
+
+A coat file tulajdonképp maga is egy speciális paraméter-parancs, az ADDSOFTBOARD paraméter-parancsokból álló paramétereit tartalmazza. A valóságban azonban ez sokkal egyszerűbb.
+
+//** MEGJEGYZÉSEK **//
+
+A coat-file tartalmazhat megjegyzéseket is. Bármely sor végére írhatunk megjegyzést, melyeket a ; (pontosvessző) vezet be. A pontosvessző után a sor fennmaradó része nem kerül feldolgozásra.
+
+A ;(...); kettős jelekkel egy blokkot tehetünk megjegyzésbe. Ezen a blokkon belül sem történik ellenőrzés. A megjegyzés-blokkok azonban nem ágyazhatóak egymásba! 
+
+//** KONSTANS ÉRTÉKET LEÍRÓ PARAMÉTEREK  **//
+
+boolean - integer, 0- hamis, bármely més érték igaz. Célszerű az előre definiált FALSE/TRUE értékkel megadni.
+
+int - 32 bites, előjeles egész. 0x prefix után hexadecimális formában is megadható.
+
+long - 64 bites, előjeles egész. 0x prefix után hexadecimális formában is megadható. (Jelenleg csak COAT paramétere)   
+
+color - 32 bites, színt kódoló integer. Megadható 0caarrggbb/0crrggbb/0cargb/0crgb ill. 0cww/0cw formában, ahol a 0c prefix után a-alpha, r-red, g-green, b-
+blue komponens, ill. w-white érték. Alfa értéke alapértelmezetten 0xFF (átlátszatlan), ez azonban az ALPHA paranccsal átállítható. A program ismeri a CSS3 és Visibone színkészletet, melyek a 0n prefix után adhatóak meg, 0nmnemonic formában. Ismeretlen szín esetén átlátszatlan fehér az alapértelmezett.
+
+string - "text" formátumban megadott szöveg. A karakterek helyett escape szekvenciák is szerepelhetnek: \n - New Line/Line Feed (0x0A), \r - Carriage Return (0x0D), \t - (Horizontal) Tab (0x09). A speciális karaktereket emiatt szintén escape szekvencia írja le: \\ - Backslash (0x5C), \' - Single quotation mark (0x27), \" - Double quotation mark (0x22), \$ - Dollar mark (0x24). A bmp unicode-ba tartozó karakterek \HHHH formában, kötelezőn négyszámjegyű hexadecimális kóddal is megadhatóak. A bmp kódsíkon kívüli értékeket az android rendszer KÉT karakteren tárolja, ezért nem escape szekvenciaként, hanem $HHHHHH formában, dollárjel prefix után hat hexadecimális számjeggyel írhatóak le (javasolt a hat számjegy használata, de itt kevesebb számjegyet is megadhatunk, ha a következő karakter nem értelmezhető hexadecimális számként). Mivel két karakteren tárolódhat, ez a szekvencia karakterként nem használható! A hosszú string megszakítható, közvetlenül az idézőjel után írt aláhúzás jellel: "A string eleje"_ " és a vége." formában.
+
+text - string vagy char formátum bármelyike használható. A char - 16 bites bmp unicode karakter kódját jelenti, mely megadható 'c' formában vagy integerként is. Ugyan önmagában számértéknek felel meg, de text esetén string-ként kerül tárolásra.
+
+file - munkakönyvtárban lévő file neve, string-ként formázva. 
+
+coat - munkakönyvtárban lévő coat-file neve, string-ként formázva. Jelenleg csak INCLUDE parancs használja. 
+
+keyword - azonosító. Az azonosítóra formátumára számos megkötés vonatkozik: csak ékezet nélküli betűket (a-z), számokat (0-9) valamint az aláhúzásjelet (_) tartalmazhatja. Legfeljebb 12 karakterből állhat, nem kezdődhet számmal, valamint nincs különbség a kis- és nagybetű között.
+
+//** PARAMÉTER-PARANCSOK **//
+
+A coat file egy virtuális paraméter-parancs, az ADDSOFTBOARD paraméterkészletét tartalmazza. A coat file feldolgozása valójában az ADDSOFTBOARD paraméter-parancs végrehajtását jelenti. Érdemes megismerni, hogy hogyan kerülnek végrehajtásra ezek az ún. paraméter-parancsok.
+Minden paraméter-parancs részben egy végrehajtandó parancs (saját paraméterekkel), ugyanakkor pedig egy felette álló paraméter-parancs paramétere is. A végrehajtás során elsőként a parancs minden paramétere kiértékelésre kerül. A kiértékelt adatokat megkapja a parancshoz tartozó programrész, és azokat betölti az adatbázisba. A parancsnak lesz (lehet) egy visszatérési értéke is. Ezt adhatja a parancshoz tartozó programrész is, vagy a konstans paramétert tartalmazó parancsok esetében maga a konstans lesz a visszatérési érték. Tehát a paraméterek rekurzív kiértékelése után a parancs egy szinttel "feljebb" lép, és ő maga, mint paraméter szolgáltatja a visszatérési értéket a felette álló parancsnak. Mint a rekurzív hívások általában, ez is rendkívül nehezen írható le, de a gyakorlatban nagyon egyszerű.
+
+A dokumentációban a listaszerűen megadható konstans paramétereket ill. a multiplex paramétereket a paraméter után írt //…// jelzi. Az opcionális paramétereket [ ] -be tettük.
+
+A virtuális ADDSOFTBOARD lehetséges paraméterei:
+COAT
+LET, DEFINE, DEFAULT, STOP, INCLUDE,
+NAME, VERSION, AUTHOR, ADDTAGS, DESCRIPTION, DOCFILE, DOCURI, LOCALE, 
+FONT, ACTIVECOLOR, LOCKCOLOR, AUTOCOLOR, TOUCHCOLOR, STROKECOLOR, ALPHA, 
+MONITOR, SHOWTITLES,
+BLOCK, ADDLAYOUT, ADDBOARD, INCLUDE, ADDMODIFY, ADDSHORTCUT, SHORTCUTSET, ADDVARIA 
+
+@s5[Parancsok részletei - coat nyelv feldolgozásához szükséges parancsok:]
+
+**COAT (long) ** - A COAT parancsnak kötelezően a legelső helyen kell állnia! Ennek hiányában az értelmező a coat file-t nem fogadja el. A paraméter a coat file verzióját adja meg (tizedespont nélkül), értéke jelenleg: 1000
+
+**LET ( keyword value )** és **DEFINE ( keyword value )** - (zárójel kötelező)
+Címke értékadása vagy végleges cimke definiálása. (A **LET** parancs értéket ad egy cimkének - függetlenül a korábbi értéktől. **DEFINE** esetén viszont a már értékkel rendelkező cimkék hibajelzést adnak.) A címkék nem ágyazhatóak egymásba! Továbbiakban a cimkével (//keyword//) hivatkozhatunk //value// értékre. Value lehet: 
+1. String paraméter,
+2. Integer/Char paraméter,
+3. Komplex-parancs(parancshoz tartozó paraméterek)
+Ez utóbbi nem egy teljes parancsot rövidít le, hanem a zárójelben megadott paramétereket gyűjti össze. A címke csak az itt megadott komplex-parancs paraméterei között szerepelhet, mégpedig önmagában (vagyis zárójelezett paraméterek nélkül). A parancs kiértékelése során a címkében szereplő paraméterek is   
+kiértékelésre kerülnek, mégpedig úgy, hogy a címke paraméterei a címke helyének megfelelően beilleszkednek a kiértékelési sorba. Ez azért fontos, mert először a címke előtt álló paraméterek kerülnek feldolgozásra, ezt követően a címke paraméterei kerülnek feldolgozásra, végül a címke után álló paraméterek következnek. Ha a teljes kiértékelési sor több azonos típusú, de ún. single paramétert tartalmaz, akkor a sorban hátrébb álló paraméter mindig felülírja az előtte állót. Vagyis, ha a címke olyan paramétert tartalmaz, melyet előtte már beírtunk a sorba, akkor azt felül fogja írni, míg a címke után megadott paraméterrel mi magunk írhatjuk felül a címke paramétereit. Multiplex paraméterekre ez persze nem vonatkozik, azok közül az összes szerepelni fog.
+
+**DEFAULT ( komplex-parancs( parameterek ) )** - (zárójel elhagyható)
+A Komplex-parancs végleges kiértékelésekor (tehát **LET** és **DEFINE** mellett nem!) az itt megadott paraméterek alapértelmezetten részei lesznek a kiértékelési sornak. Mindig az itt megadott paraméterek kerülnek elsőként kiértékelésre. A default érték felülírható, mindig az utolsó DEFAULT utasítás érvényes. 
+
+DEFAULT/LET: Amikor a komplex-parancs paraméterei feldolgozásra kerülnek, akkor először az (utolsó) DEFAULT utasításban megadott paraméterek kerülnek be a feldolgozási sorba. Ezt követően a parancs után megadott paraméterek kerülnek kiértékelésre, mégpedig balról jobbra. Ha egy single-paraméter többször szerepel, akkor az utolsó érték kerül felhasználásra. A komplex-paraméterek a kiértékelés során (rekurzív módon) teljes feldolgozásra kerülnek, és a visszaadott értékük szerepel a paraméterek között. Itt is igaz, hogy több azonos érték közül csak az utolsó kerül be a paraméterek közé, de maga a parancs mindenképpen végrehajtásra kerül. A multiplex paraméterek természetesen egymás után mind szerepelni fognak a parméterek között. Ha egy paraméter nem szerepel az engedélyezett paraméterek között, akkor a program megpróbálja kikeresni a cimkék közül. Ha van az adott parancsnak megfelelő cimke ezzel a névvel, akkor az ott szereplő paraméterek mindegyike bekerül a feldolgozási sorba, a fenti szabályok szerint. Fontos megjegyezni, hogy címke estén maguk a paraméterek már az értékadás (vagyis a LET/DEFAULT utasításban) kiértékelésre kerülnek, vagyis a paraméterekhez tartozó programrészek már ekkor végrehajtásra kerülnek. Vagyis, míg a paraméterek metódusai már ekkor lefutnak, maga a cimke értékadás NEM hívja meg a komplex-parancshoz tartozó metódust. Ez csak komplex-parancs tényleges végrehajtásakor történik meg, ahol a paraméterek között a címke is szerepelhet. Ilyenkor a címke a korábban már kiértékelt és tárolt paramétereredményeket adja át. Amikor tényleges parancshívás történik, akkor először a default-ként tárolt paraméter-értékek kerülnek átadásra, majd balról jobbra kiértékelésre kerülnek a paraméter-parancsok. Ha ezek között címke szerepel, akkor az abban tárolt paraméter eredmények is átadásra kerülnek, a címke helyzetének megfelelően. A parancs metódusa ezzel a paraméter-sorral kerül meghívásra, és - ha van visszatérési értéke -, akkor az az érték a parancs neve alatt része lesz a parancsot meghívó, eggyel magasabb szinten álló parancs paraméterlistájának.
+Érdemes ismerni ezt a módszert, mert a címkében szereplő, gyakran ismétlődő paraméterek csak egyszer kerülnek feldolgozásra, vagyis sokkal gyorsabban elkészül a billentyűzetünk, mintha a paramétereket minden egyes parancsnál megismételnénk. Ugyanakkor figyelni kell arra, hogy a címke paramétereinek kiértékelése a címke értékadásakor megtörténik, így az alapértelmezett értékek közül a címke értékadásakor érvényes érték kerül felhasználásra, nem pedig a címke felhasználásakor aktuális.
+ 
+**STOP**
+Megszakítja az aktuális paraméter-sor kiértékelését, vagyis befejezi a coat leíró file kiértékelését. A már kiolvasott parancsok kiértékelésre és feldolgozásra kerülnek.
+
+**INCLUDE (coat)** - A paraméterként szereplő coat file-t teljes egészében beilleszti a feldolgozási sorba. Fontos! A coat file-t a munkakönyvtárba kell helyezni, valamint a ''COAT ( 1000 )'' megjelölés is szükséges az elejére. A parancs pillanatában a megadott coat file teljes szövege feldolgozásra kerül, mintha csak az eredeti leíró file része lenne. Az **INCLUDE** parancsok egymásba is ágyazhatóak. (A **LOAD** és **RELOAD** utasítások egy teljesen új billentyűzetet töltenek be, a felhasználó utasítására. Ezzel szemben az **INCLUDE** a feldolgozás alatt a szöveg következő részét egy másik coat file-ból olvassa be. A file végén visszatér az eredeti coat file-hoz.)
+
+@s5[Parancsok részletei - általános beállítások:]
+
+**NAME (string)** - Aktuális coat file neve (tárolt, de jelenleg nem használt)
+
+**VERSION (int)** - Aktuális coat file verziója (tárolt, de jelenleg nem használt)
+
+**AUTHOR (string)** - Aktuális coat file szerzője (tárolt, de jelenleg nem használt)
+
+**ADDTAGS (string…)** - „Tag”-ek (tárolt, de jelenleg nem használt)
+
+**DESCRIPTION (string)** - Aktuális coat file rövid leírása (tárolt, de jelenleg nem használt)
+
+**DOCFILE (string)** - Aktuális coat file hosszú leírása file-ban (tárolt, de jelenleg nem használt)
+
+**DOCURI (string)** - Aktuális coat file hosszú leírása URI-val (tárolt, de jelenleg nem használt)
+
+**LOCALE ( [LANGUAGE (string)] [COUNTRY (string)] [VARIANT (string)] )** - A soft-board által alkalmazott Locale. Nem megadott érték esetén a string üres. A program nem ellenőrzi, hogy a megadott lokalizáció valós-e.  
+
+**FONT (file)** - alkalmazott betűkészlet (minden feliratra közös)
+
+**ACTIVECOLOR (color)** - bekapcsolt META billentyű színe
+
+**LOCKCOLOR (color)** - zárolt META billentyű színe
+
+**AUTOCOLOR (color)** - automatikusan bekapcsolt META billentyű színe. Jelenleg kizárólag az AUTOCAPS kapcsol be automatikusan; ez viszont a CAPS és SWITCH (CAPSSTATE mellett) billentyűkön is jelez.  
+
+**TOUCHCOLOR (color)** - megérintett billentyű színe
+
+**STROKECOLOR (color)** - érintési pontok visszajelzésének színe
+
+**ALPHA (int)** - az alapértelmezett alfa értéket állítja be, mely alapértelmezetten 0xFF. Ha egy szín kódjában az alfa értéket nem adjuk meg, akkor ez az érték kerül beállításra. Fontos tudni, hogy a szín mnemonikok egyike sem tartalmaz alfa értéket, tehát mindegyikre az ALPHA által beállított érték lesz érvényes.
+
+@s5[Parancsok részletei - SHOWTITLES és MONITOR row beállítások]
+
+**SHOWTITLES ( [ENTERTEXT (text)] [GOTEXT (text)] [SEARCHTEXT (text)] [SENDTEXT (text)] [NEXTTEXT (text)] [DONETEXT (text)] [PREVTEXT (text)] [NONETEXT (text)] [UNKNOWNTEXT (text)] [AUTOFUNCON (text)] [AUTOFUNCOFF (text)] )** - Ezzel a paranccsal speciális rendszerváltozókhoz rendelhetünk szöveges értéket. A kétállású értékeket az -ON és -OFF végződés jelöli. Jelenleg az **ENTER** (az enter billentyű aktuális állapottól függő funkciója) és az **AUTOFUNC** rendszerváltozó használható. A hozzárendelt szöveges értéket az ADDTITLE SHOW parancsával jeleníthetjük meg.
+Paraméterek (beállítható feliratok):
+**ENTERTEXT (text)** - ENTER: alapértelmezett funkciót jelző felirat (alapértelmezett: "CR")
+**GOTEXT (text)** - ENTER: GO utasítást jelző felirat (alapértelmezett: "GO")
+**SEARCHTEXT (text)** - ENTER: SEARCH utasítást jelző felirat (alapértelmezett: "SRCH")
+**SENDTEXT (text)** - ENTER: SEND utasítást jelző felirat (alapértelmezett: "SEND")
+**NEXTTEXT (text)** - ENTER: NEXT utasítást jelző felirat (alapértelmezett: "NEXT")
+**DONETEXT (text)** - ENTER: DONE utasítást jelző felirat (alapértelmezett: "DONE")
+**PREVTEXT (text)** - ENTER: PREVIOUS utasítást jelző felirat (alapértelmezett: "PREV")
+**NONETEXT (text)** - ENTER: „nincs utasítás” felirata (alapértelmezett: "---")
+**UNKNOWNTEXT (text)** - ENTER: „ismeretlen utasítás” felirata (alapértelmezett: "???")
+
+**AUTOFUNCON (text)** - AUTOFUNC: bekapcsolt automata funkciók felirata (alapértelmezett: "AUTO")
+**AUTOFUNCOFF (text)** - AUTOFUNC: kikapcsolt automata funkciók felirata (alapértelmezett: "OFF")
+
+**MONITOR ( LAYOUT (keyword) [SIZE (int)] [BOLD]/[NONBOLD] [ITALICS]/[NONITALICS] [COLOR (color)] )** - Beállítja a monitor sor stílusát.  A háttér színe a layout alapszínét veszi fel. A typeface a FONT-ban beállított. Minden layouthoz külön monitor-sor beállítás tartozik. 
+  * LAYOUT (keyword) - kötelező, a layout azonosítója
+  * SIZE (int) - betűméret, ezrelékben, a sor magasságát is ennek megfelelően állítja be.
+  * BOLD - (flag) félkövér (szimulált)
+  * NONBOLD - (flag) félkövér kikapcsolása, ha default vagy label bekapcsolta 
+  * ITALICS - (flag) dőlt (szimulált)
+  * NONITALICS - (flag) dőlt kikapcsolása, ha default vagy label bekapcsolta 
+  * COLOR (color) - a szöveg színe (alapértelmezett: fekete)
+
+@s5[Parancsok részletei - soft-board felépítésére szolgáló utasítások:]
+
+A billentyűzet alapvető egysége a //layout//. A //layout// egy üres rács, melynek a celláiba helyezhetjük el az egyes billentyűket. A billentyűzet tervezése során elsőként mindig a //layout// rácsot kell elkészítenünk, melyet majd a //block// ill. az azon belül elhelyezkedő különböző //button// utasításokkal fogunk feltölteni. A //layout// csak a feltöltés után válik bemutatható billentyűzet-kiosztássá.
+
+Az android rendszeren a képernyő elfordítható, ezért meg kell különböztessük az álló (portrait) és fekvő (layout) irányt. A képernyő méretaránya a két állapotban jelentősen különbözik, ezért (általában) a két irányhoz két külön //layout//-ot érdemes készítenünk. 
+
+A két irányhoz tartozó két //layout//-ot egy párba csatoljuk, ez a pár a //board//. Azért van szükség külön utasításra, mert a //layout//-okat számtalan módon kombinálhatjuk. Szerepelhet ugyanaz a //layout// a portrait és a landscape oldalon is, vagy éppen tagja lehet több //board//-nak is, esetenként más-más párral. Hogy egy //board// párból melyik //layout// jelenik meg, kizárólag az orientációtól függ.
+
+Az éppen megjelenített //board// kiválasztása viszont sok tényezőtől függ. //Board//-ot választhatunk a //SWITCH// billentyű segítségével, ill. a szerkesztőmező is igényelhet megfelelő //layout//-ot (vagyis inkább //board//-ot). Az ehhez szükséges beállításokat a //board//-on belül kell megadnunk.
+
+A //SWITCH// gomb és a hozzá tartozó  //board// hasonlóan működik, mint a //meta// állapot. Amikor átváltunk egy másik //board//-ra, akkor az új //board// csak az első billentyű leütéséig aktív. Az első leütés után a rendszer visszavált az előző //board//-ra. Ha a váltás után folyamatosan szeretnénk az új //board//-ot használni, akkor ezt a **LOCK** paranccsal jelezzük. Ha a **LOCK** értéket megadjuk, akkor az automatikus visszatérés nem engedélyezett, csak a felhasználó "kényszerítheti" ki a visszatérést. A **LOCK** érték a //board// létrehozásakor is megadható, vagy a **SWITCH** parancs mellett is megadható. A két **LOCK** között nincsen különbség.
+
+Ahogy a //board//-okat váltjuk, a korábban használt //board//-ok tárolódnak, és a felhasználás sorrendjében lépünk vissza a korábban használt //board//-okra. Tárolásara kerül a **LOCK** állapot is. 
+A korábban használt //board//-okra történő visszaugrás szabályrendszere összetett, de érdemes röviden áttekinteni.
+Alapvetően mindig a **START** jelzésű //board//-ról indulunk el. Erről a //board//-ról sem automatikusan, sem a //BACK// billentyűvel visszalépni nem lehet.
+Lényeges különbség van az ún. zárolt és a nem-zárolt board-ok között. A zárolhatjuk a //board//-ot a **LOCK** paranccsal (akár létrehozásakor, akár a **SWITCH** mellett), vagy zárolhatjuk amikor a kiválasztott, még nem zárolt //board//-on újra leütjük a //board//-hoz tartozó **SWITCH** billentyűt. (Melynek színe ilyenkor megváltozik.) 
+A zárolt //board//-on folyamatosan gépelhetünk. A //board//-ról **SWITCH** billentyű segítségével másik //board//-ra léphetünk tovább, vagy saját magára mutató **SWITCH**/**SWITCH BACK** billentyűvel az előző board-ra visszatérhetünk. 
+A nem-zárolt //board// csak egyetlen billentyű leütését várja, ezt követően automatikusan visszatér egy korábbi //board//-ra.
+Egymás után több nem-zárolt board-ot is megnyithatunk, a rajtuk elhelyezett **SWITCH** billentyűkkel. Ha azonban automata visszalépés történik egy billentyű leutése után, akkor nem csupán az előző board-ra, hanem az utolsó zárolt board-ra fogunk visszatérni.
+Ezzel szemben, ha a board zárolt (akkor is, ha azt a felhasználó a board saját **SWITCH** billentyűjével "zárta le") - a visszatérés mindig a közvetlenül előző //board//-ra történik. (És ez a //board// is zárolt lesz).
+
+Ezek a szabályok "beszoríthatnak" minket egy nem megfelelően elkészített kiosztásnál. Célszerű, hogy az alapvetően zárolt állapotú //board//-ok között - mint fő-boardok között - lehetővé tegyük az átváltást. A nem-zárolt //board//-okat ezekről a "fő" (zárolt) //board//-okról célszerű meghívni (mint kiegészítő boardokat). 
+Speciális helyzetet teremt, ha egy nem-zárolt, kiegészítő //board// meghívhat egy zárolt, fő //board//-ot. Ilyenkor ugyanis az eredeti - nem-zárolt- board a visszatérés során maga is zárolttá válik. Ilyenkor biztosítani kell, hogy legyen lehetőség az explicit visszatérésre: vagyis legyen **SWITCH BACK** billentyű.
+
+Van még egy fontos szabály: mindig a legrövidebb út érvényesül. Vagyis: ha egy olyan //board// kerül kiválasztásra, amelyiken már jártunk, akkor a korábbi változat válik aktívvá, és visszalépések a korábbi //board//-tól számítanak. (A korábbi és az újabb megjelenés közötti board lépések tehát törlődnek.) Ez biztosítja, hogy ne alakuljanak ki "hurkok", a visszatérési listában minden board legfeljebb egyszer szerepelhet. Természetesen az indító "legalsó" **START** board-ból nem lehet visszalépni (akkor sem, ha tartalmaz **SWITCH BACK** billentyűt.
+
+A fenti szabályokkal a billentyűzet felhasználóinak nem kell túl sokat törődniük, hiszen egy megfelelően elkészített billentyűzet mindig a várt módon fog váltani a kiosztások között. Ugyanakkor a billentyűzet készítőinek ezt a szabályrendszert alaposan ismerni kell, mert enélkül olyan billentyűzet is készíthető, melyben a felhasználó egyszerűen nem tud kilépni valamelyik kiosztásból. 
+
+**ADDBOARD ( ID (keyword) PORTRAIT (keyword) LANDSCAPE (keyword) [LOCK] [START])** vagy **ADDBOARD ( ID (keyword) LAYOUT (keyword) [LOCK] [START])** - Létrehoz egy board-ot. A board két layout-ot tartalmaz, egyet a portrait és egyet a landscape álláshoz. A két layout-ot a PORTRAIT és LANDSCAPE paraméterekkel adhatjuk meg, az utóbbi lehet wide is. Ha mindkét módban ugyanazt a non-wide layout-ot használjuk, akkor ezek helyett a LAYOUT paramétert kell megadni.
+A LOCK flag jelzi, hogy induláskor a board mindig LOCK állapotba kerüljön.
+A START flag ezt a board-ot helyezi a legalsó, induló pozícióra. A START board-ról nem lehet visszatérni, és állapota (emiatt) mindig LOCK. Természetesen START board-ból egyetlen lehet. Ha nem adunk meg meg START board-ot, akkor a rendszer az elsőként definiált non-wide layout-ból hoz létre egy új board-ot, így mindkét irányban az elsőként definiált non-wide layout lesz a kiindulási layout.
+Paraméterek:
+  * ID (keyword) - a board azonosítója
+  * LAYOUT (keyword) - layout azonosítója, mely mindkét irányban megjelenik (nem lehet wide)
+vagy
+  * PORTRAIT (keyword) LANDSCAPE (keyword) - a két iránynak megfelelő layout (portrait nem lehet wide)
+  * LOCK - (flag) a board - switch-től függetlenül - mindig LOCK állapotú
+  * START - (flag) ez a board kerül a kiindulási pozícióra, mindig LOCK állapotúvá 
+  
+**ADDLAYOUT ( ID (keyword) HALFCOLUMNS (int) / COLUMNS (int) ROWS (int) [WIDE] [ALIGN (ODDS/EVENS)] [COLOR (color)] [TURNON ( [SHIFT] [CTRL] [ALT] )] / [TURNOFF ( [SHIFT] [CTRL] [ALT] )] [ASBOARD] [LOCK]/[START] )** - Létrehoz egy layout-ot, vagyis egy olyan mezőt, melynek hatszögű celláiba helyezhetjük el a gombokat. Minden //board// két layoutból áll össze: egy a //portrait// és egy a //landscape// módhoz. Ez a két //layout// lehet azonos, sőt több //board// is tartalmazhatja közösen ugyanazt a //layout//-ot. A //WIDE// layoutok csak landscape módban használhatóak, a //NON-WIDE// layoutok viszont mindkét módban.
+Az ASBOARD flag egyszerűsíti a board definiálását. ugyanazon Id alatt egy layoutot és egy, mindkét állásban ugyanazt a layoutot tartalmazó board-ot is létrehoz. LOCK és START ilyenkor ugyanúgy megadhatóak, mint a boardnál egyébként. ASBOARD csak non-wide board-nál használható!
+Paraméterek:
+  * ID (keyword) - a layout azonosítója
+  * HALFCOLUMNS (int) vagy COLUMNS (int) - szélesség fél- vagy egész hatszögekben. Félhatszögekre a sorok eltolása miatt van szükség; ebből páratlan is megadható. Halfcolumns használata javasolt.
+  * ROWS (int) - magasság egész hatszögekben
+  * WIDE - (flag) landscape irányban használható, szélesebb layout jelzése. A non-wide layout szélessége mindig a keskenyebb, portrait módnak felel meg. Ugyanezzel a szélességgel használható landscape módban is. A wide layoutok viszont a szélesebb, landscape mód szélességét veszik fel, így ezek a layoutok portrait módban nem használhatóak
+  * ALIGN (ODDS/EVENS) - Odds (páratlan) vagy even (páros) sorok kezdődjenek egész hexagonnal. Legfelső sor értéke: 1. Alapértelmezetten: ODDS. 
+  * COLOR (color) - a layout alapszíne. Alapértelmezetten: light-gray
+  * LINECOLOR (color) - a hatszögek közötti vonal színe. Alapértelmezetten:  black
+  * LINESIZE (int) - a hatszögek közötti vonal vastagsága. Alapértelmezetten: 0 (hajszálvékony)
+  * PICTURE (file) - a layout hátterét a képet tartalmazó file alapján állítja be. A kép mérete a layout méretére változik, várhatóan torzul. A kép-file-naka a munkakönyvtárban kell lennie! Megjegyzendő, hogy a kép beállításával együtt érdemes minden szín alfacsatornáján az átlátszóságot növelni, melyet az ALPHA parancs lehetővé tesz.  
+  * TURNON ( SHIFT CTRL ALT ) ill. TURNOFF ( SHIFT CTRL ALT ) Kényszerítik az adott meta állapot be- vagy kikapcsolását, amikor a layoutra lépünk. Kilépéskor (kizárólag) a kényszerített értékek visszaállnak az eredeti állapotra. 
+  * ASBOARD, LOCK, START - (flag) ASBOARD esetén egy board is létrehozásra kerül, amely ezt a layoutot tartalmazza mindkét irány számára. (Ilyenkor természetesen az ADDBOARD parancsot kihagyjuk.) A board és a layout azonos id-t kap. LOCK és START ugyanúgy használható. Wide layout mellett ez természetesen nem működik.
+
+**BLOCK**
+
+Először az ADDLAYOUT (ill. ADDBOARD) parancsokkal egy üres hatszögrácsot hozunk létre a billentyűzetkiosztás számára. Második lépésben ezt az üres hatszögrácsot a BLOCK parancs segítségével töltjük fel tényleges billentyűkkel.
+
+A Block parancs - tényleges kiadásakor - kötelezően megjelöli a layout egyik celláját. Ebből a cellából kiindulva relatív elmozdulások megadásával szinte "felrajzoljuk" a billentyűket. A relatív iránymegadások miatt a block utasításban lévő billentyűk elrendezése minden kiosztáson azonos lesz. Ha megváltoztatjuk a kiindulási koordinátákat, akkor az új koordinátákból is teljesen azonos elrendezést kapunk. 
+Ez a parancs a LET/DEFINE utasítással együtt alkalmazva válik nagyon hatékonnyá. Ilyenkor ugyanis csak az összetartozó billentyűk elrendezését adjuk meg a címkében, de a címke nem fogja tartalmazni a kiindulási koordinátát. Ezt a block-ot aztán ténylegesen - a koordináták és a címke megadásával - több különböző layouton is felrajzolhatjuk, és más-más helyen, de mindig azonosan fog megjelenni. Egy layout-on természetesen több, egymástól független block-ot is felrajzolhatunk. 
+
+A kiindulási, abszolút pozíciók megadásában jelenleg mindhárom kötelező. Meg kell adjunk egy már létező layout-ot, valamint azon belül egy sor/oszlop értéket. A bal szélső már látható hexagon (fél is!) értéke 1. A legfelső sor értéke 1. Ha a sornak negatív értéket adunk, akkor a számolást a program a legalsó sortól kezdi (ennek értéke: -1). A kötelező paraméterek természetesen betehetőek egy megelőző default parancsba is, így például egymás után több block ugyanarra a layout-ra helyezhető, vagy - ha a pozíciót adjuk meg -, minden layouton ugyanazon pozícióról indulhat. (A tervezéshez segítséget jelent a beállítások között szerepelő, "Number on hexagons" bejegyzés, mely minden egyes hexagonon feltünteti a koordinátát.)
+
+Ha a relatív útvonalon a BUTTON-ok közvetlenül egymás után szerepelnek, akkor automatikus jobbra lépés történik. Irányparaméter megadásánál automatikus lépés nincs, tehát ilyenkor a beírt BUTTON pozíciójától számolhatunk.
+
+A koordináták megadásához szükséges paraméterek:
+  * LAYOUT (keyword) - a layout azonosítója, melyre a gombok kerülnek. Ennek megadása nem kötelező, ilyenkor az utolsó BLOCK vagy ADDLAYOUT parancsban használt layout-ot veszi alapul. (Vigyázat! DEFAULT ezt felülírhatja, ezért helyesebb kiírni.)
+  * COLUMN (int) - oszlop, 1. a bal szélső, már látható (alapértelmezett: 1)
+  * ROW (int) - sor, 1. a legfelső. Negatív értéknél fordítva, alulról kezdi a számolást  (alapértelmezett: 1)
+
+Irányparaméterek:
+**L** - (flag) balra;
+**R** - (flag) jobbra;
+**DL** - (flag) le és balra;
+**DR** - (flag) le és jobbra;
+**UL** - (flag) fel és balra;
+**UR** - (flag) fel és jobbra;
+**CRL** - (flag) le és vissza a sor elejére, a sorkezdő cella alá balra. A sor eleje a továbbiakban ez a cella;
+**CRR** - (flag) le és vissza a sor elejére, a sorkezdő cella alá jobbra. A sor eleje a továbbiakban ez a cella;
+**FINDFREE** - (flag) ellép a következő üres ÉS teljes méretű cellára. Csak a teljes cellákat használja, hiszen - elvileg - a billentyű bármelyik pozícióra kerülhet. Így viszont nem tudunk eredendően olyan feliratot megadni, amelyik bármely fél vagy egész gombon hibátlanul jelenne meg. Sor végén is továbblép, és a következő sor legelején (1. oszlop) kezdi a keresést. A CR pozíció viszont nem lép tovább az új sorra, ezért nem célszerű a CRR/CRL és a FINDFREE együttes használata. Mivel üres pozíciót keres, EXTEND-del értelemszerűen nem szabad használni;
+**HOME** - (flag) vissza a blokkban megadott abszolút pozícióra. A sor eleje a továbbiakban ez a cella;
+**SKIP (num)** - (int) - kihagyja a megadott számú cellát. Negatív értékkel balra hagyja ki a cellákat. 0 csak jobbra lép;
+
+@s5[Billentyűk megadása]
+
+Jelenleg rendelkezésre álló, billentyűket definiáló parancsok:
+	BUTTON,
+	SINGLE,
+	DOUBLE,
+	ALTERNATE,
+	LIST,
+	MULTI,
+	MODIFY,
+	SPACETRAVEL,
+	MEMORY,
+	PROGRAM,
+	AUTOSHORTCUT,
+	FINDSHORTCUT,
+	ENTER,
+	META,
+	SWITCH és
+	EXTEND
+
+A billentyűk elkészítése a billentyű funkciójának megfelelő BUTTON (és társai) parancsokkal történik, míg az EXTEND parancs a már megadott billentyűket bővíti vagy módosítja.
+
+A billentyűk tehát a BLOCK parancs paraméterei között adhatók meg. A BLOCK parancs egymás után olvassa be a paramétereit, és - a kötelezően megadott koordinátákból elindulva -, vagy a billentyű paraméter-parancs alapján elkészít egy billentyűt az éppen adott pozíción (és továbblép a következő pozícióra), vagy az irány paraméter-parancsoknak megfelelően mozdítja el a pozíciót.  
+
+Egy billentyű elkészítéséhez rengeteg paraméterre lesz szükségünk. (Itt is célszerű a DEFAULT és a LET/DEFINE parancsok használata az ismétlődő paraméterek helyett.) Didaktikailag a paramétereket a billentyű definiálásához szükséges 3 komponens alapján foglaljuk össze. Természetesen minden billentyű parancs a paraméterei között mindhárom komponens tartalmazhatja, vagyis a funkcióhoz szükséges paraméterek mellett egy COLOR és akár több ADDTITLE paraméter-parancsot is.
+
+A billentyűket definiáló 3 komponens:
+  - billentyű funkciója, melyet a parancs határoz meg
+  - billentyű feliratai (ADDTITLE…)
+  - billentyű alapszíne (COLOR)
+  
+Minden billentyű paraméterlistája tartalmazhat egy **OVERWRITE** paramétert. Ha ezt magadjuk, akkor nem kapunk hibaüzenetet akkor sem, ha egy, már létező billentyűt felülírunk.
+
+Bár külön tárgyaljuk, de a billentyűk definícóinál mindhárom komponens paramétereit feltűntetjük.
+
+@s4[1. A billentyű funkciója]
+
+A billentyűket a funkció szerint csoportosítva készíthetjük el. Technikailag érdemes megfigyelni, hogy a coat nyelvben általában a parancs azonosítja azt az egységet, melynek értéket adunk. Ez előnyös, hiszen a default utasítással a hasonló egységek közös paraméterei együttesen definálhatóak. Ugyanakkor a parancsot, (vagyis az egység nevét) minden egyes értékadásnál meg kell adnunk.
+A másik lehetőség, hogy az értékeket "vegyítve" közöljük a feldolgozó rendszerrel, mely az értékek alapján kiválasztja a feltöltendő struktúrát. Ebben az esetben a default utasítás korlátozottan használható, viszont sokkal takarékosabban adhatunk meg adatokat - hiszen ténylegesen csak az érték/ek megadására van szükség. A billentyűdefinícókon belül már ezt a módszert használjuk.
+@uthon[Ezt a részt nem értem kristálytisztán]
+
+@s3[MULTITOUCH érintésre felkészített billentyűk]
+
+A legtöbb esetben a billentyűzet csupán egyetlen billentyű érintését veszi figyelembe. ezek az ún. MAIN billentyűk. A MULTITOUCH érintésre felkészített billentyűket azonban használhatjuk a MAINTOUCH billentyűkkel együtt (pontosabban azok előtt megérintve és az érintést megtartva).
+Érintéskor ezek a billentyűk ún. TOUCH állapotba kerülnek, és addig aktívak lesznek, amíg az érintés tart. Az ilyenkor leütött MAIN billentyűk a MULTI billentyűkkel együtt kerülnek feldolgozásra. Ha a MULTITOUCH billentyű érintése alatt nem történik MAINTOUCH billentyű leütés, akkor a MULTITOCH billentyű a felengedése után is ACTIVE állapotban marad, vagyis a multi-billentyű a következő egyetlen MAINTOUCH leütésre lesz érvényes. Ha nem MAIN billentyűt ütünk le, hanem az ACTIVE állapotban lévő MULTITOUCH billentyűt érintjük meg ismét, akkor az ún. LOCK állapotba érünk. LOCK állapot esetén a MULTITOUCH billentyű hatása folyamatosan, minden leütött MAIN billentyűre érvényes. A LOCK állapotban lévő MULTITOUCH billentyű újabb leütése pedig a MULTITOUCH billentyű kikapcsolt állapotához visz vissza. 
+A MULTITOUCH billentyű definíciójában a paraméterek között megadhatjuk a LOCK flag-et. Ilyenkor az ACTIVE állapot kimarad, kikapcsolt állapotban történő leütés során a billentyű rögtön LOCK állapotba kerül.
+
+**META ( 
+	CAPS / CTRL / ALT / SHIFT [LOCK] )
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] )** - meta állapotot beállító billentyű
+  * CAPS / CTRL / ALT / SHIFT - a billentyűhöz rendelt meta-állapot 
+  * LOCK - (opcionális) - a meta-állapot kihagyja az aktív állapotot és azonnal zárolt állapotba lép
+
+** SWITCH (
+	BOARD (keyword) / BACK
+	[LOCK]
+	[CAPSSTATE]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] )** - boardok közötti váltásra szolgáló billentyű
+  * BOARD (keyword) - a megadott boardra vált. Ha a saját azonosítót adjuk meg, akkor ugyanaz, mint BACK
+  * BACK - visszalép az előző board-ra. (BOARD és BACK közül az egyik szerepelhet.)
+  * LOCK - (opcionális) - az új board zárolt állapotba kerül
+  * CAPSSTATE - (opcionális) - a billentyű (kikapcsolt állapotban) jelzi a bekapcsolt AUTOCAPS állapotot. Ez akkor hasznos, ha a nagybetűk egy külön layout-on szerepelnek, és nem használnánk a META (CAPS) billentyűt. 
+
+@s3[MAINTOUCH billentyűk]
+
+Hagyományos billentyűk, melyek közül egyszerre egyet tudunk leütni. Már leütött MULTITOUCH billentyűk (ill. az ezen billentyűk miatt aktív meta-állapotok) hatnak rájuk. 
+Ezekre a billentyűkre jellemző, hogy ugyan csak egy érintést fogadnak, de egymás után több különböző funkciót is elláthatnak (feltéve, hogy az előző funkció maradéktalanul visszavonható). A másodlagos funkciót kétféle módon érhetjük el: vagy hosszan mozgatjuk az ujjunkat, vagyis kőrözünk a billentyűn - ez az alapértelmezett ONCIRCLE paraméter; vagy csak folyamatosan nyomva tartjuk - ez az ONSTAY paraméter.
+Tehát a speciális paraméterek, melyek minden másodlagos funkcióval rendelkező billentyűnél szerepelhetnek:
+  * ONCIRCLE - (opcionális) - a másodlagos funkció körözéssel váltható ki (alapértelmezett)
+  * ONSTAY - (opcionális) - a másodlagos funkció hosszú (vagy speciális esetben erős) nyomással váltható ki (REPEAT mellett ez az alapértelmezett)
+
+Packet-et használó MAINTUCH billentyűk
+
+A billentyűzet elsődleges feladata, hogy az editor-nak adatokat küldjön. Ilyen adat pl. a leütött billentyűnek megfelelő karakter, vagy egy ún. hard-key, vagy akár egy speciális funkció, pl. a megelőző karakter törlése. Mindezeket az adatcsomagokat - melyeket a billentyűzet az editornak küld - PACKET-nek nevezzük. A MAINTOUCH billentyűk (néhány seciális típustól eltekintve) ilyen PACKET-eket küldenek el, és a billentyű típusa nem magát a PACKET-et, hanem azt határozza meg, hogy leütéskre a billentyű hogyan reagáljon, vagyis mikor küldje el a PACKET-et. 
+A PACKET-eket a MAINTOUCH billentyű definíciójában, annak paraméterei között külön adjuk meg. HIvatalosan ezt egy külön PACKET() utasítással tehetjük meg, vagy - ha két külön packet megadása szükséges -, akkor a FIRST() és SECOND() parancsokkal. A FIRST és PACKET parancs elhagyható, paramétereiket az aktuális BUTTON utasítás paraméterei közé keverhetjük. Szemben a BUTTON utasításokkal, ahol maga a parancs határozza meg a típust, PACKET esetén a típust a paraméterek döntik el.
+
+Számos különböző packet készíthető:
+**1. TEXT** - szöveges packet
+**PACKET ( TEXT (text) /  TIME [FORMAT (text)] / VARIA (keyword) INDEX (int)
+                [AUTOCAPS ( ON / OFF / HOLD / WAIT )]
+                [STRINGCAPS]
+                [ERASESPACE ( BEFORE / AFTER / AROUND )]
+                [AUTOSPACE ( BEFORE / AFTER / AROUND )] )**
+
+  * TEXT (text) - textuális érték, a leggyakrabban alkalmazott packet. Egy betűt, vagy akár több karakteres stringet is elküldhetünk a billentyű leütésekor. 
+
+  * TIME - Speciális szöveges packet, mely beilleszti az aktuális időt. (Bár több karaktert szúr be, a STRINGCAPS nem értelmezhető ebben az esetben. Továbbá:
+  * FORMAT ("idő-formátum") - (opcionális) - ha megadjuk, akkor az idő-formátumnak megfelelő formában adja meg az aktuális időt. Az idő-formátumot a java SimpleDateFormat() metódus alapján kell megadnunk. FORMAT parancs nélkül a TIME a rendszer és a (locale) által szolgáltatott alapértelmezett formátumban írja be a dátumot. 
+
+  * VARIA (keyword) INDEX (int) - a VARIA változó billentyűket jelöl. A VARIA több csoporot és minden egyes csoportban ugyanannyi, INDEX-szel azonosított elemet tartalmaz. A PACKET egy VARIA egyetlen - INDEX-szel jelölt - elemét választja ki. A csoportot viszont a szövegkörnyezet határozza meg; tehát a billentyű mindig az azonos sorszámú elemet veszi ki a szövegkörnyezet által meghatározott csoportból. Ez gyakorlatilag azt jelenti, hogy lesz egy (vagy akár több) olyan billentyűnk, melyek a szövegkörnyezet (vagyis a leütés előtt beírt szöveg) alapján változik. Részletes leírást ld. később.
+  
+  * AUTOCAPS (ON/OFF/HOLD/WAIT) - (opcionális) -  automatikus nagybetű kiváltási módjai:
+    * OFF (alapértelmezett) - a billentyű leütése után az automatikusan bekapcsolt AUTOCAPS meta-állapot kikapcsol. Ez nem érinti a felhasználó által, kézzel bekapcsolt CAPS meta-állapotot!
+    * ON - a billentyű leütése után a AUTOCAPS meta-állapot bekapcsol, vagyis a következő karakter nagybetűs lesz.
+    * HOLD - a billentyű leütése során az AUTOCAPS meta-állapot megmarad. Pl. egy mondatvégi írásjel bekapcsolja a AUTOCAPS állapotot. A következő space - AUTOCAPS HOLD értékkel - megtartja azt, vagyis a következő, mondatkezdő betű nagy lesz. Ezzel szemben a szavak között a space az előző szó utolsó betűje által kikapcsolt AUTOCAPS állapotot tartja meg (Hiszen ugyanúgy AUTOCAPS HOLD utasítást kapott), így a következő szó kisbetűvel kezdődik.
+    * WAIT - ez egy speciális utasítás. Az AUTOCAPS WAIT önmagában kikapcsolja az AUTOCAPS állapotot, azonban - ha a következő leütésnél AUTOCAPS HOLD következik, akkor nem megtartja, hanem bekapcsolja az AUTOCAPS állapotot. Pl. az AUTOCAPS WAIT utasítást tartalmazó pont a mondat végén tökéletesen működik, vagyis az AUTOCAPS HOLD utasítást tartalmazó szóköz miatt a következő karakter nagybetűs lesz. Ezzel szemben, ha a szóközt kihagyjuk, és a pontot közvetlenül egy betű követi, akkor az - AUTOCAPS WAIT-nek megfelelően - kisbetűt kapunk. Erre egyébként a helyesírási szabályok alapján nincs szükség, de gyors jegyzetelésnél hasznos lehet a kihagyott szórészek jelzésére. 
+  * STRINGCAPS - (opcionális) - csak stringre (vagyis több karakterből álló szövegre) érvényes. Nagybetűs írásmód: ha megadtuk, akkor a string összes betűjét kapitalizálja, míg ha nincs megadva, akkor csak első karaktert
+  * ERASESPACE ( BEFORE / AFTER / AROUND ) - (opcionális) - beírás előtt törli a környező space-ket
+  * AUTOSPACE ( BEFORE / AFTER / AROUND ) - (opcionális) beírás előtt egy space-t is ír a megadott helyre, amennyiben ott nem talál whitespace karaktert
+  Mindkét esetben:
+    * BEFORE - csak a beírás előtti szóközökre vonatkozik
+    * AFTER - csak a beírás után álló szóközökre vonatkozik
+    * AROUND - a beírás előtt és után álló szóközökre egyaránt vonatkozik.
+  Ezek az utasítások különösen hasznosak írásjelek esetén. Pl. a mondatvégi írásjelek előtt soha nem állhat szóköz, ezért azokat töröljük. Szintén töröljük az utána álló szóközöket is, mivel így megakadályozhatjuk, hogy több szóköz szerepeljen az írásjel után. Egy szóköz viszont mindenképp szükséges, ezt szintén ki tudjuk írni. Vagyis ilyenkor az ERASESPACE ( AROUND ) és AUTOSPACE ( AFTER ) utasításokat érdemes együtt megadni.
+
+**2. KEY** - szimulált hard-key
+**PACKET ( KEY (int) [TURNON (CAPS / SHIFT / CTRL / ALT)] [TURNOFF (CAPS / SHIFT / CTRL / ALT)] )**
+  * KEY (int) - A hard-key-eket címkék azonosítják, a paraméterben ezeket a konstansokat kell feltüntetni. Amennyiben létezik hard-key párjuk, akkor a BMP tartományba (0xFFFF alatt) eső karakterek közvetlenül is megadhatóak. (Emiatt figyelni kell arra, hogy a billentyűzet más kóddal azonosítja a hard-key-eket, mint az android rendszer. Ha a címke helyett mégis közvetlenül a hard-key kódszámát szeretnénk megadni, akkor a rendszer által használt kódszám értékéhez 0x10000 értéket hozzá kell adnunk. Ezzel a kódszámokat gyakorlatilag kitoltuk a BMP kódok területéről.)
+  * TURNON (CAPS/SHIFT/CTRL/ALT) ill. TURNOFF (CAPS/SHIFT/CTRL/ALT) - (opcionális) - kikényszeríti a megadott meta állapot ki vagy bekapcsolását. A nem megadottakra az aktuális meta állapot érvényes.
+
+**3. FUNCTION** - speciális funkciók
+
+  * **PACKET ( DELETE )** - jobbra törlés
+  * **PACKET ( BACKSPACE )**- balra törlés
+  * **PACKET ( SELECTALL )** - a teljes szöveget kijelöli
+  * **PACKET (CHANGECASE ( [LOWER] [UPPER] [SENTENCE] ) )**- a kijelölt szöveg/aktuális szó kisbetű/nagybetű/kezdő nagybetű állapotát váltja. A paraméterben megadott állapotok engedélyezettek, ezeket görgeti minden aktiválásnál. A paraméterek között nem megadott állapotok tiltottak. Ha egyetlen állapotot sem adunk meg, akkor egyedül a SENTENCE lesz az alapértelmezett, vagyis minden szöveg kezdőbetűjét változtatja nagybetűre, és ebből az állapotból további leütésre sem megy tovább.
+
+  * **PACKET ( TOGGLE CURSOR )** - a kijelölés két vége között vált; a kiválasztott véget tudjuk mozgatni. (ld. CURSOR)
+  * **PACKET ( TOGGLE AUTOFUNC )** - az automatikus funkciókat kapcsolja ki/be
+  * **PACKET ( RELOAD )** - újra betölti a coat file-t
+  * **PACKET ( SETTINGS )** - megnyitja a beállításokat
+  * **PACKET ( RUN ("package.name") )** - elindítja a megadott programot (melynek természetesen telepítve kell lennie)
+  * **PACKET ( HTML ("fileName") )** - megnyitja WebView-ban a megadott file-t. Könyvtár megadható, az external sd-card (rendszer által meghatározott) alatt. HTML és UTF-8 kódolás alkalmazható (alapértelmezetten).
+  * **PACKET ( WEB ("webcím") )** - mint az előző, de egy web-pldalt nyit meg. Ha nincs kitéve a ''html:'/'/" (vagy "htmls:'/'/") kód, a ''html:'/'/"-t hozzáilleszti. Fontos, hogy a ''/'' jelet használjuk elválasztásra  (és ne a backslash-t, mint Windows alatt).
+  * **PACKET ( LOAD ("coatFileName") )** - betölti a megadott coat file-t (akkor is, ha az hibás!). A file-t a working directory-ban keresi. Fontos, hogy a preferences-ben beállított coat file-t NEM módosítja, tehát a reload az eredeti coat file-t tölti be. Szintúgy az eredeti jön vissza, ha valamiért a service újraindul (gép indítás, másik billentyűzet beállítása pl.)
+  * **PACKET ( HELP )** - WebView-ban megnyitja a programhoz tartozó HELP-et. (Ez egyébként a beállítások menüjéből is elérhető)
+  
+**4. MOVE** - kurzor mozgatásával kapcsolatos funkciók
+  * **PACKET ( TOP/BOTTOM [SELECT (ALWAYS/NEVER/IFSHIFT)])**
+  * **PACKET ( LEFT/RIGHT [WORD/PARA] [CURSOR (BEGIN/END/RECENT)] [SELECT (ALWAYS/NEVER/IFSHIFT)])**
+
+Ezek a műveletek magyarázatot igényelnek:
+A **TOP** a kurzort a szöveg elejére, a **BOTTOM** a szöveg végére mozgatja. Ha kijelölés is aktív, akkor a jelenlegi kijelölés bővül. (Vagyis a TOP csak az első, míg a BOTTOM csak a hátsó kurzort mozgatja.)
+A **RIGHT/LEFT** utasításokkal relatív kijelölést végezhetünk. WORD esetén egy szót, PARA esetén egy bekezdést ugrik. Ha nincs megadva, akkor csak egyetlen karaktert ugrik.
+Kijelölésnél van jelentősége a **CURSOR** paraméternek. A BEGIN az első, END a hátsó, míg RECENT az utolsóként mozgatott kurzort vezérli. A RECENT kurzora a TOGGLE CURSOR funkcióval megfordítható. 
+A **SELECT** a kijelölés módját adja meg: ALWAYS a funkció használatakor kijelölés is történik; NEVER nem történik kijelölés csak kurzormozgatás; IFSHIFT aktív SHIFT meta-állapot esetén történik kijelölés. 
+Fontos tudni, hogy ezek a funkciók intenzív kommunikációt igényelnek a billentyűzet és az editor között. Ha ez tiltott (beállításokban), akkor egy hard-key elküldését szimulálják. Ezt a hard-key-t egy, a paraméterek között megadott KEY beállításával mi magunk is megadhatjuk. Alapértelmezetten MINDEN mozgatási utasításra az iránynak megfelelő DPAD_LEFT és DPAD_RIGHT kerül elküldésre. (Tehát ilyenkor csak egyetlen karaktert mozdít mindegyik művelet.)
+
+**5. COMBINE** 
+**PACKET( COMBINE non-key-packet-paraméterei key-packet-paraméterei )** - TEXT/FUNCTION packetet kombinál KEY packettel. Ha bármelyik meta state aktív (shift, ctrl, alt), akkor a KEY komponenst használja (akár annak kényszerített meta-állapotaival), míg ha egyik meta state sem aktív, akkor a másik (text vagy function) packetet küldi el. Ez pl. a backspace, delete vagy tab billentyűnél lehet hasznos. 
+A MOVE funkció is használható a COMBINE-ként, de ilyenkor a megadott KEY érték nem csupán a meta állapotok esetén, hanem a tiltott kommunikáció esetén is érvényes lesz. (Vagyis egyetlen KEY-t adhatunk meg mindkét feladatra; bár ez általában nem okoz problémát.
+
+A packetek elsődleges (FIRST) és másodlagos (SECOND) packetként kerülnek felhasználásra. Az egyszerűség kedvéért a FIRST (és PACKET) paraméterei beilleszthetőek a billentyű paraméterei közé. A PACKET parancs elsősorban LET/DEFINE mellett használható. Ezek a cimkék ugyanis bárhol (vagyis az összes BUTTON parancsban is) felhasználhatóak, ahol packet megadására van lehetőség.
+
+@s3[Packet elküldésére szolgáló billentyűk]
+
+Az elsődleges packet-et a FIRST, míg a másdlagos packetet a SECOND paraméterrel azonosítjuk. A FIRST parancs elhagyható, ilyenkor az elsődleges packet paraméteri a button paraméterei közé vegyíthetőek. Fontos tudni, hogy a másodlagos packet csak akkor küldhető el, ha a korábban elküldött packet visszavonható. Általában a szöveges packet-ek visszavonhatóak.
+
+**BUTTON** - paraméterek alapján választja ki, hogy SINGLE vagy DOUBLE billentyűt készítsen. A SINGLE vagy a DOUBLE parancsnál megadott paraméterek használhatóak. 
+
+**SINGLE** - csak egyetlen packet elküldése
+**SINGLE ( [FIRST](packet-paraméterek) [REPEAT/TWIN/CAPITAL]
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+
+  * FIRST (packet-paraméterek) - paraméterek FIRST nélkül, közvetlenül is megadhatóak
+  Másodlagos funkciók (opcionális a megadásuk):
+  * REPEAT - ismétli a leütést (ilyenkor ONSTAY kerül beállításra, ha másként nem jelezzük)
+  * TWIN - duplázza a karaktert
+  * CAPITAL - kis-nagybetű átalakítást végez.
+  
+**DOUBLE** - elsődleges és másodlagos funkcióhoz külön packet rendelhető
+**DOUBLE ( [FIRST](packet-paraméterek) SECOND (packet-paraméterek)
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+
+  * FIRST (packet-paraméterek) - paraméterek FIRST nélkül, közvetlenül is megadhatóak
+  * SECOND (packet-paraméterek) - másodlagos funkcióhoz tartozó packet 
+  
+**ALTERNATE** - elsődleges és másodlagos funkció minden leütésnél cserélődik.  Fontos, hogy az UTOLSÓ billentyű-felirat módosításával jelezi az aktuális packet-et. 
+**ALTERNATE ( [FIRST](packet-paraméterek) SECOND (packet-paraméterek)
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+
+  * FIRST (packet) - paraméterek FIRST nélkül, közvetlenül is megadhatóak
+  * SECOND (packet) - másik funkcióhoz tartozó packet 
+
+**MULTI** - tetszőleges számú packet megadható. Vigyázat, ezek elérése nem egyszerű! Csak felemelés nélkül, egymás után érhetőek el! Kis képernyő esetén viszont hasznos lehet. Jelenleg csak text packetet fogad!
+**MULTI ( ADD (text-packet-paraméterek)…
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+  * ADD (text-packet-paraméterek)… - a paraméterek között TIME/FORMAT is megengedett, azonban VARIA/INDEX jelenleg nem elfogadott
+
+**LIST** - egyetlen text-packet-et használ, viszont ezt követően tetszőleges számú text paraméter adható meg. A leütés során ellenőrzi a beírás előtt álló szöveget; ha ez valamelyik text-nek megfelel, akkor a következőt illeszti be. Ezzel minden egyes primér leütésre a (legfeljebb egyetlen) text-packet és (akár több) ADDTEXT paramétereit pörgeti, ugyanúgy, mint a modify parancs. Viszont, ha nem talál egyezést a beírás előtt álló szövegben, akkor beírja a text-paceket TEXT paraméterének, vagy annak hiányában az első ADDTEXT paraméterének szövegét. A beíráshoz a packet paramétereit használja (módosításhoz már nem!) Mivel a pörgetés az elsődleges funkcióval történik, kísérletképp másodlagos funkció is megadható (opcionális). Ez azonban félreérthető lehet, óvatosan használjuk!
+**LIST ( text-packet-paraméterek 
+	ADDTEXT(text)… [SECOND (packet-paraméterek)]
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+  * (text-packet-paraméterek) - jelenleg CSAK TEXT paramétert tartalmazó packet-paraméterek elfogadottak, TIME/FORMAT, VARIA/INDEX viszont nem alkalmazható. Emiatt itt kivételesen a FIRST vagy PACKET elkülönítés sem alkalmazható.
+  * ADDTEXT (text)…
+  * (SECOND (packet-paraméterek))
+
+@s3[Speciális billentyűk]
+
+**SPACETRAVEL** - speciális szóköz, csak akkor érvényes, ha a stroke (érintés) ezen kezdődik, vagy ezen végződik. Csak akkor küldi el a hozzá tartozó packet-et (ami alapértelmezetten a szóköz, ha ezen a billentyűn érintjük meg a billentyűzetet, vagy ha itt emeljük fel az érintést. Megadhatunk egy packet-et (a button paraméterei között), akkor azt használja a szóköz helyett. Másodlagos packet-et a DOUBLE-lel azonosan használja
+** SPACETRAVEL( [packet-paraméterek] [SECOND (packet-paraméterek)]
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] )) **
+  * (packet-paraméterek) - (opcionális) - paraméterek közvetlenül, space helyett 
+  * SECOND (packet-paraméterek) - (opcionális) - másodlagos funkcióhoz tartozó packet 
+
+** ENTER ** - az android rendszer kibővítette az enter jelentését. Az editor szándékától függően lehet speciális utasítás (akkor ezt a billentyű felirata jelzi), vagy lehet hagyományos, szöveges újsor. Ha meta billentyűkkel együtt használjuk, akkor viszont szimulált hard key szükséges. Packet-ként TEXT és KEY megadható, akkor azokat használja a szöveges és szimulált újsor helyett. REPEAT használható. A felirat alapértelmezetten SHOW ENTER.
+**ENTER ( [text-packet-paraméterek)] [(key-packet-paraméterek)] [REPEAT]
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+  * (textpacket) - (opcionális) - szöveges újsor helyett használt packet. Csak TEXT paraméterrel elfogadott.
+  * (keypacket) - (opcionális) - hard-key enter helyett használt szimulált hard-key (aktív meta-állapotban használt)
+  * REPEAT - (opcionális) - a másodlagos funkció: ismétli a leütést (ONSTAY kerül beállításra, ha másként nem jelezzük) 
+  
+**MEMORY** - speciális tárolóbillentyű. Állapotai: MEM - üres; SEL felirat (SHIFT meta-állapotot zárolja) - kijelölésre vár; a szöveg legfeljebb 5 karakterre rövidített változata a feliraton - a szöveget beilleszti. Másodlagos funkció: alaphelyzetbe állítja a billentyűt és törli a beállított szöveget. Fontos, hogy mindig az UTOLSÓ felirat módosításával jelez vissza.
+**MEMORY ( [text-packet-paraméterek]
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+  * (text-packet) - (opcionális) - paraméterek közvetlenül megadva. TIME/FORMAT ill. VARIA/INDEX itt nem elfogadott. Ha TEXT szöveget is megadunk, automatikusan azzal indul. Csak a szöveget módosítja új tároláskor, tehát a többi paraméter érvényes marad (pl. ERASESPACE és AUTOSPACE)
+  
+**PROGRAM** - speciális tárolóbillentyű programok számára. Az éppen aktuális programot (melyben a szerkesztés történik) tárolja. A csomag név utolsó tagjának elejét írja ki. Amikor a billentyűt leütjük, akkor a billentyűzet újra elindítja a programot - a felhasználó szempontjából átváltunk a programra. Ezzel a funkcióval gyakorlatilag visszatérhetünk az üres billentyű lenyomásakor használt programra. A másodlagos funkció törli a tárolt programot. 
+Vigyázat! Nem minden program adja meg az adatait. Ezekkel a programokkal nem tud együttműködni a billentyűzet. Arra is vigyázni kell, hogy ha a tárolt program maga nem tiltja, akkor egy új példány fog elindulni. Sajnos, csak beviteli mezővel rendelkező (tehát a billentyűzetet használó) programokkal működik.
+**PROGRAM ( [RUN ("package.name"]
+	[ONCIRCLE / ONSTAY]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+  * (run-packet-paraméterek), vagyis RUN "csomag-név" - (opcionális) - megadhatjuk az alapértelmezetten indított program nevét.
+
+**MODIFY ( 
+	ROLL (keyword)
+	[REVERSE]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+Az ADDMODIFY paranccsal beállított modify szabály végrehajtása. Részletes leírást ld. később.
+
+**AUTOSHORTCUT ( ID (keyword) 
+		[ONCIRCLE / ONSTAY]
+		[ADDTITLE(addtitle-paraméterek)…]
+		[COLOR (color)]
+		[OVERWRITE] )**
+A kiválasztott rövidítés gyűjteményt aktívvá teszi. Ha a beírás alatt egyezést (legrövidebb egyezőt) talál, azt azonnal módosítja. Részletes leírást ld. később.
+
+**FINDSHORTCUT ( ID (keyword) 
+		[ONCIRCLE / ONSTAY]
+		[ADDTITLE(addtitle-paraméterek)…]
+		[COLOR (color)]
+		[OVERWRITE] )**
+A megadott gyűjtemény alapján leütéskor keresi ki a kurzor előtt álló rövidítést (leghosszabb egyezőt).  Részletes leírást ld. később. 
+
+@s4[2. A billentyű feliratai]
+
+**ADDTITLE (
+		[TEXT (text) / GETFIRST / GETSECOND / SHOW ( AUTOFUNC/ENTER )],
+		[XOFFSET (int)], [YOFFSET (int)], 
+		[SIZE (int)],
+		BOLD/NONBOLD, 
+		ITALICS/NONITALICS,
+		COLOR (color) )**  - feliratokat definiál a billentyűre. 
+Minden billentyű, akár több ADDTITLE paramétert is tartalmazhat. 
+Egy ADDTITLE paraméteren belül a felirat szövegét meghatározó paraméterek közül egyet alkalmazhatunk. Ha egyiket sem adjuk meg, akkor a gomb típusa dönti el, hogy melyik legyen. (Jelenleg csak az enter kér SHOW ENTER megjelenítést; minden más billentyűnél a GETFIRST az alapértelmezett.)
+Felirat szövegét meghatározó paraméter (egy adható meg):
+  * TEXT (text) - szöveges felirat
+  * GETFIRST - a button által biztosított elsődleges felirat
+  * GETSECOND - a button által biztosított másodlagos felirat (DOUBLE/ALTERNATE mellett a másodlagos packet által adott szöveg, egyébként ugyanaz, mint GETFIRST)
+  * SHOW ( AUTOFUNC / ENTER ) - rendszerértékek kijelzésére alkalmas felirat. Jelenleg ebből csak egyetlen egy (az utolsó) működhet minden egyes gombon!  
+Kijelezhető rendszerértékek (az értékekhez a SHOWTITLES paranccsal rendelhetünk feliratot)
+    * ENTER: az enter billentyű aktuális funkciója (editor határozza meg) 
+    * AUTOFUNC: automata funkciók állapota (kétállású: ki/be); TOGGLE AUTOFUNC állítja be
+Felirat formáját meghatározó paraméterek:
+  * XOFFSET (int) - (opcionális) - X eltolás mértéke a középponttól ezrelékben
+  * YOFFSET (int) - (opcionális) - Y eltolás mértéke a középponttól ezrelékben
+  * SIZE (int) - (opcionális) - betűméret, ezrelékben
+  * BOLD - (opcionális) - félkövér (szimulált)
+  * NONBOLD - (opcionális) - félkövér kikapcsolása, ha default vagy let/define bekapcsolta 
+  * ITALICS - (opcionális) - dőlt (szimulált)
+  * NONITALICS - (opcionális) - dőlt kikapcsolása, ha default vagy let/define bekapcsolta 
+  * COLOR (color) - (opcionális) - a felirat színe
+  
+Méretezési szempontok:
+Az alapértelmezett SIZE 1000. A program biztosítja, hogy az 1000 méretű "M" betűből vízszintesen 3 ("MMM"); és függőlegesen 2 sor (y descenttel együtt) elférjen. A feliratok középre, vagyis függőlegesen is az "M" középvonalára, és NEM az alapvonalra kerülnek.
+Az eltolás mértéke is a betűméretből származik, vagyis 1000 pont eltolás (mindkét irányban) pontosan egy "M" betű számára biztosított helynek felel meg.
+Vigyázni kell arra, hogy a beépített feliratok 5 karakter szélességet feltételeznek. Az arányosság miatt ez SIZE 600-nak felel meg. 600-as méretű karakterből 5 fér el 0 magasságban, 3 az középvonal felett/alatt (+/-300 magasság) ill. egy a középső karakterek felett/alatt (+/-600 magasság).
+Magasság tekintetében 1800 virtuális pontot használunk ki (a teljes 2000 helyett), ez biztosítja, hogy a keret felsőrésze is elférjen (100 virtuális pixel épp a "ferde" oldal meredeksége egy 600-as keret fel szélessége alatt).
+Ha a program torzítja a billentyűzetet, akkor a keretek is arányosan torzulnak. A betűméret úgy kerül kiszámításra, hogy a szükséges keret elférjen; vagyis a fenti elrendezések minden esetben működni fognak.
+
+@s4[3. A billentyű alapszíne]
+
+**COLOR (color)** - billentyű háttérszszíne
+Minden billentyű tartalmazhat egy ilyen paramétert. Alapértelmezetten: light-gray.
+
+@s4[A billentyűk bővítése]
+
+**EXTEND (paramétereket ld. alább)** - Már meglévő(!) billentyűt képes megváltoztatni, kiegészíteni. A bővítés arra a billentyűre vonatkozik, melyen a BLOCK parancs pozíciója jelenleg áll. 
+Akkor hasznos az alkalmazása, ha egy BLOCK által előkészített (vagyis címkével jelölt), összetett kiosztás-részletet több kiosztáson is használunk. Ilyenkor a már hozzáadott billentyűket anélkül változtathatjuk meg, hogy a bővítés más layout-okon is megjelenne.
+Minden paraméter opcionális:
+  * ADDTITLE (komplex)... - a meglévő feliratokhoz továbbiakat ad hozzá
+  * COLOR (color) - megváltoztatja a billentyű alapszínét
+Funkcióváltásért felelős paraméterek közül egyetlen szerepelhet:
+  * [TODOUBLE SECOND] (packet-paraméterek) - single billentyűt double-é alakít, ahol a másodlagos funkció a SECOND packet lesz. (TODOUBLE kiírása nem kötelező.) Eredeti színt és feliratokat megtartja, de az onCircle/onStay tulajdonságot nem!
+  * TOALTERNATE SECOND (packet-paraméterek) - single billentyűt alternatívvá alakít. A másodlagos funkció a SECOND packet lesz. Eredeti színt és feliratokat megtartja, de az onCircle/onStay tulajdonságot nem!
+  * [TOMULTI] ADD (packet-paraméterek)... - single billentyűt multi billentyűvé (első packet az eredeti billentyűn definiált) alakít. Multi billentyű packetjeit kibővíti. (MULTI kiírása nem kötelező)
+Funkcióváltás mellett opcionálisan megadható paraméterek:
+  * [TOLIST] ADDTEXT (text)... - single billentyűt (csak ha textpacket-et tartalmaz!) list billentyűvé (első text az eredeti billentyűn definiált) alakít. Vagy a már elkészült list billentyű text-jeit kibővíti. (LIST kiírása nem kötelező). Másodlagos funkció csak kísérleti, jelenleg nem bővíthető.
+Funkcióváltás mellett opcionálisan megadható paraméterek:
+  * ONSTAY - onStay tulajdonságot állít be (új funkció esetén nem veszi át a single button beállítását, hanem onCircle lesz. Ezzel a kapcsolóval kell átállítani!)
+  * ONCIRCLE - onCircle tulajdonságot állít be; tekintve, hogy ez az alapértelmezés nincs nagy jelentősége
+
+@s4[Reakciók a már beírt szövegre]
+
+Megj.: ezek a funkciók a beírt szöveg felismerésén alapulnak. Ugyanakkor a program a beírt szöveget csak ellenőrzi, de semmilyen módon nem tárolja. Mivel a beírt szöveg semmilyen módon nem kerül rögzítésre, ez biztonsági kockázatot nem okoz.
+
+**MODIFY - beírt szöveg módosítása**
+
+A modify funkció használatához először az ADDMODIFY parancs használatával készítünk egy szabályrendszert. A szabályrendszer segítségével a MODIFY billentyű képes módosítani a már beírt szöveget. A módosítás alapfeltétele, hogy a billentyűzet képes legyen az editor-ból szöveget beolvasni. Ezt az editornak is támogatnia kell, a billentyűzeten beállításaiban pedig a keybard-editor kommunikációt be kell kapcsolnunk.
+
+**ADDMODIFY** - Modify szabály beállítása
+**ADDMODIFY( ID (keyword) ADDROLL (string…)… [IGNORESPACE] )**
+**ADDMODIFY( ID (keyword) ROLLS (string…) [IGNORESPACE] )**
+  * ID keyword - a szabály azonosítója, melyre a MODIFY billentyű hivatkozik
+  * ADDROLL (string…)... - Több ADDROLL paramétert adhatunk meg, melyek mindegyike egy stringekbő álló listát tartalmaz. Ha a MODIFY leütésekor a megelőző szöveg valamelyik string-gel egyezik, akkor a szöveget a listában utána álló szövegre cseréli. A lista legutolsó elemét a legelső követi, vagyis, ha az utolsót ismeri fel, akkor azt a legelsőre változtatja.
+  Fontos, hogy a módosítás csak egy ADDROLL paraméteren belül szereplő string-listán fut körbe. Ugyanakkor több ADDROLL paramétert, vagyis több szabályt is megadhatunk. Ezek külön-külön teljesülnek, vagyis: ha a MODIFY billentyű felismer egy stringet, akkor az a saját ADDROLL listáján fut csak körbe. Így egy MODIFY billentyű több különböző string módosítására képes. 
+  * ROLLS (string…) - Ez a fenti parancs egyszerűsített változata. Itt - szemben az előzővel - csupán egyetlen ROLLS paraméter adható meg. A ROLLS paraméterben szereplő string-lista minden egyes string-je egy külön szabályt ír le. Ebben az esetben a felismerés és módosítás mindig csak egyetlen karakter hosszú. Ha a MODIFY billentyű felismer egy karaktert, akkor azt a karakter stringjében szereplő következő karakterre módosítja. A string utolsó karaktere után a legelső karakter következik. A string-lista stringjei között nincs átjárás, a felismert karakter csak a saját string-jében szereplő karakterekre módosul. A MODIFY utasítás itt is több karakter módosítására képes, több szabály szerint.
+  FONTOS! Az ADDROLL ill. ROLLS paraméter nem szerepelhet együtt! Arra is figyelnünk kell, hogy a szabályok ne tartalmazzanak azonos stringet (vagy karaktert), hiszen akkor a MODIFY parancs nem tudja eldönteni, hogy a szabály melyikre vonatkozik.
+  * IGNORESPACE - (opcionális) - a beírt szöveg módosításakor a szóközöket figyelmen kívül hagyja.
+
+A hozzá tartozó billentyű (BLOCK parancs paraméterei között kell megadni):  
+**MODIFY** - a beállított modify szabály végrehajtása. 
+**MODIFY ( 
+	ROLL (keyword)
+	[REVERSE]
+	[ADDTITLE(addtitle-paraméterek)…]
+	[COLOR (color)]
+	[OVERWRITE] ))**
+  * ROLL (keyword) - az ADDMODIFY mellett megadott id, mellyel a szabályrendszert azonosítjuk.
+  * REVERSE - (opcionális) - megadása esetén a módosítás fordított irányban működik. A felismert szöveg nem a következő, hanem az előző elemre módosul. Ha a legelső elem kerül felismerésre, akkor "körben" az utolsóra módosul. 
+
+** Rövidítéskezelő **
+
+A rövidítéskezelő jelenleg két, egymástól független funkciót kezel. Ezek a VARIA és a SHORTCUT. Mindkettőben közös, hogy nem csak a billentyűzettől, hanem a beírt szövegtől függ a működésük. Ennek alapfeltétele, hogy a billentyűzet képes legyen az editor-ból szöveget beolvasni. Ezt az editornak is támogatnia kell, a billentyűzeten beállításaiban pedig a keybard-editor kommunikációt be kell kapcsolnunk.
+
+A SHORTCUT rövidítéseket cserél ki a hosszú változatra. Az AUTOSHORTCUT utasítás ezt írás közben, azonnal teszi meg, mégpedig a legrövidebb egyezőre. A FINDSHORTCUT ugyanezt csak a lenyomásakor teszi meg, de a leghosszabb egyezőre. 
+A rövidítés szabályait először meg kell adnunk egy ún. SHORTCUT gyűjteményben. Mindkét módszer egyetlen SHORTCUT gyűjteményt tud fogadni, ezért lehetőségünk van több SHORTCUT lista egyetlen gyűjteménybe való foglalására. (Az ADDSHORTCUT egy shortcut listát készít, a SHORTCUTSET több ilyen listát gyűjt egybe.) Ha egy listát aktívvá szeretnénk tenni már a billentyűzet indításakor, akkor azt a START paraméterrel jelezhetjük. Egyetlen ilyen listát jelölhetünk ki, és mindig csak egy AUTOSHORTCUT (és az ahhoz kapcsolt lista) aktív. 
+Ha nem hoztunk létre AUTOSHORTCUT gombot, akkor viszont mindegyik SHORTCUT gyűjteményt (mint egy közös istát) betölti, és az összes lista katív lesz.
+
+**ADDSHORTCUT ( ID (keyword) PAIRS(string…) [START] )**
+  ID (keyword) - a rövidítésket tartalmazó gyűjtemény azonosítója
+  PAIRS (string…) - párban álló rövidítések listája. A rövidítést mindig a kibontott elem követi, mindkettő természetesen string
+  [START] - betöltéskor a gyűjtemény aktívvá tehető. Egyetlen listát tehetünk csak aktívvá, kivéve, ha nem adunk meg AUTO- vagy FINDSHORTCUT billentyűt, mert akkor az összes gyűjtemény aktívvá válik. Ebben az esetben nem szabad a SHORTCUTSET utasítást használni, mert akkor több egyező bejegyzésünk lesz!
+  
+**SHORTCUTSET ( ID (keyword) SHORTCUTS(keyword…) [START] )**
+  ID (keyword) - a rövidítésket tartalmazó gyűjtemény azonosítója
+  SHORTCUTS(keyword…) - azon gyújtemények azonosítóinak listája, melyeket ebbe a SET-be felveszünk. A SET és a felvett gyűjtemények azonosítói függetlenek. 
+  [START] - betöltéskor ez a gyűjtemény is aktívvá tehető. Egyszerre csak egyetlen listát tehetünk csak aktívvá.
+  AUTO- vagy FINDSHORTCUT billentyű definiálása nélkül nem szabad a SHORTCUTSET utasítást használni, mert akkor több egyező bejegyzésünk lesz!
+  
+
+A hozzá tartozó billentyű (BLOCK parancs paraméterei között kell megadni):  
+
+**AUTOSHORTCUT ( ID (keyword) 
+		[ONCIRCLE / ONSTAY]
+		[ADDTITLE(addtitle-paraméterek)…]
+		[COLOR (color)]
+		[OVERWRITE] )**
+A kiválasztott rövidítésgyűjteményt aktívvá teszi. Amint egyezést talál (vagyis a legrövidebb egyezőt), azt azonnal módosítja. (Pl. "almafa" és "fa" elemeknél hiába írjuk be, hogy "almafa", a legrövidebb egyezés elvén a "fa" bejegyzést találja meg, és azt módosítja.)
+
+**FINDSHORTCUT ( ID (keyword) 
+		[ONCIRCLE / ONSTAY]
+		[ADDTITLE(addtitle-paraméterek)…]
+		[COLOR (color)]
+		[OVERWRITE] )**
+A kiválasztott gyűjtemény alapján keresi ki a rövidítést. Az AUTOSHORTCUT utasítással szemben mindig a leghosszabb egyezőt keresi meg. (Pl. a korábbi példa alapján: ha "almafa" után ütjük le a billentyűt, akkor felleli az "almafa" bejegyzést, ugyanis az hosszabb egyező, mint a "fa".) 
+
+
+A VARIA szintén a beírt szövegtől függően működik, de nem a szöveget, hanem a billentyűk feliratát, ill. a billentyűk által elküldött szöveget módosítja. 
+A VARIA szabály felállításakor ún. VARIA GROUP-okat (csoportokat) hozunk létre. Ugyanazon VARIA szabályhoz tartozó VARIA GROUP-ok mindegyike pontosan ugyanannyi ún. LEGEND-et tartalmaz, melyeket egy INDEX szám azonosít. Egy-egy ilyen LEGEND azt határozza meg, hogy mi legyen a hozzá tartozó billentyű felirata, ill. mi legyen a billentyű által elküldött text érték. (A LEGENDS paraméterrel ezt egyszerűbben is megadhatjuk, itt egy string-lista elemei határozzák meg az egyes LEGEND-eket. Itt a billentyű felirata és az elküldött text érték megegyezik.)
+A billentyű - pontosabban a VARIA packet, melyet bármelyik packet-et fogadó billentyűre rátehetünk -, csak a VARIA szabályt, és a megfelelő INDEX-szel jelölt elemet azonosítja, a csoportot nem.
+A program figyeli a beírt szöveget, és ha egyezést talál (mégpedig mindig a leghosszabb egyezőt keresi), akkor módosítja a VARIA packet-et tartalmazó billentyűk feliratát (és persze a funkcióját is). Ha ekkor elküldjük a VARIA packet-et, vagyis leütjük a billentyűt, akkor a már beírt és felismert kód-szöveget törli, és a packet aktuális tartalmával helyettesíti. Megadhatunk azonban egy, az egész VARIA szabályra érvényes KEEPCODE paramétert. Ezzel a karakterrel megakadályozzuk a törlést, vagyis a felismert szöveg megmarad, az elküldött packet csak ezt követően kerül beírásra. Természetesen, ha a felismert kód után - noha a VARIA packet-ek módosulnak -, tovább gépelhetünk, a kód már nem fog eltűnni, akkor sem, ha nem adtunk meg KEEPCODE flag-et. Viszont a VARIA packet-ek értéke a következő kódig megmarad, tehát a leütésre ezeket később is használhatjuk.
+A VARIA packet által definiált feliratot az ADDTITLE GETFIRST vagy GETSECOND parancsával írhatjuk fel a billentyűre. Az ADDTITLE ( GETFIRST() ) egyébként alapértelmezett, csak akkor kell kiírni, ha a billentyűn egyéb feliratok is szerepelnek. 
+
+**ADDVARIA (
+		ID (keyword)
+		ADDGROUP (ld. lent)… 
+		[KEEPCODE] )**
+Létrehoz egy VARIA szabályt, melyet az ID értékével azonosít. A hozzá tartozó csoportok mindegyikét meg kell adni (melyeket a beírt kód fog kiválasztani). Ha a KEEPCODE paramétert megadjuk, akkor a beírt kódot nem írja felül, hanem megtartja. 
+
+**ADDGROUP (
+                CODE (text)
+                [LEGENDS (string…)]
+                [LEGEND ( [INDEX (int)] TEXT (text) [TITLE (title)] )…] )**
+Létrehoz egy VARIA csoportot.
+  * CODE (text) - a beírt kódszó, melynek alapján a csoport felismerésre és kiválasztásra kerül. A leghosszabb egyezőre keres, ezért duplikátumok (egy másik kód végét tartalmazó kódok sem!) nem megengedettek!
+  * LEGENDS (string…) - a string listában szereplő elemek egy-egy legend-nek felelnek meg. A sorszámozás (INDEX) folyamatos, első elem a 0. sorszámot kapja. Mind az elküldött text, mind a title közösen ugyanazt a string értéket kapja.
+  * LEGEND ( [INDEX (int)] TEXT (text) [TITLE (title)] )… - a LEGENDS paraméterrel együtt is használható. Ha az INDEX paramétert megadjuk, akkor egy már létező INDEX lecserélhető, egyébként (ha nincs INDEX paraméter, vagy nem létező elemre mutat) nullától kezdődő folyamatos számozással kerülnek beillesztésre az elemek. TEXT megadása kötelező, TITLE opcionális; ha nem adjuk meg, TEXT értékét veszi fel.
+  FONTOS! Egyetlen LEGENDS és (akár több) LEGEND paraméter együtt is megadható, de a csoportnak legalább egy tartalmaznia kell a végén! 
+                
+A hozzá tartozó PACKET (Button parancsok paraméterei között kell megadni):  
+
+**VARIA (keyword) INDEX (int)** - a VARIA változó billentyűket jelöl. A VARIA szabály több csoporot és minden egyes csoportban ugyanannyi, INDEX-szel azonosított elemet tartalmaz. A PACKET egy VARIA szabály egyetlen - INDEX-szel jelölt - elemét választja ki. A csoportot viszont a szövegkörnyezet határozza meg; tehát a packet mindig az azonos sorszámú elemet veszi ki a szövegkörnyezet által meghatározott csoportból. Ez gyakorlatilag azt jelenti, hogy lesz egy (vagy akár több) olyan billentyűnk, melyek a szövegkörnyezet (vagyis a leütés előtt beírt szöveg) alapján változik.
+
+
+----
+Ezen nem változtattam (még), mert részben a teljes leírást tartalmazza, részben talán bővülni fog. Ha a nyelvtani hibákat kijavítod, azokat módosítom persze.
+----
+
+@s5[Settings - a BestBoard beállításai]
+
+@ulad[Ezek némelyikét nyelvileg meg kell igazítani. A javított szöveget a régi helyére írom, ugyanígy színezve, és idemásolom a settings képernyőjéről a második sor szövegét is, mert az is kell.]
+@uthon[Javítás még idő hiányában várat magára.]
+**Descriptor file**
+  * **Name of working @ulad[folder]** / Working @ulad[folder]: … :: munkakönyvtár címe (rendszer által adott external storage alatt)
+  * **Name of @ulad[Coat] file** / @ulad[Coat] file: … :: coat descriptor file neve (file-választó készülőben)
+  * **Force reload of @ulad[Coat] file** / Touch to reload and @ulad[parse the Coat file again!] :: újratölti a descriptor file-t
+  * **Force copy of sample files to working @ulad[folder]** / Touch to copy bundled sample files. @ulad[Copies of existing files will be retained] :: újra bemásolja a programhoz adott coat file-okat
+
+**Board layout**
+  * **Hide upper part** / @ulad[Full top row is visible] / Upper quarter of the top @ulad[row] is hidden :: legfelső hatszögek negyedét elrejti
+  * **Hide lower part** / @ulad[Full bottom row is visible] / Lower quarter of the top @ulad[row] is hidden :: legalsó hatszögek negyedét elrejti
+
+@ulad[––– itt tartok –––]
+  * @ulad[] / @ulad[] a billentyűzet legfeljebb ekkora részét foglalhatja el a képernyőnek (ezrelékben)
+  * Vertical offset, if non-wide layout is displayed in landscape view - milyen arányban toljuk el a portrait mód számára készült layout-ot, ha landscape-ben keül megjelenítésre (ezrelékben)
+  * Ratio of buttons' outer rim - a billentyűk külső gyűrűjének aránya. A billentyű működését az itt lehelyezett érintés is kiváltja, de áthúzásnál a belső részt is érinteni kell.
+  * Monitor row - kommunikációra szolgáló monitor-sor bekapcsolása. Jelenleg csak sebességmérés kerül kijelzésre
+  * Clears spedometer data - sebességmérő adatainak törlése
+  * Spedometer limit - sebességmérő határértéke (ms). Ha két billentyű leütése között ennél több idő telik el, akkor ezt az időt nem használja fel a sebesség számítására
+
+**Touch fine-tuning**
+  * Length of circle - másodlagos funkció kiváltására szolgáló érintés hossza (érintések száma) ONCIRCLE esetén
+  * Length of hard press - //tesztelés alatt//
+  * Threshold of hard-press force - //tesztelés alatt//
+  * Time of stay - másodlagos funkció kiváltására szolgáló érintés hossza (ms) ONSTAY esetén
+  * Time of repeat - REPEAT funkció ismétlésének hossza (ms)
+
+** Visual and tactile feedback**
+  * Show touched keys - a megérintett billentyűk színe megváltozik
+  * Show stroke on keyboard - az összes érintést pontokkal jelzi
+  * Vibrate on event - vibráció engedélyezett. Minden alábbi értékre vonatkozik. Ha 0 ms hosszúságot adunk meg, akkor az egyes vibrációs események külön-külön is tilthatóak.
+  * Vibration on primary events - vibráció hossza elsődleges eseménynél (ms)
+  * Vibration on secondary events - vibráció hossza másodlagos eseménynél (ms)
+  * Vibration on repeated events - vibráció hossza ismétlésnél (ms)
+
+**Editing control**
+Enable keyboard-editor communication - kommunikáció engedélyezése
+Enable to store text during text-session - szövegtárolás engedélyezése
+Elongation period - türelmi idő (ld. később)
+New text session and meta keys - új szövegbevitel kikapcsolja az aktív meta-állapotokat (mintha billentyű leütés történt volna)
+
+Mivel a billentyűzet és az editor kommunikáció alapvetően meghatározza egy soft-keyboard működését, ezért ezt részleteiben is szükséges tárgyalni. A "hard-keyboard" csupán billentyű kódokat küld el, és ezeket a fogadó oldal az igényei szerint átalakítja (pl. a neki megfelelő nyelvre). "Soft-keyboard" esetén is van lehetőség kódok küldésére (KEY), de alapvetően a rendszer szöveges kommunikációt vár el (string-ek küldése). Ha az editor támogatja, akkor hozzáférünk a szerkesztett szöveg kurzor körüli ill. kijelölt részeihez, vagyis tudunk a szövegkörnyezetnek megfelelően beállított adatokat küldeni (pl. AUTOSPACE). Ez támogatja az írást; valójában szinte mini-szövegszerkesztőként működik. Jelentősen korlátozza a lehetőségeket, hogy a billentyűzet által "látott" szöveg terjedelme kicsi; márpedig a változtatások során csak ezt a terjedelmet tudja figyelembe venni (jelenleg kb. 2000 karakter.)
+Az android rendszer legalább annyiban gátolja ezt a kommunikációt, mint amennyire segíti, ezért az algoritmusok elkészítésében kompromisszumokra kényszerültünk.
+Ha a kommunikáció tiltott, akkor semmilyen információt nem kapunk a beírt szövegről, tehát a funkciók jelentős része nem fog működni.
+Megkerülő lehetőség (és gyorsítja is a működést), ha az elküldött szövegeket átmenetileg tároljuk, mert akkor legalább az általunk elküldött szövegeket ismerjük, és tudjuk utólagosan módosítani, pl. visszavonni, és a billentyűk másodlagos funkcióját használni.
+Sajnos, nem tudhatjuk pontosan, hogy az elküldött szöveggel az editor mit tesz (pl. numerikus mezőnél kihagyja a nem-numerikus karaktereket), ezért nem lehetünk biztosak abban, hogy az elküldött és a ténylegesen beírt szöveg megegyezik. Emiatt automata beállításnál a szövegtárolást csak a többsoros, nem korlátozott szövegbeviteli mezőkben alkalmazzuk.
+Az eltérésekből fakadó hibákat a billentyűzet a kurzormozgások figyelésével igyekszik kiszűrni. A szövegátvitel azonban lassú és erőforrásigényes feladat, ezért a kurzor mozgásainak visszajelzése  csúszhat. A program feltételezi, hogy egy "bow" - vagyis egy billentyűn történő mozgás - alatt nem következik be külső módosítás. A kurzorpozíciót minden egyes "bow" elején ellenőrizzük. A teljes "stroke" befejezésekor (vagyis az ujj felemelésekor) viszont nem biztos, hogy minden módosítás már visszajelzésre került. Ekkor szükséges a türelmi periódus (elongation period). A türelmi periódus alatt érkező kurzormozgásokat a program még nem veszi hibának, hanem feltételezi, hogy a szerkesztéshez tartoznak.
+A számtalan korlát és nehézség ellenére - különösen a többsoros adatbeviteli mezőkben - a program jól működik az alapértelmezett beállításokkal. A legbiztonságosabb működést a kommunikáció engedélyezése és a tárolás tiltása adja (de ennek legnagyobb az erőforrás-igénye is). Ha le kell tiltanunk a kommunikációt (mert pl. az editor nem engedi), akkor viszont mindenképp szükséges a tárolás engedélyezése, mert különben semmilyen extra funkciót nem tudunk használni (a billentyűzet hard-keyboardként működik.)
+
+Megj.: ez a "tárolás" néhány karaktert, és csupán futásidőben létező változókban tárol rövid ideig. A beírt szöveg semmilyen módon nem kerül rögzítésre ezzel a funkcióval, és ez a "tárolás" semmilyen biztonsági rést nem okoz.
+
+**Debug**
+  * Enable developer log - a fejlesztői log adatainak mentését engedélyezi. Vigyázat! Jelentősen lassíthatja a programot, és - szemben a szövegtárolás technikájával - itt érzékeny információk is mentésre kerülhetnek. CSAK fejlesztésre javasolt használni!
+  * Numbers on hexagons - segédszámozást jelenít meg a billentyűk felső részén. Új billentyűzet készítésekor hasznos
+
+
+---- END ----

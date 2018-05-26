@@ -1,0 +1,214 @@
+BLOCK (
+                LAYOUT (keyword),
+                COLUMN (int),
+                ROW (int), 
+
+		// mind BUTTON csoportba tartoznak, hogy egymás után kerüljenek a listába
+		
+                DL,
+                DR,
+                L,
+                R,
+                UL,
+                UR,
+                CRL,
+                CRR,
+                HOME,
+                SKIP,
+                FINDFREE,
+
+                BUTTON,
+                SINGLE,
+                DOUBLE,
+                ALTERNATE,
+                LIST,
+                MULTI,
+                MODIFY,
+                SPACETRAVEL,
+                MEMORY,
+                PROGRAM,
+                AUTOSHORTCUT,
+                FINDSHORTCUT,
+                ENTER,
+                META,
+                SWITCH,
+                EXTEND )
+
+// Packet definitions
+
+PACKET (packetArray)
+FIRST (packetArray)
+SECOND (packetArray)
+
+packetArray = (
+                TEXT (text),
+                VARIA (keyword), INDEX (int),
+                AUTOCAPS (keyword),
+                STRINGCAPS,
+                ERASESPACE (keyword),
+                AUTOSPACE (keyword),
+                KEY (int),
+                TURNON, TURNOFF,
+                DELETE, BACKSPACE, TOGGLE, SELECTALL, CHANGECASE (LOWER UPPER SENTENCE),
+                RELOAD, SETTINGS, HELP, RUN (string), HTML (string), WEB (string), LOAD (string),
+                TOP, LEFT, RIGHT, BOTTOM, WORD, PARA, CURSOR (keyword), SELECT (keyword),
+                COMBINE,
+                TIME, FORMAT (text) )
+
+
+// Button definitions
+
+buttonArray = (
+		ADDTITLE…,
+		COLOR,
+		ONSTAY,
+		ONCIRCLE,
+		OVERWRITE )
+
+BUTTON ( 
+		packetArray, 
+		buttonArray, 
+		FIRST (packetArray),
+		SECOND (packetArray),
+		REPEAT, TWIN, CAPITAL )
+		.labels({PACKET, FIRST, SECOND});
+
+SINGLE (
+		packetArray, 
+		buttonArray,
+		FIRST (packetArray),
+		REPEAT, TWIN, CAPITAL )
+		.labels({BUTTON, PACKET, FIRST, SECOND});
+
+DOUBLE(
+		packetArray, 
+		buttonArray,
+		FIRST (packetArray),
+		SECOND (packetArray) )
+		.labels({BUTTON, PACKET, FIRST, SECOND});
+
+ALTERNATE(
+		packetArray, 
+		buttonArray,
+		FIRST (packetArray),
+		SECOND  (packetArray))
+		.labels({BUTTON, PACKET, FIRST, SECOND});
+
+MULTI(
+		buttonArray,
+		ADD (	TEXT (text),
+				AUTOCAPS (keyword),
+				STRINGCAPS,
+				ERASESPACE (keyword),
+				AUTOSPACE (keyword),
+				TIME, FORMAT (text) )…)
+		.labels({BUTTON});
+
+LIST( 
+		buttonArray, 
+		TEXT (text),
+		ADDTEXT (text)…
+		SECOND (packetArray) )
+		AUTOCAPS (keyword),
+		STRINGCAPS,
+		ERASESPACE (keyword),
+		AUTOSPACE (keyword),
+		.labels({BUTTON, PACKET, SECOND });
+
+MODIFY (
+		ROLL (keyword),
+		REVERSE,
+		ADDTITLE…,
+		COLOR,
+		OVERWRITE )
+		.labels({BUTTON});
+
+ENTER ( buttonArray,
+		TEXT (text),
+		AUTOCAPS (keyword),
+		STRINGCAPS,
+		ERASESPACE (keyword),
+		AUTOSPACE (keyword),
+		KEY (int),
+		TURNON (?), TURNOFF (?),
+		REPEAT )
+		.labels({BUTTON, PACKET});
+
+SPACETRAVEL (
+		packetArray, 
+		buttonArray,
+		SECOND(packetArray) )
+		.labels({BUTTON, PACKET});
+
+MEMORY ( 
+		buttonArray,
+		TEXT (text),
+		AUTOCAPS (keyword),
+		STRINGCAPS,
+		ERASESPACE (keyword),
+		AUTOSPACE (keyword),
+		.labels({BUTTON, PACKET});
+
+PROGRAM (
+		buttonArray,
+		RUN)
+		.labels({BUTTON, PACKET});
+
+AUTOSHORTCUT (
+		buttonArray,
+		ID (keyword) )
+		.labels({BUTTON});
+
+FINDSHORTCUT(
+		buttonArray,
+		ID (keyword) )
+		.labels({BUTTON});
+
+META (
+		CAPS,
+		SHIFT,
+		CTRL,
+		ALT,
+		LOCK,
+
+		ADDTITLE()…
+		COLOR (color),
+		OVERWRITE )
+		.labels({BUTTON});
+
+SWITCH (
+		BOARD (keyword)
+		BACK,
+		LOCK,
+		CAPSSTATE,
+		ADDTITLE()…
+		COLOR (color),
+		OVERWRITE )
+		.labels({BUTTON});
+
+
+ADDTITLE (
+		TEXT (text), 
+		GETFIRST, 
+		GETSECOND,
+		SHOW (keyword),
+		XOFFSET (int), 
+		YOFFSET (int), 
+		SIZE (int),
+		BOLD/NONBOLD, 
+		ITALICS/NONITALICS,
+		COLOR (color) )
+
+EXTEND (
+		ADDTITLE()…,
+		COLOR (color),
+
+		SECOND (packetArray),
+		TODOUBLE,
+		TOALTERNATE,
+		TOMULTI,
+		TOLIST,
+		ADD(),
+		ADDTEXT(),
+		ONSTAY,
+		ONCIRCLE )

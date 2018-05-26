@@ -33,19 +33,7 @@ public class ButtonAlternate extends ButtonMainTouch implements Cloneable
     @Override
     public String getFirstString()
         {
-        return packets[0].getTitleString();
-        }
-
-    @Override
-    public boolean isSecondStringChanging()
-        {
-        return true;
-        }
-
-    @Override
-    public String getSecondString()
-        {
-        return packets[1].getTitleString();
+        return packets[counter].getTitleString();
         }
 
     /**

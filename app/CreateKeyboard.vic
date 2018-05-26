@@ -1,0 +1,82 @@
+@s7[Hogyan készítsünk új billentyűzetet?]
+
+A @bo[BestBoard] programban a billentyűzet kiosztását szabadon elkészíthetjük, vagy módosíthatjuk. Ehhez a szabványos billentyűkön kívül számos speciális típust is kínál a program. Mivel a forráskód nyitott, vállalkozó kedvűek akár új billentyűtípusokat is létrehozhatnak. 
+A billentyűzet a hexagonális elrendezést használja. Ha a hexagonális elrendezésre optimalizált kiosztást készítünk, akkor - miután egy kicsit begyakoroltunk a használatát -, gyorsabban tudunk szöveget bevinni, mint a hagyományos billentyűzetekkel, sőt akár a kézírásnál is gyorsabban.
+
+A kiosztást egy szöveges leíró file tartalmazza, a @bo[coat] nyelv segítségével. A file-nak szabadon választhatunk nevet, viszont kötelező, hogy az első utasítás azonosítsa a @bo[coat] nyelv verzióját:
+<code>
+COAT ( 1000 )
+</code>
+
+A billentyűket ún. @bo[layout]-okon rendezzük el, ez a billentyűzet alapja. Egy billentyűzet több @bo[layout]-ot is tartalmazhat. 
+
+Az álló- és fekvő-képernyő számára két @bo[layout]-ot párosíthatunk, ez a két párban álló @bo[layout] alkot egy @bo[board]-ot. (Az @bo[asboard] jelző megadásával ugyanazt a @bo[layout]-ot használjuk a pár mindkét tagjaként.) Az elsőként megjelenő @bo[board]-ot kötelező kiválasztani a @bo[start] jelzővel.  
+
+A @bo[layout] hatszögletű cellákból áll. Meg kell határoznunk, hogy a @bo[layout] hány cellából álljon. Érdemes a cellák méretét úgy meghatározni, hogy azokon az ujjunk kényelmesen elférjen. Természetesen a figyelembe kell venni, hogy hány billentyűt akarunk a @bo[layout]-on elhelyezni. A hagyományos billentyűzet legalább 4 vagy 5 sort és 10 oszlopot tartalmaz. Ez utóbbit a hatszögek geometriája miatt érdemes fél oszlopokban, vagyis fél hatszögekben megadni.
+
+<code>
+ADDLAYOUT ( ID (basic) HALFCOLUMNS (22) ROWS (5) ASBOARD START ) 
+</code>
+
+A billentyűket nem egyesével, hanem ún. @bo[block]-okban helyezzük el @bo[layout]-on. Minden @bo[block] egy kezdőcellából indul el, ezt követően azonban egy relatív útvonal mentén helyezi el a billentyűket. Az alapértelmezett kezdőcella az utolsóként megadott @bo[layout] bal felső, már látható cellája.
+
+<code>
+BLOCK ( )
+</code>
+
+A @bo[block] utasításon belül fogjuk felsorolni a billentyűket. A legegyszerűbb billentyű egy szöveget tartalmaz, leütésekor/érintéskor ezt küldi el. Ugyanezt a szöveget jeleníti meg a billentyűn. A felsorolt billentyűk egymás után következnek balról jobbra, vagyis - ha más irány nem kerül megadásra - a relatív útvonal jobbra, a következő cellára mozdul el. A következő sorba a "cr..." parancsokkal jutunk. A hatszög alakja miatt nem tudunk közvetlenül az előző sor kezdő cellája alá kerülni, hanem a @bo[crl] a kezdő cella alatt balra, míg a @bo[crr] a kezdő cella alatt jobbra lévő cellában folytatja a billentyűk elhelyezését.
+
+<code>
+BLOCK (
+	BUTTON ( TEXT "1" )
+	BUTTON ( TEXT "2" )
+	BUTTON ( TEXT "3" )
+	BUTTON ( TEXT "4" )
+	BUTTON ( TEXT "5" )
+	BUTTON ( TEXT "6" )
+	BUTTON ( TEXT "7" )
+	BUTTON ( TEXT "8" )
+	BUTTON ( TEXT "9" )
+	BUTTON ( TEXT "0" )
+CRR
+	BUTTON ( TEXT "q" )
+	BUTTON ( TEXT "w" )
+	BUTTON ( TEXT "e" )
+	BUTTON ( TEXT "r" )
+	BUTTON ( TEXT "t" )
+	BUTTON ( TEXT "y" )
+	BUTTON ( TEXT "u" )
+	BUTTON ( TEXT "i" )
+	BUTTON ( TEXT "o" )
+	BUTTON ( TEXT "p" )
+CRR
+	BUTTON ( TEXT "a" )
+	BUTTON ( TEXT "s" )
+	BUTTON ( TEXT "d" )
+	BUTTON ( TEXT "f" )
+	BUTTON ( TEXT "g" )
+	BUTTON ( TEXT "h" )
+	BUTTON ( TEXT "j" )
+	BUTTON ( TEXT "k" )
+	BUTTON ( TEXT "l" )
+CRR
+	BUTTON ( TEXT "z" )
+	BUTTON ( TEXT "x" )
+	BUTTON ( TEXT "c" )
+	BUTTON ( TEXT "v" )
+	BUTTON ( TEXT "b" )
+	BUTTON ( TEXT "n" )
+	BUTTON ( TEXT "m" )
+	BUTTON ( TEXT "," )
+	BUTTON ( TEXT "." )
+CRR
+	BUTTON ( TEXT " " )
+	BUTTON ( TEXT " " )
+	BUTTON ( TEXT " " )
+	BUTTON ( TEXT " " )
+    )
+</code>
+
+
+
+

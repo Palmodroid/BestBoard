@@ -1,0 +1,66 @@
+@em[A BestBoard LayoutView kezelése]
+
+A @it[BestBoard] billentyűzet az egyetlen @it[LayoutView] osztályon keresztül jelenik meg. Az egyes kiosztásokhoz tartozó adatokat viszont a @it[Layout] osztályok tartalmazzák.
+
+A szétválasztás azért volt szükséges, mert az érintések kezelése miatt (ti. a multitouch érintések a különböző kiosztások felületén folytatódhatnak) nem készíthetünk mindig újabb @it[LayoutView]-t, hanem mindig @bo[EGYETLEN] @it[LayoutView]-val dolgozik a rendszer, melyen belül az egyes kiosztások @it[Layout] adatai változnak.
+
+A @it[LayoutView] létrehozása a @it[SoftBoardProcessor] konstruktorában történik, a @it[parsing] folyamat után. @it[SoftBoardService.softBoardParserFinished()]
+
+(Tesztelés alatt áll a teljes SoftBoard adatbázis tárolása. Ebben az esetben a @it[PREFS_ACTION_RECALL_DATA] akció-utasítás is egy kompletten új @it[SoftBoardProcessor] példányt készít, melyet a tárolt adatokkal tölt fel.]
+
+A @it[Layout] változtatása a @it[LayoutView] osztályon belül a @it[LayoutView.setLayout()] metódussal történik.
+  * Közvetlenül létrehozás után a @it[LayoutView] @it[Layout] értéket is kap.
+  * @it[SoftBoardService.onCreateInputView()] metóduson belül a @it[SoftBoardProcessor.onCreateInputView()] metódusban - ez minden elfordításkor meghívásra kerül. FONTOS! Itt sem készítünk új layout-ot, hanem az aktuálisat leválasztjuk, és visszaadjuk, hogy a rendszer újra hozzáadja a struktúrához.
+  * @it[BoardTable] metódusaiban a billentyűzethez kapcsolódó layoutváltások kapcsán.
+  
+A @it[LayoutView.setLayout()] minden esetben @it[requestLayout] hívást is végez, ezzel kényszeríti ki a billentyűzet újrarajzolását.
+
+
+@bo[A Navigation Bar-ral kapcsolatos hiba]
+
+Ha a készülék ún. @it[Navigation Bar]-t használ, akkor az @it[measure] ciklus során több mérés is történik, némelyik @it[Navigation Bar]-ral, némelyik anélkül. 
+Néha a mérési ciklus megszakad, még fix értékek átadásakor is! Ilyenkor a billentyűzet - egyébként pontos méretű - ablaka, hol feljebb (mintha lenne @it[Navigation Bar], holott nincs), hol lejjebb (a @it[Navigation Bar] mögött jelenik meg.
+
+Ez a hiba csak elforgatáskor jelentkezik, @it[requestLayout()] hívásakor nem. 
+
+Megoldás: elforgatás után csak egy "fake" view elkészítése, amely hibás pozícióban jelenhetne meg. A "fake" view mérési ciklusa után egy @it[requestLayout()] hívással újramérjük a @it[LayoutView]-t, ekkor már a normál értékekkel, és hiba nélkül. 
+Erre az @it[onDraw()] metódusban van lehetőség, ahol a megjelenítés helyett végezzük el az ismételt mérést.
+
+(Megjegyzés: ez a hívás egy billentyűről kiadva is működött, és a megfelelő helyre állította a billentyűzetet.)
+
+
+@bo[Layout.calculateScreenData( int screenWidthInPixels, int screenHeightInPixels )]
+
+A képernyő (vagy az ablak) méretéből kiszámítja, hogy milyen paraméterei lesznek ennek a konkrét @it[Layout]-nak. A számított magasságot a @it[Layout.areaHeightInPixels] tartalmazza. 
+FONTOS!
+A @it[Navigation Bar] nélküli készülékeken csak egy ilyen számítás szükséges, melyet a készülék többet nem ismétel. Ha viszont van @it[Navigation Bar], akkor a számításnak többször is le kell futnia.
+FONTOS!
+A @it[screenHeightInPixels] érték a teljes rendelkezésre álló magasságot kell tartalmazza! Ez nem egyszerű, mert a mérési ciklus során a már számított magasságot, vagy akár annál kisebb értékeket is kaphatunk.
+
+
+@bo[LayoutView.onMeasure() és .onDraw()]
+
+Ez tehát a mérési ciklus lelke.
+
+Ha konfigurációs változás történik (pl. elfordítás), akkor a program kap egy  @it[SoftBoardService.onCreateInputView()] hívást, ami  @it[SoftBoardProcessor.onCreateInputView()] hívást eredményez. Ekkor ún. @bo[FAKE] mérést végzünk, amit a @it[LayoutView.measureFakeViewFirst()] állít be.
+
+Ilyenkor az @it[onMeasure()] mérés nem számol semmit, hanem beállít egy @bo[fake view]-t. Ennek magassága az első méréskor megkapott magasság negyede. 
+
+Miért?
+Mert az anamiáció szebben mutat, ha a @bo[fake view] kisebb, mint a @bo[keyboard view], ugyanis ilyenkor lentről jön fel, egyébként meg fentől (magassabbtól) ereszkedik le.
+Akkor miért nem 1 a magasság pl?
+Mert a mérési ciklus során néha kisebb magasságot kapunk vissza, mint amit a custom view kért magának. Ha ez 0, akkor az @it[onDraw] metódus nem kerül meghívásra, és soha nem fut le újra az @it[onMeasure] metódus.
+A "negyed" képernyőni @bo[fake view] jó alternatívának tűnik.
+
+A mérési ciklus után megjelenik a @bo[fake view], vagyis indul az @it[onDraw()] metódus. Ez viszont nem rajzol semmit, hanem kér egy @it[requestLayout()]-ot, és törli a @bo[FAKE] jelzést. EZ a számítás már jónak tűnik.
+(Érdekes, hogy sehol máshol nem működött a kérés, sem az @it[onLayout], sem az @it[onSizeChanged] részben. Valószínű, az még a mérési részhez tartozik.)
+
+Tényleges mérés:
+
+@it[requestLayout()] után már tényleges mérés történik:
+  * ha a @bo[HEIGHT] változik, (de nem a korábban számított értéket, vagy annál is kisebb magasságot kaptunk meg), akkor újabb számítás kell
+  * ha a @bo[WIDTH] változik, akkor mindenképp új számítás kell
+
+Elvégezzük a számítást (ha kell), és a @it[layout.areaHeightInPixels] értékét, mint magsságot állítjuk be a view számára.
+
+Ezzel az algoritmussal bármilyen ablak esetén működni tűnik a mérési ciklus.

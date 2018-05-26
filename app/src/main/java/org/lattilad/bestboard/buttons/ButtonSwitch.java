@@ -34,7 +34,10 @@ public class ButtonSwitch extends ButtonMultiTouch implements Cloneable
     @Override
     public String getFirstString()
         {
-        return (lockKey ? "L" : "") + Tokenizer.regenerateKeyword(layoutId);
+        if ( layoutId == -1L )
+            return ("BACK");
+        else
+            return (lockKey ? "L" : "") + Tokenizer.regenerateKeyword(layoutId);
         }
 
     @Override
